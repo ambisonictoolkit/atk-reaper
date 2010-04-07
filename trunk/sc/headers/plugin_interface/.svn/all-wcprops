@@ -1,0 +1,149 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/supercollider/!svn/ver/9928/trunk/common/Headers/plugin_interface
+END
+SC_Types.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_Types.h
+END
+SC_Wire.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_Wire.h
+END
+SC_BufGen.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_BufGen.h
+END
+SC_InterfaceTable.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_InterfaceTable.h
+END
+sc_msg_iter.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/sc_msg_iter.h
+END
+SC_Constants.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_Constants.h
+END
+SC_Unit.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/supercollider/!svn/ver/9928/trunk/common/Headers/plugin_interface/SC_Unit.h
+END
+SC_sndfile_stub.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_sndfile_stub.h
+END
+SC_SndBuf.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_SndBuf.h
+END
+SC_InlineBinaryOp.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_InlineBinaryOp.h
+END
+SC_Node.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_Node.h
+END
+Unroll.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/Unroll.h
+END
+SC_World.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_World.h
+END
+SC_DemandUnit.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_DemandUnit.h
+END
+SC_FifoMsg.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_FifoMsg.h
+END
+SC_Rate.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_Rate.h
+END
+SC_RGen.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_RGen.h
+END
+SC_InlineUnaryOp.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_InlineUnaryOp.h
+END
+SC_PlugIn.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_PlugIn.h
+END
+Hash.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/Hash.h
+END
+SC_BoundsMacros.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/supercollider/!svn/ver/9838/trunk/common/Headers/plugin_interface/SC_BoundsMacros.h
+END
+SC_Graph.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/supercollider/!svn/ver/9928/trunk/common/Headers/plugin_interface/SC_Graph.h
+END
+SC_WorldOptions.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/SC_WorldOptions.h
+END
+clz.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svnroot/supercollider/!svn/ver/9821/trunk/common/Headers/plugin_interface/clz.h
+END

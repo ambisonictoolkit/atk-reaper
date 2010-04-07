@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title></title>
+<meta name="Generator" content="Cocoa HTML Writer">
+<meta name="CocoaVersion" content="1038.25">
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 18.0px Helvetica}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; min-height: 12.0px}
+p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+span.Apple-tab-span {white-space:pre}
+</style>
+</head>
+<body>
+<p class="p1"><b>AtkBtoA<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Ambisonic B-format transform</b></p>
+<p class="p2"><br></p>
+<p class="p3"><b>AtkBtoA.ar(w, x, y, z, orientation, mode)</b></p>
+<p class="p4"><br></p>
+<p class="p3">Transform input B-format soundfield to A-format soundfield.<span class="Apple-converted-space"> </span></p>
+<p class="p4"><br></p>
+<p class="p3"><b>w, x, y, z</b> - input B-format signal</p>
+<p class="p3"><b>orientation</b> - orientation of channels of resulting A-format soundfield, as follows:</p>
+<p class="p3"><span class="Apple-tab-span">	</span>0 - flu - front left up: FLU, FRD, BLD, BRU</p>
+<p class="p3"><span class="Apple-tab-span">	</span>1 - fld - front left down: FLD, FRU, BLU, BRD</p>
+<p class="p3"><span class="Apple-tab-span">	</span>2 - flr - front left-right: FL, FR, BU, BD</p>
+<p class="p3"><span class="Apple-tab-span">	</span>3 - fud - front up-down: FU, FD, BL, BR</p>
+<p class="p3"><span class="Apple-tab-span">	</span>4 - fbd - front and back down: F, BD, BLU, BRU</p>
+<p class="p3"><span class="Apple-tab-span">	</span>5 - fbu - front and back up: F, BU, BLD, BRD</p>
+<p class="p3"><span class="Apple-tab-span">	</span>6 - flru - front left-right up: FLU, FRU, FD, B</p>
+<p class="p3"><span class="Apple-tab-span">	</span>7- flrd - front left-right down: FLD, FRD, FU, B</p>
+<p class="p4"><br></p>
+<p class="p3"><b>mode</b> -<span class="Apple-converted-space">  </span>W scaling mode, as follows:</p>
+<p class="p3"><span class="Apple-tab-span">	</span>0 - can - canonical: 1/sqrt(2)</p>
+<p class="p3"><span class="Apple-tab-span">	</span>1 - dec - decorrelated: 1/sqrt(3)</p>
+<p class="p3"><span class="Apple-tab-span">	</span>2 - uns - unscaled: 1</p>
+<p class="p2"><br></p>
+<p class="p3">Output channels are in order as listed above.</p>
+<p class="p2"><br></p>
+</body>
+</html>

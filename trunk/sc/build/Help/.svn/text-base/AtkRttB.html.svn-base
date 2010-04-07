@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title></title>
+<meta name="Generator" content="Cocoa HTML Writer">
+<meta name="CocoaVersion" content="1038.25">
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 18.0px Helvetica}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; min-height: 12.0px}
+p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+span.Apple-tab-span {white-space:pre}
+</style>
+</head>
+<body>
+<p class="p1"><b>RttB<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Ambisonic B-format imager</b></p>
+<p class="p2"><br></p>
+<p class="p3"><b>RttB.ar(w, x, y, z, rotate, tilt, tumble)</b></p>
+<p class="p4"><br></p>
+<p class="p3">Rotate input B-format soundfield around z-, x-, and y-axis.<span class="Apple-converted-space"> </span></p>
+<p class="p4"><br></p>
+<p class="p3"><b>w, x, y, z</b> - input B-format signal</p>
+<p class="p3"><b>rotate</b> - rotate left (from x-axis to y-axis) around the z-axis, in radians</p>
+<p class="p3"><b>tilt</b> -<span class="Apple-converted-space">  </span>rotate up (from y-axis to z-axis) around the x-axis, in radians</p>
+<p class="p3"><b>tumble</b> - rotate up (from x-axis to z-axis) around the y-axis, in radians</p>
+<p class="p2"><br></p>
+<p class="p3">Output channels are in order W,X,Y,Z.</p>
+<p class="p2"><br></p>
+</body>
+</html>

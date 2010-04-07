@@ -1,0 +1,160 @@
+% LaTeX definitions for SBC 2001 style
+%
+% Created by Jomi & Rafael, june 2001
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sbc2003}[2001/06/09]
+
+% margem sup 3.5 cm: há 1,5 cm para header, + 2 cm para top
+% margem inf 2.5 cm: há 1,5 cm para foot, + 1 cm para bottom
+% margem esq/dir 3 cm
+\RequirePackage[a4paper,top=2cm,left=3cm,right=3cm,bottom=1.5cm]{geometry}
+
+
+\parindent 1.27cm
+\parskip   6pt
+
+\flushbottom
+
+% captions
+\RequirePackage[bf,sf,footnotesize,hang]{caption}
+\setlength{\captionmargin}{0.8cm}
+\renewcommand{\captionfont}{\sffamily\footnotesize\bfseries}
+
+% font
+\RequirePackage{times}
+
+%\renewcommand{\normalsize}{\@setfontsize\normalsize\@xiipt\@xivpt}
+\newcommand{\XIIIPT}{\@setfontsize\xiiipt{13}{17}}
+\newcommand{\XVIPT}{\@setfontsize\xvipt{16}{20}}
+
+% new commands
+\newcounter{instn}
+\setcounter{instn}{1}
+\newcommand{\instnum}{\arabic{instn}}
+\newcommand{\inst}[1]{\ensuremath{^#1}}
+\newcommand{\nextinstitute}{\\\mbox{}\\[-6pt] \addtocounter{instn}{1}\inst{\instnum}}
+\newcommand{\email}[1]{\\\mbox{}\\[-6pt]\footnotesize\texttt{#1}}
+\renewcommand{\and}{, }
+
+% to avoid [...] in the bibliography
+% \item[] instead of \item[\@biblabel{#1}\hfill]
+\def\@lbibitem[#1]#2{\item[]\if@filesw
+      {\let\protect\noexpand
+       \immediate
+       \write\@auxout{\string\bibcite{#2}{#1}}}\fi\ignorespaces}
+\renewenvironment{thebibliography}[1]
+     {\section*{\refname
+        \@mkboth{\MakeUppercase\refname}{\MakeUppercase\refname}}%
+      \list{\@biblabel{\@arabic\c@enumiv}}%
+           {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin\labelsep
+            %% changed!
+               \itemindent -\leftmargin
+               \itemsep 6pt
+            %%%%%%%%%%%
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
+
+
+% itens
+\setlength\leftmargini   {1.27cm}
+\setlength\leftmargin    {\leftmargini}
+\setlength\leftmarginii  {\leftmargini}
+\setlength\leftmarginiii {\leftmargini}
+\setlength\leftmarginiv  {\leftmargini}
+\setlength  \labelsep    {.5em}
+\setlength  \labelwidth  {\leftmargini}
+\addtolength\labelwidth  {-\labelsep}
+\def\@listI{\leftmargin\leftmargini
+            \parsep 0\p@ \@plus1\p@ \@minus\p@
+            \topsep 0\p@ \@plus2\p@ \@minus4\p@
+            \itemsep0\p@}
+\let\@listi\@listI
+\@listi
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep    0\p@ \@plus2\p@ \@minus\p@}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep    0\p@ \@plus\p@\@minus\p@
+              \parsep    \z@
+              \partopsep \p@ \@plus\z@ \@minus\p@}
+
+
+% sections
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+                       {-18\p@ \@plus -4\p@ \@minus -4\p@}%
+                       {1\p@ \@plus 4\p@ \@minus 4\p@}%
+                       {\normalfont\XIIIPT\bfseries\boldmath
+                        \rightskip=\z@ \@plus 8em\pretolerance=10000 }}
+
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                       {-6\p@ \@plus -4\p@ \@minus -4\p@}%
+                       {1\p@ \@plus 4\p@ \@minus 4\p@}%
+                       {\normalfont\normalsize\bfseries\boldmath
+                        \rightskip=\z@ \@plus 8em\pretolerance=10000 }}
+
+\RequirePackage{titlesec}
+\titlelabel{\thetitle.\hspace{1ex}}
+
+
+
+% first page
+
+\pagestyle{empty}
+
+\newcommand{\authortag}[1]{$^{#1}$}
+
+\def\address#1{\gdef\@address{#1}}
+
+\def\@maketitle{\newpage
+ %\null % isso dava um espaco extra antes do title
+ \begin{center}
+   %\vglue -6pt
+   \vspace*{12pt}
+  {\XVIPT\bf\@title\par}
+   \vglue 6pt plus 3pt minus 3pt
+  {\normalsize
+   \textbf{\begin{tabular}[t]{c}\@author\end{tabular}}\par}
+   \vglue 6pt plus 3pt minus 3pt
+  {\normalsize
+   \begin{tabular}[t]{c}\inst{\instnum}\@address\end{tabular}\par}
+   \vglue 6pt plus 3pt minus 3pt
+   \end{center}\par
+}
+\let\maketitleOLD\maketitle
+\renewcommand{\maketitle}{\maketitleOLD\thispagestyle{empty}}
+
+\renewenvironment{abstract}{%
+      \list{}{%\advance\topsep by0.35cm\relax%\small
+      \leftmargin=0.8cm
+      \labelwidth=\z@
+      \listparindent=\z@
+      \itemindent\listparindent
+      \rightmargin\leftmargin}\item[\hskip\labelsep
+                                    \bfseries\itshape Abstract.]\itshape}%
+      {\endlist}
+
+\newenvironment{resumo}{%
+      \list{}{%\advance\topsep by0.35cm\relax%\small
+      \leftmargin=0.8cm
+      \labelwidth=\z@
+      \listparindent=\z@
+      \itemindent\listparindent
+      \rightmargin\leftmargin}\item[\hskip\labelsep
+                                    \bfseries\itshape Resumo.]\itshape}%
+      {\endlist}

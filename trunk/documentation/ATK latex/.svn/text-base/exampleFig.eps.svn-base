@@ -1,0 +1,265 @@
+%!PS-Adobe-2.0 EPSF-2.0
+%%Title: roadmap.fig
+%%Creator: fig2dev Version 3.1 Patchlevel 1
+%%CreationDate: Sat Sep 16 18:24:06 1995
+%%For: alanje@rsuna.crn.cogs.susx.ac.uk (Alan Jeffrey, Research Fellow)
+%%Orientation: Portrait
+%%BoundingBox: 0 0 298 312
+%%Pages: 0
+%%BeginSetup
+%%IncludeFeature: *PageSize A4
+%%EndSetup
+%%EndComments
+/$F2psDict 200 dict def
+$F2psDict begin
+$F2psDict /mtrx matrix put
+/col-1 {} def
+/col0 {0.000 0.000 0.000 srgb} bind def
+/col1 {0.000 0.000 1.000 srgb} bind def
+/col2 {0.000 1.000 0.000 srgb} bind def
+/col3 {0.000 1.000 1.000 srgb} bind def
+/col4 {1.000 0.000 0.000 srgb} bind def
+/col5 {1.000 0.000 1.000 srgb} bind def
+/col6 {1.000 1.000 0.000 srgb} bind def
+/col7 {1.000 1.000 1.000 srgb} bind def
+/col8 {0.000 0.000 0.560 srgb} bind def
+/col9 {0.000 0.000 0.690 srgb} bind def
+/col10 {0.000 0.000 0.820 srgb} bind def
+/col11 {0.530 0.810 1.000 srgb} bind def
+/col12 {0.000 0.560 0.000 srgb} bind def
+/col13 {0.000 0.690 0.000 srgb} bind def
+/col14 {0.000 0.820 0.000 srgb} bind def
+/col15 {0.000 0.560 0.560 srgb} bind def
+/col16 {0.000 0.690 0.690 srgb} bind def
+/col17 {0.000 0.820 0.820 srgb} bind def
+/col18 {0.560 0.000 0.000 srgb} bind def
+/col19 {0.690 0.000 0.000 srgb} bind def
+/col20 {0.820 0.000 0.000 srgb} bind def
+/col21 {0.560 0.000 0.560 srgb} bind def
+/col22 {0.690 0.000 0.690 srgb} bind def
+/col23 {0.820 0.000 0.820 srgb} bind def
+/col24 {0.500 0.190 0.000 srgb} bind def
+/col25 {0.630 0.250 0.000 srgb} bind def
+/col26 {0.750 0.380 0.000 srgb} bind def
+/col27 {1.000 0.500 0.500 srgb} bind def
+/col28 {1.000 0.630 0.630 srgb} bind def
+/col29 {1.000 0.750 0.750 srgb} bind def
+/col30 {1.000 0.880 0.880 srgb} bind def
+/col31 {1.000 0.840 0.000 srgb} bind def
+
+end
+save
+-112.0 334.0 translate
+1 -1 scale
+
+/clp {closepath} bind def
+/ef {eofill} bind def
+/gr {grestore} bind def
+/gs {gsave} bind def
+/l {lineto} bind def
+/m {moveto} bind def
+/n {newpath} bind def
+/s {stroke} bind def
+/slc {setlinecap} bind def
+/slj {setlinejoin} bind def
+/slw {setlinewidth} bind def
+/srgb {setrgbcolor} bind def
+/rot {rotate} bind def
+/sc {scale} bind def
+/tr {translate} bind def
+/tnt {dup dup currentrgbcolor
+  4 -2 roll dup 1 exch sub 3 -1 roll mul add
+  4 -2 roll dup 1 exch sub 3 -1 roll mul add
+  4 -2 roll dup 1 exch sub 3 -1 roll mul add srgb}
+  bind def
+/shd {dup dup currentrgbcolor 4 -2 roll mul 4 -2 roll mul
+  4 -2 roll mul srgb} bind def
+ /DrawEllipse {
+	/endangle exch def
+	/startangle exch def
+	/yrad exch def
+	/xrad exch def
+	/y exch def
+	/x exch def
+	/savematrix mtrx currentmatrix def
+	x y tr xrad yrad sc 0 0 1 startangle endangle arc
+	closepath
+	savematrix setmatrix
+	} def
+
+/$F2psBegin {$F2psDict begin /$F2psEnteredState save def} def
+/$F2psEnd {$F2psEnteredState restore end} def
+%%EndProlog
+
+$F2psBegin
+10 setmiterlimit
+ 0.06000 0.06000 sc
+7.500 slw
+% Arc
+n 4813.51 1452.05 m 4800.00 1575.00 l 4754.06 1460.15 l gs col-1 s gr
+n 4284.38 1645.31 520.40 -91.03 -7.77 arc
+gs col-1 s gr
+
+% Arc
+n 3045.94 1460.15 m 3000.00 1575.00 l 2986.49 1452.05 l gs col-1 s gr
+n 3515.62 1645.31 520.40 -88.97 -172.23 arcn
+gs col-1 s gr
+
+% Arc
+n 2771.84 3251.35 m 2775.00 3375.00 l 2714.02 3267.38 l gs col-1 s gr
+n 2279.17 3512.50 514.55 -84.89 -15.50 arc
+gs col-1 s gr
+
+% Arc
+n 3285.98 3267.38 m 3225.00 3375.00 l 3228.16 3251.35 l gs col-1 s gr
+n 3720.83 3512.50 514.55 -95.11 -164.50 arcn
+gs col-1 s gr
+
+% Arc
+n 4247.24 2906.08 m 4125.00 2925.00 l 4223.95 2850.78 l gs col-1 s gr
+n 3525.00 1500.00 1546.16 39.09 67.17 arc
+gs col-1 s gr
+
+% Arc
+n 3403.37 4702.50 m 3525.00 4725.00 l 3407.09 4762.39 l gs col-1 s gr
+n 3493.27 4214.42 511.56 164.63 86.44 arcn
+gs col-1 s gr
+
+% Arc
+n 4394.64 4681.42 m 4275.00 4650.00 l 4395.35 4621.42 l gs col-1 s gr
+n 4291.72 3239.01 1411.09 -3.62 90.68 arc
+gs col-1 s gr
+
+% Arc
+n 4398.18 4811.29 m 4275.00 4800.00 l 4389.00 4752.00 l gs col-1 s gr
+n 3787.50 1650.00 3187.50 28.07 81.20 arc
+gs col-1 s gr
+
+% Arc
+n 4306.30 4511.76 m 4200.00 4575.00 l 4264.03 4469.17 l gs col-1 s gr
+n 2769.64 3133.93 2030.42 0.45 45.21 arc
+gs col-1 s gr
+
+% Ellipse
+n 3900 2962 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 3900 562 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 3900 1762 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 3000 1762 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 4800 1762 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 4800 2962 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 5700 2962 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 6600 2962 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 2100 2962 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 3000 4162 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Ellipse
+n 3900 5362 225 187 0 360 DrawEllipse gs col-1 s gr
+
+% Polyline
+n 3525 975 m 4275 975 l  4275 1275 l  3525 1275 l  clp  gs col-1 s gr 
+% Polyline
+n 3525 2175 m 4275 2175 l  4275 2475 l  3525 2475 l  clp  gs col-1 s gr 
+% Polyline
+n 4425 2175 m 5175 2175 l  5175 2475 l  4425 2475 l  clp  gs col-1 s gr 
+% Polyline
+n 2625 3375 m 3375 3375 l  3375 3675 l  2625 3675 l  clp  gs col-1 s gr 
+% Polyline
+n 3525 4575 m 4275 4575 l  4275 4875 l  3525 4875 l  clp  gs col-1 s gr 
+% Polyline
+n 3900 750 m 3900 975 l  gs col-1 s gr 
+n 3930.00 855.00 m 3900.00 975.00 l 3870.00 855.00 l gs col-1 s gr
+% Polyline
+n 3900 1275 m 3900 1575 l  gs col-1 s gr 
+n 3930.00 1455.00 m 3900.00 1575.00 l 3870.00 1455.00 l gs col-1 s gr
+% Polyline
+n 3900 1950 m 3900 2175 l  gs col-1 s gr 
+n 3930.00 2055.00 m 3900.00 2175.00 l 3870.00 2055.00 l gs col-1 s gr
+% Polyline
+n 3900 2475 m 3900 2775 l  gs col-1 s gr 
+n 3930.00 2655.00 m 3900.00 2775.00 l 3870.00 2655.00 l gs col-1 s gr
+% Polyline
+n 4800 1950 m 4800 2175 l  gs col-1 s gr 
+n 4830.00 2055.00 m 4800.00 2175.00 l 4770.00 2055.00 l gs col-1 s gr
+% Polyline
+n 4800 2475 m 4800 2775 l  gs col-1 s gr 
+n 4830.00 2655.00 m 4800.00 2775.00 l 4770.00 2655.00 l gs col-1 s gr
+% Polyline
+n 3000 1950 m 3000 3375 l  gs col-1 s gr 
+n 3030.00 3255.00 m 3000.00 3375.00 l 2970.00 3255.00 l gs col-1 s gr
+% Polyline
+n 3000 3675 m 3000 3975 l  gs col-1 s gr 
+n 3030.00 3855.00 m 3000.00 3975.00 l 2970.00 3855.00 l gs col-1 s gr
+% Polyline
+n 3900 3150 m 3900 4575 l  gs col-1 s gr 
+n 3930.00 4455.00 m 3900.00 4575.00 l 3870.00 4455.00 l gs col-1 s gr
+% Polyline
+n 3900 4875 m 3900 5175 l  gs col-1 s gr 
+n 3930.00 5055.00 m 3900.00 5175.00 l 3870.00 5055.00 l gs col-1 s gr
+/Helvetica findfont 180.00 scalefont setfont
+3900 3000 m
+gs 1 -1 sc (tfm) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+3900 600 m
+gs 1 -1 sc (afm) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+3900 1800 m
+gs 1 -1 sc (pl) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+4800 1800 m
+gs 1 -1 sc (vpl) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+3000 1800 m
+gs 1 -1 sc (fd) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+4800 3000 m
+gs 1 -1 sc (vf) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+5700 3000 m
+gs 1 -1 sc (pfa) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+6600 3000 m
+gs 1 -1 sc (pfb) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+2100 3000 m
+gs 1 -1 sc (tex) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+3000 4200 m
+gs 1 -1 sc (dvi) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Helvetica findfont 180.00 scalefont setfont
+3900 5400 m
+gs 1 -1 sc (ps) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Palatino-Italic findfont 180.00 scalefont setfont
+3900 1175 m
+gs 1 -1 sc (fontinst) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Palatino-Italic findfont 180.00 scalefont setfont
+3900 2375 m
+gs 1 -1 sc (pltotf) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Palatino-Italic findfont 180.00 scalefont setfont
+4800 2375 m
+gs 1 -1 sc (vptovf) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Palatino-Italic findfont 180.00 scalefont setfont
+3000 3575 m
+gs 1 -1 sc (latex) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+/Palatino-Italic findfont 180.00 scalefont setfont
+3900 4775 m
+gs 1 -1 sc (dvips) dup stringwidth pop 2 div neg 0 rmoveto  col-1 show gr
+$F2psEnd
+restore
