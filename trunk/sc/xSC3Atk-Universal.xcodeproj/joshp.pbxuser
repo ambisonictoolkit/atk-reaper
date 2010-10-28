@@ -135,17 +135,17 @@
 	};
 	F3FE07630B0D76AC00A29459 /* AtkUGens.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1010, 35217}}";
-			sepNavSelRange = "{47986, 0}";
-			sepNavVisRange = "{47191, 1420}";
+			sepNavIntBoundsRect = "{{0, 0}, {1010, 35282}}";
+			sepNavSelRange = "{43521, 0}";
+			sepNavVisRange = "{42992, 1221}";
 			sepNavVisRect = "{{0, 31244}, {1030, 698}}";
-			sepNavWindowFrame = "{{-9, 43}, {1069, 827}}";
+			sepNavWindowFrame = "{{283, 40}, {1069, 827}}";
 		};
 	};
 	F50D04F702E68E8201CA2799 /* Project object */ = {
 		activeBuildConfigurationName = Deployment;
 		activeSDKPreference = macosx10.5;
-		activeTarget = 631417A30A203392007B9355 /* All */;
+		activeTarget = F3FE07510B0D767000A29459 /* AtkUGens (Upgraded) */;
 		addToTargets = (
 			631417A30A203392007B9355 /* All */,
 		);
@@ -286,8 +286,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 290989428;
-			PBXWorkspaceStateSaveDate = 290989428;
+			PBXPerProjectTemplateStateSaveDate = 309973363;
+			PBXWorkspaceStateSaveDate = 309973363;
 		};
 		sourceControlManager = F3FE07250B0D758200A29459 /* Source Control */;
 		userBuildSettings = {
@@ -309,7 +309,7 @@
 			sepNavWindowFrame = "{{15, 46}, {1069, 827}}";
 		};
 	};
-	F50D05E302E69B6B01CA2799 /* SCComplex.h */ = {
+	F50D05E302E69B6B01CA2799 /* SC_Complex.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1030, 1806}}";
 			sepNavSelRange = "{0, 0}";

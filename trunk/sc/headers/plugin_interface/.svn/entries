@@ -1,15 +1,15 @@
 10
 
 dir
-9967
+10365
 https://supercollider.svn.sourceforge.net/svnroot/supercollider/trunk/common/Headers/plugin_interface
 https://supercollider.svn.sourceforge.net/svnroot/supercollider
 
 
 
-2010-03-05T20:40:38.779489Z
-9928
-timblech
+2010-08-17T14:09:53.779801Z
+10259
+danstowell
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2010-02-12T01:39:49.000000Z
-c659e6d43b93ba15ba20cc54a9b385f3
-2009-09-26T06:17:48.413711Z
-9417
-timblech
+2010-08-17T20:53:44.000000Z
+4e11a3eef7e681cb7cb7ea42b1e412ee
+2010-08-17T14:09:53.779801Z
+10259
+danstowell
 has-props
 
 
@@ -58,41 +58,7 @@ has-props
 
 
 
-1643
-
-SC_Wire.h
-file
-
-
-
-
-2010-02-12T01:39:49.000000Z
-6d1f1b24ceb5f724151efa31c9cbd426
-2009-09-26T06:17:48.413711Z
-9417
-timblech
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1065
+1641
 
 SC_BufGen.h
 file
@@ -128,16 +94,50 @@ has-props
 
 1195
 
-SC_InterfaceTable.h
+SC_Wire.h
 file
 
 
 
 
 2010-02-12T01:39:49.000000Z
-9f25239551124168b03e1d53eeb30431
-2010-01-24T14:00:45.741996Z
-9697
+6d1f1b24ceb5f724151efa31c9cbd426
+2009-09-26T06:17:48.413711Z
+9417
+timblech
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1065
+
+SC_InterfaceTable.h
+file
+
+
+
+
+2010-08-17T20:53:44.000000Z
+80f879858ef2fde967f4f64473fe0d1b
+2010-08-17T14:09:53.779801Z
+10259
 danstowell
 has-props
 
@@ -160,7 +160,7 @@ has-props
 
 
 
-6413
+6411
 
 sc_msg_iter.h
 file
@@ -236,11 +236,11 @@ file
 
 
 
-2010-03-05T22:11:58.000000Z
-7f99285b568e8ceaf06c8ef99fe4e57b
-2010-03-05T20:40:38.779489Z
-9928
-timblech
+2010-08-17T20:53:44.000000Z
+5f0545bbc94fc53b46ff32990551980b
+2010-08-17T14:09:53.779801Z
+10259
+danstowell
 has-props
 
 
@@ -262,7 +262,41 @@ has-props
 
 
 
-5393
+9387
+
+SC_SndBuf.h
+file
+
+
+
+
+2010-08-17T20:53:44.000000Z
+9cfd8d85453d4f7260ff8dfcb6bfebd2
+2010-08-17T14:09:53.779801Z
+10259
+danstowell
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3329
 
 SC_sndfile_stub.h
 file
@@ -298,51 +332,17 @@ danstowell
 
 1894
 
-SC_SndBuf.h
-file
-
-
-
-
-2010-02-12T01:39:49.000000Z
-8f6a91f3ce93efd960adf98a38069fb3
-2010-02-08T18:44:01.496466Z
-9818
-timblech
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3215
-
 SC_InlineBinaryOp.h
 file
 
 
 
 
-2010-02-12T01:39:49.000000Z
-b821e56e00e9c3a1cfa7d4bf9188ad90
-2009-12-15T15:24:28.173677Z
-9616
-timblech
+2010-08-17T20:53:44.000000Z
+020a89d2d4a40d18852cf5ebaaacd690
+2010-08-17T14:09:53.779801Z
+10259
+danstowell
 has-props
 
 
@@ -364,7 +364,7 @@ has-props
 
 
 
-10757
+10749
 
 SC_Node.h
 file
@@ -440,11 +440,11 @@ file
 
 
 
-2010-02-12T01:39:49.000000Z
-d4c7ee519fd6da4ce0f70a362aa33712
-2009-09-26T06:17:48.413711Z
-9417
-timblech
+2010-08-17T20:53:44.000000Z
+31d0848a387eb28a52b0237358e837f1
+2010-08-17T14:09:53.779801Z
+10259
+danstowell
 has-props
 
 
@@ -466,7 +466,7 @@ has-props
 
 
 
-3099
+3217
 
 SC_DemandUnit.h
 file
@@ -474,11 +474,11 @@ file
 
 
 
-2010-02-12T01:39:49.000000Z
-c14e2bd36bc2ce2403e0d13a366bf262
-2009-09-26T06:17:48.413711Z
-9417
-timblech
+2010-08-17T20:53:44.000000Z
+2f006da89b92230191f1ae60499cf235
+2010-08-17T14:09:53.779801Z
+10259
+danstowell
 has-props
 
 
@@ -500,7 +500,7 @@ has-props
 
 
 
-2687
+2685
 
 SC_FifoMsg.h
 file
@@ -610,10 +610,10 @@ file
 
 
 
-2010-02-12T01:39:49.000000Z
-c39e4c0b9cfd273e45e572f807fb9afa
-2010-02-06T13:22:29.862903Z
-9756
+2010-05-14T15:31:16.000000Z
+9b5d689ad74f8aa7a05865335458ac63
+2010-05-02T10:37:12.619545Z
+10107
 danstowell
 has-props
 
@@ -636,7 +636,7 @@ has-props
 
 
 
-11450
+11456
 
 SC_PlugIn.h
 file
@@ -644,11 +644,11 @@ file
 
 
 
-2010-02-12T01:39:49.000000Z
-1ffe44b770fd52f3de7c97c74f90efc5
-2010-02-06T14:57:50.246627Z
-9758
-timblech
+2010-08-17T20:53:44.000000Z
+4579a83cdc94e7cdd6e210db378d5242
+2010-08-17T14:09:53.779801Z
+10259
+danstowell
 has-props
 
 
@@ -670,7 +670,7 @@ has-props
 
 
 
-2131
+2129
 
 Hash.h
 file
@@ -780,44 +780,10 @@ file
 
 
 
-2010-02-12T01:39:49.000000Z
-98e87d9f4166f4e124a9ad42b86eba50
-2009-09-26T06:17:48.413711Z
-9417
-timblech
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3768
-
-clz.h
-file
-
-
-
-
-2010-02-12T01:39:49.000000Z
-54df80e44a803c2f260f3a9206300537
-2010-01-24T11:50:13.970639Z
-9695
+2010-08-17T20:53:44.000000Z
+9af2f9fc4bb67076153345d4c9237bf0
+2010-08-17T14:09:53.779801Z
+10259
 danstowell
 has-props
 
@@ -840,5 +806,39 @@ has-props
 
 
 
-4203
+3606
+
+clz.h
+file
+
+
+
+
+2010-08-17T20:53:44.000000Z
+be580c68643053660292f1cc9810d399
+2010-08-17T14:09:53.779801Z
+10259
+danstowell
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4363
 

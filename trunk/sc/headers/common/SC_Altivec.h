@@ -15,13 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
 #ifndef _SC_Altivec_
 #define _SC_Altivec_
 
-#if defined(__ALTIVEC__) && !defined(__APPLE_ALTIVEC__)
+#if defined(HAS_ALTIVEC) || defined(__ALTIVEC__) && !defined(__APPLE_ALTIVEC__)
 # include <altivec.h>
 /* From <altivec.h>:
    You are allowed to undef these for C++ compatibility. */
@@ -99,13 +99,13 @@ inline vint32 vload( int32 a, int32 b, int32 c, int32 d )
 
 inline vector float vec_float_1( void )
 {
-	return vec_ctf( vec_splat_u32(1), 0); 
+	return vec_ctf( vec_splat_u32(1), 0);
 }
 
-inline vector float vec_reciprocal( vector float v ) 
+inline vector float vec_reciprocal( vector float v )
 {
-	vector float reciprocal = vec_re( v ); 
-	return vec_madd( reciprocal, vec_nmsub( reciprocal, v, vec_float_1()), reciprocal ); //Newton Rapheson refinement 
+	vector float reciprocal = vec_re( v );
+	return vec_madd( reciprocal, vec_nmsub( reciprocal, v, vec_float_1()), reciprocal ); //Newton Rapheson refinement
 }
 
 #define vec_div(a, b)  vec_mul(a, vec_reciprocal(b))

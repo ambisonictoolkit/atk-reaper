@@ -15,11 +15,11 @@
 
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
 /* NOTE: This file should declare/define the following functions/macros:
-	
+
 	htonl
 	htons
 	ntohl
@@ -31,21 +31,30 @@
 #ifndef SC_ENDIAN_H_INCLUDED
 #define SC_ENDIAN_H_INCLUDED
 
-#ifdef SC_DARWIN
+#if defined(__APPLE__)
 
 # include <machine/endian.h>
 
-#elif defined(SC_WIN32)
+#elif defined(__FreeBSD__)
+
+# include <machine/endian.h>
+# include <netinet/in.h>
+
+#elif defined(_WIN32)
 
 # define LITTLE_ENDIAN 1234
 # define BIG_ENDIAN 4321
 # define BYTE_ORDER LITTLE_ENDIAN
 # include <winsock2.h>
 
-#else
+#elif defined(__linux__)
 
 # include <endian.h>
 # include <netinet/in.h>
+
+#else
+
+# error cannot find endianess on this platform
 
 #endif
 

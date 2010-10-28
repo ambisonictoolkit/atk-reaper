@@ -1,0 +1,473 @@
+TAtkUGens (Upgraded)
+v7
+r0
+t309810514.646483
+cCheck dependencies
+cCompileC "build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o" /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+cCompileC "build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o" /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp normal i386 c++ com.apple.compilers.gcc.4_2
+cMasterObjectLink "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o"
+cLd "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx" normal x86_64
+cCompileC "build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGens.o" /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp normal ppc c++ com.apple.compilers.gcc.4_2
+cMasterObjectLink "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o"
+cLd "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx" normal i386
+cMasterObjectLink "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-ppc-master.o"
+cLd "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.scx" normal ppc
+cCreateUniversalBinary /Users/joshp/src/atk/trunk/sc/build/AtkUGensUB.scx normal "x86_64 i386 ppc"
+cPhaseScriptExecution "Run Script" "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh"
+
+N/Developer/SDKs/MacOSX10.5.sdk
+c000000004C412AD700000000000000EE
+t1279339223
+s238
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/assert.h
+c0000000047BA99300000000000000DCB
+t1203411248
+s3531
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/machine/endian.h
+c0000000047E883B700000000000006C3
+t1206420407
+s1731
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/math.h
+c0000000047BA987000000000000004B7
+t1203411056
+s1207
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/netinet/in.h
+c0000000047E883C30000000000005346
+t1206420419
+s21318
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/pthread.h
+c0000000047BA9932000000000000380F
+t1203411250
+s14351
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/stdio.h
+c0000000047BA99310000000000003D1D
+t1203411249
+s15645
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/stdlib.h
+c0000000047BA99310000000000002A79
+t1203411249
+s10873
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/string.h
+c0000000047BA99320000000000001731
+t1203411250
+s5937
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/sys/types.h
+c0000000047E883D2000000000000290F
+t1206420434
+s10511
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/lib/gcc/powerpc-apple-darwin10/4.2.1/include/altivec.h
+c000000004AC59DA0000000000000467F
+t1254464928
+s18047
+
+N/System/Library/Frameworks/vecLib.framework/vecLib
+c000000004B738EE0000000000005DBF0
+t1265864416
+s383984
+
+N/Users/joshp/src/atk/trunk/sc/build/AtkUGensUB.scx
+t1288117714
+s407140
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o
+t1288117711
+s160560
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-ppc-master.o
+t1288117714
+s146320
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o
+t1288117711
+s153160
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o
+t1288117711
+s383908
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.LinkFileList
+c000000004CC71DCB0000000000000082
+t1288117707
+s130
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx
+t1288117711
+s142764
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGens.o
+t1288117714
+s431560
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.LinkFileList
+c000000004CC71DCB0000000000000081
+t1288117707
+s129
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.scx
+t1288117714
+s112228
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o
+t1288117710
+s457660
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.LinkFileList
+c000000004CC71DCB0000000000000084
+t1288117707
+s132
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx
+t1288117711
+s144424
+
+N/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh
+c000000004CC71DCB0000000000000041
+t1288117707
+s65
+
+N/Users/joshp/src/atk/trunk/sc/headers/common/SC_Altivec.h
+c00000000457F9E800000000000000F6E
+t1165991552
+s3950
+i<altivec.h>
+
+N/Users/joshp/src/atk/trunk/sc/headers/common/SC_Endian.h
+c00000000449183DB0000000000000667
+t1150387163
+s1639
+i<machine/endian.h>
+i<winsock2.h>
+i<endian.h>
+i<netinet/in.h>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/Hash.h
+c000000004B74B1650000000000000FB9
+t1265938789
+s4025
+i"SC_Types.h"
+i"SC_Endian.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_BoundsMacros.h
+c000000004B74B1650000000000000514
+t1265938789
+s1300
+i<cstdlib>
+i<cmath>
+i<algorithm>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_BufGen.h
+c000000004B74B16500000000000004AB
+t1265938789
+s1195
+i"SC_Types.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_Constants.h
+c000000004B74B165000000000000070C
+t1265938789
+s1804
+i<cmath>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_DemandUnit.h
+c000000004B74B1650000000000000A7F
+t1265938789
+s2687
+i"SC_Unit.h"
+i"SC_Wire.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_FifoMsg.h
+c000000004B74B1650000000000000638
+t1265938789
+s1592
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_Graph.h
+c000000004B9181AE0000000000000606
+t1267827118
+s1542
+i"SC_Node.h"
+i"SC_Rate.h"
+i"SC_SndBuf.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_InlineBinaryOp.h
+c000000004B74B1650000000000002A05
+t1265938789
+s10757
+i"SC_BoundsMacros.h"
+i<cmath>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_InlineUnaryOp.h
+c000000004B74B1650000000000002CBA
+t1265938789
+s11450
+i"SC_Types.h"
+i"SC_Constants.h"
+i<cmath>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_InterfaceTable.h
+c000000004B74B165000000000000190D
+t1265938789
+s6413
+i"SC_Types.h"
+i"SC_SndBuf.h"
+i"SC_Unit.h"
+i"SC_BufGen.h"
+i"SC_FifoMsg.h"
+i<sndfile-win.h>
+i<sndfile.h>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_Node.h
+c000000004B74B16500000000000004FF
+t1265938789
+s1279
+i"SC_Types.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_PlugIn.h
+c000000004B74B1650000000000000853
+t1265938789
+s2131
+i"SC_World.h"
+i"SC_Graph.h"
+i"SC_Unit.h"
+i"SC_Wire.h"
+i"SC_InterfaceTable.h"
+i"Unroll.h"
+i"SC_InlineUnaryOp.h"
+i"SC_InlineBinaryOp.h"
+i"SC_BoundsMacros.h"
+i"SC_RGen.h"
+i"SC_DemandUnit.h"
+i"clz.h"
+i"sc_msg_iter.h"
+i"SC_Altivec.h"
+i"SC_VFP11.h"
+i<stdlib.h>
+i<xmath.h>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_RGen.h
+c000000004B74B1650000000000001EF3
+t1265938789
+s7923
+i"SC_Endian.h"
+i"SC_Types.h"
+i"SC_BoundsMacros.h"
+i"Hash.h"
+i<math.h>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_Rate.h
+c000000004B74B165000000000000059A
+t1265938789
+s1434
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_SndBuf.h
+c000000004B74B1650000000000000C8F
+t1265938789
+s3215
+i<sys/types.h>
+i<sndfile-win.h>
+i<sndfile.h>
+i"SC_sndfile_stub.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_Types.h
+c000000004B74B165000000000000066B
+t1265938789
+s1643
+i<sys/types.h>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_Unit.h
+c000000004B9181AE0000000000001511
+t1267827118
+s5393
+i"SC_Types.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_Wire.h
+c000000004B74B1650000000000000429
+t1265938789
+s1065
+i"SC_Types.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_World.h
+c000000004B74B1650000000000000C1B
+t1265938789
+s3099
+i"SC_Types.h"
+i"SC_Rate.h"
+i"SC_SndBuf.h"
+i"SC_RGen.h"
+i"SC_Lock.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/SC_sndfile_stub.h
+c000000004B74B1650000000000000766
+t1265938789
+s1894
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/Unroll.h
+c000000004B74B16500000000000016E6
+t1265938789
+s5862
+i<string.h>
+i<cassert>
+i"SC_BoundsMacros.h"
+i<assert.h>
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/clz.h
+c000000004B74B165000000000000106B
+t1265938789
+s4203
+i"SC_Types.h"
+
+N/Users/joshp/src/atk/trunk/sc/headers/plugin_interface/sc_msg_iter.h
+c000000004B74B165000000000000193A
+t1265938789
+s6458
+i"SC_Endian.h"
+i"SC_Types.h"
+i<string.h>
+
+N/Users/joshp/src/atk/trunk/sc/headers/server/SC_Lock.h
+c00000000449183DB00000000000004A2
+t1150387163
+s1186
+i<pthread.h>
+
+N/Users/joshp/src/atk/trunk/sc/headers/sndfile.h
+c00000000466EB15200000000000046A5
+t1181659474
+s18085
+i<stdio.h>
+i<unix.h>
+i<sys/types.h>
+
+N/Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp
+c000000004CC71DC80000000000010886
+t1288117704
+s67718
+i"SC_PlugIn.h"
+
+CCheck dependencies
+r0
+lSLF07#2@18"Check dependencies309810507#309810507#0(0"0(0#1#0"8602216160#0"0#
+
+CCompileC "build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o" /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp normal i386 c++ com.apple.compilers.gcc.4_2
+s309810507.328736
+e309810511.170059
+r1
+xCompileC
+xbuild/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o
+x/Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp
+xnormal
+xi386
+xc++
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@57"Compile /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp309810507#309810511#0(0"0(0#0#49"/Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp8617083936#941"    cd /Users/joshp/src/atk/trunk/sc    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x c++ -arch i386 -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -O3 -DSC_DARWIN -isysroot /Developer/SDKs/MacOSX10.5.sdk -fvisibility-inlines-hidden -mmacosx-version-min=10.5 -gdwarf-2 "-I/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/AtkUGensUB.hmap" -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -F/Users/joshp/src/atk/trunk/sc/build -I/Users/joshp/src/atk/trunk/sc/build/include "-I/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/DerivedSources/i386" "-I/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/DerivedSources" -c /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp -o "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o"0#
+
+CCompileC "build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGens.o" /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp normal ppc c++ com.apple.compilers.gcc.4_2
+s309810511.030979
+e309810514.317964
+r1
+xCompileC
+xbuild/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGens.o
+x/Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp
+xnormal
+xppc
+xc++
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@57"Compile /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp309810511#309810514#0(0"0(0#0#49"/Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp8632842496#948"    cd /Users/joshp/src/atk/trunk/sc    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x c++ -arch ppc -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -O3 -DSC_DARWIN -isysroot /Developer/SDKs/MacOSX10.5.sdk -mtune=G4 -fvisibility-inlines-hidden -mmacosx-version-min=10.5 -gdwarf-2 "-I/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/AtkUGensUB.hmap" -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -F/Users/joshp/src/atk/trunk/sc/build -I/Users/joshp/src/atk/trunk/sc/build/include "-I/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/DerivedSources/ppc" "-I/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/DerivedSources" -c /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp -o "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGens.o"0#
+
+CCompileC "build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o" /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+s309810507.327889
+e309810510.942721
+r1
+xCompileC
+xbuild/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o
+x/Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp
+xnormal
+xx86_64
+xc++
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@57"Compile /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp309810507#309810510#0(0"0(0#0#49"/Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp8621838624#947"    cd /Users/joshp/src/atk/trunk/sc    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x c++ -arch x86_64 -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -O3 -DSC_DARWIN -isysroot /Developer/SDKs/MacOSX10.5.sdk -fvisibility-inlines-hidden -mmacosx-version-min=10.5 -gdwarf-2 "-I/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/AtkUGensUB.hmap" -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -F/Users/joshp/src/atk/trunk/sc/build -I/Users/joshp/src/atk/trunk/sc/build/include "-I/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/DerivedSources/x86_64" "-I/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/DerivedSources" -c /Users/joshp/src/atk/trunk/sc/source/AtkUGens.cpp -o "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o"0#
+
+CCreateUniversalBinary /Users/joshp/src/atk/trunk/sc/build/AtkUGensUB.scx normal "ppc i386"
+r0
+
+CCreateUniversalBinary /Users/joshp/src/atk/trunk/sc/build/AtkUGensUB.scx normal "x86_64 i386 ppc"
+s309810514.618891
+e309810514.622358
+r1
+xCreateUniversalBinary
+x/Users/joshp/src/atk/trunk/sc/build/AtkUGensUB.scx
+xnormal
+xx86_64 i386 ppc
+lSLF07#2@67"CreateUniversalBinary build/AtkUGensUB.scx normal "x86_64 i386 ppc"309810514#309810514#0(0"0(0#0#45"/Users/joshp/src/atk/trunk/sc/x86_64 i386 ppc8617765504#492"    cd /Users/joshp/src/atk/trunk/sc    /usr/bin/lipo -create "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx" "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx" "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.scx" -output /Users/joshp/src/atk/trunk/sc/build/AtkUGensUB.scx0#
+
+CLd "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx" normal i386
+s309810511.182789
+e309810511.207208
+r1
+xLd
+x/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx
+xnormal
+xi386
+lSLF07#2@125"Link /Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx309810511#309810511#0(0"0(0#0#0"8608122432#557"    cd /Users/joshp/src/atk/trunk/sc    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Developer/usr/bin/g++-4.2 -arch i386 -bundle -isysroot /Developer/SDKs/MacOSX10.5.sdk -L/Users/joshp/src/atk/trunk/sc/build -F/Users/joshp/src/atk/trunk/sc/build -filelist "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.LinkFileList" -mmacosx-version-min=10.5 -framework vecLib -o "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx"0#
+
+CLd "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.scx" normal ppc
+s309810514.599690
+e309810514.618783
+r1
+xLd
+x/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.scx
+xnormal
+xppc
+lSLF07#2@124"Link /Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.scx309810514#309810514#0(0"0(0#0#0"8618337312#554"    cd /Users/joshp/src/atk/trunk/sc    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Developer/usr/bin/g++-4.2 -arch ppc -bundle -isysroot /Developer/SDKs/MacOSX10.5.sdk -L/Users/joshp/src/atk/trunk/sc/build -F/Users/joshp/src/atk/trunk/sc/build -filelist "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.LinkFileList" -mmacosx-version-min=10.5 -framework vecLib -o "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.scx"0#
+
+CLd "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx" normal x86_64
+s309810511.005993
+e309810511.030886
+r1
+xLd
+x/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx
+xnormal
+xx86_64
+lSLF07#2@127"Link /Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx309810511#309810511#0(0"0(0#0#0"8618219104#563"    cd /Users/joshp/src/atk/trunk/sc    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Developer/usr/bin/g++-4.2 -arch x86_64 -bundle -isysroot /Developer/SDKs/MacOSX10.5.sdk -L/Users/joshp/src/atk/trunk/sc/build -F/Users/joshp/src/atk/trunk/sc/build -filelist "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.LinkFileList" -mmacosx-version-min=10.5 -framework vecLib -o "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx"0#
+
+CMasterObjectLink "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o"
+s309810511.170156
+e309810511.182679
+r1
+xMasterObjectLink
+x/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o
+lSLF07#2@134"Link /Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o309810511#309810511#0(0"0(0#0#129"/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o8615429536#331"    cd /Users/joshp/src/atk/trunk/sc    /Developer/usr/bin/ld -r -arch i386 "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o" -o "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o"0#
+
+CMasterObjectLink "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-ppc-master.o"
+s309810514.318095
+e309810514.599594
+r1
+xMasterObjectLink
+x/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-ppc-master.o
+lSLF07#2@133"Link /Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-ppc-master.o309810514#309810514#0(0"0(0#0#128"/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-ppc-master.o8608347648#328"    cd /Users/joshp/src/atk/trunk/sc    /Developer/usr/bin/ld -r -arch ppc "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGens.o" -o "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-ppc-master.o"0#
+
+CMasterObjectLink "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o"
+s309810510.942923
+e309810511.005882
+r1
+xMasterObjectLink
+x/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o
+lSLF07#2@136"Link /Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o309810510#309810511#0(0"0(0#0#131"/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o8608536032#337"    cd /Users/joshp/src/atk/trunk/sc    /Developer/usr/bin/ld -r -arch x86_64 "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o" -o "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o"0#
+
+CPhaseScriptExecution "Run Script" "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh"
+s309810514.622432
+e309810514.646423
+r1
+xPhaseScriptExecution
+xRun Script
+x/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh
+lSLF07#2@36"Run custom shell script 'Run Script'309810514#309810514#0(0"0(0#0#0"8606215840#14986"    cd /Users/joshp/src/atk/trunk/sc    setenv ACTION build    setenv ALTERNATE_GROUP staff    setenv ALTERNATE_MODE u+w,go-w,a+rX    setenv ALTERNATE_OWNER joshp    setenv ALWAYS_SEARCH_USER_PATHS YES    setenv APPLE_INTERNAL_DEVELOPER_DIR /AppleInternal/Developer    setenv APPLE_INTERNAL_DIR /AppleInternal    setenv APPLE_INTERNAL_DOCUMENTATION_DIR /AppleInternal/Documentation    setenv APPLE_INTERNAL_LIBRARY_DIR /AppleInternal/Library    setenv APPLE_INTERNAL_TOOLS /AppleInternal/Developer/Tools    setenv APPLY_RULES_IN_COPY_FILES NO    setenv ARCHS "x86_64 i386 ppc"    setenv ARCHS_STANDARD_32_64_BIT "x86_64 i386 ppc"    setenv ARCHS_STANDARD_32_BIT "i386 ppc"    setenv ARCHS_STANDARD_64_BIT x86_64    setenv BUILD_COMPONENTS "headers build"    setenv BUILD_DIR /Users/joshp/src/atk/trunk/sc/build    setenv BUILD_ROOT /Users/joshp/src/atk/trunk/sc/build    setenv BUILD_STYLE Deployment    setenv BUILD_VARIANTS normal    setenv BUILT_PRODUCTS_DIR /Users/joshp/src/atk/trunk/sc/build    setenv CACHE_ROOT /var/folders/IK/IKeDs0IJGu4Zz6z+irE3h++++TM/-Caches-/com.apple.Xcode.502    setenv CCHROOT /var/folders/IK/IKeDs0IJGu4Zz6z+irE3h++++TM/-Caches-/com.apple.Xcode.502    setenv CHMOD /bin/chmod    setenv CHOWN /usr/sbin/chown    setenv CLASS_FILE_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/JavaClasses"    setenv CLEAN_PRECOMPS YES    setenv CLONE_HEADERS NO    setenv CODESIGNING_FOLDER_PATH /Users/joshp/src/atk/trunk/sc/build/AtkUGensUB.scx    setenv CODE_SIGNING_ALLOWED YES    setenv COMMAND_MODE legacy    setenv COMPOSITE_SDK_DIRS /var/folders/IK/IKeDs0IJGu4Zz6z+irE3h++++TM/-Caches-/com.apple.Xcode.502/CompositeSDKs    setenv CONFIGURATION Deployment    setenv CONFIGURATION_BUILD_DIR /Users/joshp/src/atk/trunk/sc/build    setenv CONFIGURATION_TEMP_DIR /Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build    setenv COPYING_PRESERVES_HFS_DATA NO    setenv COPY_PHASE_STRIP YES    setenv COPY_RESOURCES_FROM_STATIC_FRAMEWORKS YES    setenv CP /bin/cp    setenv CURRENT_ARCH ppc    setenv CURRENT_VARIANT normal    setenv DEAD_CODE_STRIPPING NO    setenv DEBUGGING_SYMBOLS YES    setenv DEBUG_INFORMATION_FORMAT dwarf    setenv DEPLOYMENT_LOCATION NO    setenv DEPLOYMENT_POSTPROCESSING NO    setenv DERIVED_FILES_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/DerivedSources"    setenv DERIVED_FILE_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/DerivedSources"    setenv DERIVED_SOURCES_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/DerivedSources"    setenv DEVELOPER_APPLICATIONS_DIR /Developer/Applications    setenv DEVELOPER_BIN_DIR /Developer/usr/bin    setenv DEVELOPER_DIR /Developer    setenv DEVELOPER_FRAMEWORKS_DIR /Developer/Library/Frameworks    setenv DEVELOPER_FRAMEWORKS_DIR_QUOTED "\"/Developer/Library/Frameworks\""    setenv DEVELOPER_LIBRARY_DIR /Developer/Library    setenv DEVELOPER_SDK_DIR /Developer/SDKs    setenv DEVELOPER_TOOLS_DIR /Developer/Tools    setenv DEVELOPER_USR_DIR /Developer/usr    setenv DEVELOPMENT_LANGUAGE English    setenv DO_HEADER_SCANNING_IN_JAM NO    setenv DSTROOT /tmp/xSC3Atk-Universal.dst    setenv DWARF_DSYM_FILE_NAME AtkUGensUB.scx.dSYM    setenv DWARF_DSYM_FOLDER_PATH /Users/joshp/src/atk/trunk/sc/build    setenv DYLIB_INSTALL_NAME_BASE /usr/local/lib    setenv ENABLE_HEADER_DEPENDENCIES YES    setenv ENABLE_OPENMP_SUPPORT NO    setenv EXCLUDED_INSTALLSRC_SUBDIRECTORY_PATTERNS ".svn CVS"    setenv EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES "*.nib *.lproj *.framework *.gch (*) CVS .svn *.xcodeproj *.xcode *.pbproj *.pbxproj"    setenv EXECUTABLE_EXTENSION scx    setenv EXECUTABLE_NAME AtkUGensUB.scx    setenv EXECUTABLE_PATH AtkUGensUB.scx    setenv EXECUTABLE_SUFFIX .scx    setenv FILE_LIST "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects/LinkFileList"    setenv FIXED_FILES_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/FixedFiles"    setenv FRAMEWORK_FLAG_PREFIX -framework    setenv FRAMEWORK_SEARCH_PATHS "\"/Users/joshp/src/atk/trunk/sc/build\" "    setenv FRAMEWORK_VERSION A    setenv FULL_PRODUCT_NAME AtkUGensUB.scx    setenv GCC3_VERSION 3.3    setenv GCC_ENABLE_FIX_AND_CONTINUE NO    setenv GCC_INLINES_ARE_PRIVATE_EXTERN YES    setenv GCC_OPTIMIZATION_LEVEL 3    setenv GCC_PFE_FILE_C_DIALECTS "c objective-c c++ objective-c++"    setenv GCC_PREPROCESSOR_DEFINITIONS SC_DARWIN    setenv GCC_TREAT_WARNINGS_AS_ERRORS NO    setenv GCC_VERSION 4.2    setenv GCC_VERSION_IDENTIFIER __2    setenv GENERATE_MASTER_OBJECT_FILE YES    setenv GENERATE_PKGINFO_FILE NO    setenv GENERATE_PROFILING_CODE NO    setenv GID 20    setenv GROUP staff    setenv HEADERMAP_INCLUDES_FLAT_ENTRIES_FOR_TARGET_BEING_BUILT YES    setenv HEADERMAP_INCLUDES_FRAMEWORK_ENTRIES_FOR_ALL_PRODUCT_TYPES YES    setenv HEADERMAP_INCLUDES_NONPUBLIC_NONPRIVATE_HEADERS YES    setenv HEADERMAP_INCLUDES_PROJECT_HEADERS YES    setenv HEADER_SEARCH_PATHS "\"/Users/joshp/src/atk/trunk/sc/build/include\" "    setenv ICONV /usr/bin/iconv    setenv INFOPLIST_EXPAND_BUILD_SETTINGS YES    setenv INFOPLIST_OUTPUT_FORMAT same-as-input    setenv INFOPLIST_PREPROCESS NO    setenv INSTALL_DIR /tmp/xSC3Atk-Universal.dst/usr/local/lib    setenv INSTALL_GROUP staff    setenv INSTALL_MODE_FLAG u+w,go-w,a+rX    setenv INSTALL_OWNER joshp    setenv INSTALL_PATH /usr/local/lib    setenv INSTALL_ROOT /tmp/xSC3Atk-Universal.dst    setenv JAVAC_DEFAULT_FLAGS "-J-Xms64m -J-XX:NewSize=4M -J-Dfile.encoding=UTF8"    setenv JAVA_APP_STUB /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub    setenv JAVA_ARCHIVE_CLASSES YES    setenv JAVA_ARCHIVE_TYPE JAR    setenv JAVA_COMPILER /usr/bin/javac    setenv JAVA_FRAMEWORK_RESOURCES_DIRS Resources    setenv JAVA_JAR_FLAGS cv    setenv JAVA_SOURCE_SUBDIR .    setenv JAVA_USE_DEPENDENCIES YES    setenv JAVA_ZIP_FLAGS -urg    setenv JIKES_DEFAULT_FLAGS "+E +OLDCSO"    setenv KEEP_PRIVATE_EXTERNS NO    setenv LD_DYLIB_INSTALL_NAME /usr/local/lib/AtkUGensUB.scx    setenv LD_GENERATE_MAP_FILE NO    setenv LD_MAP_FILE_PATH "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/AtkUGensUB-LinkMap-normal-ppc.txt"    setenv LD_OPENMP_FLAGS -fopenmp    setenv LEX /Developer/usr/bin/lex    setenv LIBRARY_FLAG_NOSPACE YES    setenv LIBRARY_FLAG_PREFIX -l    setenv LIBRARY_SEARCH_PATHS "\"/Users/joshp/src/atk/trunk/sc/build\" "    setenv LIBRARY_STYLE BUNDLE    setenv LINKER_DISPLAYS_MANGLED_NAMES NO    setenv LINK_FILE_LIST_normal_i386 "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.LinkFileList"    setenv LINK_FILE_LIST_normal_ppc "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/ppc/AtkUGensUB.LinkFileList"    setenv LINK_FILE_LIST_normal_x86_64 "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.LinkFileList"    setenv LINK_WITH_STANDARD_LIBRARIES YES    setenv LOCAL_ADMIN_APPS_DIR /Applications/Utilities    setenv LOCAL_APPS_DIR /Applications    setenv LOCAL_DEVELOPER_DIR /Library/Developer    setenv LOCAL_LIBRARY_DIR /Library    setenv MACH_O_TYPE mh_bundle    setenv MACOSX_DEPLOYMENT_TARGET 10.5    setenv MAC_OS_X_VERSION_ACTUAL 1064    setenv MAC_OS_X_VERSION_MAJOR 1060    setenv MAC_OS_X_VERSION_MINOR 0604    setenv NATIVE_ARCH i386    setenv NATIVE_ARCH_32_BIT i386    setenv NATIVE_ARCH_64_BIT x86_64    setenv NATIVE_ARCH_ACTUAL x86_64    setenv NO_COMMON YES    setenv OBJECT_FILE_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects"    setenv OBJECT_FILE_DIR_normal "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Objects-normal"    setenv OBJROOT /Users/joshp/src/atk/trunk/sc/build    setenv ONLY_ACTIVE_ARCH NO    setenv OPTIMIZATION_LEVEL 0    setenv OS MACOS    setenv OSAC /usr/bin/osacompile    setenv PACKAGE_TYPE com.apple.package-type.mach-o-dylib    setenv PASCAL_STRINGS YES    setenv PATH_PREFIXES_EXCLUDED_FROM_HEADER_DEPENDENCIES "/usr/include /usr/local/include /System/Library/Frameworks /System/Library/PrivateFrameworks /Developer/Headers /Developer/SDKs /Developer/Platforms"    setenv PFE_FILE_C_DIALECTS c++    setenv PKGINFO_FILE_PATH "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/PkgInfo"    setenv PLATFORM_DEVELOPER_APPLICATIONS_DIR /Developer/Applications    setenv PLATFORM_DEVELOPER_BIN_DIR /Developer/usr/bin    setenv PLATFORM_DEVELOPER_LIBRARY_DIR /Developer/Library    setenv PLATFORM_DEVELOPER_SDK_DIR /Developer/SDKs    setenv PLATFORM_DEVELOPER_TOOLS_DIR /Developer/Tools    setenv PLATFORM_DEVELOPER_USR_DIR /Developer/usr    setenv PLATFORM_NAME macosx    setenv PLIST_FILE_OUTPUT_FORMAT same-as-input    setenv PREBINDING NO    setenv PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR YES    setenv PRECOMP_DESTINATION_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/PrefixHeaders"    setenv PRESERVE_DEAD_CODE_INITS_AND_TERMS NO    setenv PRIVATE_HEADERS_FOLDER_PATH /usr/local/include    setenv PRODUCT_NAME AtkUGensUB    setenv PRODUCT_SETTINGS_PATH     setenv PRODUCT_TYPE com.apple.product-type.library.dynamic    setenv PROFILING_CODE NO    setenv PROJECT xSC3Atk-Universal    setenv PROJECT_DERIVED_FILE_DIR /Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/DerivedSources    setenv PROJECT_DIR /Users/joshp/src/atk/trunk/sc    setenv PROJECT_FILE_PATH /Users/joshp/src/atk/trunk/sc/xSC3Atk-Universal.xcodeproj    setenv PROJECT_NAME xSC3Atk-Universal    setenv PROJECT_TEMP_DIR /Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build    setenv PUBLIC_HEADERS_FOLDER_PATH /usr/local/include    setenv RECURSIVE_SEARCH_PATHS_FOLLOW_SYMLINKS YES    setenv REMOVE_CVS_FROM_RESOURCES YES    setenv REMOVE_SVN_FROM_RESOURCES YES    setenv REZ_COLLECTOR_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/ResourceManagerResources"    setenv REZ_EXECUTABLE YES    setenv REZ_OBJECTS_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/ResourceManagerResources/Objects"    setenv REZ_SEARCH_PATHS "\"/Users/joshp/src/atk/trunk/sc/build\" "    setenv RUN_CLANG_STATIC_ANALYZER NO    setenv SCAN_ALL_SOURCE_FILES_FOR_INCLUDES NO    setenv SCRIPT_INPUT_FILE_COUNT 0    setenv SCRIPT_OUTPUT_FILE_COUNT 0    setenv SDKROOT /Developer/SDKs/MacOSX10.5.sdk    setenv SDK_DIR /Developer/SDKs/MacOSX10.5.sdk    setenv SDK_NAME macosx10.5    setenv SED /usr/bin/sed    setenv SEPARATE_STRIP NO    setenv SEPARATE_SYMBOL_EDIT NO    setenv SET_DIR_MODE_OWNER_GROUP YES    setenv SET_FILE_MODE_OWNER_GROUP NO    setenv SHARED_DERIVED_FILE_DIR /Users/joshp/src/atk/trunk/sc/build/DerivedSources    setenv SHARED_PRECOMPS_DIR /var/folders/IK/IKeDs0IJGu4Zz6z+irE3h++++TM/-Caches-/com.apple.Xcode.502/SharedPrecompiledHeaders    setenv SKIP_INSTALL YES    setenv SOURCE_ROOT /Users/joshp/src/atk/trunk/sc    setenv SRCROOT /Users/joshp/src/atk/trunk/sc    setenv STANDARD_C_PLUS_PLUS_LIBRARY_TYPE dynamic    setenv STRINGS_FILE_OUTPUT_ENCODING UTF-16    setenv STRIP_INSTALLED_PRODUCT YES    setenv STRIP_STYLE debugging    setenv SYMBOL_REPOSITORY_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/SymbolRepositories"    setenv SYMROOT /Users/joshp/src/atk/trunk/sc/build    setenv SYSTEM_ADMIN_APPS_DIR /Applications/Utilities    setenv SYSTEM_APPS_DIR /Applications    setenv SYSTEM_CORE_SERVICES_DIR /System/Library/CoreServices    setenv SYSTEM_DEMOS_DIR /Applications/Extras    setenv SYSTEM_DEVELOPER_APPS_DIR /Developer/Applications    setenv SYSTEM_DEVELOPER_BIN_DIR /Developer/usr/bin    setenv SYSTEM_DEVELOPER_DEMOS_DIR "/Developer/Applications/Utilities/Built Examples"    setenv SYSTEM_DEVELOPER_DIR /Developer    setenv SYSTEM_DEVELOPER_DOC_DIR "/Developer/ADC Reference Library"    setenv SYSTEM_DEVELOPER_GRAPHICS_TOOLS_DIR "/Developer/Applications/Graphics Tools"    setenv SYSTEM_DEVELOPER_JAVA_TOOLS_DIR "/Developer/Applications/Java Tools"    setenv SYSTEM_DEVELOPER_PERFORMANCE_TOOLS_DIR "/Developer/Applications/Performance Tools"    setenv SYSTEM_DEVELOPER_RELEASENOTES_DIR "/Developer/ADC Reference Library/releasenotes"    setenv SYSTEM_DEVELOPER_TOOLS /Developer/Tools    setenv SYSTEM_DEVELOPER_TOOLS_DOC_DIR "/Developer/ADC Reference Library/documentation/DeveloperTools"    setenv SYSTEM_DEVELOPER_TOOLS_RELEASENOTES_DIR "/Developer/ADC Reference Library/releasenotes/DeveloperTools"    setenv SYSTEM_DEVELOPER_USR_DIR /Developer/usr    setenv SYSTEM_DEVELOPER_UTILITIES_DIR /Developer/Applications/Utilities    setenv SYSTEM_DOCUMENTATION_DIR /Library/Documentation    setenv SYSTEM_LIBRARY_DIR /System/Library    setenv TARGETNAME "AtkUGens (Upgraded)"    setenv TARGET_BUILD_DIR /Users/joshp/src/atk/trunk/sc/build    setenv TARGET_NAME "AtkUGens (Upgraded)"    setenv TARGET_TEMP_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build"    setenv TEMP_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build"    setenv TEMP_FILES_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build"    setenv TEMP_FILE_DIR "/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build"    setenv TEMP_ROOT /Users/joshp/src/atk/trunk/sc/build    setenv UID 502    setenv UNSTRIPPED_PRODUCT NO    setenv USER joshp    setenv USER_APPS_DIR /Users/joshp/Applications    setenv USER_LIBRARY_DIR /Users/joshp/Library    setenv USE_DYNAMIC_NO_PIC YES    setenv USE_HEADERMAP YES    setenv USE_HEADER_SYMLINKS NO    setenv VALIDATE_PRODUCT NO    setenv VALID_ARCHS "i386 ppc ppc64 ppc7400 ppc970 x86_64"    setenv VERBOSE_PBXCP NO    setenv VERSION_INFO_BUILDER joshp    setenv VERSION_INFO_FILE AtkUGensUB_vers.c    setenv VERSION_INFO_STRING "\"@(#)PROGRAM:AtkUGensUB  PROJECT:xSC3Atk-Universal-\""    setenv WARNING_CFLAGS "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas"    setenv XCODE_APP_SUPPORT_DIR /Developer/Library/Xcode    setenv XCODE_VERSION_ACTUAL 0323    setenv XCODE_VERSION_MAJOR 0300    setenv XCODE_VERSION_MINOR 0320    setenv YACC /Developer/usr/bin/yacc    setenv ZERO_LINK NO    setenv i386 YES    setenv x86_64 YES    /bin/sh -c "\"/Users/joshp/src/atk/trunk/sc/build/xSC3Atk-Universal.build/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh\""0#
+
