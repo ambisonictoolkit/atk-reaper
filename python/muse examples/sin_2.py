@@ -35,7 +35,7 @@ phase = [0., halfPi]            # in radians
 env_durs = dur * array([.1, .5, 1.]) # env breakpoints, in sec
 
 # parameters for output file
-out_file = "/Users/josephla/Sound/PythonTest/sin_2.aif"
+out_file = "/Volumes/Audio/test/sin_2.aif"
 file_format = 'aiff'            # 
 encoding = 'pcm24'              # 
 channels = 2                    # stereo out

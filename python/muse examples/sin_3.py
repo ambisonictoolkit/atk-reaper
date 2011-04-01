@@ -35,7 +35,7 @@ phase = 0.                      # in radians
 env_durs = dur * array([.1, .5, 1.]) # env breakpoints, in sec
 
 # parameters for output file
-out_file = "/Users/josephla/Sound/PythonTest/sin_3.aif"
+out_file = "/Volumes/Audio/test/sin_3.aif"
 file_format = 'aiff'            # 
 encoding = 'pcm24'              # 
 channels = 3                    # 3 chanls out
