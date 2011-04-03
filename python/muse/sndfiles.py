@@ -4,6 +4,12 @@
 
 # Joseph Anderson 2007
 
+# NOTE: this module is to be deprecated
+#       the functionality to read/write multiple
+#       soundfiles is to be replace through the use
+#       of 'external', command line driven (de)interleaving
+#       by sndfile-(de)interleave [http://www.mega-nerd.com/libsndfile/]
+
 
 # Muse
 # ==========
