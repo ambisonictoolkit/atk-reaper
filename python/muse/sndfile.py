@@ -222,11 +222,19 @@ class Format(object):
             return self._encoding_description
 
     # Properties
-    file_format             = property(_get_file_format)
-    encoding                = property(_get_encoding)
-    endianness              = property(_get_endianness)
-    file_format_description = property(_get_file_format_description)
-    encoding_description    = property(_get_encoding_description)
+    file_format             = property(_get_file_format, \
+                                       doc = 'File format (wav, etc...).')
+    encoding                = property(_get_encoding, \
+                                       doc = 'File encoding (pcm16, etc...).')
+    endianness              = property(_get_endianness, \
+                                       doc = 'File endianness (file, ' +\
+                                       'little, etc...).')
+    file_format_description = property(_get_file_format_description, \
+                                       doc = 'File format description: the ' +\
+                                       'full description from sndfile.')
+    encoding_description    = property(_get_encoding_description, \
+                                       doc = 'File encoding description: the' +\
+                                       'full description from sndfile.')
 
 
 #NOTE:  scikits.audiolab.Sndfile is a 'type'
