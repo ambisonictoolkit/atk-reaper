@@ -536,24 +536,62 @@ class Sndfile(object):
         # the samples of all channels.
         raw_frames = self._sndfile.readframes(nframes)
         
+        # Catch 'pcm24', and 'upsample' to 'pcm32'...
+        #               ...re-setting file_dtype correctly
+        # NOTE: for some reason 'is' doesn't work, use '==' instead
+        if self._format.encoding == 'pcm24':
+            tmp_frames = ''             #temp holder to build upsamp str
+
+            if endian_flag is '<':      #little endian
+                for x in range(len(raw_frames) / sampwidth):
+
+                    #extract sample and append a padding byte
+                    samp = raw_frames[x * sampwidth:(x + 1) * sampwidth]
+
+                    #negative or positive?
+                    if ord(samp[2]) & 0x80:
+                        tmp_frames += (samp + '\xff')   #neg val
+                    else:
+                        tmp_frames += (samp + '\x00')   #pos val     
+
+            else:                       #big endian
+                for x in range(len(raw_frames) / sampwidth):
+
+                    #extract sample and append a padding byte
+                    samp = raw_frames[x * sampwidth:(x + 1) * sampwidth]
+
+                    #negative or positive?
+                    if ord(samp[0]) & 0x80:
+                        tmp_frames += ('\xff' + samp)   #neg val
+                    else:
+                        tmp_frames += ('\x00' + samp)   #pos val     
+
+            #assign to raw_frames
+            raw_frames = tmp_frames
+
+            #assign new file_dtype (to 'pcm32')
+            file_dtype = endian_flag +\
+                         _aencodings_dtype_dic[self._format.encoding] +\
+                         '4'
+            
+
         # Convert to numpy array
-        # NOTE: need to catch 'pcm24', as the below won't work...
         frames = np.fromstring(
             raw_frames,
             dtype = file_dtype
             ).astype(dtype)
 
         # Catch 'pcmu8', to center around 0
-        # NOTE: for some reason 'is' doesn't work... use '==' instead
+        # NOTE: for some reason 'is' doesn't work, use '==' instead
         if self._format.encoding == 'pcmu8':
             frames -= pow(2, self._bps - 1)
 
         # If dtype is float, scale to +/-1
-        # NOTE: there may an an issue w/ 'pcmu8' support
         if dtype in _numpy_floats:
             frames *= pow(2, 1 - self._bps)
 
         return frames
+
 
     def seek(self):
         """Seek into audio file: similar to python seek function, taking only in
