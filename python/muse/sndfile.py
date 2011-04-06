@@ -36,6 +36,7 @@ import sndhdr
 import aifc
 import wave
 
+from muse import nchannels
 
 # **************************
 # NOTE: '_a' appended to var names = '_available_'
@@ -421,7 +422,8 @@ class Sndfile(object):
             self._samplerate    = samplerate
             self._channels      = channels
             self._bps           = _aencodings_bps_dic[self._format.encoding]
-            self._nframes       = long(-1)  #Update when frames are written
+#            self._nframes       = long(-1)  #Update when frames are written
+            self._nframes       = long(0)   #Update when frames are written
             
             # 2) assign appropriate PSL soundfile read/writer,
             #    e.g., psl_sndfile = wave
@@ -436,7 +438,7 @@ class Sndfile(object):
             self._sndfile.setsampwidth(
                 _aencodings_bps_dic[self._format.encoding] / 8
                 )
-            self._sndfile.setnframes(self._nframes)             # init to -1
+            self._sndfile.setnframes(self._nframes)             # init to 0
             self._sndfile.setcomptype('NONE', 'not compressed') # compression is
                                                                 # not supported
 
@@ -632,8 +634,13 @@ class Sndfile(object):
         (that is in the range [-1..1] - which will corresponds to the maximum
         range allowed by the integer bitwidth)."""
 
+        # Error check:
+        if nchannels(input) != self._channels:
+            raise ValueError, 'Expected %s channel(s), ' % self._channels +\
+                  'got %s' % nchannels(input)
+
         # First, set up...
-        
+
         # Read sample width (in bytes)
         # NOTE: this could be determined from self._bps
         sampwidth = self._sndfile.getsampwidth()
