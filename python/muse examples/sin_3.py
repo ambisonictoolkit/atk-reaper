@@ -35,10 +35,13 @@ phase = 0.                      # in radians
 env_durs = dur * array([.1, .5, 1.]) # env breakpoints, in sec
 
 # parameters for output file
-out_file = "/Volumes/Audio/test/sin_3.aif"
-file_format = 'aiff'            # 
-encoding = 'pcm24'              # 
-channels = 3                    # 3 chanls out
+file_type   = 'wav'             # 'wav' chosen as both PSL and scikits.audiolab
+encoding    = 'pcm24'           #       support read/write 'pcm24
+channels    = 3                 # three channels out
+
+file_path   = '/Volumes/Audio/test/'
+file_name   = 'sin_3'
+out_file    = file_path + file_name + '.' + file_type[:3]
 
 
 # calulate values from parameters
@@ -61,7 +64,6 @@ env = scale * interleave(
 
 # envelope
 env_sig = env * sig
-# env_sig = sig
 
 # display
 pl.xlabel('Time (frames)')      # label x-axis
@@ -73,25 +75,24 @@ pl.ylim(-1,1)                   # set the y display limit
 pl.show()                       # show the thing!!
 
 # instantiate output soundfile for writing
-out_sfile =  sndfile(
+# Sndfile(filename, mode=r, Format, channels, samplerate)
+out_sfile =  Sndfile(
     out_file,
-    'write',
-    formatinfo(
-        file_format,
-        encoding
-        ),
+    'w',
+    Format(file_type, encoding),    # Format(type, encoding, endianness=file)
     channels,
     sr
-)
+    )
 
 # write to output
 out_sfile.write_frames(
-    env_sig,                    # signal for output
-    nframes                     # number of frames to write
+    env_sig                     # signal for output
 )
 
 # now close file
 out_sfile.close()
 
+# close pylab
+pl.close()
 
 print "Done!!"
