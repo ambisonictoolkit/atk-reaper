@@ -204,6 +204,10 @@ def sndfile_version():  #e.g., libsndfile is not installed
 
 # **************************
 
+# define a generic exception
+class Error(Exception):
+    pass
+
 #NOTE:  scikits.audiolab.Format is a 'type'
 #       Format is defined as a 'new-style' class (which is also a type)
 class Format(object):
@@ -399,7 +403,7 @@ class Sndfile(object):
             elif file_type is 'aiff' or file_type is 'aifc':
                 encoding    = 'pcms' + str(bps)
             else:
-                raise ValueError, "Couldn't determine correct encoding."
+                raise Error, "Couldn't determine correct encoding."
 
             self._format        = Format(file_type, encoding, 'file')
             self._samplerate    = _sndhdr[1]
@@ -730,7 +734,7 @@ class Sndfile(object):
         self._sndfile.writeframes(raw_frames)
 
 
-    def seek(self):
+    def seek(self, offset, whence = 0, mode = 'rw'):
         """Seek into audio file: similar to python seek function, taking only in
         account audio data.
         
@@ -746,7 +750,7 @@ class Sndfile(object):
             If set to 'rw', both read and write pointers are updated. If
             'r' is given, only read pointer is updated, if 'w', only the
             write one is (this may of course make sense only if you open
-            the file in a certain mode).
+            the file in a certain mode). See note below regarding 'w'.
         
         Returns
         -------
@@ -757,12 +761,41 @@ class Sndfile(object):
         -----
         
         Offset relative to audio data: meta-data are ignored.
+
+        PSL actually only supports seeking for a file being read. This
+        is equivalent to the 'r' mode. So as not to throw an error, given
+        'rw' is the default flag for the seek method, 'rw' is accepted,
+        but supported as 'r'.
         
-        if an invalid seek is given (beyond or before the file), an IOError is
-        launched; note that this is different from the seek method of a File
-        object."""
+        If an invalid seek is given (beyond or before the file), a PSL
+        error is thrown."""
 
         pass
+
+        # Error check:
+        if mode not in ['rw', 'r']:
+            raise ValueError, 'mode %s is not supported: ' % mode +\
+                  'the only supported modes are rw and r.'
+
+        if whence not in range(3):
+            raise ValueError, 'whence %i is not supported: ' % whence +\
+                  'choose values 0-2.'
+
+        if not (isinstance(self._sndfile, wave.Wave_read) or \
+                isinstance(self._sndfile, aifc.Aifc_read)):
+            raise Error, 'PSL can only seek in files opened for reading.'
+
+
+        # do the stuff
+        if whence == 0:             # with respect to start of file
+            self._sndfile.setpos(offset)
+
+        if whence == 1:             # with respect to current position
+            self._sndfile.setpos(offset + self._sndfile.tell())
+
+        if whence == 2:             # with respect to end of file
+            self._sndfile.setpos(offset + self._sndfile.getnframes())
+
 
     def sync(self):
         """call the operating system's function to force the writing of all
@@ -771,9 +804,9 @@ class Sndfile(object):
         No effect if file is open as read"""
 
         # PSL doesn't have an analagous method.
-        # Need to work out what to do here....
-
-        pass
+        print "The Python Standard Library doesn't have an analagous" +\
+              "method.\nWith PSL, this method is redundant, given " +\
+              "the behaviour \nof PSL modules."
 
 
 ##    read_frames(...)
