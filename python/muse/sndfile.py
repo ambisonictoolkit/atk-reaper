@@ -90,7 +90,7 @@ _aencodings_descriptions_dic = {
     'ima_adpcm' :   'IMA ADPCM'
 }
 
-_aencodings_dtype_dic = {
+_aencodings_kind_dic = {
     'pcmu8'     :   'u',
     'pcms8'     :   'i',
     'pcm16'     :   'i',
@@ -98,6 +98,16 @@ _aencodings_dtype_dic = {
     'pcm32'     :   'i',
     'float32'   :   'f',
     'float64'   :   'f'
+}
+
+_aencodings_bps_dic = {
+    'pcmu8'     :   8,
+    'pcms8'     :   8,
+    'pcm16'     :   16,
+    'pcm24'     :   24,
+    'pcm32'     :   32,
+    'float32'   :   32,
+    'float64'   :   64
 }
 
 # set-up individual type support for encodings
@@ -179,12 +189,6 @@ _apsl_sndfile_dict = {
     'wav'   :   wave
 }
 
-# List of numpy floats
-# NOTE: Not all of these are supported on all systems
-##_numpy_floats = [ np.half, np.single, np.double, np.float_, np.longfloat, \
-##                 np.float16, np.float32, np.float64, np.float96, np.float128 ]
-_numpy_floats = [ np.single, np.double, np.float_, np.longfloat, \
-                 np.float32, np.float64, np.float128 ]
 
 # **************************
 
@@ -412,20 +416,29 @@ class Sndfile(object):
 
         # Set-up for writing, e.g., 'w'... (including opening files!)
         else:
-            # 1) populate params,
+            # 1) populate params
             self._format        = format
-            self._channels      = channels
             self._samplerate    = samplerate
-            self._nframes       = long(-1)
-            self._bps           = None  #Need to populate via a dict
+            self._channels      = channels
+            self._bps           = _aencodings_bps_dic[self._format.encoding]
+            self._nframes       = long(-1)  #Update when frames are written
             
             # 2) assign appropriate PSL soundfile read/writer,
             #    e.g., psl_sndfile = wave
-            _apsl_sndfile = _apsl_sndfile_dict[file_type]
+            _apsl_sndfile = _apsl_sndfile_dict[format.file_format]
 
             # 3) open w/ PSL
             self._sndfile = _apsl_sndfile.open(filename, 'wb')
 
+            # 4) set various PSL params
+            self._sndfile.setnchannels(channels)
+            self._sndfile.setframerate(samplerate)
+            self._sndfile.setsampwidth(
+                _aencodings_bps_dic[self._format.encoding] / 8
+                )
+            self._sndfile.setnframes(self._nframes)             # init to -1
+            self._sndfile.setcomptype('NONE', 'not compressed') # compression is
+                                                                # not supported
 
 
     # New-class properties are equivalent to CPython getset.
@@ -478,6 +491,7 @@ class Sndfile(object):
         """Close the file."""
         self._sndfile.close()
 
+
     #------------------
     # Functions to read
     #------------------
@@ -529,14 +543,14 @@ class Sndfile(object):
 
         # file data type (as a numpy dtype)
         file_dtype = endian_flag +\
-                     _aencodings_dtype_dic[self._format.encoding] +\
+                     _aencodings_kind_dic[self._format.encoding] +\
                      str(sampwidth)
 
         # Read frames, returned 'raw' as a string containing for each frame
         # the samples of all channels.
         raw_frames = self._sndfile.readframes(nframes)
         
-        # Catch 'pcm24', and 'upsample' to 'pcm32'...
+        # Catch 'pcm24', and 'upsample' to 'i4'...
         #               ...re-setting file_dtype correctly
         # NOTE: for some reason 'is' doesn't work, use '==' instead
         if self._format.encoding == 'pcm24':
@@ -554,7 +568,7 @@ class Sndfile(object):
                     else:
                         tmp_frames += (samp + '\x00')   #pos val     
 
-            else:                       #big endian
+            else:                       #big endian (**untested)
                 for x in range(len(raw_frames) / sampwidth):
 
                     #extract sample and append a padding byte
@@ -571,9 +585,8 @@ class Sndfile(object):
 
             #assign new file_dtype (to 'pcm32')
             file_dtype = endian_flag +\
-                         _aencodings_dtype_dic[self._format.encoding] +\
+                         _aencodings_kind_dic[self._format.encoding] +\
                          '4'
-            
 
         # Convert to numpy array
         frames = np.fromstring(
@@ -587,10 +600,127 @@ class Sndfile(object):
             frames -= pow(2, self._bps - 1)
 
         # If dtype is float, scale to +/-1
-        if dtype in _numpy_floats:
+        if np.dtype(dtype).kind is 'f':
             frames *= pow(2, 1 - self._bps)
 
+        # Finally... correctly reshape for multi-channel
+        if self._channels > 1:
+            frames = np.reshape(frames, (-1, self._channels))
+
         return frames
+
+
+    #-------------------
+    # Functions to write
+    #-------------------
+    def write_frames(self, input):
+        """write given number frames into file.
+        
+        Parameters
+        ----------
+        input : ndarray
+            array containing data to write.
+        
+        Notes
+        -----
+        One column per channel.
+        
+        updates the write pointer.
+        
+        if the input type is float, and the file encoding is an integer type,
+        you should make sure the input data are normalized normalized data
+        (that is in the range [-1..1] - which will corresponds to the maximum
+        range allowed by the integer bitwidth)."""
+
+        # First, set up...
+        
+        # Read sample width (in bytes)
+        # NOTE: this could be determined from self._bps
+        sampwidth = self._sndfile.getsampwidth()
+
+        # Determine actual endianness...
+        #           ... from defaults for standard file spec
+        # NOTE: this may result in a problem for 'wav' files on ppc
+        if self._format.endianness is 'file':
+            if self._format.file_format is 'wav':
+                endian_flag = '<'       # 'wav' is little endian
+
+            elif self._format.file_format is 'aiff' \
+                 or self._format.file_format is 'aifc':
+                endian_flag = '>'       # 'aiff' is big endian
+
+        # data type (as a numpy dtype)
+        file_dtype = endian_flag +\
+                     _aencodings_kind_dic[self._format.encoding] +\
+                     str(sampwidth)
+
+        # catch 'pcm24', and set data type to 32 bit
+        if file_dtype == '<i3':
+            file_dtype = '<i4'
+        elif file_dtype == '>i3':
+            file_dtype = '>i4'
+
+        # make a copy of the input to work with
+        frames = input.copy()
+
+        # rescale if need be...
+        #   do nothing if input dtype kind == file encoding kind
+        # NOTE: For input dtype kind 'int', there is no rescaling/
+        #       This is left to the user.
+        #       ***May want to check the behaviour of scikits.audiolab
+        if frames.dtype.kind != _aencodings_kind_dic[self._format.encoding]:
+            if frames.dtype.kind == 'f':        #input is 'f', file is 'i'
+                if _aencodings_kind_dic[self._format.encoding] == 'u': #pcmus8
+                    frames += 1
+                frames *= pow(2, self._bps - 1) - 1
+            else:                               #input is 'i', file is 'f'
+                frames *= pow(2, 1 - self._bps)
+
+        # cast to the correct byte size / bit depth
+        frames = frames.astype(file_dtype)
+
+        # is it multi-channel?
+        if len(np.shape(frames)) > 1:
+            frames = frames.ravel()
+
+        # convert to string
+        raw_frames = frames.tostring()
+
+        # catch 'pcm24' and drop 1 byte out of 4
+        # NOTE: for some reason 'is' doesn't work, use '==' instead
+        if self._format.encoding == 'pcm24':
+            tmp_frames = ''             #temp holder to build upsamp str
+
+            if endian_flag is '<':      #little endian
+                for x in range(len(raw_frames) / frames.dtype.itemsize):
+
+                    #extract sample and drop ms byte
+                    samp = raw_frames[
+                        x * frames.dtype.itemsize:
+                        x * frames.dtype.itemsize + sampwidth
+                        ]
+
+                    #append to the string
+                    tmp_frames += samp
+
+            else:                       #big endian (**untested)
+                for x in range(len(raw_frames) / frames.dtype.itemsize):
+
+                    #extract sample and drop ms byte
+                    samp = raw_frames[
+                        x * frames.dtype.itemsize + 1:
+                        x * frames.dtype.itemsize + 1 + sampwidth
+                        ]
+
+                    #append to the string
+                    tmp_frames += samp
+
+            #assign to raw_frames
+            raw_frames = tmp_frames
+
+
+        # write out!
+        self._sndfile.writeframes(raw_frames)
 
 
     def seek(self):
@@ -633,26 +763,8 @@ class Sndfile(object):
         
         No effect if file is open as read"""
 
-        pass
-
-    def write_frames(self):
-        """write given number frames into file.
-        
-        Parameters
-        ----------
-        input : ndarray
-            array containing data to write.
-        
-        Notes
-        -----
-        One column per channel.
-        
-        updates the write pointer.
-        
-        if the input type is float, and the file encoding is an integer type,
-        you should make sure the input data are normalized normalized data
-        (that is in the range [-1..1] - which will corresponds to the maximum
-        range allowed by the integer bitwidth)."""
+        # PSL doesn't have an analagous method.
+        # Need to work out what to do here....
 
         pass
 
