@@ -251,7 +251,8 @@ class Format(object):
         if encoding not in _aencodings_dict[type] or \
            endianness not in _aendianness_dict[type]:
             raise ValueError, 'The combination ' +\
-                  '(type=wav|encoding=pcms8|endianness=file) ' +\
+                  ('(type = %s|encoding = %s|endianness = %s) ' % \
+                  (type, encoding, endianness)) + \
                   'you requested is not supported. You can use ' +\
                   'available_formats and available_encodings functions ' +\
                   'to query which formats and encodings are available.'
