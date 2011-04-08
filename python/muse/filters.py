@@ -21,6 +21,8 @@ from muse import *
 from generators import *
 from scipy.signal import *
 from scipy.signal.signaltools import *
+from numpy.fft import rfft, irfft # may want to replace this with fftpack...
+import scipy.fftpack
 
 
 # #=========================
@@ -74,7 +76,6 @@ def irceps(b):
     Inputs:
     
       b  -- signal (or filter) kernel
-      min -- minimum value to clip input fft to.
 
     Outputs:
     
@@ -87,6 +88,115 @@ def irceps(b):
             ))
 
     return res
+
+
+# Laguerre
+def lagt(x, c, M):
+    """lagt(x, c, M)
+
+    Laguerre transform of input.
+    
+    Inputs:
+    
+      x -- input signal
+      c -- Laguerre parameter (warping, -1 to +1, 0 = none)
+      M -- number of terms of the Laguerre transform to compute.
+    
+    Outputs:
+    
+      y -- transformed output.
+
+
+    Notes: 
+
+    For for approximate length to match N:
+
+    M = int((1 + abs(c)) / (1 - abs(c)) * N)
+
+
+    To calculate c in terms of Wn:
+
+    c = -(tan(pi / 2 * Wn) - 1.) / (tan(pi / 2 * Wn) + 1.)
+
+    OR
+
+    b, a = butter(1, Wn, 'lowpass')
+    c = -a[1]
+
+    """
+
+    N = len(x)
+    y = empty(M)                # empty output
+    rx = flipud(x)              # time reverse x
+
+    yy = ffilter(              # filter by normalizing filter lambda_0
+        array([sqrt(1 - c**2)]),
+        array([1., c]),
+        x
+        )
+    y[0] = yy[-1]               # keep last sample for 1st output
+
+    for k in range(1, M):        # allpass loop
+        yy = ffilter(
+            array([c, 1.]),
+            array([1., c]),
+            yy
+            )
+        y[k] = yy[-1]           # keep last sample for kth output
+
+    return y
+
+
+def lagtun(x, c, M):
+    """lagtun(x, c, M)
+
+    Laguerre transform of input, un-normalized.
+
+    Inputs:
+    
+      x -- input signal
+      c -- Laguerre parameter (warping, -1 to +1, 0 = none)
+      M -- number of terms of the Laguerre transform to compute.
+    
+    Outputs:
+    
+      y -- transformed output.
+
+
+    Notes: 
+
+    For for approximate length to match N:
+
+    M = int((1 + abs(c)) / (1 - abs(c)) * N)
+
+
+    To calculate c in terms of Wn:
+
+    c = -(tan(pi / 2 * Wn) - 1.) / (tan(pi / 2 * Wn) + 1.)
+
+    OR
+
+    b, a = butter(1, Wn, 'lowpass')
+    c = -a[1]
+
+    """
+
+    N = len(x)
+    y = empty(M)                # empty output
+    rx = flipud(x)              # time reverse x
+
+    yy = x                      # un-normalized input
+    y[0] = yy[-1]               # keep last sample for 1st output
+
+    for k in range(1, M):        # allpass loop
+        yy = ffilter(
+            array([c, 1.]),
+            array([1., c]),
+            yy
+            )
+        y[k] = yy[-1]           # keep last sample for kth output
+
+    return y
 
 
 # FIR methods. . . 
@@ -130,6 +240,7 @@ def mirf(b):
     return mir_b
 
 
+# NOTE: ADD A KEY HERE, TO CHOOSE BETWEEN FFT OR TIME DOMAIN INVF
 def invf(b):
     """invf(b)
 
@@ -147,6 +258,73 @@ def invf(b):
     inv_b = ap_b - b
     
     return inv_b
+
+# # NOTE: FFT VERSION NEEDS REVISION, THERE IS A PROBLEM W/ PHASE
+# #       IN THAT b + invf(b) != ap(b)
+# def invf(b):
+#     """invf(b)
+
+#     Return spectral inversion of kernel b.
+
+#     b + invf(b) returns allpass
+#     """
+
+#     # take real fft
+#     fft_b = rfft(b)
+
+#     # find magnitude
+#     mag = abs(fft_b)
+
+#     # find phase
+#     phase = angle(fft_b)
+
+#     # invert mag
+#     inv_mag = 1. - mag
+
+#     # take the ifft (real)
+#     res = irfft(inv_mag * (cos(phase) + sin(phase) * 1j))
+    
+#     return res
+
+
+def apf(b):
+    """apf(b)
+
+    Return allpass kernel, preserving phase of b.
+    """
+    
+    # take real fft
+    fft_b = rfft(b)
+
+    # find phase
+    phase = angle(fft_b)
+
+    # take the ifft (real)
+    res = irfft(cos(phase) + sin(phase) * 1j)
+
+    return res
+
+
+def linf(b):
+    """linf(b)
+
+    Return linear phase kernel, preserving magnitude of b.
+    """
+    
+    # take real fft
+    fft_b = rfft(b)
+
+    # find magnitude
+    mag = abs(fft_b)
+
+    # set phase to linear
+    N = len(mag)
+    phase = lin([0., -pi * N], N)
+
+    # take the ifft (real)
+    res = irfft(mag * (cos(phase) + sin(phase) * 1j))
+
+    return res
 
 
 # minimum phase
@@ -215,6 +393,9 @@ def minf(b, min = -120., oversampling = 8):
 
     return res
 
+
+# *************************
+# filter kernel generation functions, below
 
 # consider replacing FIR design methods with sinc methods
 # see also: http://www.nicholson.com/rhn/dsp.html
@@ -571,9 +752,258 @@ def fir_hb(N, beta=5):
         return res
 
 
+# def fir_ap(N, width=pi):
+#     """fir_ap(N, width=pi)
+
+#     Allpass FIR Filter Design using ideal filter method, un-windowed.
+    
+#     Inputs:
+    
+#       N  -- order of filter (number of taps)
+#       width -- phase range.
+    
+#     Outputs:
+    
+#       b      -- coefficients of length N FIR filter.
+#     """
+#     Nr = N/2 + 1
+
+#     mag = ones(Nr)
+#     phase = white(Nr)
+        
+#     phase *= width
+#     phase += lin([0., -pi * N / 2], Nr)
+#     phase[0] = 0
+
+#     # take the ifft (real)
+#     ap_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
+
+#     return ap_b
+
+
+# def fir_ap(N, Wn=.5, width=pi):
+#     """fir_ap(N, Wn=.5, width=pi)
+
+#     Allpass FIR Filter Design using ideal filter method, un-windowed.
+    
+#     Inputs:
+    
+#       N  -- order of filter (number of taps)
+#       Wn -- frequency warping
+#       width -- phase range
+    
+#     Outputs:
+    
+#       b      -- coefficients of length N FIR filter.
+#     """
+
+#     Nr = N/2 + 1
+
+#     mag = ones(Nr)
+#     phase = white(Nr)
+    
+#     if Wn != .5:                # warp
+
+#         c = -(tan(pi / 2 * Wn) - 1.) / (tan(pi / 2 * Wn) + 1.)
+
+#         x0 = lin(nframes = Nr)      # linear index
+
+#         phase = interp(
+#             Wn_warp(x0, c),
+#             x0,
+#             phase
+#             )
+
+#     phase *= width
+#     phase += lin([0., -pi * N / 2], Nr)
+#     phase[0] = 0
+
+#     # take the ifft (real)
+#     ap_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
+
+#     return ap_b
+
+
+def fir_ap(N, Wn=.5, width=pi):
+    """fir_ap(N, Wn=.5, width=pi)
+
+    Allpass FIR Filter Design using ideal filter method, un-windowed.
+    
+    Inputs:
+    
+      N  -- order of filter (number of taps)
+      Wn -- frequency warping
+      width -- phase range
+    
+    Outputs:
+    
+      b      -- coefficients of length N FIR filter.
+    """
+
+    Nr = N/2 + 1
+
+    mag = ones(Nr)
+    phase = white(Nr)
+    
+    if Wn != .5:                # warp
+
+        x0 = lin(nframes = Nr)      # linear index
+
+        phase = interp(
+            Wn_warp(x0, 1. - Wn, True),
+            x0,
+            phase
+            )
+
+    phase *= width
+    phase += lin([0., -pi * N / 2], Nr)
+    phase[0] = 0
+
+    # take the ifft (real)
+    ap_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
+
+    return ap_b
+
+
+def fir_apw(N, Wn=.5, width=pi, minp=True):
+    """fir_apw(N, Wn=.5, width=pi, minp=True)
+
+    Allpass FIR Filter Design using ideal filter method, warped and windowed.
+    
+    Inputs:
+    
+      N  -- order of filter (number of taps)
+      Wn -- frequency warping
+      width -- kaiser window beta
+      minp -- minimum phase?
+    
+    Outputs:
+    
+      b      -- coefficients of length N FIR filter.
+    """
+
+    N /= 2
+
+    c = -(tan(pi / 2 * Wn) - 1.) / (tan(pi / 2 * Wn) + 1.)
+    Nr = int((1 - abs(c)) / (1 + abs(c)) * N)/2 + 1
+
+    phase = white(Nr)
+    phase[0] = 0
+
+    # take the ifft (real): generates ap filter
+    ap_b = irfft(cos(phase) + sin(phase) * 1j)
+
+    # warp: changes response from ap
+    ap_b = lagt(ap_b, c, N)
+
+    # window: reduce 'tail'
+    ap_b *= kaiser(2 * N, width)[N:]
+
+    # re-normalise gain for allpass: through convolution with inverse filter
+    # NOTE: may want to replace with apf()
+    rfft_b = rfft(ap_b)
+    mag = 1./absolute(rfft_b)
+    phase = lin([0., -pi * len(mag)], len(mag))
+    inv_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
+    if minp:
+        inv_b = minf(inv_b)
+    ap_b = convfilt(ap_b, inv_b, 'full')
+
+    # append zeros as necessary
+    if len(ap_b) < 2 * N:
+        ap_b = concatenate((ap_b, zeros(2 * N - len(ap_b))))
+
+    return ap_b
+
 #=========================
 # Convolution Function
 #=========================
+
+def fftpackrconvolve(in1, in2, fftN):
+    # returns complete fft
+
+    res = real(
+        scipy.fftpack.ifft(
+            scipy.fftpack.fft(in1, fftN) * scipy.fftpack.fft(in2, fftN)
+            )
+        )
+
+    return res
+
+
+# NOTE: fconvolve is principally to be used as a primitive
+# doesn't handle all cases well--use convfilt! (this is a primitive for convfilt)
+def fconvolve(in1, in2):
+    """fconvolve(in1, in2)
+
+    Convolve two N-dimensional arrays, using fftpack.
+    
+    Description:
+    
+       Convolve in1 and in2.
+    
+    Inputs:
+    
+      in1 -- an N-dimensional array.
+      in2 -- an array with the same number of dimensions as in1.
+    
+    Outputs:  (out,)
+    
+      out -- an N-dimensional array containing a subset of the discrete linear
+             convolution of in1 with in2. The output is the full discrete linear
+             convolution of the inputs.
+    """
+    
+    # size and channels for in1 and in2
+    in1N = nframes(in1)
+    in2N = nframes(in2)
+
+    in1Ch = nchannels(in1)
+    in2Ch = nchannels(in2)
+
+    # resulting convolution length
+    cN = in1N + in2N - 1
+
+    # resulting fft size should be a power of 2 for speed
+    fftN = 2**int(ceil(log2(cN)))
+
+    # case 2: in1 is multichannel and in2 is single channel (interleaved)
+    if (in1Ch > 1) and (in2Ch is 1):
+        in2 = tile(
+            in2,
+            in1Ch
+            )
+
+    # case 3: in1 is single channel (interleaved) and in2 is multichannel
+    elif (in1Ch is 1) and (in2Ch > 1):
+        in1 = tile(
+            in1,
+            in2Ch
+            )
+
+    # convolve here
+#     res = real(
+#         scipy.fftpack.ifft(
+#             scipy.fftpack.fft(in1, fftN) * scipy.fftpack.fft(in2, fftN)
+#             )
+#         )[:cN]
+
+    if in1Ch is 1 and in2Ch is 1:
+        res = fftpackrconvolve(in1, in2, fftN)[:cN]
+
+    else:
+        maxCh = max(in1Ch, in2Ch)
+        res = empty([maxCh, in1N + in2N - 1]) # deinterleaved, empty res
+
+        in1_d = deinterleave(in1)
+        in2_d = deinterleave(in2)
+
+        for n in range(maxCh):
+            res[n] = fftpackrconvolve(in1_d[n], in2_d[n], fftN)[:cN]
+        res = interleave(res)
+
+    return res
+
 
 # may want to add a convolution function that
 # takes kernel as a spectrum
@@ -613,7 +1043,8 @@ def convfilt(x, kernel, mode = 'z', kind = 'fft', zi = None):
     if kind is 'direct':
         convfun = convolve
     else:
-        convfun = fftconvolve
+#         convfun = fftconvolve
+        convfun = fconvolve
 
     x_chans = nchannels(x)
     k_chans = nchannels(kernel)
@@ -667,6 +1098,98 @@ def convfilt(x, kernel, mode = 'z', kind = 'fft', zi = None):
     else:
         return y
 
+# # may want to add a convolution function that
+# # takes kernel as a spectrum
+# def convfilt(x, kernel, mode = 'z', kind = 'fft', zi = None):
+#     """convfilt(x, kernel, mode = 'z', zi = None)
+
+#     Convolve input x by kernel. 
+    
+#     Description
+    
+#       Convolve input x by kernel along the 0 axis.
+#       Operates in two different modes, returning the complete
+#       convolution, or acting as a filter with state.
+
+#       Wraps convolve and fftconvolve.
+    
+#     Inputs:
+    
+#       x -- A N-dimensional input array.
+#       kernel -- A one or N-dimensional input array.
+#       mode -- 'z' or 'full'. If mode is 'z', acts as a filter
+#                with state 'z', and returns a vector of length len(x).
+#                If mode is 'full', returns the full convolution.
+#       kind -- 'direct' or 'fft', for direct or fft convolution
+#       zi -- Initial state.  It is a vector
+#             (or array of vectors for an N-dimensional input) of length
+#             len(kernel) - 1.  If zi=None or is not given then initial
+#             rest is assumed.
+    
+#     Outputs: (y, {zf})
+    
+#       y -- The output of the delay.
+#       zf -- If zi is None, this is not returned, otherwise, zf holds the
+#             delay values.
+    
+#       """
+#     if kind is 'direct':
+#         convfun = convolve
+#     else:
+#         convfun = fftconvolve
+
+#     x_chans = nchannels(x)
+#     k_chans = nchannels(kernel)
+
+#     # case 1: x and kernel are are both single channel
+#     if (x_chans is 1) and (k_chans is 1):
+#         y = convfun(x, kernel)
+
+#     # case 2: x is multichannel and kernel is single channel
+#     elif (x_chans > 1) and (k_chans is 1):
+#         kernel = interleave(kernel)
+#         y = convfun(x, kernel)
+
+#     # case 3: x is single channel and kernel is multichannel
+#     elif (x_chans is 1) and (k_chans > 1):
+#         x = interleave(x)
+#         y = convfun(x, kernel)
+
+#     # case 4: x and kernel are multichannel, test if equal
+#     elif x_chans == k_chans:
+
+#         y = empty([x_chans, nframes(x) + nframes(kernel) - 1]) # deinterleaved, empty y
+
+#         x_d = deinterleave(x)
+#         k_d = deinterleave(kernel)
+
+#         for n in range(x_chans):
+#             y[n] = convfun(x_d[n], k_d[n])
+#         y = interleave(y)
+
+#     else:                       # raise error here
+#         raise ValueError, ("Doh!!, x and kernel don't broadcast!")
+
+#     # now return the result. . .
+#     if mode is 'z':
+
+#         y, zf = split(y, [nframes(x)])
+
+#         if zi is None:
+#             return y
+
+#         else:
+#             if nframes(zi) == (nframes(kernel) - 1):
+#                 over_dub(y, zi, write_over = True)
+#                 return y, zf
+
+#             else:
+#                 print nframes(zi), (nframes(kernel) - 1)
+#                 raise ValueError, ("Doh!!, zi is wrong size!!")
+
+#     else:
+#         return y
+
 
 #=========================
 # IIR Filter Functions
@@ -713,19 +1236,20 @@ def ffilter(b, a, x, zi=None):
       """
     axis = 0                    # filter along the 0 axis
 
-    # test on input conditions
     if (x.ndim is 2) and (zi != None): # test for 2-dim case where lfilter fails
+
+        chans = nchannels(x)
         
         x = deinterleave(x, False) # deinterleave x
 
         y = empty_like(x) # empty outputs
         zf = empty_like(zi)
 
-        for (n, x_n, zi_n) in zip(range(shape(zi)[0]), x, zi): # iterate, by channel
+        for (n, x_n, zi_n) in zip(range(chans), x, zi): # iterate, by channel
 
             y[n], zf[n] = lfilter(b, a, x_n, axis, zi_n)
 
-        y = interleave(y)   # deinterleave y
+        y = interleave(y, False)   # deinterleave y
 
         return y, zf
 
@@ -1122,6 +1646,47 @@ def fiir_bs(x, N, Wn, q = 1., zi = None):
     return y
 
 
+def fiir_ap(x, N, Wn, zi = None):
+    """fiir_ap(x, N, Wn, zi = None)
+
+    Filter data along one-dimension with a fixed frequency butterworth
+    allpass IIR filter. Filter along the 0 axis
+    
+    Description
+    
+      Filter a data sequence, x, using an all pass digital butterworth filter.
+      The filter is a direct form II transposed implementation of the standard
+      difference equation
+      (see "Algorithm").
+    
+    Inputs:
+    
+      x -- An N-dimensional input array.
+      N -- order
+      Wn -- cutoff
+      zi -- Initial conditions for the filter delays.  It is a vector
+            (or array of vectors for an N-dimensional input) of length
+            max(len(a),len(b)).  If zi=None or is not given then initial
+            rest is assumed.  SEE signal.lfiltic for more information.
+    
+    Outputs: (y, {zf})
+    
+      y -- The output of the digital filter.
+      zf -- If zi is None, this is not returned, otherwise, zf holds the
+            final filter delay values.
+    
+    Algorithm:
+      See butter and lfilter
+
+      """
+    b, a = butter(N, Wn, 'lowpass')
+    b = flipud(a)
+
+    y = ffilter(b, a, x, zi)
+    
+    return y
+
+
 def diff_filt(x, zi = None):
     """diff_filt(x, zi = None)
 
@@ -1266,6 +1831,49 @@ def sinosc(Wn, phase = 0., zi = None):
     else:
         y, zf = phasor(Wn, phase, zi)
         return sin(y), zf
+
+
+# **************************************
+# low noise. . .
+# **************************************
+
+def low_noise(nframes, N, Wn, zi = None):
+    """low_noise(nframes, N, Wn, zi = None)
+
+    Generate low frequency noise by filtering white noise with
+    a fixed frequency butterworth low pass IIR filter. Retains
+    constant power with cutoff.
+        
+    Inputs:
+    
+      nframes -- nframes to generate, may be a shape tuple for multichannel.
+      N       -- low pass filter order
+      Wn      -- cutoff
+      zi      -- Initial conditions for the filter delays.  It is a vector
+                 (or array of vectors for an N-dimensional input) of length
+                 max(len(a),len(b)).  If zi=None or is not given then initial
+                 rest is assumed.  SEE signal.lfiltic for more information.
+    
+    Outputs: (y, {zf})
+    
+      y -- The output of the digital filter.
+      zf -- If zi is None, this is not returned, otherwise, zf holds the
+            final filter delay values.
+    
+    Algorithm:
+      See white, butter and lfilter
+
+      """
+    if Wn == 1.:
+        b = zeros(N+1)
+        b[0] = 1.
+        a = b
+    else:
+        b, a = butter(N, Wn, 'lowpass')
+
+    y = ffilter(b, a, white(nframes) / sqrt(Wn), zi)
+    
+    return y
 
 
 # **************************************
