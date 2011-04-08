@@ -199,6 +199,69 @@ def lagtun(x, c, M):
     return y
 
 
+# ************** New allpass normalised lagt
+def lagtapn(x, c, M):
+    """lagtapn(x, c, M)
+
+    Laguerre transform of input, all-pass normalized.
+    
+    Inputs:
+    
+      x -- input signal
+      c -- Laguerre parameter (warping, -1 to +1, 0 = none)
+      M -- number of terms of the Laguerre transform to compute.
+    
+    Outputs:
+    
+      y -- transformed output.
+
+
+    Notes: 
+
+    For for approximate length to match N:
+
+    M = int((1 + abs(c)) / (1 - abs(c)) * N)
+
+
+    To calculate c in terms of Wn:
+
+    c = -(tan(pi / 2 * Wn) - 1.) / (tan(pi / 2 * Wn) + 1.)
+
+    OR
+
+    b, a = butter(1, Wn, 'lowpass')
+    c = -a[1]
+
+    """
+
+    N = len(x)
+    y = empty(M)                # empty output
+    rx = flipud(x)              # time reverse x
+
+    yy = ffilter(              # filter by normalizing filter lambda_0
+        array([sqrt(1 - c**2)]),
+        array([1., c]),
+        x
+        )
+    y[0] = yy[-1]               # keep last sample for 1st output
+
+    for k in range(1, M):        # allpass loop
+        yy = ffilter(
+            array([c, 1.]),
+            array([1., c]),
+            yy
+            )
+        y[k] = yy[-1]           # keep last sample for kth output
+
+    y_nor = lfilter(            # all-pass normalize the result
+        array([1., -c]),
+        array([c]),
+        y
+        )
+
+    return y_nor
+
+
 # FIR methods. . . 
 
 def reff(b, Wn):
