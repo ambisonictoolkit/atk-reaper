@@ -284,11 +284,9 @@ def quadf(a, angle = 0.78539816339744828, directivity = 1):
     # generate speaker pair positions
     # start with polar positions. . .
     num_speaker_pairs = 2
-    theta = array([ angle, -angle ])
 
-    polar = array([ ones(num_speaker_pairs), theta ]) # [ r, theta ]
-
-    positions = interleave(pol_to_cart(polar)) # . . . then convert from polar to cartesian
+    polar = array([[1, angle], [1, -angle]]) # [ r, theta ]
+    positions = pol_to_cart(polar) # . . . then convert from polar to cartesian
 
     # generate decoder pairs
     decoder = decoder_gain_matrix(positions, k)
