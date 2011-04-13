@@ -588,7 +588,7 @@ def b_to_uhj(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
             kind,
             zi
             )
-        over_dub(hb, zi, write_over = True)
+        over_dub(hb, zi)
     else:
         hb = convfilt(
             a[:, :3],               # strip Z

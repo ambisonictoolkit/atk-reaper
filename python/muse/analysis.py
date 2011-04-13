@@ -114,6 +114,65 @@ def vpeak(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
         return res
 
 
+def venv(a, N, t, T, width=pi, mode = 'z', kind = 'fft', zi = None):
+    """venv(a, N, t, T, width=pi, mode = 'z', kind = 'fft', zi = None)
+    
+    Args:
+        - a    -- Input signal
+        - N    -- filter (number of taps), should be odd
+        - t    -- envelope attack/release (averaging) time, in sec.
+        - T    -- Sampling period, in sec/sample.
+        - width -- beta for Kaiser window FIR design.
+                  pi = minimum ripple for steepest cutoff.
+
+        - mode -- 'z' or 'full'. If mode is 'z', acts as a filter
+                  with state 'z', and returns a vector of length
+                  len(x). If mode is 'full', returns the full
+                  convolution.
+        - kind -- 'direct' or 'fft', for direct or fft convolution
+
+        - zi   -- Initial state. An array of shape (len(kernel) - 1, 3).
+                  If zi=None or is not given then initial rest is assumed.
+
+    Outputs: (y, {zf})
+    
+      y -- The output, tracked envelope.
+      zf -- If zi is None, this is not returned, otherwise, zf holds the
+            filter state.
+    
+    Track the envelope of a signal abs-->lp method.
+    """
+
+    Wn = freq_to_Wn(1./t, T)
+
+    x = abs(a)
+
+    # convolve with low-pass kernel
+    if zi is not None:
+        lp, zf = convfilt(
+            x,
+            fir_lp(N, Wn, width),      # generate lp kernel
+            mode,
+            kind,
+            zi
+            )
+        over_dub(lp, zi, write_over = True)
+    else:
+        lp = convfilt(
+            x,
+            fir_lp(N, Wn, width),      # generate lp kernel
+            mode,
+            kind
+            )
+
+    res = lp
+
+    if zi is not None:
+        return res, zf
+    else:
+        return res
+
+
 # vaed (azimuth, elevation, directivity)
 def vaed(b):
     """vaed(a)
@@ -169,6 +228,7 @@ def vaed(b):
 
 # aed (azimuth, elevation, directivity)
 # return constants
+# may want to make more like aed_rms
 def aed(b):
     """aed(a)
     
@@ -213,6 +273,59 @@ def aed(b):
     spher = mean(
         cart_to_spher(b_abs[:, 1:]),
         0
+        )
+
+    # return [theta, phi, d]
+    res = append(spher[1:], d)
+
+    return res
+
+
+# aed (azimuth, elevation)
+# return constants
+def aed_rms(b):
+    """aed_rms(a)
+    
+    Analyze an ambisonic B-format sound field, returning azimuth,
+    elevation and directivity. (Using RMS.)
+    
+    Inputs:
+        - b         : Input b-format signal
+
+    Outputs: ([a, e, d])
+    
+      [a, e, d] -- Azimuth, elevation and directivity in radians.
+                   (See direct for details on directivity.)
+
+    """
+
+    # calculate directivity
+    b_sqd_mean = (b**2).mean(0)
+
+    d = 2 * arctan2(
+        C.rec_sqrt2 * sqrt(
+            (b_sqd_mean[1] + b_sqd_mean[2] + b_sqd_mean[3])
+            ),
+        sqrt(b_sqd_mean[0])
+        )
+
+    # adjust directivity so that it is idealized
+    b_dir = direct(
+        b,
+        2. * arctan(1 / tan(d / 2.))
+        )
+
+    # calculate azimuth, elevation
+    b_rms = a_to_b(
+        rms(
+            b_to_a(b_dir, weight = 'car'),
+            0
+            ),
+        weight = 'car'
+        )
+
+    spher = cart_to_spher(
+        b_rms[1:],
         )
 
     # return [theta, phi, d]

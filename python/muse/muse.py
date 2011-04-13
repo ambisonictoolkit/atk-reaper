@@ -182,6 +182,44 @@ def pch_to_freq(a):
     return oct_to_freq(pch_to_oct(a))
 
 
+def Wn_warp(Wn, c, Wn_w = False):
+    """Wn_warp(Wn, c, Wn_w = False)
+    
+    Bilinear warping. Return warped Wn.
+
+    Warping may be specified by c, (allpass) warping
+    coefficient OR by Wn_w, the warped value of input Wn = .5.
+
+    c = 0, no warping
+    Wn_w = .5, no warping
+
+    Note, c is -1 * value used by lagt.
+
+    """
+
+    if Wn_w:
+        # this one here matches behaviour w/ calculating c and Wn
+#         Wn1 = arctan2(
+#             sin(pi * c) * sin(pi * Wn),
+#             -cos(pi * c) + cos(pi * Wn)
+#             ) / pi
+        # this one acts as expecting w/ mapping
+        # there may be a necessary modification of signs
+        # w/ AP filtering?
+        # ALSO NOTE: win warping is now dependent on this function
+        Wn1 = arctan2(
+            sin(pi * c) * sin(pi * Wn),
+            cos(pi * c) + cos(pi * Wn)
+            ) / pi
+    else:
+        Wn1 = arctan2(
+            ((1 - c**2) * sin(pi * Wn)),
+            (-2 * c + (1 + c**2) * cos(pi * Wn))
+            ) / pi
+
+    return Wn1
+
+
 def deg_to_rad(a):
     """deg_to_rad(a)
     

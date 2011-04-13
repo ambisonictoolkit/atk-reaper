@@ -108,17 +108,41 @@ def linen(nframes = [3, 7, 9], shape = 'line'):
         print "Invalid shape: %s" % shape
 
 
-def win(nframes = 9, warp = 0., shape = 'hann'):
-    """win(nframes = 9, warp = 0., shape = 'hann')
+# def win(nframes = 9, warp = 0., shape = 'hann'):
+#     """win(nframes = 9, warp = 0., shape = 'hann')
+
+#     Return a window array of nframes.
+#     Shapes: sine, hann, bart
+#     Warp: warps increment by incr**(2**warp)
+
+#     Endpoints are zeros. (Or nearly!)
+
+#     """
+#     incr = (linspace(0., 1., nframes))**(2**warp)
+
+#     try:
+#         res = {
+#             'sine': (lambda: sin(pi * incr)),
+#             'hann': (lambda: sin(pi * incr)**2),
+#             'bart': (lambda: (1. - 2. / (nframes  - 1.) * abs(.5 * (nframes  - 1.) * (2. * incr - 1.)))), 
+#             }[shape]()
+
+#         return res
+
+#     except KeyError:
+#         print "Invalid shape: %s" % shape
+def win(nframes = 9, warp = .5, shape = 'hann'):
+    """win(nframes = 9, warp = .5, shape = 'hann')
 
     Return a window array of nframes.
     Shapes: sine, hann, bart
-    Warp: warps increment by incr**(2**warp)
+    Warp: warps increment by Wn_warp
 
     Endpoints are zeros. (Or nearly!)
 
     """
-    incr = (linspace(0., 1., nframes))**(2**warp)
+    Wn = lin([0., 1.], nframes)
+    incr = Wn_warp(Wn, 1.-warp, Wn_w = True)
 
     try:
         res = {
@@ -346,8 +370,37 @@ def linen_gen(nframes = [3, 7, 9], shape = 'line'):
             break
 
 
-def win_gen(nframes = 9, warp = 0., shape = 'hann'):
-    """win_gen(nframes = 9, warp = 0., shape = 'hann')
+# def win_gen(nframes = 9, warp = 0., shape = 'hann'):
+#     """win_gen(nframes = 9, warp = 0., shape = 'hann')
+
+#     Like win(), but instead of returning an array, returns an object that
+#     generates the numbers in the range on demand.  For looping, this is 
+#     slightly faster than win() and more memory efficient.
+    
+#     Return a window array of nframes.
+#     Shapes: sine, hann, bart
+#     Warp: warps increment by incr**(2**warp)
+
+#     Endpoints are zeros. (Or nearly!)
+    
+#     """
+
+#     for incr_prewarped in xlinspace(0., 1., nframes):
+#         incr = incr_prewarped**(2**warp)
+#         try:
+#             res = {
+#                 'sine': (lambda: sin(pi * incr)),
+#                 'hann': (lambda: sin(pi * incr)**2),
+#                 'bart': (lambda: (1. - 2. / (nframes  - 1.) * abs(.5 * (nframes  - 1.) * (2. * incr - 1.)))), 
+#                 }[shape]()
+
+#             yield res
+
+#         except KeyError:
+#             print "Invalid shape: %s" % shape
+#             break
+def win_gen(nframes = 9, warp =.5, shape = 'hann'):
+    """win_gen(nframes = 9, warp = .5, shape = 'hann')
 
     Like win(), but instead of returning an array, returns an object that
     generates the numbers in the range on demand.  For looping, this is 
@@ -355,14 +408,15 @@ def win_gen(nframes = 9, warp = 0., shape = 'hann'):
     
     Return a window array of nframes.
     Shapes: sine, hann, bart
-    Warp: warps increment by incr**(2**warp)
+    Warp: warps increment by Wn_warp
 
     Endpoints are zeros. (Or nearly!)
     
     """
 
     for incr_prewarped in xlinspace(0., 1., nframes):
-        incr = incr_prewarped**(2**warp)
+        incr = Wn_warp(incr_prewarped, 1.-warp, Wn_w = True)
+
         try:
             res = {
                 'sine': (lambda: sin(pi * incr)),
