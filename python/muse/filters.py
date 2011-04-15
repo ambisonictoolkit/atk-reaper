@@ -255,10 +255,9 @@ def lagtapn(x, c, M):
 
     y_nor = lfilter(            # all-pass normalize the result
         array([1., -c]),
-        array([c]),
+        array([sqrt(1 - c**2)]),
         y
         )
-    y_nor *= sqrt(1. / (c**-2 - 1))
 
     return y_nor
 
