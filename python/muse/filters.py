@@ -258,6 +258,7 @@ def lagtapn(x, c, M):
         array([c]),
         y
         )
+    y_nor *= sqrt(1. / (c**-2 - 1))
 
     return y_nor
 
