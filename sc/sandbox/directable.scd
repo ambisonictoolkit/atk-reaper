@@ -6,12 +6,13 @@
 // -------------------------------------------------------
 
 
-// directable transforms [squish not included... TBD]
-//
 // Implemented below as global functions, interface:
 //
 // ~atkDominate.value(gain, azimuth, elevation)
 // ~atkFocus.value(angle, azimuth, elevation)
+//
+// NOTE: ~atkSquishX is found in file 'directivity.scd'
+
 (
 	~atkDominate = { arg bSig, gain = 0, azimuth = 0, elevation = 0;
 		var w, x, y, z;
@@ -72,4 +73,28 @@
 		#w, x, y, z = AtkTumble.ar(w, x, y, z, elevation);
 		AtkRotate.ar(w, x, y, z, azimuth);
 	}
+	
+	~atkMirror = { arg bSig, azimuth = 0, elevation = 0;
+		var w, x, y, z;
+		
+		#w, x, y, z = bSig;
+		
+		#w, x, y, z = AtkRotate.ar(w, x, y, z, -1 * azimuth);
+		#w, x, y, z = AtkTumble.ar(w, x, y, z, -1 * elevation);
+		#w, x, y, z = AtkTumble.ar(w, -1 * x, y, z, elevation);
+		AtkRotate.ar(w, x, y, z, azimuth);
+	}
+
+	~atkSquish = { arg bSig, azimuth = 0, elevation = 0;
+		var w, x, y, z;
+		
+		#w, x, y, z = bSig;
+		
+		#w, x, y, z = AtkRotate.ar(w, x, y, z, -1 * azimuth);
+		#w, x, y, z = AtkTumble.ar(w, x, y, z, -1 * elevation);
+		#w, x, y, z = ~atkSquishX.value([w, x, y, z], angle);
+		#w, x, y, z = AtkTumble.ar(w, x, y, z, elevation);
+		AtkRotate.ar(w, x, y, z, azimuth);
+	}
+	
 )
