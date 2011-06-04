@@ -1,3 +1,51 @@
+/* FOA wrappers */
+
+FOA {
+	var <w, <x, <y, <z;
+	
+	*new {arg w, x, y, z;
+		^super.newCopyArgs(w, x, y, z);
+	}
+	
+	*ar {arg w, x, y, z;
+		^this.new(w, x, y, z);
+	}
+	
+	madd {arg mul = 1, add = 0;
+		^MulAdd.ar([w, x, y, z], mul, add);	
+	}
+	
+	sig {arg mul = 1, add = 0;
+		^[w, x, y, z] * mul + add;
+	}
+}
+
+ATKMonoToFOA {
+	*ar {arg in, azimuth = 0, elevation = 0;	
+		var w, x, y, z;
+		#w, x, y, z = AtkMonoToB.ar(in, azimuth, elevation);
+		^FOA.ar(w, x, y, z);
+	}	
+}
+
+ATKRotate {
+	*ar {arg in, angle = 0, mul = 1, add = 0;
+		var w, x, y, z;
+		(in.isKindOf(FOA)).if({
+			#w, x, y, z = AtkRotate.ar(in.w, in.x, in.y, in.z, angle, mul, add);
+			^FOA.ar(w, x, y, z);
+		})
+	}
+}
+
+ATKPantoF {
+	*ar {arg numChannels, in, orientation = 1, directivity = 1, mul = 1, add = 1;
+		(in.isKindOf(FOA)).if({
+			^AtkPantoF.ar(numChannels, in.w, in.x, in.y, orientation, directivity);
+		})
+	}
+}
+		
 AtkMonoToB : Panner {
 	
 	*ar { arg in, azimuth=0, elevation=0;
@@ -25,6 +73,7 @@ AtkSterToB : Panner {
 		^channels
 	}
 }
+
 
 Atk : Panner {
 		
