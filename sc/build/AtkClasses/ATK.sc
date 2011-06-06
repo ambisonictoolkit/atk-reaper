@@ -18,6 +18,14 @@ FOA {
 	sig {arg mul = 1, add = 0;
 		^[w, x, y, z] * mul + add;
 	}
+	
+	asUGenInput {
+		^[w, x, y, z];
+	}
+	
+	asAudioRateInput {
+		^[w, x, y, z];
+	}
 }
 
 ATKMonoToFOA {
