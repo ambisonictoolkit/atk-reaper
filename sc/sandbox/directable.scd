@@ -85,7 +85,7 @@
 		AtkRotate.ar(w, x, y, z, azimuth);
 	}
 
-	~atkSquish = { arg bSig, azimuth = 0, elevation = 0;
+	~atkDirectD = { arg bSig, azimuth = 0, elevation = 0;
 		var w, x, y, z;
 		
 		#w, x, y, z = bSig;

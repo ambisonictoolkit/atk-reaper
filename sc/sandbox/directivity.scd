@@ -11,6 +11,8 @@
 // Implemented below as global functions, interface:
 //
 // ~atkDirect.value(bSig, angle)
+//
+// NOTE: Muse should be updated to this interface
 (
 	~atkDirect = { arg bSig, angle;
 		var w, x, y, z, g0, g1;
@@ -23,7 +25,7 @@
 		[g0 *w, g1 * x, g1 * y, g1 * z]
 	};
 
-	~atkSquishX = { arg bSig, angle;
+	~atkDirectX = { arg bSig, angle;
 		var w, x, y, z, g0, g1;
 		
 		#w, x, y, z = bSig;
@@ -34,7 +36,7 @@
 		[g0 *w, g1 * x, g0 * y, g0 * z]
 	};
 
-	~atkSquishY = { arg bSig, angle;
+	~atkDirectY = { arg bSig, angle;
 		var w, x, y, z, g0, g1;
 		
 		#w, x, y, z = bSig;
@@ -45,7 +47,7 @@
 		[g0 *w, g0 * x, g1 * y, g0 * z]
 	};
 
-	~atkSquishZ = { arg bSig, angle;
+	~atkDirectZ = { arg bSig, angle;
 		var w, x, y, z, g0, g1;
 		
 		#w, x, y, z = bSig;
