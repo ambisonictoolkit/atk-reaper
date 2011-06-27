@@ -452,39 +452,44 @@ def tumble(a, theta = 0.):
 
 
 #=========================
-# directivity
+# directivity (and squishing!)
 #=========================
 
 
-def direct(a, theta = pi/2.):
-    """direct(a, theta = pi/2.)
+def direct(a, theta = 0):
+    """direct(a, theta = 0)
     
     Adjust directivity of an ambisonic B-format sound field.
 
     Args:
         - a         : Input b-format signal
-        - theta     : directivity, in radians (-pi to pi)
+        - theta     : directivity, in radians (-pi/2 to pi/2)
 
 
-    Theta = 0 reduces the directivity to the w component only,
-    bringing everything to the middle of the image. Values greater
-    than pi/2 increase the gain of x, y, z while reducing w; this
-    range of values can be used to exaggerate the directional
-    impression. Values between pi/2 and -pi/2 bring the image from
-    unchanged, through the center, to inverted directional components.
-    The default, pi/2, results in no change.
+    Theta = 0 retains the current directivity of the soundfield.
+    Increasing theta towards pi/2 decreases the directivity,
+    reducing the gains on the directional compenents (x, y, z)
+    to zero--and is equivalent to a 'spatial lo-pass filter'.
+    The resulting image becomes 'directionless'.
 
+    Decreasing theta towards -pi/2 decreases the gain on the w,
+    the zero order component, and can be regarded as a kind of
+    'spatial sharpening' filter.
+
+    Standard use of direct() is with theta >=0,
+    
     """
 
-    # compute cosines and sines
-    cos_theta, sin_theta = cos(.5 * theta), sin(.5 * theta)
+    # compute gains
+    g0 = sqrt(1 + sin(theta))
+    g1 = sqrt(1 - sin(theta))
 
     # construct appropriate transform
-    transform = C.sqrt2 * array([
-            cos_theta, 
-            sin_theta,
-            sin_theta,
-            sin_theta
+    transform = array([
+            g0, 
+            g1,
+            g1,
+            g1
         ])
 
     if not(isscalar(theta)):                       # reshape for vectors
@@ -493,39 +498,40 @@ def direct(a, theta = pi/2.):
     return a * transform
 
 
-#=========================
-# squishing
-#=========================
-
-def squish_x(a, theta = pi/2.):
-    """squish_x(a, theta = pi/2.0)
+def direct_x(a, theta = 0):
+    """direct_x(a, theta = 0)
     
-    Squish an ambisonic B-format sound field on the x-axis.
+    Adjust the directivy of an ambisonic B-format sound field on the x-axis.
 
     Args:
         - a         : Input b-format signal
-        - theta     : angle of distortion, in radians (-pi to pi)
+        - theta     : directivity, in radians (-pi/2 to pi/2)
 
-    Theta = 0 squishes the x-axis to the center, bringing what
-    was at front center and back center to the middle of the
-    image, squishing the image to the y-z plane. Values greater
-    than pi/2 increase the gain of x while reducing w, y, z;
-    this range of values can be used to exaggerate the front/back
-    depth of the image. Values between pi/2 and -pi/2 squish the
-    image from unchanged, through the y-z plane, to front/back
-    reversed. The default, pi/2, results in no change.
 
+    Theta = 0 retains the current directivity of the soundfield.
+    Increasing theta towards pi/2 decreases the directivity on
+    the x-axis, reducing the gains on this axis to zero--and is
+    equivalent to a 'spatial lo-pass filter'. The resulting image
+    becomes 'directionless' on the x-axis.
+
+    Decreasing theta towards -pi/2 decreases the gain on w, y, z,
+    and can be regarded as a kind of 'spatial sharpening' filter
+    on the x-axis.
+
+    Standard use of direct_x() is with theta >=0,
+    
     """
 
-    # compute cosines and sines
-    cos_theta, sin_theta = cos(.5 * theta), sin(.5 * theta)
+    # compute gains
+    g0 = sqrt(1 + sin(theta))
+    g1 = sqrt(1 - sin(theta))
 
     # construct appropriate transform
-    transform = C.sqrt2 * array([
-            cos_theta, 
-            sin_theta,
-            cos_theta,
-            cos_theta
+    transform = array([
+            g0, 
+            g1,
+            g0,
+            g0
         ])
 
     if not(isscalar(theta)):                       # reshape for vectors
@@ -534,35 +540,40 @@ def squish_x(a, theta = pi/2.):
     return a * transform
 
 
-def squish_y(a, theta = pi/2.):
-    """squish_y(a, theta = pi/2.)
+def direct_y(a, theta = 0):
+    """direct_y(a, theta = 0)
     
-    Squish an ambisonic B-format sound field on the y-axis.
+    Adjust the directivy of an ambisonic B-format sound field on the y-axis.
 
     Args:
         - a         : Input b-format signal
-        - theta     : angle of distortion, in radians (-pi to pi)
+        - theta     : directivity, in radians (-pi/2 to pi/2)
 
-    Theta = 0 squishes the y-axis to the center, bringing what
-    was at hard left and hard right to the middle of the image,
-    squishing the image to the x-z plane. Values greater than
-    pi/2 increase the gain of y while reducing w, x, z; this
-    range of values can be used to exaggerate the left/right
-    width of the image. Values between pi/2 and -pi/2 squish
-    the image from unchanged, through the x-z plane, to
-    left/right reversed. The default, pi/2, results in no change.
+
+    Theta = 0 retains the current directivity of the soundfield.
+    Increasing theta towards pi/2 decreases the directivity on
+    the y-axis, reducing the gains on this axis to zero--and is
+    equivalent to a 'spatial lo-pass filter'. The resulting image
+    becomes 'directionless' on the y-axis.
+
+    Decreasing theta towards -pi/2 decreases the gain on w, x, z,
+    and can be regarded as a kind of 'spatial sharpening' filter
+    on the y-axis.
+
+    Standard use of direct_y() is with theta >=0,
 
     """
 
-    # compute cosines and sines
-    cos_theta, sin_theta = cos(.5 * theta), sin(.5 * theta)
+    # compute gains
+    g0 = sqrt(1 + sin(theta))
+    g1 = sqrt(1 - sin(theta))
 
     # construct appropriate transform
-    transform = C.sqrt2 * array([
-            cos_theta, 
-            cos_theta,
-            sin_theta,
-            cos_theta
+    transform = array([
+            g0, 
+            g0,
+            g1,
+            g0
         ])
 
     if not(isscalar(theta)):                       # reshape for vectors
@@ -571,34 +582,40 @@ def squish_y(a, theta = pi/2.):
     return a * transform
 
 
-def squish_z(a, theta = pi/2.):
-    """squish_z(a, theta = pi/2.)
+def direct_z(a, theta = 0):
+    """direct_z(a, theta = 0)
     
-    Squish an ambisonic B-format sound field on the z-axis.
+    Adjust the directivy of an ambisonic B-format sound field on the z-axis.
 
     Args:
         - a         : Input b-format signal
-        - theta     : angle of distortion, in radians (-pi to pi)
+       - theta     : directivity, in radians (-pi/2 to pi/2)
 
-    Theta = 0 squishes the z-axis to the center, bringing what
-    was at up and down to the middle of the image, squishing the
-    image to the x-y plane. Values greater than pi/2 increase the
-    gain of z while reducing w, x, y; this range of values can be
-    used to exaggerate the height of the image. Values between pi/2
-    and -pi/2 squish the image from unchanged, through the x-y
-    plane, to up/down inverted. The default, pi/2, results in no change.
+
+    Theta = 0 retains the current directivity of the soundfield.
+    Increasing theta towards pi/2 decreases the directivity on
+    the z-axis, reducing the gains on this axis to zero--and is
+    equivalent to a 'spatial lo-pass filter'. The resulting image
+    becomes 'directionless' on the z-axis.
+
+    Decreasing theta towards -pi/2 decreases the gain on w, x, y,
+    and can be regarded as a kind of 'spatial sharpening' filter
+    on the z-axis.
+
+    Standard use of direct_z() is with theta >=0,
 
     """
 
-    # compute cosines and sines
-    cos_theta, sin_theta = cos(.5 * theta), sin(.5 * theta)
+    # compute gains
+    g0 = sqrt(1 + sin(theta))
+    g1 = sqrt(1 - sin(theta))
 
     # construct appropriate transform
-    transform = C.sqrt2 * array([
-            cos_theta, 
-            cos_theta,
-            cos_theta,
-            sin_theta
+    transform = array([
+            g0, 
+            g0,
+            g0,
+            g1
         ])
 
     if not(isscalar(theta)):                       # reshape for vectors
@@ -609,37 +626,36 @@ def squish_z(a, theta = pi/2.):
 
 # may want to update this so it inculdes a matrix calc
 # rather than acting as a wrapper
-def squish(a, theta = pi/2., azimuth = 0., elevation = 0.):
-    """squish(a, theta = pi/2., azimuth = 0., elevation = 0.)
+def directD(a, theta = 0, azimuth = 0., elevation = 0.):
+    """directD(a, theta = 0, azimuth = 0., elevation = 0.)
     
-    Squish an ambisonic B-format sound field along an axis
+    Adjust the directivy of an ambisonic B-format sound field along an axis
     oriented along azimuth, elevation.
 
     Args:
         - a         : Input b-format signal
-        - theta     : angle of distortion, in radians (-pi to pi)
-        - azimuth   : azimuth to squish along
-        - elevation : elevation to squish along
+       - theta     : directivity, in radians (-pi/2 to pi/2)
+        - azimuth   : azimuth to direct along
+        - elevation : elevation to direct along
 
-    Theta = 0 squishes the axis defined by (azimuth, elevation)
-    to the center, bringing what was at (azimuth, elevation)
-    and (-azimuth, -elevation) to the middle of the image,
-    squishing the image to the plane normal to (azimuth, elevation).
-    Values greater than pi/2 increase the gain of axis defined by
-    (azimuth, elevation) while reducing w, and the gain along the
-    plane normal to (azimuth, elevation); this range of values can
-    be used to exaggerate the depth of the image along the axis
-    defined by (azimuth, elevation). Values between pi/2 and -pi/2
-    squish the image from unchanged, through the plane normal to
-    (azimuth, elevation), to axis defined by (azimuth, elevation)
-    reversed. The default, pi/2, results in no change.
+    Theta = 0 retains the current directivity of the soundfield.
+    Increasing theta towards pi/2 decreases the directivity on
+    the axis determined by (azimuth, elevation), reducing the gains
+    on this axis to zero--and is equivalent to a 'spatial lo-pass filter'.
+    The resulting image becomes 'directionless' on this axis.
 
+    Decreasing theta towards -pi/2 decreases the gain on w and the
+    plane perpendicular to the normal defined by (azimuth, elevation)
+    and can be regarded as a kind of 'spatial sharpening' filter
+    on the specified axis.
+
+    Standard use of directD() is with theta >=0,
     """
 
     # transform here!
     return rotate(
         tumble(
-            squish_x(
+            direct_x(
                 tumble(
                     rotate(
                         a,
@@ -648,6 +664,163 @@ def squish(a, theta = pi/2., azimuth = 0., elevation = 0.):
                 theta),
             elevation),
         azimuth)
+
+###=========================
+### squishing
+###=========================
+##
+##def squish_x(a, theta = pi/2.):
+##    """squish_x(a, theta = pi/2.0)
+##    
+##    Squish an ambisonic B-format sound field on the x-axis.
+##
+##    Args:
+##        - a         : Input b-format signal
+##        - theta     : angle of distortion, in radians (-pi to pi)
+##
+##    Theta = 0 squishes the x-axis to the center, bringing what
+##    was at front center and back center to the middle of the
+##    image, squishing the image to the y-z plane. Values greater
+##    than pi/2 increase the gain of x while reducing w, y, z;
+##    this range of values can be used to exaggerate the front/back
+##    depth of the image. Values between pi/2 and -pi/2 squish the
+##    image from unchanged, through the y-z plane, to front/back
+##    reversed. The default, pi/2, results in no change.
+##
+##    """
+##
+##    # compute cosines and sines
+##    cos_theta, sin_theta = cos(.5 * theta), sin(.5 * theta)
+##
+##    # construct appropriate transform
+##    transform = C.sqrt2 * array([
+##            cos_theta, 
+##            sin_theta,
+##            cos_theta,
+##            cos_theta
+##        ])
+##
+##    if not(isscalar(theta)):                       # reshape for vectors
+##        transform = interleave(transform)
+##
+##    return a * transform
+##
+##
+##def squish_y(a, theta = pi/2.):
+##    """squish_y(a, theta = pi/2.)
+##    
+##    Squish an ambisonic B-format sound field on the y-axis.
+##
+##    Args:
+##        - a         : Input b-format signal
+##        - theta     : angle of distortion, in radians (-pi to pi)
+##
+##    Theta = 0 squishes the y-axis to the center, bringing what
+##    was at hard left and hard right to the middle of the image,
+##    squishing the image to the x-z plane. Values greater than
+##    pi/2 increase the gain of y while reducing w, x, z; this
+##    range of values can be used to exaggerate the left/right
+##    width of the image. Values between pi/2 and -pi/2 squish
+##    the image from unchanged, through the x-z plane, to
+##    left/right reversed. The default, pi/2, results in no change.
+##
+##    """
+##
+##    # compute cosines and sines
+##    cos_theta, sin_theta = cos(.5 * theta), sin(.5 * theta)
+##
+##    # construct appropriate transform
+##    transform = C.sqrt2 * array([
+##            cos_theta, 
+##            cos_theta,
+##            sin_theta,
+##            cos_theta
+##        ])
+##
+##    if not(isscalar(theta)):                       # reshape for vectors
+##        transform = interleave(transform)
+##
+##    return a * transform
+##
+##
+##def squish_z(a, theta = pi/2.):
+##    """squish_z(a, theta = pi/2.)
+##    
+##    Squish an ambisonic B-format sound field on the z-axis.
+##
+##    Args:
+##        - a         : Input b-format signal
+##        - theta     : angle of distortion, in radians (-pi to pi)
+##
+##    Theta = 0 squishes the z-axis to the center, bringing what
+##    was at up and down to the middle of the image, squishing the
+##    image to the x-y plane. Values greater than pi/2 increase the
+##    gain of z while reducing w, x, y; this range of values can be
+##    used to exaggerate the height of the image. Values between pi/2
+##    and -pi/2 squish the image from unchanged, through the x-y
+##    plane, to up/down inverted. The default, pi/2, results in no change.
+##
+##    """
+##
+##    # compute cosines and sines
+##    cos_theta, sin_theta = cos(.5 * theta), sin(.5 * theta)
+##
+##    # construct appropriate transform
+##    transform = C.sqrt2 * array([
+##            cos_theta, 
+##            cos_theta,
+##            cos_theta,
+##            sin_theta
+##        ])
+##
+##    if not(isscalar(theta)):                       # reshape for vectors
+##        transform = interleave(transform)
+##
+##    return a * transform
+##
+##
+### may want to update this so it inculdes a matrix calc
+### rather than acting as a wrapper
+##def squish(a, theta = pi/2., azimuth = 0., elevation = 0.):
+##    """squish(a, theta = pi/2., azimuth = 0., elevation = 0.)
+##    
+##    Squish an ambisonic B-format sound field along an axis
+##    oriented along azimuth, elevation.
+##
+##    Args:
+##        - a         : Input b-format signal
+##        - theta     : angle of distortion, in radians (-pi to pi)
+##        - azimuth   : azimuth to squish along
+##        - elevation : elevation to squish along
+##
+##    Theta = 0 squishes the axis defined by (azimuth, elevation)
+##    to the center, bringing what was at (azimuth, elevation)
+##    and (-azimuth, -elevation) to the middle of the image,
+##    squishing the image to the plane normal to (azimuth, elevation).
+##    Values greater than pi/2 increase the gain of axis defined by
+##    (azimuth, elevation) while reducing w, and the gain along the
+##    plane normal to (azimuth, elevation); this range of values can
+##    be used to exaggerate the depth of the image along the axis
+##    defined by (azimuth, elevation). Values between pi/2 and -pi/2
+##    squish the image from unchanged, through the plane normal to
+##    (azimuth, elevation), to axis defined by (azimuth, elevation)
+##    reversed. The default, pi/2, results in no change.
+##
+##    """
+##
+##    # transform here!
+##    return rotate(
+##        tumble(
+##            squish_x(
+##                tumble(
+##                    rotate(
+##                        a,
+##                        -azimuth),
+##                    -elevation),
+##                theta),
+##            elevation),
+##        azimuth)
+##
 
 
 #=========================

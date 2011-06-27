@@ -190,20 +190,22 @@ def vaed(b):
 
     """
 
-    # calculate directivity
+    # find the square of b
     b_sqrd = b**2
 
-    d = 2 * arctan2(
-        C.rec_sqrt2 * sqrt(
-            (b_sqrd[:, 1] + b_sqrd[:, 2] + b_sqrd[:, 3])
-            ),
+    # normalise W
+    b_sqrd *= array([2, 1, 1, 1])
+
+    # calculate directivity
+    d = pi/2 - 2 * arctan2(
+        sqrt((b_sqrd[:, 1] + b_sqrd[:, 2] + b_sqrd[:, 3])),
         sqrt(b_sqrd[:, 0])
         )
 
     # adjust directivity so that it is idealized
     b_dir = direct(
         b,
-        2. * arctan(1 / tan(d / 2.))
+        -d
         )
 
     # calculate azimuth, elevation
@@ -245,21 +247,23 @@ def aed(b):
 
     """
 
-    # calculate directivity
-    b_sqd_mean = (b**2).mean(0)
+    # find the mean of b**2
+    b_sqrd_mean = (b**2).mean(0)
 
-    d = 2 * arctan2(
-        C.rec_sqrt2 * sqrt(
-            (b_sqd_mean[1] + b_sqd_mean[2] + b_sqd_mean[3])
-            ),
-        sqrt(b_sqd_mean[0])
+    # normalise W
+    b_sqrd_mean[0] *= 2
+
+    # calculate directivity
+    d = pi/2 - 2 * arctan2(
+        sqrt(b_sqrd_mean[1] + b_sqrd_mean[2] + b_sqrd_mean[3]),
+        sqrt(b_sqrd_mean[0])
         )
 
     # adjust directivity so that it is idealized
     b_dir = direct(
-        b,
-        2. * arctan(1 / tan(d / 2.))
-        )
+	b,
+	-d
+	)
 
     # calculate azimuth, elevation
     b_abs = a_to_b(
@@ -299,22 +303,24 @@ def aed_rms(b):
 
     """
 
-    # calculate directivity
-    b_sqd_mean = (b**2).mean(0)
+    # find the mean of b**2
+    b_sqrd_mean = (b**2).mean(0)
 
-    d = 2 * arctan2(
-        C.rec_sqrt2 * sqrt(
-            (b_sqd_mean[1] + b_sqd_mean[2] + b_sqd_mean[3])
-            ),
-        sqrt(b_sqd_mean[0])
+    # normalise W
+    b_sqrd_mean[0] *= 2
+
+    # calculate directivity
+    d = pi/2 - 2 * arctan2(
+        sqrt(b_sqrd_mean[1] + b_sqrd_mean[2] + b_sqrd_mean[3]),
+        sqrt(b_sqrd_mean[0])
         )
 
     # adjust directivity so that it is idealized
     b_dir = direct(
         b,
-        2. * arctan(1 / tan(d / 2.))
+        -d
         )
-
+    
     # calculate azimuth, elevation
     b_rms = a_to_b(
         rms(
