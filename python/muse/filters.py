@@ -928,6 +928,8 @@ def fir_ap(N, Wn=.5, width=pi):
     return ap_b
 
 
+# NOTE: we may want to revisit this in light of recent
+#       comb-warping [S(PACE)] developed methods
 def fir_apw(N, Wn=.5, width=pi, minp=True):
     """fir_apw(N, Wn=.5, width=pi, minp=True)
 
@@ -1826,6 +1828,301 @@ def integ_filt(x, zi = None):
     y = ffilter(b, a, x, zi)
     
     return y
+
+
+# --------------------------------------
+# Regalia-Mitra filters
+# --------------------------------------
+
+def fiir_rmhs2(x, Wn, k, zi = None):
+    """fiir_rmhs2(x, Wn, k, zi = None)
+
+    Filter data along one-dimension with a fixed frequency Regalia-Mitra
+    2nd-order high-shelf IIR filter. Filter along the 0 axis
+    
+    Description
+    
+      Filter a data sequence, x, using Regalia-Mitra 2nd-order high-shelf
+      filter. This filter has a constant phase for all k, matching the
+      phase of a 1st-order all-pass filter.
+      
+      The filter is a direct form II transposed implementation of the standard
+      difference equation
+      (see "Algorithm").
+    
+    Inputs:
+    
+      x -- An N-dimensional input array.
+      Wn -- cutoff
+      k -- scale at high frequencies
+      zi -- Initial conditions for the filter delays.  It is a vector
+            (or array of vectors for an N-dimensional input) of length
+            max(len(a),len(b)).  If zi=None or is not given then initial
+            rest is assumed.  SEE signal.lfiltic for more information.
+    
+    Outputs: (y, {zf})
+    
+      y -- The output of the digital filter.
+      zf -- If zi is None, this is not returned, otherwise, zf holds the
+            final filter delay values.
+    
+    Algorithm:
+      See butter and lfilter
+
+      """
+    # NOTE: for simplicity of handling of state (zi, zf) this
+    #       filter is implemented directly as a 2nd order filter
+    #       rather than through Regalia-Mitra architecture
+
+    # generate allpass coefficients
+    b, a = butter(1, Wn, 'lowpass')
+
+    c = a[1]
+
+    # generate 2nd-order shelf coefficients
+    b = array([
+        ((1.-k)/4 * (1+c**2)) + ((1.+k)/2 * c),
+        ((1.-k) * c) + ((1.+k)/2 * (1.+c**2)),
+        ((1.-k)/4 * (1+c**2)) + ((1.+k)/2 * c),
+    ])
+    a = array([
+        1,
+        2*c,
+        c**2
+    ])
+
+    y = ffilter(b, a, x, zi)
+
+    return y
+
+
+def fiir_rmls2(x, Wn, k, zi = None):
+    """fiir_rmls2(x, Wn, k, zi = None)
+
+    Filter data along one-dimension with a fixed frequency Regalia-Mitra
+    2nd-order low-shelf IIR filter. Filter along the 0 axis
+    
+    Description
+    
+      Filter a data sequence, x, using Regalia-Mitra 2nd-order low-shelf
+      filter. This filter has a constant phase for all k, matching the
+      phase of a 1st-order all-pass filter.
+      
+      The filter is a direct form II transposed implementation of the standard
+      difference equation
+      (see "Algorithm").
+    
+    Inputs:
+    
+      x -- An N-dimensional input array.
+      Wn -- cutoff
+      k -- scale at low frequencies
+      zi -- Initial conditions for the filter delays.  It is a vector
+            (or array of vectors for an N-dimensional input) of length
+            max(len(a),len(b)).  If zi=None or is not given then initial
+            rest is assumed.  SEE signal.lfiltic for more information.
+    
+    Outputs: (y, {zf})
+    
+      y -- The output of the digital filter.
+      zf -- If zi is None, this is not returned, otherwise, zf holds the
+            final filter delay values.
+    
+    Algorithm:
+      See butter and lfilter
+
+      """
+    # NOTE: for simplicity of handling of state (zi, zf) this
+    #       filter is implemented directly as a 2nd order filter
+    #       rather than through Regalia-Mitra architecture
+
+    # generate allpass coefficients
+    b, a = butter(1, Wn, 'lowpass')
+
+    c = a[1]
+
+    # generate 2nd-order shelf coefficients
+    b = array([
+        ((k-1.)/4 * (1+c**2)) + ((k+1.)/2 * c),
+        ((k-1.) * c) + ((k+1.)/2 * (1.+c**2)),
+        ((k-1.)/4 * (1+c**2)) + ((k+1.)/2 * c),
+    ])
+    a = array([
+        1,
+        2*c,
+        c**2
+    ])
+
+    y = ffilter(b, a, x, zi)
+
+    return y
+
+
+# --------------------------------------
+# Ambisonic / Soundfield filters
+# --------------------------------------
+
+def nfc(x, r, T, zi = None):
+    """nfc(x, r, T, zi = None)
+    
+    "Near-field distance compensation" filter an ambisonic B-format sound field.
+    (Inverse of "proximity filter".)
+    
+    (1st order highpass on X, Y, Z)
+
+    Args:
+        - x         : Input b-format signal
+        - r         : Distance, in meters, to compensate for
+        - T         : Sampling period, 1./sr
+        - zi        : Initial conditions for the filter delays.  A vector
+            (or array of vectors for an N-dimensional input) of length
+            max(len(a),len(b)).  If zi=None or is not given then initial
+            rest is assumed.  SEE signal.lfiltic for more information.
+    
+    Outputs: (y, {zf})
+    
+      y -- The near-field compensated output.
+      zf -- If zi is None, this is not returned, otherwise, zf holds the
+            final filter delay values.
+    
+    Algorithm:
+      See butter and lfilter
+
+    """
+    # Calculate Wn
+    Wn = freq_to_Wn(C.speed_of_sound / (C.twoPi * r), T)
+
+    # generate b, a for 1st order highpass
+    b, a = butter(1, Wn, 'highpass')
+
+    # X, Y, Z mask
+    chnls = array([False, True, True, True])
+
+    # operate on a copy
+    res = x.copy()
+
+    # filter!
+    # Note: could use fiir_hp, but choose
+    # to generate coefficients directly to
+    # make the inverse filter more explicit
+    if zi is None:
+        res[:, chnls] =  ffilter(b, a, x[:, chnls])
+        
+        return res
+
+    else:
+        res[:, chnls], zf =  ffilter(b, a, x[:, chnls], zi)
+        
+        return res, zf
+
+
+def proximity(x, r, T, zi = None):
+    """proximity(x, r, T, zi = None)
+    
+    "Proximity filter" an ambisonic B-format sound field.
+    (Inverse of "distance filter".)
+    
+    (Integrate, sum on X, Y, Z)
+
+    Args:
+        - x         : Input b-format signal
+        - r         : Distance, in meters, to generate cues for
+        - T         : Sampling period, 1./sr
+        - zi        : Initial conditions for the filter delays.  A vector
+            (or array of vectors for an N-dimensional input) of length
+            max(len(a),len(b)).  If zi=None or is not given then initial
+            rest is assumed.  SEE signal.lfiltic for more information.
+    
+    Outputs: (y, {zf})
+    
+      y -- The "proximity" filtered output.
+      zf -- If zi is None, this is not returned, otherwise, zf holds the
+            final filter delay values.
+    
+    Algorithm:
+      See butter and lfilter
+
+    NOTE: As X, Y, Z are integrated, it is best to initially prepare
+          the signal with a highpass filter.
+
+    """
+    # Calculate Wn
+    Wn = freq_to_Wn(C.speed_of_sound / (C.twoPi * r), T)
+
+    # generate b, a for 1st order highpass
+    b, a = butter(1, Wn, 'highpass')
+
+    # X, Y, Z mask
+    chnls = array([False, True, True, True])
+
+    # operate on a copy
+    res = x.copy()
+
+    # filter!
+    # b, a coefficients are inverted
+    # see distance filter above
+    if zi is None:
+        res[:, chnls] =  ffilter(a, b, x[:, chnls])
+        
+        return res
+
+    else:
+        res[:, chnls], zf =  ffilter(a, b, x[:, chnls], zi)
+        
+        return res, zf
+
+
+def psycho_shelf(x, Wn, k, zi = None):
+    """psycho_shelf(x, Wn, k, zi = None)
+
+    Psychoacoustic shelf filtering for Ambisonic Dual Band decoding.
+        
+    Args:
+        x           : input b-format signal
+        Wn          : shelf filter corner, set to ~400 Hz
+        k           : an array [k0, k1] where k0 is the W scale at high
+                        frequencies, and k1 is the X, Y, Z scale at high
+                        frequencies
+        zi          : Initial conditions for the filter delays, a
+                        4 x 2 vector. (4 channels of 2nd order) If
+                        zi = None or is not given then initial rest is
+                        assumed.  SEE signal.lfiltic for more information.
+    
+    Outputs: (y, {zf})
+
+        y           : The output of the digital filter.
+        zf          : If zi is None, this is not returned, otherwise, zf
+                        holds the final filter delay values.
+    
+    Algorithm:
+      See fiir_rmhs2, ffilter and lfilter
+
+    """
+    # fiir_rmhs2(x, Wn, k, zi = None)
+    
+    # channel masks
+    deg = array([
+        [True, False, False, False],    # W (degree 0) mask
+        [False, True, True, True]       # X, Y, Z (degree 1) mask
+        ])
+
+    # operate on a copy
+    y = x.copy()
+
+    # filter!
+    if zi is None:
+        for i in range(size(k)):
+            y[:, deg[i]] = fiir_rmhs2(x[:, deg[i]], Wn, k[i])
+        return y
+
+    else:
+        zf = zeros_like(zi)             # init zf
+
+        for i in range(size(k)):
+            y[:, deg[i]], zf[deg[i]] = \
+                 fiir_rmhs2(x[:, deg[i]], Wn, k[i], zi[deg[i]])
+        return y, zf
+        
 
 # **************************************
 # osc. . .

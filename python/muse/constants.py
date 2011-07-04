@@ -50,6 +50,10 @@ twodiv_sqrt2sum_sqrt3 = 2./(sqrt(2.) + sqrt(3.))
 
 sqrt6 = sqrt(6.)
 
+# decoder high shelf gains
+k_2D = array([sqrt3div_sqrt2, sqrt3div2])       # pantophonic
+k_3D = array([sqrt2, sqrt2div_sqrt3])           # periphonic
+
 
 # b to a conversion dictionary
 b_to_a_dict = {

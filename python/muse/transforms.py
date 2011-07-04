@@ -18,7 +18,7 @@
 # from numpy import *
 # from pyaudiolab import *
 from muse import *
-from filters import *
+# from filters import *
 
 # import muse defined constants
 import constants as C
@@ -626,8 +626,8 @@ def direct_z(a, theta = 0):
 
 # may want to update this so it inculdes a matrix calc
 # rather than acting as a wrapper
-def directD(a, theta = 0, azimuth = 0., elevation = 0.):
-    """directD(a, theta = 0, azimuth = 0., elevation = 0.)
+def direct_a(a, theta = 0, azimuth = 0., elevation = 0.):
+    """direct_a(a, theta = 0, azimuth = 0., elevation = 0.)
     
     Adjust the directivy of an ambisonic B-format sound field along an axis
     oriented along azimuth, elevation.
@@ -649,7 +649,7 @@ def directD(a, theta = 0, azimuth = 0., elevation = 0.):
     and can be regarded as a kind of 'spatial sharpening' filter
     on the specified axis.
 
-    Standard use of directD() is with theta >=0,
+    Standard use of direct_a() is with theta >=0,
     """
 
     # transform here!
@@ -1580,112 +1580,58 @@ def a_to_a(a, in_orientation = 'flu', out_orientation = 'flu'):
 #=========================
 
 
-def distance(x, r, T, zi = None):
-    """distance(x, r, T, zi = None)
-    
-    "Distance compensation" filter an ambisonic B-format sound field.
-    (Inverse of "proximity filter".)
-    
-    (1st order highpass on X, Y, Z)
+##def distance(x, r, T, zi = None):
+##    """distance(x, r, T, zi = None)
+##    
+##    "Distance compensation" filter an ambisonic B-format sound field.
+##    (Inverse of "proximity filter".)
+##    
+##    (1st order highpass on X, Y, Z)
+##
+##    Args:
+##        - x         : Input b-format signal
+##        - r         : Distance, in meters, to compensate for
+##        - T         : Sampling period, 1./sr
+##        - zi        : Initial conditions for the filter delays.  A vector
+##            (or array of vectors for an N-dimensional input) of length
+##            max(len(a),len(b)).  If zi=None or is not given then initial
+##            rest is assumed.  SEE signal.lfiltic for more information.
+##    
+##    Outputs: (y, {zf})
+##    
+##      y -- The "distance filtered" output.
+##      zf -- If zi is None, this is not returned, otherwise, zf holds the
+##            final filter delay values.
+##    
+##    Algorithm:
+##      See butter and lfilter
+##
+##    """
+##    # Calculate Wn
+##    Wn = freq_to_Wn(C.speed_of_sound / (C.twoPi * r), T)
+##
+##    # generate b, a for 1st order highpass
+##    b, a = butter(1, Wn, 'highpass')
+##
+##    # X, Y, Z mask
+##    chnls = array([False, True, True, True])
+##
+##    # operate on a copy
+##    res = x.copy()
+##
+##    # filter!
+##    # Note: could use fiir_hp, but choose
+##    # to generate coefficients directly to
+##    # make the inverse filter more explicit
+##    if zi is None:
+##        res[:, chnls] =  ffilter(b, a, x[:, chnls])
+##        
+##        return res
+##
+##    else:
+##        res[:, chnls], zf =  ffilter(b, a, x[:, chnls], zi)
+##        
+##        return res, zf
 
-    Args:
-        - x         : Input b-format signal
-        - r         : Distance, in meters, to compensate for
-        - T         : Sampling period, 1./sr
-        - zi        : Initial conditions for the filter delays.  A vector
-            (or array of vectors for an N-dimensional input) of length
-            max(len(a),len(b)).  If zi=None or is not given then initial
-            rest is assumed.  SEE signal.lfiltic for more information.
-    
-    Outputs: (y, {zf})
-    
-      y -- The "distance filtered" output.
-      zf -- If zi is None, this is not returned, otherwise, zf holds the
-            final filter delay values.
-    
-    Algorithm:
-      See butter and lfilter
 
-    """
-    # Calculate Wn
-    Wn = freq_to_Wn(C.speed_of_sound / (C.twoPi * r), T)
-
-    # generate b, a for 1st order highpass
-    b, a = butter(1, Wn, 'highpass')
-
-    # X, Y, Z mask
-    chnls = array([False, True, True, True])
-
-    # operate on a copy
-    res = x.copy()
-
-    # filter!
-    # Note: could use fiir_hp, but choose
-    # to generate coefficients directly to
-    # make the inverse filter more explicit
-    if zi is None:
-        res[:, chnls] =  ffilter(b, a, x[:, chnls])
-        
-        return res
-
-    else:
-        res[:, chnls], zf =  ffilter(b, a, x[:, chnls], zi)
-        
-        return res, zf
-
-
-def proximity(x, r, T, zi = None):
-    """proximity(x, r, T, zi = None)
-    
-    "Proximity filter" an ambisonic B-format sound field.
-    (Inverse of "distance filter".)
-    
-    (Integrate, sum on X, Y, Z)
-
-    Args:
-        - x         : Input b-format signal
-        - r         : Distance, in meters, to generate cues for
-        - T         : Sampling period, 1./sr
-        - zi        : Initial conditions for the filter delays.  A vector
-            (or array of vectors for an N-dimensional input) of length
-            max(len(a),len(b)).  If zi=None or is not given then initial
-            rest is assumed.  SEE signal.lfiltic for more information.
-    
-    Outputs: (y, {zf})
-    
-      y -- The "proximity" filtered output.
-      zf -- If zi is None, this is not returned, otherwise, zf holds the
-            final filter delay values.
-    
-    Algorithm:
-      See butter and lfilter
-
-    NOTE: As X, Y, Z are integrated, it is best to initially prepare
-          the signal with a highpass filter.
-
-    """
-    # Calculate Wn
-    Wn = freq_to_Wn(C.speed_of_sound / (C.twoPi * r), T)
-
-    # generate b, a for 1st order highpass
-    b, a = butter(1, Wn, 'highpass')
-
-    # X, Y, Z mask
-    chnls = array([False, True, True, True])
-
-    # operate on a copy
-    res = x.copy()
-
-    # filter!
-    # b, a coefficients are inverted
-    # see distance filter above
-    if zi is None:
-        res[:, chnls] =  ffilter(a, b, x[:, chnls])
-        
-        return res
-
-    else:
-        res[:, chnls], zf =  ffilter(a, b, x[:, chnls], zi)
-        
-        return res, zf
 

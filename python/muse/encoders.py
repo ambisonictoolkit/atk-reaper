@@ -169,9 +169,9 @@ def uhj_to_b(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
         return res
 
 
-def stereo_to_b(a, N, width = .593, fpref = .354, beta = 5, mode = 'z', \
+def superstereo(a, N, width = .593, fpref = .354, beta = 5, mode = 'z', \
                     kind = 'fft', zi = None):
-    """stereo_to_b(a, N, width = .593, fpref = 0., beta = 5, mode = 'z',
+    """superstereo(a, N, width = .593, fpref = 0., beta = 5, mode = 'z',
                        kind = 'fft', zi = None)
     
     Args:
