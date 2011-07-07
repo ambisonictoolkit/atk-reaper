@@ -21,8 +21,11 @@ from muse import *
 from generators import *
 from scipy.signal import *
 from scipy.signal.signaltools import *
-from numpy.fft import rfft, irfft # may want to replace this with fftpack...
+from numpy.fft import fft, ifft, rfft, irfft
 import scipy.fftpack
+
+# import muse defined constants
+import constants as C
 
 
 # #=========================
@@ -59,7 +62,7 @@ def rceps(b, min = -120.):
     """
     res = real(
         ifft(
-            log(
+            numpy.log(
                 clip(
                     abs(fft(b)),
                     db_to_amp(min),
@@ -303,11 +306,10 @@ def mirf(b):
     return mir_b
 
 
-# NOTE: ADD A KEY HERE, TO CHOOSE BETWEEN FFT OR TIME DOMAIN INVF
 def invf(b):
     """invf(b)
 
-    Return spectral inversion of kernel b.
+    Return spectral inversion of a normalised linear phase kernel b.
 
     b + invf(b) returns allpass
 
@@ -315,8 +317,12 @@ def invf(b):
     """
     N = len(b)
 
-    ap_b = zeros(N)
-    ap_b[N / 2] = 1
+    if mod(N, 2) == 1:      # odd
+        ap_b = zeros(N)
+        ap_b[N/2] = 1
+    else:                   # even
+        ap_b = sinc(lin([-N/2, N/2], N))
+        ap_b *= hamming(N)
 
     inv_b = ap_b - b
     
@@ -363,7 +369,7 @@ def apf(b):
     phase = angle(fft_b)
 
     # take the ifft (real)
-    res = irfft(cos(phase) + sin(phase) * 1j)
+    res = irfft(cos(phase) + sin(phase) * 1j, len(b))
 
     return res
 
@@ -373,6 +379,9 @@ def linf(b):
 
     Return linear phase kernel, preserving magnitude of b.
     """
+
+    # N, input/output kernel length
+    N = len(b)
     
     # take real fft
     fft_b = rfft(b)
@@ -381,11 +390,32 @@ def linf(b):
     mag = abs(fft_b)
 
     # set phase to linear
-    N = len(mag)
-    phase = lin([0., -pi * N], N)
+    M = len(mag)
+    phase = lin([0, -pi * (M-1) * (N-1) / N], M)
 
     # take the ifft (real)
-    res = irfft(mag * (cos(phase) + sin(phase) * 1j))
+    res = irfft(mag * (cos(phase) + sin(phase) * 1j), N)
+
+    return res
+
+
+def norf(b):
+    """norf(b)
+
+    Return peak gain normalised kernel b.
+
+    Normalised to 0dB.
+
+    """
+    N = len(b)
+
+    res = reciprocal(
+        peak(
+            abs(
+                rfft(b)
+                )
+            )
+        ) * b
 
     return res
 
@@ -815,170 +845,233 @@ def fir_hb(N, beta=5):
         return res
 
 
-# def fir_ap(N, width=pi):
-#     """fir_ap(N, width=pi)
+def fir_ap(N, width = pi):
+    """fir_ap(N, width = pi)
 
-#     Allpass FIR Filter Design using ideal filter method, un-windowed.
-    
-#     Inputs:
-    
-#       N  -- order of filter (number of taps)
-#       width -- phase range.
-    
-#     Outputs:
-    
-#       b      -- coefficients of length N FIR filter.
-#     """
-#     Nr = N/2 + 1
-
-#     mag = ones(Nr)
-#     phase = white(Nr)
-        
-#     phase *= width
-#     phase += lin([0., -pi * N / 2], Nr)
-#     phase[0] = 0
-
-#     # take the ifft (real)
-#     ap_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
-
-#     return ap_b
-
-
-# def fir_ap(N, Wn=.5, width=pi):
-#     """fir_ap(N, Wn=.5, width=pi)
-
-#     Allpass FIR Filter Design using ideal filter method, un-windowed.
-    
-#     Inputs:
-    
-#       N  -- order of filter (number of taps)
-#       Wn -- frequency warping
-#       width -- phase range
-    
-#     Outputs:
-    
-#       b      -- coefficients of length N FIR filter.
-#     """
-
-#     Nr = N/2 + 1
-
-#     mag = ones(Nr)
-#     phase = white(Nr)
-    
-#     if Wn != .5:                # warp
-
-#         c = -(tan(pi / 2 * Wn) - 1.) / (tan(pi / 2 * Wn) + 1.)
-
-#         x0 = lin(nframes = Nr)      # linear index
-
-#         phase = interp(
-#             Wn_warp(x0, c),
-#             x0,
-#             phase
-#             )
-
-#     phase *= width
-#     phase += lin([0., -pi * N / 2], Nr)
-#     phase[0] = 0
-
-#     # take the ifft (real)
-#     ap_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
-
-#     return ap_b
-
-
-def fir_ap(N, Wn=.5, width=pi):
-    """fir_ap(N, Wn=.5, width=pi)
-
-    Allpass FIR Filter Design using ideal filter method, un-windowed.
+    Allpass FIR Filter design using frequency sampling.
     
     Inputs:
     
-      N  -- order of filter (number of taps)
-      Wn -- frequency warping
-      width -- phase range
+      N         -- order of filter (number of taps)
+      width     -- random phase width
     
     Outputs:
     
       b      -- coefficients of length N FIR filter.
     """
 
-    Nr = N/2 + 1
+    M = N/2 + 1
 
-    mag = ones(Nr)
-    phase = white(Nr)
-    
-    if Wn != .5:                # warp
-
-        x0 = lin(nframes = Nr)      # linear index
-
-        phase = interp(
-            Wn_warp(x0, 1. - Wn, True),
-            x0,
-            phase
-            )
-
+    phase = white(M)
     phase *= width
-    phase += lin([0., -pi * N / 2], Nr)
+
+    # convert to 'linear' phase
+    phase += lin([0, -pi * (M-1) * (N-1) / N], M)
+
+    # normalise phase at DC
     phase[0] = 0
+
+    # normalise phase at Nyquist
+    if mod(N, 2) == 0:
+        phase[-1] = 0.
+    else:
+        phase[-1] = pi/2
 
     # take the ifft (real)
-    ap_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
+    ap_b = irfft(cos(phase) + sin(phase) * 1j, N)
 
     return ap_b
 
 
-# NOTE: we may want to revisit this in light of recent
-#       comb-warping [S(PACE)] developed methods
-def fir_apw(N, Wn=.5, width=pi, minp=True):
-    """fir_apw(N, Wn=.5, width=pi, minp=True)
+##def fir_ap(N, Wn=.5, width=pi):
+##    """fir_ap(N, Wn=.5, width=pi)
+##
+##    Allpass FIR Filter Design using ideal filter method, un-windowed.
+##    
+##    Inputs:
+##    
+##      N  -- order of filter (number of taps)
+##      Wn -- frequency warping
+##      width -- phase range
+##    
+##    Outputs:
+##    
+##      b      -- coefficients of length N FIR filter.
+##    """
+##
+##    Nr = N/2 + 1
+##
+##    mag = ones(Nr)
+##    phase = white(Nr)
+##    
+##    if Wn != .5:                # warp
+##
+##        x0 = lin(nframes = Nr)      # linear index
+##
+##        phase = interp(
+##            Wn_warp(x0, 1. - Wn, True),
+##            x0,
+##            phase
+##            )
+##
+##    phase *= width
+##    phase += lin([0., -pi * Nr], Nr)
+##    phase[0] = 0
+##
+##    # take the ifft (real)
+##    ap_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
+##
+##    return ap_b
+##
 
-    Allpass FIR Filter Design using ideal filter method, warped and windowed.
+##def fir_ap(N, width=pi):
+##    """fir_ap(N, width=pi)
+##
+##    Allpass FIR Filter Design using ideal filter method, un-windowed.
+##    
+##    Inputs:
+##    
+##      N  -- order of filter (number of taps)
+##      width -- phase range
+##    
+##    Outputs:
+##    
+##      b      -- coefficients of length N FIR filter.
+##    """
+##
+##    Nr = N/2 + 1
+##
+##    mag = ones(Nr)
+##    phase = white(Nr)
+##
+##    phase *= width
+##    phase += lin([0., -pi * Nr], Nr)
+##    phase[0] = 0
+##
+##    # take the ifft (real)
+##    ap_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
+##
+##    return ap_b
+
+
+### NOTE: we may want to revisit this in light of recent
+###       comb-warping [S(PACE)] developed methods
+##def fir_apw(N, Wn=.5, width=pi, minp=True):
+##    """fir_apw(N, Wn=.5, width=pi, minp=True)
+##
+##    Allpass FIR Filter Design using ideal filter method, warped and windowed.
+##    
+##    Inputs:
+##    
+##      N  -- order of filter (number of taps)
+##      Wn -- frequency warping
+##      width -- kaiser window beta
+##      minp -- minimum phase?
+##    
+##    Outputs:
+##    
+##      b      -- coefficients of length N FIR filter.
+##    """
+##
+##    N /= 2
+##
+##    c = -(tan(pi / 2 * Wn) - 1.) / (tan(pi / 2 * Wn) + 1.)
+##    Nr = int((1 - abs(c)) / (1 + abs(c)) * N)/2 + 1
+##
+##    phase = white(Nr)
+##    phase[0] = 0
+##
+##    # take the ifft (real): generates ap filter
+##    ap_b = irfft(cos(phase) + sin(phase) * 1j)
+##
+##    # warp: allpass normalised
+##    ap_b = lagtapn(ap_b, c, N)
+##
+##    # window: reduce 'tail'
+##    ap_b *= kaiser(2 * N, width)[N:]
+##
+##    # re-normalise gain for allpass: through convolution with inverse filter
+##    rfft_b = rfft(ap_b)
+##    mag = 1./absolute(rfft_b)
+##    phase = lin([0., -pi * len(mag)], len(mag))
+##    inv_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
+##    if minp:
+##        inv_b = minf(inv_b)
+##    ap_b = convfilt(ap_b, inv_b, 'full')
+##
+##    # append zeros as necessary
+##    if len(ap_b) < 2 * N:
+##        ap_b = concatenate((ap_b, zeros(2 * N - len(ap_b))))
+##
+##    return ap_b
+
+
+
+# New all pass warping
+def fir_lap(M, Wn, N = None, width = pi, phase = pi):
+    """fir_lap(M, Wn, N, width=pi)
+
+    Laguerre warped allpass FIR Filter Design using ideal filter method,
+        un-windowed.
     
     Inputs:
     
-      N  -- order of filter (number of taps)
-      Wn -- frequency warping
-      width -- kaiser window beta
-      minp -- minimum phase?
+        M -- order of filter (number of terms of the Laguerre
+              transform to compute.)
+        Wn -- Laguerre warping frequency. Wn = 0.5 gives no warping.
+              See notes below
+        N  -- order of FFT. If is None, computes as 'approximate length'
+              FFT. See notes below.
+        width     -- random phase width
+        phase -- kernel phase. pi centers the response, pi/2 moves
+                    response to 1/4 of the window
+    
     
     Outputs:
     
       b      -- coefficients of length N FIR filter.
+
+
+    Notes: 
+
+    For for approximate length to match N:
+
+        N = int((1 - abs(c)) / (1 + abs(c)) * M)
+
+
+    To calculate c in terms of Wn:
+
+        c = -(tan(pi / 2 * Wn) - 1.) / (tan(pi / 2 * Wn) + 1.)
+
+        OR
+
+        b, a = butter(1, Wn, 'lowpass')
+        c = -a[1]
     """
 
-    N /= 2
+    # Laguerre warping coefficient
+    b, a = butter(1, Wn, 'lowpass')
+    c = -a[1]
 
-    c = -(tan(pi / 2 * Wn) - 1.) / (tan(pi / 2 * Wn) + 1.)
-    Nr = int((1 - abs(c)) / (1 + abs(c)) * N)/2 + 1
+    # compute N, if not given
+    if N is None:
+        N = int((1 - abs(c)) / (1 + abs(c)) * M)
 
-    phase = white(Nr)
-    phase[0] = 0
+    # warp
+    ap_b = lagtapn(
+            fir_ap(N, width),
+            c,
+            M
+            )
 
-    # take the ifft (real): generates ap filter
-    ap_b = irfft(cos(phase) + sin(phase) * 1j)
-
-    # warp: changes response from ap
-    ap_b = lagt(ap_b, c, N)
-
-    # window: reduce 'tail'
-    ap_b *= kaiser(2 * N, width)[N:]
-
-    # re-normalise gain for allpass: through convolution with inverse filter
-    # NOTE: may want to replace with apf()
-    rfft_b = rfft(ap_b)
-    mag = 1./absolute(rfft_b)
-    phase = lin([0., -pi * len(mag)], len(mag))
-    inv_b = irfft(mag * (cos(phase) + sin(phase) * 1j))
-    if minp:
-        inv_b = minf(inv_b)
-    ap_b = convfilt(ap_b, inv_b, 'full')
-
-    # append zeros as necessary
-    if len(ap_b) < 2 * N:
-        ap_b = concatenate((ap_b, zeros(2 * N - len(ap_b))))
+    # restore response to allpass, and adjust 'kernel phase'
+    ap_b = roll(
+        apf(ap_b),
+        int(M * phase / C.twoPi)
+        )
 
     return ap_b
+
 
 #=========================
 # Convolution Function

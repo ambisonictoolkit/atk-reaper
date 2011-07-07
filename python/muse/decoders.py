@@ -733,7 +733,7 @@ def panto_sbr(a, num_speakers = 4, orientation = 'flat', k = 0.7071):
     decoder = panto_reg_decoder_gain_matrix(num_speakers, orientation, k)
 
     # decode here!
-    return inner(a, array(decoder))
+    return inner(a[:, 0:-1], array(decoder))
 
 
 def peri_sbr(num_speaker_pairs = 4, elevation = 0.6155, orientation = 'flat', \
@@ -848,6 +848,10 @@ def decode_sbd(a, positions, k = 0.7071):
     # return decoder gain matrix
     decoder = decoder_gain_matrix(positions, k)
 
+    # pantophonic or periphonic?
+    if shape(positions)[1] is 2:
+        a = a[:, 0:-1]
+
     # decode here!
     return inner(a, array(decoder))
 
@@ -886,7 +890,7 @@ def quad_sbd(a, angle = 0.7854, k = 0.7071):
     decoder = quad_decoder_gain_matrix(angle, k)
 
     # decode here!
-    return inner(a, array(decoder))
+    return inner(a[:, 0:-1], array(decoder))
 
 
 #------------------------------------------------------------------------
@@ -939,14 +943,14 @@ def panto_dbr(a, num_speakers = 4, orientation = 'flat', Wn = None, zi = None):
 
     # shelf filter
     if zi is None:
-        b = psycho_shelf(a, Wn, C.k_2D)
+        b = psycho_shelf(a[:, 0:-1], Wn, C.k_2D)
 
         # decode here!
         res = inner(b, array(decoder))
         return res
 
     else:
-        b, zf = psycho_shelf(a, Wn, C.k_2D, zi)
+        b, zf = psycho_shelf(a[:, 0:-1], Wn, C.k_2D, zi)
 
         # decode here!
         res = inner(b, array(decoder))
@@ -1067,6 +1071,7 @@ def decode_dbd(a, positions, Wn, zi = None):
     # determin k for pantophonic or periphonic shelving
     if shape(positions)[1] is 2:
         k = C.k_2D
+        a = a[:, 0:-1]
     else:
         k = C.k_3D
     
@@ -1087,8 +1092,8 @@ def decode_dbd(a, positions, Wn, zi = None):
         return res, zf
 
 
-def quad_dbd(a, angle = 0.7854, Wn, zi = None):
-    """quad_dbd(a, angle = 0.7854, Wn, zi = None)
+def quad_dbd(a, angle = 0.7854, Wn = None, zi = None):
+    """quad_dbd(a, angle = 0.7854, Wn = None, zi = None)
     
     Quadraphonic Dual Band Decoder
     
@@ -1122,14 +1127,14 @@ def quad_dbd(a, angle = 0.7854, Wn, zi = None):
 
     # shelf filter
     if zi is None:
-        b = psycho_shelf(a, Wn, C.k_2D)
+        b = psycho_shelf(a[:, 0:-1], Wn, C.k_2D)
 
         # decode here!
         res = inner(b, array(decoder))
         return res
 
     else:
-        b, zf = psycho_shelf(a, Wn, C.k_2D, zi)
+        b, zf = psycho_shelf(a[:, 0:-1], Wn, C.k_2D, zi)
 
         # decode here!
         res = inner(b, array(decoder))
@@ -1140,7 +1145,6 @@ def quad_dbd(a, angle = 0.7854, Wn, zi = None):
 # Special decoders
 #
 #   b_to_ITU5           Wiggins coefficients (Single Band Decoders)
-#   b_to_uhj            "Ambisonic Decoders for HDTV" (1992)
 #
 #------------------------------------------------------------------------
 
@@ -1187,21 +1191,28 @@ def b_to_ITU5(a, kind = 'foc'):
     decoder_dict = {
         'foc' : [[.2000, .4250,  .4700,  .4700,  .4250],
                  [.1600, .3600, -.3300, -.3300,  .3600],
-                 [.0000, .4050,  .4150, -.4150, -.4050],
-                 [.0000, .0000,  .0000,  .0000,  .0000]],
+                 [.0000, .4050,  .4150, -.4150, -.4050]],
 
         'equ' : [[.0000, .3650,  .5550,  .5550,  .3650],
                  [.0850, .4350, -.2850, -.2850,  .4350],
-                 [.0000, .3400,  .4050, -.4050, -.3400],
-                 [.0000, .0000,  .0000,  .0000,  .0000]]
+                 [.0000, .3400,  .4050, -.4050, -.3400]]
         }
 
     # construct decoder
     decoder = transpose(array(decoder_dict[kind]))
 
     # decode here!
-    return inner(a, array(decoder))
+    return inner(a[:, 0:-1], array(decoder))
 
+
+#------------------------------------------------------------------------
+# Stereo decoders
+#
+#   b_to_uhj            "Ambisonic Decoders for HDTV" (1992)
+#   b_to_stereo         virtual stereo microphone decoding
+#   b_to_binaural       HRTF (Dual Band Diametric Decoder) decoding
+#
+#------------------------------------------------------------------------
 
 def b_to_uhj(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
     """b_to_uhj(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None)
@@ -1271,6 +1282,44 @@ def b_to_uhj(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
         return res
 
 
+def b_to_stereo(a, angle = 0.7854, pattern = 1.0):
+    """b_to_stereo(a, angle = 0.7854, pattern = 1.0)
+    
+    Virtual Stereo Microphone Decoder
+    
+    Args:
+        - a         : Input B-format signal
+
+        - angle     : Microphone pair 1/2 angle
+
+        - pattern   : Microphone response pattern, k. k = 1 returns
+                        a bi-directional pattern (fig-8). k = 0.5
+                        returns a cardioid pattern. I.e.:
+
+                        (1-k) + k * cos
+
+                         
+    Decode a three dimensional ambisonic B-format signal to two channel
+    stereo.
+
+
+    This decoder does not employ psychoacoustic shelf filtering.
+
+    """
+    # compute cosines and sines
+    cos_angle, sin_angle = cos(angle), sin(angle)
+
+    # construct decoder gain matrix
+    decoder = array([
+        [(1.-k) * C.sqrt2, k * cos_angle, k * sin_angle],
+        [(1.-k) * C.sqrt2, k * cos_angle, -k * sin_angle]
+        ])
+
+    # decode here!
+    res = inner(a[:, 0:-1], decoder)
+    return res
+
+
 # ------------------------------------------------------------
 # B-format to A-format
 # ------------------------------------------------------------
@@ -1312,10 +1361,6 @@ def b_to_a(a, orientation = 'flu', weight = 'can'):
     # decode here!
     return inner(a, decoder)
 
-
-# ------------------------------------------------------------
-# HRTF (Dual Band Diametric Decoder)
-# ------------------------------------------------------------
 
 # ------------------------------------------------------------
 # Redundant
