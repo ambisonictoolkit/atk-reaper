@@ -2213,6 +2213,122 @@ def psycho_shelf(x, Wn, k, zi = None):
         return y, zf
         
 
+# --------------------------------------
+# Spherical and HRIR filters
+# --------------------------------------
+
+def sphere(N, theta, T, \
+           r = 0.0875, k_0 = 0.1, theta_0 = 5./6 * pi, width = pi):
+    """sphere(x, N, theta, T, \
+           r = 0.0875, k_0 = 0.1, theta_0 = 5./6 * pi, width = pi)
+
+    Spherical model FIR Filter Design using method demonstrated by Brown
+    and Duda, windowed with the Kaiser window.
+
+    Brown, C. Phillip and Richard O. Duda. "An Efficient HRTF Model for
+    3-D Sound." In proceedings: IEEE Workshop on Applications of Signal
+    Processing to Audio and Acoustics (WASPAA), New Paltz, NY 1997.
+    
+    Args:
+    
+        - N         : order of filter (number of taps)
+        - theta     : incidence angle (-pi, pi)
+        - T         : sampling period, 1./sr 
+        - r         : sphere radius (default is Brown/Duda value)
+        - k_0       : filter minimum scale
+        - theta_0   : incidence angle for minimimum scale
+        - width     : beta for Kaiser window FIR design.
+                      pi = minimum ripple for steepest cutoff.    
+    Outputs:
+    
+        - b         : coefficients of length N FIR filter.
+
+    """
+
+    # precondition angle, constrain to -pi, pi
+    if theta > pi:
+        theta -= C.twoPi
+    elif theta > pi:
+        theta += C.twoPi
+
+    # compute delay from centre of sphere
+    if abs(theta) < C.halfPi:
+        delay = -r / C.speed_of_sound * cos(theta)
+    else:
+        delay = r / C.speed_of_sound * (abs(theta) - C.halfPi)
+
+    delayN = delay * reciprocal(T)
+
+
+    # compute filter coefficients
+    w_0 = C.speed_of_sound / r * T
+    k = (1 + k_0 / 2) + \
+              (1 - k_0 / 2) * cos(theta / theta_0 * pi)
+
+    b = array([w_0 + k, w_0 - k])
+    a = array([w_0 + 1, w_0 - 1])
+
+
+    # generate delay response
+    x =  sinc(
+        lin([-(N-1)/2., (N-1)/2.], N) - delayN
+        )
+
+    # apply frequency dependent gain, and window
+    x = lfilter(b, a, x)
+    x *= kaiser(N, width)
+
+    return x
+
+
+def sHRIR(N, azimuth, elevation, T, \
+           r = 0.0875, theta_e = 5./9*pi, width = pi):
+    """sHRIR(N, azimuth, elevation, T, \
+           r = 0.0875, theta_e = 5./9*pi, width = pi)
+
+    Spherical HRIR model FIR Filter Design using method demonstrated by Brown
+    and Duda, windowed with the Kaiser window.
+
+    Brown, C. Phillip and Richard O. Duda. "An Efficient HRTF Model for
+    3-D Sound." In proceedings: IEEE Workshop on Applications of Signal
+    Processing to Audio and Acoustics (WASPAA), New Paltz, NY 1997.
+    
+    Args:
+    
+        - N         : order of filter (number of taps)
+        - azimuth   : source azimuth (-pi, pi)
+        - elevation : sourze elevation (-pi/2, pi/2)
+        - T         : sampling period, 1./sr 
+        - r         : sphere radius (default is Brown/Duda value)
+        - theta_e   : +/- ear angle (default is Brown/Duda value)
+        - width     : beta for Kaiser window FIR design.
+                      pi = minimum ripple for steepest cutoff.    
+    Outputs:
+    
+        - b         : coefficients of length N FIR filter. Interleaved
+                        [left_FIR, right_FIR]
+
+    Note: As as simple sphereical model, the generated HRIR does not
+            include torso or pinnae effects. Because of this, the
+            simple spherical model does not generate elevation cues.
+
+    """
+
+    # calculate angles to ears
+    theta_l = arccos(cos(azimuth - theta_e) * cos(elevation))
+    theta_r = arccos(cos(azimuth + theta_e) * cos(elevation))
+
+    # calculate sHRIR
+    res = interleave(
+        array([
+            sphere(N, theta_l, T, r, width = width),
+            sphere(N, theta_r, T, r, width = width)
+            ])
+        )
+
+    return res
+
+
 # **************************************
 # osc. . .
 # **************************************
