@@ -317,12 +317,8 @@ def invf(b):
     """
     N = len(b)
 
-    if mod(N, 2) == 1:      # odd
-        ap_b = zeros(N)
-        ap_b[N/2] = 1
-    else:                   # even
-        ap_b = sinc(lin([-N/2, N/2], N))
-        ap_b *= hamming(N)
+    ap_b = sinc(lin([-(N-1)/2., (N-1)/2.], N))
+    ap_b *= hamming(N)
 
     inv_b = ap_b - b
     
