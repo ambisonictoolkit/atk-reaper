@@ -1282,8 +1282,8 @@ def b_to_uhj(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
         return res
 
 
-def b_to_stereo(a, angle = 0.7854, pattern = 1.0):
-    """b_to_stereo(a, angle = 0.7854, pattern = 1.0)
+def b_to_stereo(a, angle = 0.7854, k = 1.0):
+    """b_to_stereo(a, angle = 0.7854, k = 1.0)
     
     Virtual Stereo Microphone Decoder
     

@@ -2281,6 +2281,51 @@ def sphere(N, theta, T, \
     return x
 
 
+def open_sphere(N, theta, T, \
+           r = 0.13125, k = 0., width = pi):
+    """open_sphere(N, theta, T, \
+           r = 0.13125, k = 0., width = pi)
+
+    Open spherical model FIR Filter Design windowed with the Kaiser window.
+    
+    Args:
+    
+        - N         : order of filter (number of taps)
+        - theta     : incidence angle
+        - T         : sampling period, 1./sr 
+        - r         : sphere radius
+        - k         : Microphone response pattern, k. k = 1 returns
+                        a bi-directional pattern (fig-8). k = 0.5
+                        returns a cardioid pattern. I.e.:
+
+                        (1-k) + k * cos
+        - width     : beta for Kaiser window FIR design.
+                      pi = minimum ripple for steepest cutoff.    
+    Outputs:
+    
+      b      -- coefficients of length N FIR filter.
+
+    """
+
+    # compute delay from centre of sphere
+    delay = -r / C.speed_of_sound * cos(theta)
+    delayN = delay * reciprocal(T)
+
+    # compute directional scale
+    scale = (1.-k) + (k * cos(theta))
+
+    # generate delay response
+    x =  sinc(
+        lin([-(N-1)/2., (N-1)/2.], N) - delayN
+        )
+
+    # apply gain, and window
+    x *= scale
+    x *= kaiser(N, width)
+
+    return x
+
+
 def sHRIR(N, azimuth, elevation, T, \
            r = 0.0875, theta_e = 5./9*pi, width = pi):
     """sHRIR(N, azimuth, elevation, T, \
@@ -2327,6 +2372,11 @@ def sHRIR(N, azimuth, elevation, T, \
         )
 
     return res
+
+
+# NOTE: Consider adding general open and closed sphere arrays.
+#       These would be useful for testing and simulation of
+#       prototype real arrays before deployment.
 
 
 # **************************************
