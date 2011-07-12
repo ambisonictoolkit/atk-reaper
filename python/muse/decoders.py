@@ -736,7 +736,7 @@ def panto_sbr(a, num_speakers = 4, orientation = 'flat', k = 0.7071):
     return inner(a[:, 0:-1], array(decoder))
 
 
-def peri_sbr(num_speaker_pairs = 4, elevation = 0.6155, orientation = 'flat', \
+def peri_sbr(a, num_speaker_pairs = 4, elevation = 0.6155, orientation = 'flat', \
              k = 0.5774):
     """peri_sbr(a, num_speaker_pairs = 4, elevation = 0.6155,
                                     orientation = 'flat', k = 0.5774)
@@ -957,7 +957,7 @@ def panto_dbr(a, num_speakers = 4, orientation = 'flat', Wn = None, zi = None):
         return res, zf
 
 
-def peri_dbr(num_speaker_pairs = 4, elevation = 0.6155, orientation = 'flat', \
+def peri_dbr(a, num_speaker_pairs = 4, elevation = 0.6155, orientation = 'flat', \
              Wn = None, zi = None):
     """peri_dbr(a, num_speaker_pairs = 4, elevation = 0.6155,
                                 orientation = 'flat', Wn = None, zi = None)
