@@ -2187,8 +2187,6 @@ def psycho_shelf(x, Wn, k, zi = None):
       See fiir_rmhs2, ffilter and lfilter
 
     """
-    # fiir_rmhs2(x, Wn, k, zi = None)
-    
     # channel masks
     deg = array([
         [True, False, False, False],    # W (degree 0) mask
