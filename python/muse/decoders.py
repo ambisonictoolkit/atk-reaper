@@ -454,6 +454,110 @@ def quad_decoder_gain_matrix(angle, k):
 
 
 #---------------------------------------------
+# binaural decoder kernels
+#---------------------------------------------
+
+def sHRIR_decoder_kernel(positions, k, N, T, \
+                           r = 0.0875, theta_e = 5./9*pi, width = pi):
+    """sHRIR_decoder_kernel(positions, k, N, T, \
+                           r = 0.0875, theta_e = 5./9*pi, width = pi)
+    
+    DDT, spherical HRIR model FIR Filter decoder kernel using spherical
+    HRIR demonstrated by Brown and Duda, windowed with the Kaiser window.
+
+    Decoder is Aaron Heller's DDT implementation. 
+
+    See:
+
+    Brown, C. Phillip and Richard O. Duda. "An Efficient HRTF Model for
+    3-D Sound." In proceedings: IEEE Workshop on Applications of Signal
+    Processing to Audio and Acoustics (WASPAA), New Paltz, NY 1997.
+
+    http://www.ai.sri.com/ajh/ambisonics/
+
+    Args:
+        - positions : XYZ positions of the speaker pairs,
+                      one speaker pair per row, i.e., [[1 1 1], [1 -1 -1]]
+                      If Z positions of speaker pairs are omitted,
+                      it does a horizontal decode (otherwise Z
+                      gain is infinite).
+
+                      positions: [ [ x_0   y_0   z_0 ]
+                                   ...
+                                   [ x_i   y_i   z_i ]
+                                   ...
+                                   [ x_n-1 y_n-1 z_n-1 ] ]
+
+        - k         : W gain factor, corresponding to directivity
+
+                      For pantophonic (2D)
+                      k: 1         => velocity,
+                         sqrt(1/2) => energy, 
+                         1/2       => controlled opposites
+        
+                      For periphonic (3D)
+                      k: 1         => velocity,
+                         sqrt(1/3) => energy, 
+                         1/3       => controlled opposites
+        
+        - N         : order of filter (number of taps)
+        - T         : sampling period, 1./sr 
+        - r         : sphere radius (default is Brown/Duda value)
+        - theta_e   : +/- ear angle (default is Brown/Duda value)
+        - width     : beta for Kaiser window FIR design.
+                      pi = minimum ripple for steepest cutoff.    
+
+    Outputs:
+    
+        - b         : coefficients of length N FIR filter: 
+                        [[W_left_FIR, W_right_FIR],
+                        [[X_left_FIR, X_right_FIR],
+                        [[Y_left_FIR, Y_right_FIR],
+                        [[Z_left_FIR, Z_right_FIR]]
+
+    Notes:  This assumes standard B format
+            definitions for W, X, Y, and Z, i.e., W
+            is sqrt(2) lower than X, Y, and Z.
+    
+            As as simple sphereical model, the generated HRIR does not
+            include torso or pinnae effects. Because of this, the
+            simple spherical model does not generate elevation cues.
+
+
+    Joseph Anderson <josephlloydanderson@mac.com>
+
+    """
+    gains = decoder_gain_matrix(positions, k)
+    n, m = shape(positions)         # n = number of speaker pairs
+                                    # m = number of dimensions,
+                                    #        2=panto, 3=peri 
+    positions2 = vstack((positions, -positions))
+
+    speaker_kernels = empty((2 * n, N, 2))  # speakers, N, sHRIR channels
+    decoder_kernels = zeros((m + 1, N, 2))  # harmonics, N, sHRIR channels
+
+    # collect decoder kernel
+    for i in range(2 * n):          # i is speaker number
+
+        # collect speaker sHRIR kernels
+        if m is 2:              # (2D)
+            radius, azimuth = cart_to_pol(positions2)[i]
+            elevation = 0.
+        else:                   # (3D)
+            radius, azimuth, elevation = cart_to_spher(positions2)[i]
+                
+        # find speaker kernel
+        speaker_kernels[i] = sHRIR(N, azimuth, elevation, T, \
+                                   r, theta_e, width)
+
+        # sum to decoder kernels
+        for j in range(m + 1):          # j is harmonic number
+            decoder_kernels[j] += gains[i, j] * speaker_kernels[i]
+
+    return decoder_kernels
+
+
+#---------------------------------------------
 # rV and rE analysis (in XY plane)
 #---------------------------------------------
 
@@ -1261,7 +1365,6 @@ def b_to_uhj(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
             kind,
             zi
             )
-        over_dub(hb, zi)
     else:
         hb = convfilt(
             a[:, :3],               # strip Z
@@ -1318,6 +1421,102 @@ def b_to_stereo(a, angle = 0.7854, k = 1.0):
     # decode here!
     res = inner(a[:, 0:-1], decoder)
     return res
+
+
+def b_to_binaural(b, decoder_kernels, mode = 'z', kind = 'fft', zi = None):
+    """b_to_binaural(b, decoder_kernels, mode = 'z', kind = 'fft', zi = None)
+    
+    Args:
+        - b                 : Input B-format signal
+
+        - decoder_kernels   : HRIR decoder kernels, for periphonic (3D):
+        
+                              [[W_HRIR_l, W_HRIR_r],
+                               [X_HRIR_l, X_HRIR_r],
+                               [Y_HRIR_l, Y_HRIR_r],
+                               [Z_HRIR_l, Z_HRIR_r]]
+
+                               shape = (4, HRIR_kernel_size, 2)
+
+                               for pantophonic (2D):
+        
+                              [[W_HRIR_l, W_HRIR_r],
+                               [X_HRIR_l, X_HRIR_r],
+                               [Y_HRIR_l, Y_HRIR_r]]
+
+                               shape = (3, HRIR_kernel_size, 2)
+
+        - mode  : 'z' or 'full'. If mode is 'z', acts as a filter with state
+                  'z', and returns a vector of length nframes(b). If mode is
+                  'full', returns the full convolution.
+
+        - kind  : 'direct' or 'fft', for direct or fft convolution
+
+        - zi    : Initial state. An array of shape...
+
+                  for periphonic (3D): (4, len(HRIR_kernel_size) - 1, 2)
+                  for pantophonic (2D): (3, len(HRIR_kernel_size) - 1, 2)
+                  
+                  If zi = None or is not given then initial rest is assumed.
+
+    Outputs: (y, {zf})
+    
+      y         : The output of the decoder.
+      zf        : If zi is None, this is not returned, otherwise, zf holds
+                  the filter state.
+    
+    Decode a three dimensional ambisonic B-format signal to two channel
+    binaural stereo using the supplied HRIR decoder kernels.
+
+    """
+
+    M = nframes(b)                      # length of input b-format
+    N = shape(decoder_kernels)[1]       # length of HRIR kernels
+    m = shape(decoder_kernels)[0]       # number of harmonics
+
+    # initialise result to correct size
+    # NOTE: At the moment, the assumption is asymmetrical HRIR,
+    #       i.e., separate convolutions for L, R
+    #
+    #       In the symmetrical case, the algorithm can be optimised to
+    #       use 3 convolutions for 2D and 4 for 3D. I.e., half the 
+    #       convolution load. Such optimisation may be useful for
+    #       real-time implementations. HOWEVER, there is evidence
+    #       for better perceptial performance to use real-world
+    #       assymetric HRIRs
+    if mode is 'z':
+        res = zeros((M, 2))
+    else:
+        res = zeros((M+N-1, 2))
+
+    # convolve with HRIR kernel
+    if zi is not None:
+        zf = zeros_like(zi)
+        
+        for i in range(m):
+            res_i, zf_i = convfilt(
+                interleave(b[:, i]),
+                decoder_kernels[i],
+                mode,
+                kind,
+                zi[i]
+                )
+
+            res += res_i
+            zf[i] = zf_i
+    else:
+        for i in range(m):
+            res += convfilt(
+                interleave(b[:, i]),
+                decoder_kernels[i],
+                mode,
+                kind
+                )
+
+    if zi is not None:
+        return res, zf
+    else:
+        return res
 
 
 # ------------------------------------------------------------
