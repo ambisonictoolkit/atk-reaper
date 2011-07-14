@@ -788,11 +788,16 @@ def fir_pks(N, Wn, bw, k, width=pi):
 # Gibson, D. (1996, May). "Desigining an SSB Outphaser, Part 2."
 # Electronics World, 392-394.
 # **************************************
+
 def fir_hb(N, beta=5):
     """fir_hb(N, beta=5)
 
-    Hilbert FIR Filter Design using method demonstrated by Gibson,
-    windowed with the Kaiser window.
+    Hilbert FIR Filter Design:
+
+        N = odd, using method demonstrated by Gibson
+        N = even, using Nyquist mirrored sinc()
+
+    Windowed with the Kaiser window.
 
     Gibson, D. (1996, April). "Desigining an SSB Outphaser, Part 1."
     Electronics World, 306-310.
@@ -801,44 +806,42 @@ def fir_hb(N, beta=5):
     
     Inputs:
     
-      N  -- order of filter (number of taps), should be odd
-      beta -- beta for Kaiser window FIR design.
+      N     : order of filter (number of taps), should be odd
+      beta  : beta for Kaiser window FIR design.
                   5 = similiar to Hamming.
     
     Outputs:
     
-      b      -- coefficients of length N FIR filter.
+      b     : coefficients of length N FIR filter, returned as complex
+              coefficients. Unit response is found in 'real' and Hilbert
+              response is found in 'imag'.
 
     """
-    # check if even or odd
-    if N % 2 is 0:
-        raise ValueError, ("N should be odd!!")
 
-    else:
-        # first make real response
-        hilreal = zeros(N, complex)
-        hilreal[(N -1 )/2] = 1.
+    # real response
+    x_real = sinc(lin([-(N-1)/2., (N-1)/2.], N))
 
-        # then make imag response & window with kaiser
-        hilimag = []
-        for n in range(N):
-            if n == (N - 1) / 2:
-                hilimag.append(complex(0, 0))
+    # imag response
+    if N % 2 is 1:                          # N odd
+        x_imag = zeros(N)
+
+        for i in range(N):
+            if i == (N -1) / 2:
+                pass
             else:
-                hilimag.append(
-                    complex(
-                        0,
-                        (1 - (cos((n - (N - 1) / 2) * pi)))
-                        /
-                        ((n - (N - 1) / 2) * pi)
-                        )
-                    )
-        hilimag *= kaiser(N, beta)
+                x_imag[i] = (1 - (cos((i - (N - 1) / 2) * pi))) / \
+                            ((i - (N - 1) / 2) * pi)
 
-        # sum real and imag
-        res = hilreal + hilimag
+    else:                                   # N even
+        x_imag = mirf(x_real)
 
-        return res
+    # sum real and imag (cast as complex)
+    res = x_real + 1j * x_imag
+
+    # window
+    res *= kaiser(N, beta)
+
+    return res
 
 
 def fir_ap(N, width = pi):
@@ -1197,7 +1200,6 @@ def convfilt(x, kernel, mode = 'z', kind = 'fft', zi = None):
     if kind is 'direct':
         convfun = convolve
     else:
-#         convfun = fftconvolve
         convfun = fconvolve
 
     x_chans = nchannels(x)
