@@ -1138,13 +1138,6 @@ def fconvolve(in1, in2):
             in2Ch
             )
 
-    # convolve here
-#     res = real(
-#         scipy.fftpack.ifft(
-#             scipy.fftpack.fft(in1, fftN) * scipy.fftpack.fft(in2, fftN)
-#             )
-#         )[:cN]
-
     if in1Ch is 1 and in2Ch is 1:
         res = fftpackrconvolve(in1, in2, fftN)[:cN]
 

@@ -1318,28 +1318,28 @@ def b_to_ITU5(a, kind = 'foc'):
 #
 #------------------------------------------------------------------------
 
-def b_to_uhj(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
-    """b_to_uhj(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None)
+def b_to_uhj(a, hilbert_kernel, mode = 'z', kind = 'fft', zi = None):
+    """b_to_uhj(a, hilbert_kernel, mode = 'z', kind = 'fft', zi = None)
     
     Args:
-        - a    -- Input B-format signal
-        - N    -- filter (number of taps), should be odd
-        - beta -- beta for Kaiser window FIR design.
-                  5 = similiar to Hamming.
-        - mode -- 'z' or 'full'. If mode is 'z', acts as a filter
+        - a                 : Input B-format signal
+        - hilbert_kernel    : Complex Hilbert transform kernel.
+                              Real contains real resonse, Complex
+                              contains complex response.
+        - mode  : 'z' or 'full'. If mode is 'z', acts as a filter
                   with state 'z', and returns a vector of length
                   len(x). If mode is 'full', returns the full
                   convolution.
-        - kind -- 'direct' or 'fft', for direct or fft convolution
+        - kind  : 'direct' or 'fft', for direct or fft convolution
 
-        - zi   -- Initial state. An array of shape (len(kernel) - 1, 3).
+        - zi    : Initial state. An array of shape (len(kernel) - 1, 3).
                   If zi=None or is not given then initial rest is assumed.
 
     Outputs: (y, {zf})
     
-      y -- The output of the decoder.
-      zf -- If zi is None, this is not returned, otherwise, zf holds the
-            filter state.
+      y     : The output of the decoder.
+      zf    : If zi is None, this is not returned, otherwise, zf holds the
+              filter state.
     
     Decode a three dimensional ambisonic B-format signal to two channel
     stereo ambisonic UHJ using a linear phase hilbert transform filter.
@@ -1358,24 +1358,40 @@ def b_to_uhj(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
 
     # convolve with hilbert kernel
     if zi is not None:
-        hb, zf = convfilt(
-            a[:, :3],               # strip Z
-            fir_hb(N, beta=5),      # generate hilbert kernel
+
+        hb_real, zf_real = convfilt(
+            a[:, :3],                       # strip Z
+            hilbert_kernel.real,
             mode,
             kind,
-            zi
+            zi.real
             )
+        hb_imag, zf_imag = convfilt(
+            a[:, :3],                       # strip Z
+            hilbert_kernel.imag,
+            mode,
+            kind,
+            zi.imag
+            )
+        zf = zf_real + 1j * zf_imag
+
     else:
-        hb = convfilt(
-            a[:, :3],               # strip Z
-            fir_hb(N, beta=5),      # generate hilbert kernel
+        hb_real = convfilt(
+            a[:, :3],                       # strip Z
+            hilbert_kernel.real,
+            mode,
+            kind
+            )
+        hb_imag = convfilt(
+            a[:, :3],                       # strip Z
+            hilbert_kernel.imag,
             mode,
             kind
             )
 
-    s = (array([.9396926, .1855740]) * hb.real[:, :2]).sum(axis = -1)
-    d = (array([-.3420201, .5098604]) * hb.imag[:, :2]).sum(axis = -1) + \
-        .6554516 * hb.real[:, 2]
+    s = (array([.9396926, .1855740]) * hb_real[:, :2]).sum(axis = -1)
+    d = (array([-.3420201, .5098604]) * hb_imag[:, :2]).sum(axis = -1) + \
+        .6554516 * hb_real[:, 2]
     
     res = .5 * interleave(array([s + d, s - d]))
 

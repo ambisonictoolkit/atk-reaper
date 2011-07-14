@@ -94,72 +94,125 @@ def mono_to_b(a, azimuth = 0., elevation = 0.):
 
 
 # it may be desirable to add "forward preference" to the uhj encoder
-def uhj_to_b(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
-    """uhj_to_b(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None)
+def uhj_to_b(a, hilbert_kernel, fpref = .354, \
+             mode = 'z', kind = 'fft', zi = None):
+    """uhj_to_b(a, hilbert_kernel, fpref = .354, \
+                mode = 'z', kind = 'fft', zi = None)
     
     Args:
-        - a    -- Input UHJ signal
-        - N    -- filter (number of taps), should be odd
-        - beta -- beta for Kaiser window FIR design.
-                  5 = similiar to Hamming.
-        - mode -- 'z' or 'full'. If mode is 'z', acts as a filter
+        - a                 : Input UHJ signal
+        - hilbert_kernel    : Complex Hilbert transform kernel.
+                              Real contains real resonse, Complex
+                              contains complex response.
+        - fpref : Forward preference, pushes phasiness to the rear
+                  of the sound field where it is less offensive. With
+                  no forward preference (= 0), the phasiness is distributed
+                  equally around 360 degrees. .354 gives no phasiness at
+                  front. 0. < fpref < .5
+        - mode  : 'z' or 'full'. If mode is 'z', acts as a filter
                   with state 'z', and returns a vector of length
                   len(x). If mode is 'full', returns the full
                   convolution.
-        - kind -- 'direct' or 'fft', for direct or fft convolution
+        - kind  : 'direct' or 'fft', for direct or fft convolution
 
-        - zi   -- Initial state. An array of shape (len(kernel) - 1, 2).
+        - zi    : Initial state. An array of shape (len(kernel) - 1, 2).
                   If zi=None or is not given then initial rest is assumed.
 
     Outputs: (y, {zf})
     
-      y -- The output of the encoder.
-      zf -- If zi is None, this is not returned, otherwise, zf holds the
-            filter state.
+      y         : The output of the encoder.
+      zf        : If zi is None, this is not returned, otherwise, zf holds the
+                  filter state.
     
     Decode a two dimensional ambisonic UHJ signal to four channel
     ambisonic b-format using a linear phase hilbert transform filter.
     (Channel Z is zeros.)
 
     """
-#     Audio Engineering Society E-Library
-#     Ambisonic Decoders for HDTV
-#     Preprint Number:   3345    Convention:   92 (February 1992)
-#     Authors:   Gerzon, Michael A.; Barton, Geoffrey J.
-#     E-library Location: (CD aes12)   /pp9193/pp9203/3405.pdf
+    #     Audio Engineering Society E-Library
+    #     Ambisonic Decoders for HDTV
+    #     Preprint Number:   3345    Convention:   92 (February 1992)
+    #     Authors:   Gerzon, Michael A.; Barton, Geoffrey J.
+    #     E-library Location: (CD aes12)   /pp9193/pp9203/3405.pdf
 
-#     S = (Left + Right)/2.0
-#     D = (Left - Right)/2.0
+    #     S = (Left + Right)/2.0
+    #     D = (Left - Right)/2.0
 
-#     W = 0.982*S + j*0.164*D
-#     X = 0.419*S - j*0.828*D
-#     Y = 0.763*D + j*0.385*S
+    #     W = 0.982*S + j*0.164*D
+    #     X = 0.419*S - j*0.828*D
+    #     Y = 0.763*D + j*0.385*S
+
+    # Martin Lese on Forward Preference:
+    # 
+    # It pushes phasiness to the rear of the sound field where it is less 
+    # offensive.  With no forward preference (a = 0), the phasiness is 
+    # distributed equally around 360 degrees.  The transformation is:
+    # 
+    # new W = W
+    # new X = X
+    # new Y = Y - a.(jW)
+    # 
+    # where a = a constant
+    # j = 90-degree phase shift
+    # 
+    # Now, what value of "a" to use?  In theory, 0 < a < 1.  Gerzon's
+    # patent 4081606 suggests 0.333 < a < 0.5.  Gerzon 1977 (refs at end)
+    # uses a = 0.3.  Gerzon 1985 suggests 0 < k' < 0.7 which is equivalent
+    # to 0 < a < 0.49.  I would either allow 0 < a < 1.0 and experiment or
+    # go with the most recent reference, Gerzon 1985.
+
+
+    # J Anderson on SuperStereo with Forward Preference:
+    # 
+    # The above two transforms can be combined
+    # to give the following: 
+    #
+    #     W = 0.982*S + j*0.164*D
+    #     X = 0.419*S - j*0.828*D
+    #     Y = 0.763*D - j*a*0.763*D + a*0.385*S + j*0.385*S
+    # 
+    # a = .35355342513417343 for 'optimum', e.g., no phasiness at front
 
     s = a.sum(axis = -1)
     d = (array([1., -1.]) * a).sum(axis = -1)
 
     # convolve with hilbert kernel
     if zi is not None:
-        hb, zf = convfilt(
+        hb_real, zf_real = convfilt(
             interleave(array([s, d])), # interleave s & d
-            fir_hb(N, beta=5),      # generate hilbert kernel
+            hilbert_kernel.real,
             mode,
             kind,
-            zi
+            zi.real
             )
-        over_dub(hb, zi, write_over = True)
-    else:
-        hb = convfilt(
+        hb_imag, zf_imag = convfilt(
             interleave(array([s, d])), # interleave s & d
-            fir_hb(N, beta=5),      # generate hilbert kernel
+            hilbert_kernel.imag,
+            mode,
+            kind,
+            zi.imag
+            )
+        zf = zf_real + 1j * zf_imag
+
+    else:
+        hb_real = convfilt(
+            interleave(array([s, d])), # interleave s & d
+            hilbert_kernel.real,
+            mode,
+            kind
+            )
+        hb_imag = convfilt(
+            interleave(array([s, d])), # interleave s & d
+            hilbert_kernel.imag,
             mode,
             kind
             )
 
-    w = .982 * hb.real[:, 0] + .164 * hb.imag[:, 1]
-    x = .419 * hb.real[:, 0] - .828 * hb.imag[:, 1]
-    y = .763 * hb.real[:, 1] + .385 * hb.imag[:, 0]
-    z = zeros(nframes(hb))
+    w = .982 * hb_real[:, 0] + .164 * hb_imag[:, 1]
+    x = .419 * hb_real[:, 0] - .828 * hb_imag[:, 1]
+    y = .763 * (hb_real[:, 1] - fpref * hb_imag[:, 1]) + \
+        .385 * (fpref * hb_real[:, 0] + hb_imag[:, 0])
+    z = zeros(nframes(hb_real))
     
     res = .5 * interleave(array([w, x, y, z]))
 
@@ -169,37 +222,37 @@ def uhj_to_b(a, N, beta = 5, mode = 'z', kind = 'fft', zi = None):
         return res
 
 
-def superstereo(a, N, width = .593, fpref = .354, beta = 5, mode = 'z', \
+def superstereo(a, hilbert_kernel, width = .593, fpref = .354, mode = 'z', \
                     kind = 'fft', zi = None):
-    """superstereo(a, N, width = .593, fpref = 0., beta = 5, mode = 'z',
-                       kind = 'fft', zi = None)
+    """superstereo(a, hilbert_kernel, width = .593, fpref = .354, mode = 'z', \
+                    kind = 'fft', zi = None)
     
     Args:
-        - a    -- Input stereo signal (2 channel L/R)
-        - N    -- filter (number of taps), should be odd
-        - width-- Width setting, the optimal (in some senses)
-                  value of which is about .593.
-        - fpref-- Forward preference, pushes phasiness to the rear
-                  of the sound field where it is less offensive. With
-                  no forward preference (= 0), the phasiness is distributed
-                  equally around 360 degrees. .354 gives no phasiness at
-                  front. 0. < fpref < .5
-        - beta -- beta for Kaiser window FIR design.
-                  5 = similiar to Hamming.
-        - mode -- 'z' or 'full'. If mode is 'z', acts as a filter
-                  with state 'z', and returns a vector of length
-                  len(x). If mode is 'full', returns the full
-                  convolution.
-        - kind -- 'direct' or 'fft', for direct or fft convolution
+        - a                 : Input stereo signal (2 channel L/R)
+        - hilbert_kernel    : Complex Hilbert transform kernel.
+                              Real contains real resonse, Complex
+                              contains complex response.
+        - width     : Width setting, the optimal (in some senses)
+                      value of which is about .593.
+        - fpref     : Forward preference, pushes phasiness to the rear
+                      of the sound field where it is less offensive. With
+                      no forward preference (= 0), the phasiness is distributed
+                      equally around 360 degrees. .354 gives no phasiness at
+                      front. 0. < fpref < .5
+        - mode      : 'z' or 'full'. If mode is 'z', acts as a filter
+                      with state 'z', and returns a vector of length
+                      len(x). If mode is 'full', returns the full
+                      convolution.
+        - kind      : 'direct' or 'fft', for direct or fft convolution
 
-        - zi   -- Initial state. An array of shape (len(kernel) - 1, 2).
-                  If zi=None or is not given then initial rest is assumed.
+        - zi        : Initial state. An array of shape (len(kernel) - 1, 2).
+                      If zi=None or is not given then initial rest is assumed.
 
     Outputs: (y, {zf})
     
-      y -- The output of the encoder.
-      zf -- If zi is None, this is not returned, otherwise, zf holds the
-            filter state.
+      y             : The output of the encoder.
+      zf            : If zi is None, this is not returned, otherwise, zf
+                      holds the filter state.
     
     Encode a two channel L/R stereo signal via the ambisonic
     "super stereo" method to four channel ambisonic b-format
@@ -207,55 +260,55 @@ def superstereo(a, N, width = .593, fpref = .354, beta = 5, mode = 'z', \
     (Channel Z is zeros.)
 
     """
-# Geoff Barton on SuperStereo:
-# 
-# as you say; it was already out of date when it was published.
-# There were various later 'stereo decodes' we tried. By about 1982
-# we were using something like:-
-# 
-# W' = 0.6098637*S - 0.6896511*j*w*D
-# X' = 0.8624776*S + 0.7626955*j*w*D
-# Y' = 1.6822415*w*D - 0.2156194*j*S
-# 
-# where 'w' is a width setting, the optimal (in some senses) value
-# of which is about 0.593, S & D are as defined above. NB, in MAG's
-# notation W'' etc is the signal after the shelf filter, W' before.
-# 
-# There are various options, -j can be substituted for j and
-# 'forward preference' can be added.
+    # Geoff Barton on SuperStereo:
+    # 
+    # as you say; it was already out of date when it was published.
+    # There were various later 'stereo decodes' we tried. By about 1982
+    # we were using something like:-
+    # 
+    # W' = 0.6098637*S - 0.6896511*j*w*D
+    # X' = 0.8624776*S + 0.7626955*j*w*D
+    # Y' = 1.6822415*w*D - 0.2156194*j*S
+    # 
+    # where 'w' is a width setting, the optimal (in some senses) value
+    # of which is about 0.593, S & D are as defined above. NB, in MAG's
+    # notation W'' etc is the signal after the shelf filter, W' before.
+    # 
+    # There are various options, -j can be substituted for j and
+    # 'forward preference' can be added.
 
 
-# Martin Lese on Forward Preference:
-# 
-# It pushes phasiness to the rear of the sound field where it is less 
-# offensive.  With no forward preference (a = 0), the phasiness is 
-# distributed equally around 360 degrees.  The transformation is:
-# 
-# new W = W
-# new X = X
-# new Y = Y - a.(jW)
-# 
-# where a = a constant
-# j = 90-degree phase shift
-# 
-# Now, what value of "a" to use?  In theory, 0 < a < 1.  Gerzon's
-# patent 4081606 suggests 0.333 < a < 0.5.  Gerzon 1977 (refs at end)
-# uses a = 0.3.  Gerzon 1985 suggests 0 < k' < 0.7 which is equivalent
-# to 0 < a < 0.49.  I would either allow 0 < a < 1.0 and experiment or
-# go with the most recent reference, Gerzon 1985.
+    # Martin Lese on Forward Preference:
+    # 
+    # It pushes phasiness to the rear of the sound field where it is less 
+    # offensive.  With no forward preference (a = 0), the phasiness is 
+    # distributed equally around 360 degrees.  The transformation is:
+    # 
+    # new W = W
+    # new X = X
+    # new Y = Y - a.(jW)
+    # 
+    # where a = a constant
+    # j = 90-degree phase shift
+    # 
+    # Now, what value of "a" to use?  In theory, 0 < a < 1.  Gerzon's
+    # patent 4081606 suggests 0.333 < a < 0.5.  Gerzon 1977 (refs at end)
+    # uses a = 0.3.  Gerzon 1985 suggests 0 < k' < 0.7 which is equivalent
+    # to 0 < a < 0.49.  I would either allow 0 < a < 1.0 and experiment or
+    # go with the most recent reference, Gerzon 1985.
 
 
-# J Anderson on SuperStereo with Forward Preference:
-# 
-# Substituting -a allows the forward preference to act as expected (or
-# using -j for super stereo). The above two transforms can be combined
-# to give the following: 
-#
-# W = 0.6098637 * S - j * 0.6896511 * w * D
-# X = 0.8624776 * S + j * 0.7626955 * w * D
-# Y = (1.6822415 + a * 0.6896511) * w * D - j * (0.2156194 - a * 0.6098637) * S
-# 
-# a = .35355342513417343 for 'optimum', e.g., no phasiness at front
+    # J Anderson on SuperStereo with Forward Preference:
+    # 
+    # Substituting -a allows the forward preference to act as expected (or
+    # using -j for super stereo). The above two transforms can be combined
+    # to give the following: 
+    #
+    # W = 0.6098637 * S - j * 0.6896511 * w * D
+    # X = 0.8624776 * S + j * 0.7626955 * w * D
+    # Y = (1.6822415 + a * 0.6896511) * w * D - j * (0.2156194 - a * 0.6098637) * S
+    # 
+    # a = .35355342513417343 for 'optimum', e.g., no phasiness at front
 
 
     s = a.sum(axis = -1)
@@ -263,27 +316,41 @@ def superstereo(a, N, width = .593, fpref = .354, beta = 5, mode = 'z', \
 
     # convolve with hilbert kernel
     if zi is not None:
-        hb, zf = convfilt(
+        hb_real, zf_real = convfilt(
             interleave(array([s, d])), # interleave s & d
-            fir_hb(N, beta=5),      # generate hilbert kernel
+            hilbert_kernel.real,
             mode,
             kind,
-            zi
+            zi.real
             )
-        over_dub(hb, zi, write_over = True)
-    else:
-        hb = convfilt(
+        hb_imag, zf_imag = convfilt(
             interleave(array([s, d])), # interleave s & d
-            fir_hb(N, beta=5),      # generate hilbert kernel
+            hilbert_kernel.imag,
+            mode,
+            kind,
+            zi.imag
+            )
+        zf = zf_real + 1j * zf_imag
+
+    else:
+        hb_real = convfilt(
+            interleave(array([s, d])), # interleave s & d
+            hilbert_kernel.real,
+            mode,
+            kind
+            )
+        hb_imag = convfilt(
+            interleave(array([s, d])), # interleave s & d
+            hilbert_kernel.imag,
             mode,
             kind
             )
 
-    w = .6098637 * hb.real[:, 0] - .6896511 * width * hb.imag[:, 1]
-    x = .8624776 * hb.real[:, 0] + .7626955 * width * hb.imag[:, 1]
-    y = (1.6822415 + fpref * .6896511) * width * hb.real[:, 1] \
-        - (.2156194 - fpref * .6098637) * hb.imag[:, 0]
-    z = zeros(nframes(hb))
+    w = .6098637 * hb_real[:, 0] - .6896511 * width * hb_imag[:, 1]
+    x = .8624776 * hb_real[:, 0] + .7626955 * width * hb_imag[:, 1]
+    y = (1.6822415 + fpref * .6896511) * width * hb_real[:, 1] \
+        - (.2156194 - fpref * .6098637) * hb_imag[:, 0]
+    z = zeros(nframes(hb_real))
     
     res = .5 * interleave(array([w, x, y, z]))
 
