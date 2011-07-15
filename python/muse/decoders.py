@@ -557,6 +557,129 @@ def sHRIR_decoder_kernel(positions, k, N, T, \
     return decoder_kernels
 
 
+def decoder_lHRIR_kernel(positions, k, subject_id, database_dir, status = 'C'):
+    """decoder_lHRIR_kernel(positions, k, subject_id, database_dir, status = 'C')
+    
+    DDT / HRIR FIR Filter decoder using measured HRIRs from the
+    IRCAM hosted Listen HRTF database.
+
+    Decoder is Aaron Heller's DDT implementation. 
+
+    See: http://recherche.ircam.fr/equipes/salles/listen/
+         http://www.ai.sri.com/ajh/ambisonics/
+
+    Args:
+        - positions : XYZ positions of the speaker pairs,
+                      one speaker pair per row, i.e., [[1 1 1], [1 -1 -1]]
+                      If Z positions of speaker pairs are omitted,
+                      it does a horizontal decode (otherwise Z
+                      gain is infinite).
+
+                      positions: [ [ x_0   y_0   z_0 ]
+                                   ...
+                                   [ x_i   y_i   z_i ]
+                                   ...
+                                   [ x_n-1 y_n-1 z_n-1 ] ]
+
+        - k         : W gain factor, corresponding to directivity
+
+                      For pantophonic (2D)
+                      k: 1         => velocity,
+                         sqrt(1/2) => energy, 
+                         1/2       => controlled opposites
+        
+                      For periphonic (3D)
+                      k: 1         => velocity,
+                         sqrt(1/3) => energy, 
+                         1/3       => controlled opposites
+        
+        - subject_id    : 1002 - 1059 (as string)
+        - database_dir  : path to local directory where subject directories
+                          for the Listen database are located                          
+        - status        : compensated ('C') or raw ('R') HRIRs
+                            len('C' ) = 512, len('R') = 8192
+
+    Outputs:
+    
+        - b         : coefficients of length N FIR filter: 
+                        [[W_left_FIR, W_right_FIR],
+                        [[X_left_FIR, X_right_FIR],
+                        [[Y_left_FIR, Y_right_FIR],
+                        [[Z_left_FIR, Z_right_FIR]]
+
+    Notes:  This assumes standard B format
+            definitions for W, X, Y, and Z, i.e., W
+            is sqrt(2) lower than X, Y, and Z.
+    
+    The following table shows HRIR measurement points :
+
+    Elevation (deg)         Azimuth increment (deg)     Points per elevation
+    ------------------------------------------------------------------------
+    -45                     15                          24
+    -30                     15                          24
+    -15                     15                          24
+      0                     15                          24
+     15                     15                          24
+     30                     15                          24
+     45                     15                          24
+     60                     30                          12
+     75                     60                           6
+     90                     360                          1
+
+
+    The setup consists of 10 elevation angles starting at -45deg ending at
+    +90deg in 15deg steps vertical resolution. The steps per rotation varies
+    from 24 to only 1 (90deg elevation). Measurement points are always
+    located at the 15deg grid, but with increasing elevation only every
+    second or fourth measurement point is taken into account. As a whole,
+    there are 187 measurement points, hence 187 stereo audio files.
+
+    Source is at a distance of 1.95 meter. Use this value for NFC filtering.
+
+
+    Note: Returns the complete (asymmetric) HRIR
+
+
+    Joseph Anderson <josephlloydanderson@mac.com>
+
+    """
+
+    # set kernel length (fixed for Listen HRIR database)
+    if status is 'R':
+        N = 8192
+    else:
+        N = 512
+    
+    gains = decoder_gain_matrix(positions, k)
+    n, m = shape(positions)         # n = number of speaker pairs
+                                    # m = number of dimensions,
+                                    #        2=panto, 3=peri 
+    positions2 = vstack((positions, -positions))
+
+    speaker_kernels = empty((2 * n, N, 2))  # speakers, N, lHRIR channels
+    decoder_kernels = zeros((m + 1, N, 2))  # harmonics, N, lHRIR channels
+
+    # collect decoder kernel
+    for i in range(2 * n):          # i is speaker number
+
+        # collect speaker lHRIR kernels
+        if m is 2:              # (2D)
+            radius, azimuth = cart_to_pol(positions2)[i]
+            elevation = 0.
+        else:                   # (3D)
+            radius, azimuth, elevation = cart_to_spher(positions2)[i]
+                
+        # find speaker kernel
+        speaker_kernels[i] = lHRIR(azimuth, elevation, \
+                                   subject_id, database_dir, status)
+
+        # sum to decoder kernels
+        for j in range(m + 1):          # j is harmonic number
+            decoder_kernels[j] += gains[i, j] * speaker_kernels[i]
+
+    return decoder_kernels
+
+
 #---------------------------------------------
 # rV and rE analysis (in XY plane)
 #---------------------------------------------

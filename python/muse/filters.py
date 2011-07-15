@@ -19,6 +19,8 @@
 # from pyaudiolab import *
 from muse import *
 from generators import *
+from sndfile import *          # uses sndfile rather than scikits.audiolab
+
 from scipy.signal import *
 from scipy.signal.signaltools import *
 from numpy.fft import fft, ifft, rfft, irfft
@@ -2086,9 +2088,6 @@ def nfc(x, r, T, zi = None):
     res = x.copy()
 
     # filter!
-    # Note: could use fiir_hp, but choose
-    # to generate coefficients directly to
-    # make the inverse filter more explicit
     if zi is None:
         res[:, chnls] =  ffilter(b, a, x[:, chnls])
         
