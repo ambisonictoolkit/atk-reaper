@@ -2372,6 +2372,89 @@ def sHRIR(N, azimuth, elevation, T, \
 #       prototype real arrays before deployment.
 
 
+def lHRIR(azimuth, elevation, subject_id, database_dir, status = 'C'):
+    """lHRIR(azimuth, elevation, subject_id, database_dir, status = 'C')
+
+    Return measured HRIRs from the IRCAM hosted Listen HRTF database.
+    HRIR measurements were taken in blocked-meatus conditions.
+
+    See: http://recherche.ircam.fr/equipes/salles/listen/
+    
+
+    Args:
+    
+        - azimuth       : source azimuth (-pi, pi)
+        - elevation     : sourze elevation (-pi/2, pi/2)
+        - subject_id    : 1002 - 1059 (as string)
+        - database_dir  : path to local directory where subject directories
+                          for the Listen database are located                          
+        - status        : compensated ('C') or raw ('R') HRIRs
+                            len('C' ) = 512, len('R') = 8192
+
+    Outputs:
+    
+        - b         : coefficients of measured FIR filter. Interleaved
+                        [left_FIR, right_FIR]
+
+
+    The following table shows HRIR measurement points :
+
+    Elevation (deg)         Azimuth increment (deg)     Points per elevation
+    ------------------------------------------------------------------------
+    -45                     15                          24
+    -30                     15                          24
+    -15                     15                          24
+      0                     15                          24
+     15                     15                          24
+     30                     15                          24
+     45                     15                          24
+     60                     30                          12
+     75                     60                           6
+     90                     360                          1
+
+
+    The setup consists of 10 elevation angles starting at -45deg ending at
+    +90deg in 15deg steps vertical resolution. The steps per rotation varies
+    from 24 to only 1 (90deg elevation). Measurement points are always
+    located at the 15deg grid, but with increasing elevation only every
+    second or fourth measurement point is taken into account. As a whole,
+    there are 187 measurement points, hence 187 stereo audio files.
+
+
+    Note: Returns the complete (asymmetric) HRIR
+
+    """
+
+    # lHRIR dirs, constants
+    database_status_dir = {
+        'C' : '/COMPENSATED/WAV/',
+        'R' : '/RAW/WAV/'
+        }
+    radius = '0195'
+
+    # generate az, el from azimuth, elevation
+    az = str(int(round(rad_to_deg(azimuth))) % 360).zfill(3)
+    el = str(int(round(rad_to_deg(elevation))) % 360).zfill(3)
+
+    # generate lHRIR path
+    HRIR_file = database_dir + 'IRC_' + subject_id + \
+                  database_status_dir[status] + \
+                  'IRC_' + subject_id + '_' + status + \
+                  '/' + 'IRC_' + subject_id + '_' + status + \
+                  '_R' + radius + '_T' + az + '_P' + el + '.wav'
+
+    # set up sndfile for reading:
+    HRIR_sndfile = Sndfile(HRIR_file, 'r')
+
+    # read in HRIR
+    res = HRIR_sndfile.read_frames(HRIR_sndfile.nframes)
+
+    # close file
+    HRIR_sndfile.close()
+
+    return res
+
+
 # **************************************
 # osc. . .
 # **************************************
