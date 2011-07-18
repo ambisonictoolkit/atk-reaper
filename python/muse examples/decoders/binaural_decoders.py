@@ -121,7 +121,7 @@ file_dir    =   '/Volumes/Audio/test/'      #write file dir
 read_file = '/Volumes/Audio/SinS/sweet_1.wav'
 
 # lHRIR
-database_dir = '/Users/josephla/Documents/Developer/Listen_HRIR/'
+database_dir = '/Users/josephla/Documents/Developer/Listen_hrtf_database/'
 
 subject_id  = '1002'
 nfc_r       = 1.95        # distance of lHRIR measurement
