@@ -637,7 +637,7 @@ def decoder_lHRIR_kernel(positions, k, subject_id, database_dir, status = 'C'):
     Source is at a distance of 1.95 meter. Use this value for NFC filtering.
 
 
-    Note: Returns the complete (asymmetric) HRIR
+    Note: Returns the complete (asymmetric) HRIR, measured at SR = 44.1kHz
 
 
     Joseph Anderson <josephlloydanderson@mac.com>
