@@ -557,8 +557,8 @@ def sHRIR_decoder_kernel(positions, k, N, T, \
     return decoder_kernels
 
 
-def decoder_lHRIR_kernel(positions, k, subject_id, database_dir, status = 'C'):
-    """decoder_lHRIR_kernel(positions, k, subject_id, database_dir, status = 'C')
+def lHRIR_decoder_kernel(positions, k, subject_id, database_dir, status = 'C'):
+    """lHRIR_decoder_kernel(positions, k, subject_id, database_dir, status = 'C')
     
     DDT / HRIR FIR Filter decoder using measured HRIRs from the
     IRCAM hosted Listen HRTF database.
@@ -672,6 +672,105 @@ def decoder_lHRIR_kernel(positions, k, subject_id, database_dir, status = 'C'):
         # find speaker kernel
         speaker_kernels[i] = lHRIR(azimuth, elevation, \
                                    subject_id, database_dir, status)
+
+        # sum to decoder kernels
+        for j in range(m + 1):          # j is harmonic number
+            decoder_kernels[j] += gains[i, j] * speaker_kernels[i]
+
+    return decoder_kernels
+
+
+def cHRIR_decoder_kernel(positions, k, subject_id, database_dir):
+    """cHRIR_decoder_kernel(positions, k, subject_id, database_dir)
+    
+    DDT / HRIR FIR Filter decoder using measured HRIRs from the
+    CIPIC HRTF database.
+
+    Decoder is Aaron Heller's DDT implementation. 
+
+    See: http://interface.cipic.ucdavis.edu/sound/hrtf.html
+         http://www.ai.sri.com/ajh/ambisonics/
+
+    Args:
+        - positions : XYZ positions of the speaker pairs,
+                      one speaker pair per row, i.e., [[1 1 1], [1 -1 -1]]
+                      If Z positions of speaker pairs are omitted,
+                      it does a horizontal decode (otherwise Z
+                      gain is infinite).
+
+                      positions: [ [ x_0   y_0   z_0 ]
+                                   ...
+                                   [ x_i   y_i   z_i ]
+                                   ...
+                                   [ x_n-1 y_n-1 z_n-1 ] ]
+
+        - k         : W gain factor, corresponding to directivity
+
+                      For pantophonic (2D)
+                      k: 1         => velocity,
+                         sqrt(1/2) => energy, 
+                         1/2       => controlled opposites
+        
+                      For periphonic (3D)
+                      k: 1         => velocity,
+                         sqrt(1/3) => energy, 
+                         1/3       => controlled opposites
+        
+        - subject_id    : 003 - 165 (as string)
+                          subjects '021' and '165' are the KEMAR head
+        - database_dir  : path to local directory where subject directories
+                          for the Listen database are located                          
+
+    Outputs:
+    
+        - b         : coefficients of length N FIR filter: 
+                        [[W_left_FIR, W_right_FIR],
+                        [[X_left_FIR, X_right_FIR],
+                        [[Y_left_FIR, Y_right_FIR],
+                        [[Z_left_FIR, Z_right_FIR]]
+
+    Notes:  This assumes standard B format
+            definitions for W, X, Y, and Z, i.e., W
+            is sqrt(2) lower than X, Y, and Z.
+    
+    Please see "Documentation for the UCD HRIR Files" avaliable at the
+    above link for measurement details. As a whole, there are 1250
+    measurement points.
+
+    Source is at a distance of 1.0 meter. Use this value for NFC filtering.
+
+    Note: Returns the complete (asymmetric) HRIR, measured at SR = 44.1kHz
+
+
+    Joseph Anderson <josephlloydanderson@mac.com>
+
+    """
+
+    # set kernel length (fixed for CIPIC HRIR database)
+    N = 256
+    
+    gains = decoder_gain_matrix(positions, k)
+    n, m = shape(positions)         # n = number of speaker pairs
+                                    # m = number of dimensions,
+                                    #        2=panto, 3=peri 
+    positions2 = vstack((positions, -positions))
+
+    speaker_kernels = empty((2 * n, N, 2))  # speakers, N, cHRIR channels
+    decoder_kernels = zeros((m + 1, N, 2))  # harmonics, N, cHRIR channels
+
+    # collect decoder kernel
+    for i in range(2 * n):          # i is speaker number
+
+        # collect speaker cHRIR kernels
+        if m is 2:              # (2D)
+            radius, azimuth = cart_to_pol(positions2)[i]
+            elevation = 0.
+        else:                   # (3D)
+            radius, azimuth, elevation = cart_to_spher(positions2)[i]
+                
+        # find speaker kernel
+        speaker_kernels[i] = cHRIR(azimuth, elevation, \
+                                   subject_id, database_dir)
 
         # sum to decoder kernels
         for j in range(m + 1):          # j is harmonic number
@@ -1437,7 +1536,7 @@ def b_to_ITU5(a, kind = 'foc'):
 #
 #   b_to_uhj            "Ambisonic Decoders for HDTV" (1992)
 #   b_to_stereo         virtual stereo microphone decoding
-#   b_to_binaural       HRTF (Dual Band Diametric Decoder) decoding
+#   b_to_binaural       HRTF decoding
 #
 #------------------------------------------------------------------------
 

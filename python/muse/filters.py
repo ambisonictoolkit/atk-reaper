@@ -21,6 +21,7 @@ from muse import *
 from generators import *
 from sndfile import *          # uses sndfile rather than scikits.audiolab
 
+import scipy.io as sio
 from scipy.signal import *
 from scipy.signal.signaltools import *
 from numpy.fft import fft, ifft, rfft, irfft
@@ -2365,7 +2366,6 @@ def sHRIR(N, azimuth, elevation, T, \
 
     return res
 
-
 # NOTE: Consider adding general open and closed sphere arrays.
 #       These would be useful for testing and simulation of
 #       prototype real arrays before deployment.
@@ -2450,6 +2450,89 @@ def lHRIR(azimuth, elevation, subject_id, database_dir, status = 'C'):
 
     # close file
     HRIR_sndfile.close()
+
+    return res
+
+
+def cHRIR(azimuth, elevation, subject_id, database_dir):
+    """cHRIR(azimuth, elevation, subject_id, database_dir)
+
+    Return measured HRIRs from the CIPIC HRTF database.
+    HRIR measurements were taken in blocked-meatus conditions.
+
+    See: http://interface.cipic.ucdavis.edu/sound/hrtf.html
+    
+
+    Args:
+    
+        - azimuth       : source azimuth (-pi, pi)
+        - elevation     : sourze elevation (-pi/2, pi/2)
+        - subject_id    : 003 - 165 (as string)
+                          subjects '021' and '165' are the KEMAR head
+        - database_dir  : path to local directory where subject directories
+                          for the CIPIC database are located                          
+
+    Outputs:
+    
+        - b         : coefficients of measured FIR filter. Interleaved
+                        [left_FIR, right_FIR]
+
+
+    Please see "Documentation for the UCD HRIR Files" avaliable at the
+    above link for measurement details. As a whole, there are 1250
+    measurement points.
+
+
+    Note: Returns the complete (asymmetric) HRIR
+
+    """
+
+    # constants: cHRIR azimuth and elevation (in degrees)
+    c_azimuths = concatenate((linspace(0, 45, 10), array([55, 65, 80])))
+    c_azimuths = concatenate((-c_azimuths[1:][::-1], c_azimuths))
+    c_elevations = -45 + (360. / 64 * arange(50))
+
+    # map from ambisonic to CIPIC coordinates (in degrees)
+    c_azimuth = round(
+        rad_to_deg(
+            -arcsin(sin(azimuth) * cos(elevation))
+            ),
+        3
+        )
+    c_elevation = round(
+        rad_to_deg(
+            arctan2(tan(elevation), cos(azimuth))
+            ),
+        3
+        ) % 360
+    if c_elevation > 230.625:
+        c_elevation -= 360
+
+    # generate az, el (indices) from azimuth, elevation
+    # az = 12                 # 0 deg
+    # el = 8                  # 0 deg
+    az = where(c_azimuths == c_azimuth)[0][0]
+    el = where(c_elevations == c_elevation)[0][0]
+
+
+    # generate lHRIR path
+    HRIR_file = database_dir + 'subject_' + subject_id + '/' + \
+                'hrir_final.mat'
+
+    # Read matlab file:
+    HRIR_matfile = sio.loadmat(HRIR_file)
+
+    res = interleave(array([
+        HRIR_matfile['hrir_l'][az, el],
+        HRIR_matfile['hrir_r'][az, el]
+        ]))
+
+
+    # pad with zeros to nearest power of 2
+    res = concatenate((
+        res,
+        zeros([2**int(ceil(log2(nframes(res)))) - nframes(res), nchannels(res)])
+        ))
 
     return res
 
