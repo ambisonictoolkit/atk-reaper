@@ -211,14 +211,14 @@ if kind is 'sphere':                # psycho_shelf only for sphere
     for i in range(2):
         b_format_kernels[i] = psycho_shelf(
             b_format_kernels[i],
-            freq_to_Wn(400., 1./sr),
+            freq_to_Wn(700., 1./sr),
             C.k_3D                  # 3D shelf
             )
 else:
     for i in range(2):              # psycho_shelf and nfc for measured HRIRs
         b_format_kernels[i] = psycho_shelf(
             nfc(b_format_kernels[i], nfc_r[kind], T),
-            freq_to_Wn(400., 1./sr),
+            freq_to_Wn(700., 1./sr),
             C.k_3D                  # 3D shelf
             )
 
