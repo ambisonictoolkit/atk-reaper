@@ -132,8 +132,8 @@ def uhj_encoder_kernel(N, Wn, k = 0.):
 
     """
 
-    #     S = (Left + Right)/2.0
-    #     D = (Left - Right)/2.0
+    #     S = (Left + Right)
+    #     D = (Left - Right)
 
     #     W' = 0.982*S + j*0.164*D
     #     X' = 0.419*S - j*0.828*D
@@ -188,7 +188,7 @@ def uhj_encoder_kernel(N, Wn, k = 0.):
     k_2 = 1.263                         # HF gains = 1
     k_3 = 0.775
 
-    gains_lf = 0.5 * array([            # LF complex gains
+    gains_lf = array([                  # LF complex gains
         [k_1*complex(c_0, c_1),
          k_2*complex(c_2, -c_3),
          k_2*complex((c_4 + (k*k_3/k_2)*c_5), (c_6 - (k*k_3/k_2)*c_7))],
@@ -198,7 +198,7 @@ def uhj_encoder_kernel(N, Wn, k = 0.):
          k_2*complex(-(c_4 + (k*k_3/k_2)*c_5), (c_6 - (k*k_3/k_2)*c_7))]
         ])
 
-    gains_hf = 0.5 * array([                # HF complex gains, normalised to
+    gains_hf = array([                      # HF complex gains, normalised to
         [1./C.k_2D[0]*complex(c_0, c_1),    # 2D psycho_acoustic shelf gains
          1./C.k_2D[1]*complex(c_2, -c_3),
          1./C.k_2D[1]*complex((c_4 + k*c_5), (c_6 - k*c_7))],
