@@ -454,8 +454,71 @@ def quad_decoder_gain_matrix(angle, k):
 
 
 #---------------------------------------------
-# binaural decoder kernels
+# UHJ and binaural decoder kernels
 #---------------------------------------------
+
+def uhj_decoder_kernel(N):
+    """uhj_decoder_kernel(N)
+    
+    Generate a filter kernel suitable for b-format to UHJ decoding.
+
+    See:
+
+    Audio Engineering Society E-Library
+    Ambisonic Decoders for HDTV
+    Preprint Number:   3345    Convention:   92 (February 1992)
+    Authors:   Gerzon, Michael A.; Barton, Geoffrey J.
+    E-library Location: (CD aes12)   /pp9193/pp9203/3405.pdf
+
+    Args:
+        - N         : order of filter (number of taps)
+
+    Outputs:
+    
+        - b         : coefficients of length N FIR filter: 
+                        [[W_left_FIR, W_right_FIR],
+                         [X_left_FIR, X_right_FIR],
+                         [Y_left_FIR, Y_right_FIR]]
+
+    Joseph Anderson <josephlloydanderson@mac.com>
+
+    """
+
+    #     S = 0.9396926*W + 0.1855740*X
+    #     D = j(-0.3420201*W + 0.5098604*X) + 0.6554516*Y
+    #     Left = (S + D)/2.0
+    #     Right = (S - D)/2.0
+
+    #---------------------------------
+    # UHJ coefficients
+    c_0 = 0.9396926
+    c_1 = 0.1855740
+    c_2 = -0.3420201
+    c_3 = 0.5098604
+    c_4 = 0.6554516
+
+    gains = 0.5 * array([
+        [complex(c_0, c_2), complex(c_0, -c_2)],
+        [complex(c_1, c_3), complex(c_1, -c_3)],
+        [complex(c_4, 0), complex(-c_4, 0)]
+        ])
+
+    m = 3               # harmonics (W, X, Y)
+
+    #---------------------------------
+    # calculate kernels
+
+    hilbert = fir_hb(N)
+
+    decoder_kernels = zeros((m, N, 2))  # harmonics, N, stereo
+
+    # collect decoder kernel
+    for i in range(m):          # i is harmonic number
+        decoder_kernels[i] += gains[i].real * interleave(hilbert.real)
+        decoder_kernels[i] += gains[i].imag * interleave(hilbert.imag)
+
+    return decoder_kernels
+
 
 def sHRIR_decoder_kernel(positions, k, N, T, \
                            r = 0.0875, theta_e = 5./9*pi, width = pi):
@@ -1540,82 +1603,76 @@ def b_to_ITU5(a, kind = 'foc'):
 #
 #------------------------------------------------------------------------
 
-def b_to_uhj(a, hilbert_kernel, mode = 'z', kind = 'fft', zi = None):
-    """b_to_uhj(a, hilbert_kernel, mode = 'z', kind = 'fft', zi = None)
+def b_to_uhj(b, decoder_kernels, mode = 'z', kind = 'fft', zi = None):
+    """b_to_uhj(b, decoder_kernels, mode = 'z', kind = 'fft', zi = None)
     
     Args:
-        - a                 : Input B-format signal
-        - hilbert_kernel    : Complex Hilbert transform kernel.
-                              Real contains real resonse, Complex
-                              contains complex response.
-        - mode  : 'z' or 'full'. If mode is 'z', acts as a filter
-                  with state 'z', and returns a vector of length
-                  len(x). If mode is 'full', returns the full
-                  convolution.
+        - b                 : Input B-format signal
+
+        - decoder_kernels   : UHJ decoder kernels:
+        
+                              [[W_UHJ_l, W_UHJ_r],
+                               [X_UHJ_l, X_UHJ_r],
+                               [Y_UHJ_l, Y_UHJ_r]]
+
+                               shape = (3, UHJ_kernel_size, 2)
+
+        - mode  : 'z' or 'full'. If mode is 'z', acts as a filter with state
+                  'z', and returns a vector of length nframes(b). If mode is
+                  'full', returns the full convolution.
+
         - kind  : 'direct' or 'fft', for direct or fft convolution
 
-        - zi    : Initial state. An array of shape (len(kernel) - 1, 3).
-                  If zi=None or is not given then initial rest is assumed.
+        - zi    : Initial state. An array of shape...
+
+                  (3, len(uhj_kernel_size) - 1, 2)
+                  
+                  If zi = None or is not given then initial rest is assumed.
 
     Outputs: (y, {zf})
     
-      y     : The output of the decoder.
-      zf    : If zi is None, this is not returned, otherwise, zf holds the
-              filter state.
+      y         : The output of the decoder.
+      zf        : If zi is None, this is not returned, otherwise, zf holds
+                  the filter state.
     
     Decode a three dimensional ambisonic B-format signal to two channel
-    stereo ambisonic UHJ using a linear phase hilbert transform filter.
+    UHJ stereo using the supplied UHJ decoder kernels.
 
     """
-    #     Audio Engineering Society E-Library
-    #     Ambisonic Decoders for HDTV
-    #     Preprint Number:   3345    Convention:   92 (February 1992)
-    #     Authors:   Gerzon, Michael A.; Barton, Geoffrey J.
-    #     E-library Location: (CD aes12)   /pp9193/pp9203/3405.pdf
 
-    #     S = 0.9396926*W + 0.1855740*X
-    #     D = j(-0.3420201*W + 0.5098604*X) + 0.6554516*Y
-    #     Left = (S + D)/2.0
-    #     Right = (S - D)/2.0
+    M = nframes(b)                      # length of input b-format
+    N = shape(decoder_kernels)[1]       # length of UHJ kernels
+    m = 3                               # number of harmonics
 
-    # convolve with hilbert kernel
-    if zi is not None:
-
-        hb_real, zf_real = convfilt(
-            a[:, :3],                       # strip Z
-            hilbert_kernel.real,
-            mode,
-            kind,
-            zi.real
-            )
-        hb_imag, zf_imag = convfilt(
-            a[:, :3],                       # strip Z
-            hilbert_kernel.imag,
-            mode,
-            kind,
-            zi.imag
-            )
-        zf = zf_real + 1j * zf_imag
-
+    # initialise result to correct size
+    if mode is 'z':
+        res = zeros((M, 2))
     else:
-        hb_real = convfilt(
-            a[:, :3],                       # strip Z
-            hilbert_kernel.real,
-            mode,
-            kind
-            )
-        hb_imag = convfilt(
-            a[:, :3],                       # strip Z
-            hilbert_kernel.imag,
-            mode,
-            kind
-            )
+        res = zeros((M+N-1, 2))
 
-    s = (array([.9396926, .1855740]) * hb_real[:, :2]).sum(axis = -1)
-    d = (array([-.3420201, .5098604]) * hb_imag[:, :2]).sum(axis = -1) + \
-        .6554516 * hb_real[:, 2]
-    
-    res = .5 * interleave(array([s + d, s - d]))
+    # convolve with UHJ kernel
+    if zi is not None:
+        zf = zeros_like(zi)
+        
+        for i in range(m):
+            res_i, zf_i = convfilt(
+                interleave(b[:, i]),
+                decoder_kernels[i],
+                mode,
+                kind,
+                zi[i]
+                )
+
+            res += res_i
+            zf[i] = zf_i
+    else:
+        for i in range(m):
+            res += convfilt(
+                interleave(b[:, i]),
+                decoder_kernels[i],
+                mode,
+                kind
+                )
 
     if zi is not None:
         return res, zf

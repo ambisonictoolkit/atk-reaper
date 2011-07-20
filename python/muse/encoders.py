@@ -93,68 +93,68 @@ def mono_to_b(a, azimuth = 0., elevation = 0.):
     return b * encoder
 
 
-# it may be desirable to add "forward preference" to the uhj encoder
-def uhj_to_b(a, hilbert_kernel, fpref = .354, \
-             mode = 'z', kind = 'fft', zi = None):
-    """uhj_to_b(a, hilbert_kernel, fpref = .354, \
-                mode = 'z', kind = 'fft', zi = None)
+#---------------------------------------------
+# UHJ and SuperStereo encoder kernels
+#---------------------------------------------
+
+def uhj_encoder_kernel(N, Wn, k = 0.):
+    """uhj_encoder_kernel(N, Wn, k = 0.)
     
+    Generate a filter kernel suitable for UHJ to b-format encoding.
+    The kernel is shelf filtered, with the assumption the resulting
+    b-format signal will be decoded to a pantophonic (horizontal)
+    array with the decoder using an appropriate psychoacoustic
+    shelf filter.
+
+    See:
+
+    Audio Engineering Society E-Library
+    Ambisonic Decoders for HDTV
+    Preprint Number:   3345    Convention:   92 (February 1992)
+    Authors:   Gerzon, Michael A.; Barton, Geoffrey J.
+    E-library Location: (CD aes12)   /pp9193/pp9203/3405.pdf
+
     Args:
-        - a                 : Input UHJ signal
-        - hilbert_kernel    : Complex Hilbert transform kernel.
-                              Real contains real resonse, Complex
-                              contains complex response.
-        - fpref : Forward preference, pushes phasiness to the rear
+        - N     : order of filter (number of taps)
+        - Wn    : shelf filter corner, set to ~400 Hz
+        - k     : Forward preference, pushes phasiness to the rear
                   of the sound field where it is less offensive. With
                   no forward preference (= 0), the phasiness is distributed
-                  equally around 360 degrees. .354 gives no phasiness at
-                  front. 0. < fpref < .5
-        - mode  : 'z' or 'full'. If mode is 'z', acts as a filter
-                  with state 'z', and returns a vector of length
-                  len(x). If mode is 'full', returns the full
-                  convolution.
-        - kind  : 'direct' or 'fft', for direct or fft convolution
+                  equally around 360 degrees. 0. < k < .7
 
-        - zi    : Initial state. An array of shape (len(kernel) - 1, 2).
-                  If zi=None or is not given then initial rest is assumed.
+    Outputs:
+    
+        - b         : coefficients of length N FIR filter: 
+                        [[ left_W_FIR,  left_X_FIR,  left_Y_FIR],
+                         [right_W_FIR, right_X_FIR, right_Y_FIR]]
 
-    Outputs: (y, {zf})
-    
-      y         : The output of the encoder.
-      zf        : If zi is None, this is not returned, otherwise, zf holds the
-                  filter state.
-    
-    Decode a two dimensional ambisonic UHJ signal to four channel
-    ambisonic b-format using a linear phase hilbert transform filter.
-    (Channel Z is zeros.)
+    Joseph Anderson <josephlloydanderson@mac.com>
 
     """
-    #     Audio Engineering Society E-Library
-    #     Ambisonic Decoders for HDTV
-    #     Preprint Number:   3345    Convention:   92 (February 1992)
-    #     Authors:   Gerzon, Michael A.; Barton, Geoffrey J.
-    #     E-library Location: (CD aes12)   /pp9193/pp9203/3405.pdf
 
     #     S = (Left + Right)/2.0
     #     D = (Left - Right)/2.0
 
-    #     W = 0.982*S + j*0.164*D
-    #     X = 0.419*S - j*0.828*D
-    #     Y = 0.763*D + j*0.385*S
+    #     W' = 0.982*S + j*0.164*D
+    #     X' = 0.419*S - j*0.828*D
+    #     Y' = 0.763*D + j*0.385*S
+    #     B' = 0.116*D - j*0.694*S
+
+    #     W" = k1*W'
+    #     X" = k2*X'
+    #     Y" = k2*Y' + k'*k3*B'         (where k' = forward preference)
+
+    #   ------------------------
+    #           LF      HF              (decoding shelfs)
+    #   k1      0.646   1.000           NOTE: These shelfs gains should be 
+    #   k2      1.263   1.000                   compensated for on
+    #   k3      0.775   1.000                   encoding into b-format.
+    #                                           Use a 2D psycho-acoustic
+    #                                           shelf filter to do so.
 
     # Martin Lese on Forward Preference:
-    # 
-    # It pushes phasiness to the rear of the sound field where it is less 
-    # offensive.  With no forward preference (a = 0), the phasiness is 
-    # distributed equally around 360 degrees.  The transformation is:
-    # 
-    # new W = W
-    # new X = X
-    # new Y = Y - a.(jW)
-    # 
-    # where a = a constant
-    # j = 90-degree phase shift
-    # 
+    # (http://members.tripod.com/martin_leese/Ambisonic/diy.html)
+    #
     # Now, what value of "a" to use?  In theory, 0 < a < 1.  Gerzon's
     # patent 4081606 suggests 0.333 < a < 0.5.  Gerzon 1977 (refs at end)
     # uses a = 0.3.  Gerzon 1985 suggests 0 < k' < 0.7 which is equivalent
@@ -162,59 +162,159 @@ def uhj_to_b(a, hilbert_kernel, fpref = .354, \
     # go with the most recent reference, Gerzon 1985.
 
 
-    # J Anderson on SuperStereo with Forward Preference:
+    # J Anderson on UHJ encode with Forward Preference:
     # 
-    # The above two transforms can be combined
-    # to give the following: 
+    # The above can be combined to give the following: 
     #
-    #     W = 0.982*S + j*0.164*D
-    #     X = 0.419*S - j*0.828*D
-    #     Y = 0.763*D - j*a*0.763*D + a*0.385*S + j*0.385*S
+    #     W = k1*(0.982*S + j*0.164*D)
+    #     X = k2*(0.419*S - j*0.828*D)
+    #     Y = k2*((0.763 + k'*k3/k2*0.116)*D + j*(0.385 - k'*k3/k2*0.694)*S)
     # 
-    # a = .35355342513417343 for 'optimum', e.g., no phasiness at front
+    # k' = sqrt(2)/4 for 'optimum', e.g., no phasiness at front
 
-    s = a.sum(axis = -1)
-    d = (array([1., -1.]) * a).sum(axis = -1)
+    #---------------------------------
+    # UHJ coefficients
 
-    # convolve with hilbert kernel
-    if zi is not None:
-        hb_real, zf_real = convfilt(
-            interleave(array([s, d])), # interleave s & d
-            hilbert_kernel.real,
-            mode,
-            kind,
-            zi.real
-            )
-        hb_imag, zf_imag = convfilt(
-            interleave(array([s, d])), # interleave s & d
-            hilbert_kernel.imag,
-            mode,
-            kind,
-            zi.imag
-            )
-        zf = zf_real + 1j * zf_imag
+    c_0 = 0.982
+    c_1 = 0.164
+    c_2 = 0.419
+    c_3 = 0.828
+    c_4 = 0.763
+    c_5 = 0.116
+    c_6 = 0.385
+    c_7 = 0.694
 
-    else:
-        hb_real = convfilt(
-            interleave(array([s, d])), # interleave s & d
-            hilbert_kernel.real,
-            mode,
-            kind
+    k_1 = 0.646                         # LF gains
+    k_2 = 1.263                         # HF gains = 1
+    k_3 = 0.775
+
+    gains_lf = 0.5 * array([            # LF complex gains
+        [k_1*complex(c_0, c_1),
+         k_2*complex(c_2, -c_3),
+         k_2*complex((c_4 + (k*k_3/k_2)*c_5), (c_6 - (k*k_3/k_2)*c_7))],
+
+        [k_1*complex(c_0, -c_1),
+         k_2*complex(c_2, c_3),
+         k_2*complex(-(c_4 + (k*k_3/k_2)*c_5), (c_6 - (k*k_3/k_2)*c_7))]
+        ])
+
+    gains_hf = 0.5 * array([                # HF complex gains, normalised to
+        [1./C.k_2D[0]*complex(c_0, c_1),    # 2D psycho_acoustic shelf gains
+         1./C.k_2D[1]*complex(c_2, -c_3),
+         1./C.k_2D[1]*complex((c_4 + k*c_5), (c_6 - k*c_7))],
+
+        [1./C.k_2D[0]*complex(c_0, -c_1),
+         1./C.k_2D[1]*complex(c_2, c_3),
+         1./C.k_2D[1]*complex(-(c_4 + k*c_5), (c_6 - k*c_7))]
+        ])
+
+    m = 3               # harmonics (W, X, Y)
+
+    #---------------------------------
+    # calculate kernels
+
+    hilbert = fir_hb(N)
+
+    encoder_kernels = zeros((2, N, m))  # stereo, N, harmonics
+
+    # collect decoder kernel... shelving
+    for i in range(2):          # i is UHJ stereo channel number
+        encoder_kernels[i] += gains_lf[i].real * fiir_rmhs2(
+            interleave(hilbert.real),
+            Wn,
+            0.
             )
-        hb_imag = convfilt(
-            interleave(array([s, d])), # interleave s & d
-            hilbert_kernel.imag,
-            mode,
-            kind
+        encoder_kernels[i] += gains_lf[i].imag * fiir_rmhs2(
+            interleave(hilbert.imag),
+            Wn,
+            0.
             )
 
-    w = .982 * hb_real[:, 0] + .164 * hb_imag[:, 1]
-    x = .419 * hb_real[:, 0] - .828 * hb_imag[:, 1]
-    y = .763 * (hb_real[:, 1] - fpref * hb_imag[:, 1]) + \
-        .385 * (fpref * hb_real[:, 0] + hb_imag[:, 0])
-    z = zeros(nframes(hb_real))
+        encoder_kernels[i] += gains_hf[i].real * fiir_rmls2(
+            interleave(hilbert.real),
+            Wn,
+            0.
+            )
+        encoder_kernels[i] += gains_hf[i].imag * fiir_rmls2(
+            interleave(hilbert.imag),
+            Wn,
+            0.
+            )
+
+    return encoder_kernels
+
+
+def uhj_to_b(a, encoder_kernels, mode = 'z', kind = 'fft', zi = None):
+    """uhj_to_b(a, encoder_kernels, mode = 'z', kind = 'fft', zi = None)
     
-    res = .5 * interleave(array([w, x, y, z]))
+    Args:
+        - a                 : Input UHJ signal
+
+        - decoder_kernels   : UHJ encoder kernels:
+        
+                        [[ left_W_FIR,  left_X_FIR,  left_Y_FIR],
+                         [right_W_FIR, right_X_FIR, right_Y_FIR]]
+
+                               shape = (2, UHJ_kernel_size, 3)
+
+        - mode  : 'z' or 'full'. If mode is 'z', acts as a filter with state
+                  'z', and returns a vector of length nframes(b). If mode is
+                  'full', returns the full convolution.
+
+        - kind  : 'direct' or 'fft', for direct or fft convolution
+
+        - zi    : Initial state. An array of shape...
+
+                  (2, len(uhj_kernel_size) - 1, 3)
+                  
+                  If zi = None or is not given then initial rest is assumed.
+
+    Outputs: (y, {zf})
+    
+      y         : The output of the encoder.
+      zf        : If zi is None, this is not returned, otherwise, zf holds
+                  the filter state.
+    
+    Decode a three dimensional ambisonic B-format signal to two channel
+    UHJ stereo using the supplied UHJ decoder kernels.
+
+    """
+
+    M = nframes(a)                      # length of input UHJ
+    N = shape(encoder_kernels)[1]       # length of UHJ kernels
+    m = 2                               # number of stereo channels
+
+    # initialise result to correct size
+    if mode is 'z':
+        res = zeros((M, 3))
+    else:
+        res = zeros((M+N-1, 3))
+
+    # convolve with UHJ kernel
+    if zi is not None:
+        zf = zeros_like(zi)
+        
+        for i in range(m):
+            res_i, zf_i = convfilt(
+                interleave(a[:, i]),
+                encoder_kernels[i],
+                mode,
+                kind,
+                zi[i]
+                )
+
+            res += res_i
+            zf[i] = zf_i
+    else:
+        for i in range(m):
+            res += convfilt(
+                interleave(a[:, i]),
+                encoder_kernels[i],
+                mode,
+                kind
+                )
+
+    res = hstack((res, zeros((nframes(res), 1))))
 
     if zi is not None:
         return res, zf
