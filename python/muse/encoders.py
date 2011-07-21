@@ -94,6 +94,47 @@ def mono_to_b(a, azimuth = 0., elevation = 0.):
 
 
 #---------------------------------------------
+# A to B encoder
+#---------------------------------------------
+def a_to_b(a, orientation = 'flu', weight = 'can'):
+    """a_to_b(a, orientation = 'flu', weight = 'can')
+    
+    Args:
+        - a              : Input A-format signal
+        - orientation    : Orientation of the A-format channel tetrahedron
+            flu = front left up:          FLU, FRD, BLD, BRU
+            fld = front left down:        FLD, FRU, BLU, BRD
+            flr = front left-right:       FL, FR, BU, BD
+            fud = front up-down:          FU, FD, BL, BR
+            fbd = front and back down:    F, BD, BLU, BRU 
+            fbu = front and back up:      F, BU, BLD, BRD
+            flru = front left-right up:   FLU, FRU, FD, B
+            flrd = front left-right down: FLD, FRD, FU, B
+
+        - weight : The scaling on W in the output a-format signal:
+            can = canonical scaling of 1/sqrt(2)
+            dec = scaling for decorrelated soundfields, weight of 1/sqrt(3) on W
+            car = scaling for cardioid response, weight of sqrt(3) on W
+            uns = unscaled, weight of 1 on W
+
+            dec is the usual choice for use in reverberators
+
+    Transform an A-format signal to the B-format domain.
+
+    """
+    decoder_dict = C.b_to_a_dict
+
+    weight_dict = C.b_to_a_weight_dict
+
+    # construct encoder
+    encoder = (array(decoder_dict[orientation]) * \
+               reciprocal(array(weight_dict[weight]))).transpose()
+
+    # encode here!
+    return inner(a, encoder)
+
+
+#---------------------------------------------
 # UHJ and SuperStereo encoder kernels
 #---------------------------------------------
 
@@ -244,8 +285,8 @@ def uhj_encoder_kernel(N, Wn, k = 0.):
     return encoder_kernels
 
 
-def ss_encoder_kernel(N, width = .593, k = 0.):
-    """ss_encoder_kernel(N, width = .593, k = 0.)
+def super_encoder_kernel(N, width = .593, k = 0.):
+    """super_encoder_kernel(N, width = .593, k = 0.)
     
     Generate a filter kernel suitable for "super stereo" to b-format encoding.
 
@@ -360,6 +401,10 @@ def ss_encoder_kernel(N, width = .593, k = 0.):
 
     return encoder_kernels
 
+
+#---------------------------------------------
+# UHJ, SuperStereo and SimpleStereo encoders
+#---------------------------------------------
 
 def uhj_to_b(a, encoder_kernels, mode = 'z', kind = 'fft', zi = None):
     """uhj_to_b(a, encoder_kernels, mode = 'z', kind = 'fft', zi = None)
@@ -480,42 +525,53 @@ def superstereo(a, encoder_kernels, mode = 'z', kind = 'fft', zi = None):
     return uhj_to_b(a, encoder_kernels, mode, kind, zi)
 
 
-def a_to_b(a, orientation = 'flu', weight = 'can'):
-    """a_to_b(a, orientation = 'flu', weight = 'can')
+def simplestereo(a, theta = 0.):
+    """simplestereo(a, theta = 0.)
     
     Args:
-        - a              : Input A-format signal
-        - orientation    : Orientation of the A-format channel tetrahedron
-            flu = front left up:          FLU, FRD, BLD, BRU
-            fld = front left down:        FLD, FRU, BLU, BRD
-            flr = front left-right:       FL, FR, BU, BD
-            fud = front up-down:          FU, FD, BL, BR
-            fbd = front and back down:    F, BD, BLU, BRU 
-            fbu = front and back up:      F, BU, BLD, BRD
-            flru = front left-right up:   FLU, FRU, FD, B
-            flrd = front left-right down: FLD, FRD, FU, B
+        - a     : Stereo signal
 
-        - weight : The scaling on W in the output a-format signal:
-            can = canonical scaling of 1/sqrt(2)
-            dec = scaling for decorrelated soundfields, weight of 1/sqrt(3) on W
-            car = scaling for cardioid response, weight of sqrt(3) on W
-            uns = unscaled, weight of 1 on W
-
-            dec is the usual choice for use in reverberators
-
-    Transform an A-format signal to the B-format domain.
+        - theta : Stereo encoding angle, -pi/2 to pi/2. The default value,
+                    0, place input stereo left/right at +/- pi/2 (hard
+                    left/right). Theta = pi/2 collapses the image to front
+                    centre, while -pi/2 collapses to back centre.
+        
+    Outputs: (y)
+    
+      y         : The output of the encoder.
+    
+    Encode a two dimensional stereo signal to horizontal
+    ambisonic B-format using the Simple Stereo encoding method.
 
     """
-    decoder_dict = C.b_to_a_dict
 
-    weight_dict = C.b_to_a_weight_dict
+    # coefficients
+    k0 = 0.5 * ones_like(theta)
+    k1 = C.rec_sqrt2 * sin(theta)
+    k2 = C.rec_sqrt2 * cos(theta)
 
-    # construct encoder
-    encoder = (array(decoder_dict[orientation]) * reciprocal(array(weight_dict[weight]))).transpose()
+    # construct appropriate transform
+    transform = array([
+            [k0,  k0],
+            [k1,  k1],
+            [k2, -k2]
+            ])
 
-    # encode here!
-    return inner(a, encoder)
+    if not(isscalar(theta)):                       # reshape for vectors
+        transform = transform.transpose(2, 0, 1)
 
+    res = (a[:, newaxis, :] * transform).sum(axis = -1)
+
+    res = hstack((res, zeros((nframes(a), 1))))
+
+    return res
+
+
+#---------------------------------------------
+# Special encoders
+#
+#   ZoomH2
+#---------------------------------------------
 
 def zoomH2_to_b(a):
     """zoomH2_to_b(a)
