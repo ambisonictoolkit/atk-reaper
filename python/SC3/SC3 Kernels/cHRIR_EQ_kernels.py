@@ -15,7 +15,7 @@
 #
 # Kernels are classified by kernel size, N, subject, and stored in directory: 
 #
-#       'ATK_kernels/decoders/CIPIC_EQ_HRIR/SR_[sr]/N_[kernel_size]/ \
+#       'ATK_kernels/FOA/decoders/CIPIC_EQ_HRIR/SR_[sr]/N_[kernel_size]/ \
 #           [subject_ID]'
 #
 # Within, four [W,X,Y,Z] two channel [L,R] kernels are found, named:
@@ -45,22 +45,24 @@ nfc_r = 1.00                # NFC distance (for compensation)
 
 # EQ params
 low_shelf = array([
-    400,
-    8.5
+    400,                    # freq (Hz)
+    9.0,                    # gain (dB)
+    20 * pi                 # width (kaiser smoothing)
     ])
 
 peaking = array([
-    7000.,
-    8000.,
-    -8.5
+    7500.,                  # freq (Hz)
+    8500.,                  # bw (Hz)
+    -8.5,                   # gain (dB)
+    50 * pi                 # width (kaiser smoothing)
     ])
 
 high_shelf = array([
-    17000.,
-    4.0
+    19000.,                 # freq (Hz)
+    9.0,                    # gain (dB)
+    200 * pi                # width (kaiser smoothing)
     ])
 
-eq_width = 20 * pi          # kaiser (smoothing) window width
 
 #                                       B3c
 #   [[  0,     -33.750],
@@ -88,7 +90,7 @@ endianness  = 'file'
 
 
 target_dir  = '/Volumes/Audio/test'      # temp write dir
-file_dir    = '/ATK_kernels/decoders/CIPIC_EQ_HRIR'
+file_dir    = '/ATK_kernels/FOA/decoders/CIPIC_EQ_HRIR'
 
 file_names  = ['HRIR_W', 'HRIR_X', 'HRIR_Y', 'HRIR_Z']
 
@@ -112,22 +114,22 @@ for sr in srs:                          # SR
                     N + 1,
                     freq_to_Wn(low_shelf[0], 1./sr),
                     db_to_amp(low_shelf[1])
-                    ),
+                    ) * kaiser(N + 1, low_shelf[2]),
                 fir_pk(
                     N + 1,
                     freq_to_Wn(peaking[0], 1./sr),
                     freq_to_Wn(peaking[1], 1./sr),
                     db_to_amp(peaking[2])
-                    ),
+                    ) * kaiser(N + 1, peaking[3]),
                 'same'
                 ),
             fir_hs(
                 N + 1,
                 freq_to_Wn(high_shelf[0], 1./sr),
                 db_to_amp(high_shelf[1])
-                ),
+                ) * kaiser(N + 1, high_shelf[2]),
             'same'
-            ) * kaiser(N + 1, eq_width)
+            )
         eq_kernel = minf(eq_kernel)
 
 

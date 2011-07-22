@@ -6,7 +6,7 @@
 #
 # Kernels are classified by kernel size, N, subject, and stored in directory: 
 #
-#       'ATK_kernels/decoders/CIPIC_HRIR/SR_[sr]/N_[kernel_size]/ \
+#       'ATK_kernels/FOA/decoders/CIPIC_HRIR/SR_[sr]/N_[kernel_size]/ \
 #           [subject_ID]'
 #
 # Within, four [W,X,Y,Z] two channel [L,R] kernels are found, named:
@@ -60,7 +60,7 @@ endianness  = 'file'
 
 
 target_dir  = '/Volumes/Audio/test'      # temp write dir
-file_dir    = '/ATK_kernels/decoders/CIPIC_HRIR'
+file_dir    = '/ATK_kernels/FOA/decoders/CIPIC_HRIR'
 
 file_names  = ['HRIR_W', 'HRIR_X', 'HRIR_Y', 'HRIR_Z']
 

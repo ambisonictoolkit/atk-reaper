@@ -6,7 +6,7 @@
 #
 # Kernels are classified by kernel size, N, and stored in directory: 
 #
-#       'ATK_kernels/decoders/UHJ/SR_nan/N_[kernel_size]/'
+#       'ATK_kernels/FOA/decoders/UHJ/SR_nan/N_[kernel_size]/'
 #
 # Within, three [W,X,Y] two channel [L,R] kernels are found, named:
 #
@@ -35,7 +35,7 @@ endianness  = 'file'
 
 
 target_dir  = '/Volumes/Audio/test'      #temp write dir
-file_dir    = '/ATK_kernels/decoders/UHJ'
+file_dir    = '/ATK_kernels/FOA/decoders/UHJ'
 
 file_names  = ['uhj_W', 'uhj_X', 'uhj_Y']
 

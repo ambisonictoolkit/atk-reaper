@@ -6,7 +6,8 @@
 #
 # Kernels are classified by kernel size, N, and stored in directory: 
 #
-#       'ATK_kernels/decoders/Spherical_HRIR/SR_[sr]/N_[kernel_size]/'
+#       'ATK_kernels/FOA/decoders/Spherical_HRIR/SR_[sr]/N_[kernel_size]/ \
+#           0000'
 #
 # Within, three [W,X,Y] two channel [L,R] kernels are found, named:
 #
@@ -47,10 +48,11 @@ endianness  = 'file'
 
 
 target_dir  = '/Volumes/Audio/test'      # temp write dir
-file_dir    = '/ATK_kernels/decoders/Spherical_HRIR'
+file_dir    = '/ATK_kernels/FOA/decoders/Spherical_HRIR'
 
 file_names  = ['HRIR_W', 'HRIR_X', 'HRIR_Y']
 
+subject_id  = '0000'                    # only one 'subject'
 
 # ----- loop
 for sr in srs:                          # SR
@@ -93,7 +95,7 @@ for sr in srs:                          # SR
             write_files += [
                 target_dir + file_dir + \
                 '/SR_' + str(sr).zfill(6) + '/N_' + str(N).zfill(4) + '/' + \
-                name + '.' + file_type[:3]
+                subject_id + '/' + name + '.' + file_type[:3]
                 ]
 
         # ----- write out decoder kernels
