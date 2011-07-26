@@ -1,6 +1,6 @@
 # **************************************
 # 
-# UHJ decoder
+# Simple Stereo decoder
 # 
 # decode a b-format signal to stereo (virtual mics)
 # 
