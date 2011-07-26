@@ -573,24 +573,63 @@ def simplestereo(a, theta = 0.):
 #   ZoomH2
 #---------------------------------------------
 
-def zoomH2_to_b(a):
-    """zoomH2_to_b(a)
+def zoomH2_to_b(x, theta = [pi/3, 3*pi/4], a = 0.58578643762690497):
+    """zoomH2_to_b(x, theta = [pi/3, 3*pi/4], a = 0.58578643762690497)
     
     Args:
-        - a         : Input 4 channel signal from Zoom H2 recorder.
+        - x         : Input 4 channel signal from Zoom H2 recorder.
+                        [FL, FR, BL, BR]. SEE NOTE below.
+        - theta     : Angles for Front Left and Back Left microphones.
+                        (The corresponding Right microphones are mirrored
+                        across the x-axis.) Default +-60deg, +-135deg.
+        - a         : Microphone pattern. 0 = omni, 0.5 = cardioid,
+                        1 = fig-8. The default value, 0.5857, is derived
+                        from the measurements made by Farina, and is a
+                        hyper-cardioid response with a zero at 135deg.
+                        
 
     Encode a Zoom H2 signal into the B-format domain.
-    Channels should be in order: FL, FR, BL, BR
+
+    NOTE: zoomH2_to_b() reverses the labels for front and back of the
+            ZoomH2, so that directions are are preserved from the
+            point of view of the operator. That is, the direction labelled
+            as 'Front' [appended 'F' in soundfile name] on the device is
+            referred to as Back by this encoder, and the direction labelled
+            as 'Rear' is described [appended 'R' in soundfile name] by this
+            encoder as Front.
+
+            A four channel recording made by the ZoomH2 will return files
+            named as below:
+
+                SRxxxF.wav, SRxxxR.wav
+
+            The following correctly illustrates input for the encoder:
+
+                x = [ SRxxxR[0], SRxxxR[1], SRxxxF[0], SRxxxF[1] ]
+
+    See also:
+
+    A. Farina, "Polar pattern mesurements of five microphonic arrays,"
+    Index of /Public/Brahma, 14-May-2009. [Online].
+    Available: http://pcfarina.eng.unipr.it/Public/Brahma/.
+    [Accessed: 26-Jul-2011].
+
+    "Handy Recorder H2: Operations Manual." Zoom Corporation.
+
 
     """
 
     # construct appropriate encoder
-    encoder = array(
-        [[C.rec_sqrt2sum2, C.rec_sqrt2sum2, C.sqrt2div_sqrt2sum2, C.sqrt2div_sqrt2sum2],
-         [C.twodiv_sqrt2sum1, C.twodiv_sqrt2sum1, -C.twodiv_sqrt2sum1, -C.twodiv_sqrt2sum1],
-         [C.twodiv_sqrt2sum_sqrt3, -C.twodiv_sqrt2sum_sqrt3, C.twodiv_sqrt2sum_sqrt3, -C.twodiv_sqrt2sum_sqrt3],
-         [0., 0., 0., 0.]]
+    encoder = asarray(
+        matrix([
+            [(1-a) * C.sqrt2, a * cos(theta[0]), a * sin(theta[0])],
+            [(1-a) * C.sqrt2, a * cos(theta[0]), -a * sin(theta[0])],
+            [(1-a) * C.sqrt2, a * cos(theta[1]), a * sin(theta[1])],
+            [(1-a) * C.sqrt2, a * cos(theta[1]), -a * sin(theta[1])]
+            ]).I
         )
+    encoder = vstack((encoder, zeros(4)))       # append z, as zeros
 
     # encode here!
-    return inner(a, encoder)
+    return inner(x, encoder)
+
