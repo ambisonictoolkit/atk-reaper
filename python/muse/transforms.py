@@ -367,6 +367,87 @@ def _asymmetry(a, theta = 0.):
 
 
 #=========================
+# mirroring
+#=========================
+
+
+def mirror_x(a):
+    """mirror_x(a)
+    
+    Mirror an ambisonic B-format across the x-axis.
+    
+    Args:
+        - a         : Input b-format signal
+
+    """
+
+    chnls = array([False, True, False, False]) # X
+
+    res = a.copy()              # operate on a copy
+    
+    res[:, chnls] = -res[:, chnls]  # mirror
+
+    return res
+
+
+def mirror_y(a):
+    """mirror_y(a)
+    
+    Mirror an ambisonic B-format across the y-axis.
+    
+    Args:
+        - a         : Input b-format signal
+
+    """
+
+    chnls = array([False, False, True, False]) # Y
+
+    res = a.copy()              # operate on a copy
+    
+    res[:, chnls] = -res[:, chnls]  # mirror
+
+    return res
+
+
+def mirror_z(a):
+    """mirror_z(a)
+    
+    Mirror an ambisonic B-format across the z-axis.
+    
+    Args:
+        - a         : Input b-format signal
+
+    """
+
+    chnls = array([False, False, False, True]) # Z
+
+    res = a.copy()              # operate on a copy
+    
+    res[:, chnls] = -res[:, chnls]  # mirror
+
+    return res
+
+
+def mirror_o(a):
+    """mirror_z(a)
+    
+    Mirror an ambisonic B-format across the origin.
+    
+    Args:
+        - a         : Input b-format signal
+
+    """
+
+    chnls = array([False, True, True, True]) # X, Y, Z
+
+    res = a.copy()              # operate on a copy
+    
+    res[:, chnls] = -res[:, chnls]  # mirror
+
+    return res
+
+
+#=========================
 # rotations
 #=========================
 

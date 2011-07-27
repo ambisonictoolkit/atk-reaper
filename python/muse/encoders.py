@@ -573,8 +573,8 @@ def simplestereo(a, theta = 0.):
 #   ZoomH2
 #---------------------------------------------
 
-def zoomH2_to_b(x, theta = [pi/3, 3*pi/4], a = 0.58578643762690497):
-    """zoomH2_to_b(x, theta = [pi/3, 3*pi/4], a = 0.58578643762690497)
+def zoomH2_to_b(x, theta = [pi/3, 3*pi/4], a = 0.5857, k = 1.):
+    """zoomH2_to_b(x, theta = [pi/3, 3*pi/4], a = 0.5857, k= 1.)
     
     Args:
         - x         : Input 4 channel signal from Zoom H2 recorder.
@@ -586,6 +586,12 @@ def zoomH2_to_b(x, theta = [pi/3, 3*pi/4], a = 0.58578643762690497):
                         1 = fig-8. The default value, 0.5857, is derived
                         from the measurements made by Farina, and is a
                         hyper-cardioid response with a zero at 135deg.
+        - k         : Post-encoding Y scalar. As the ZoomH2 polar patterns
+                        are not consistent across frequency, it is often
+                        desirable to scale the resulting Y channel after
+                        encoding. k = 1.7378 is a value suitable for the
+                        Courville example recordings.
+
                         
 
     Encode a Zoom H2 signal into the B-format domain.
@@ -616,6 +622,11 @@ def zoomH2_to_b(x, theta = [pi/3, 3*pi/4], a = 0.58578643762690497):
 
     "Handy Recorder H2: Operations Manual." Zoom Corporation.
 
+    D. Courville, "Comparative Surround Recording," Ambisonic Studio |
+    Comparative Surround Recording, 2007. [Online].
+    Available: http://www.radio.uqam.ca/ambisonic/comparative_recording.html.
+    [Accessed: 26-Jul-2011].
+
 
     """
 
@@ -628,6 +639,7 @@ def zoomH2_to_b(x, theta = [pi/3, 3*pi/4], a = 0.58578643762690497):
             [(1-a) * C.sqrt2, a * cos(theta[1]), -a * sin(theta[1])]
             ]).I
         )
+    encoder[2] *= k                             # scale y by k
     encoder = vstack((encoder, zeros(4)))       # append z, as zeros
 
     # encode here!
