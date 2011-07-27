@@ -1332,17 +1332,17 @@ def panto_dbr(a, num_speakers = 4, orientation = 'flat', Wn = None, zi = None):
 
     # shelf filter
     if zi is None:
-        b = psycho_shelf(a[:, 0:-1], Wn, C.k_2D)
+        b = psycho_shelf(a, Wn, C.k_2D)
 
         # decode here!
         res = inner(b, array(decoder))
         return res
 
     else:
-        b, zf = psycho_shelf(a[:, 0:-1], Wn, C.k_2D, zi)
+        b, zf = psycho_shelf(a, Wn, C.k_2D, zi)
 
         # decode here!
-        res = inner(b, array(decoder))
+        res = inner(b[:, 0:-1], array(decoder))
         return res, zf
 
 
@@ -1460,7 +1460,6 @@ def decode_dbd(a, positions, Wn, zi = None):
     # determin k for pantophonic or periphonic shelving
     if shape(positions)[1] is 2:
         k = C.k_2D
-        a = a[:, 0:-1]
     else:
         k = C.k_3D
     
@@ -1470,6 +1469,9 @@ def decode_dbd(a, positions, Wn, zi = None):
         b = psycho_shelf(a, Wn, k)
 
         # decode here!
+        if shape(positions)[1] is 2:
+            b = b[:, 0:-1]
+            
         res = inner(b, array(decoder))
         return res
 
@@ -1477,6 +1479,9 @@ def decode_dbd(a, positions, Wn, zi = None):
         b, zf = psycho_shelf(a, Wn, k, zi)
 
         # decode here!
+        if shape(positions)[1] is 2:
+            b = b[:, 0:-1]
+            
         res = inner(b, array(decoder))
         return res, zf
 
@@ -1516,17 +1521,17 @@ def quad_dbd(a, angle = 0.7854, Wn = None, zi = None):
 
     # shelf filter
     if zi is None:
-        b = psycho_shelf(a[:, 0:-1], Wn, C.k_2D)
+        b = psycho_shelf(a, Wn, C.k_2D)
 
         # decode here!
-        res = inner(b, array(decoder))
+        res = inner(b[:, 0:-1], array(decoder))
         return res
 
     else:
-        b, zf = psycho_shelf(a[:, 0:-1], Wn, C.k_2D, zi)
+        b, zf = psycho_shelf(a, Wn, C.k_2D, zi)
 
         # decode here!
-        res = inner(b, array(decoder))
+        res = inner(b[:, 0:-1], array(decoder))
         return res, zf
 
 

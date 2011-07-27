@@ -7,7 +7,7 @@
 # microphones, and the ZoomH2 recorder.
 #
 # These are decoded to a dual-band compressed 'quad' array
-# with nearfield (distance) compensation.
+# (+/-30deg) with nearfield (distance) compensation.
 # (Alternative decoders can also be using this model.) This example
 # uses 'block' decoding--and keeps track of the states of the varying
 # decoder filters (nearfield distance compensation, psychoacoustic
@@ -58,7 +58,6 @@ exec_dir = '/usr/local/bin'  # directory where flac and src are installed
 
 sr = 44100          # sample rate (output)
 
-k           = 1.            # velocity decode (shelf later)
 Wn_ps       = freq_to_Wn(400, 1./sr) #psychoacoustic shelf crossover
 nf_r        = 1.2           # NFC distance, in meters (for compensation)
 
@@ -66,7 +65,7 @@ num_chans = 4               # decode to 4 speakers == quad
 angle = deg_to_rad(60/2)    # 1/2 angle for 'narrow' quad decode
                             # front speakers are at +- 30 deg
 
-gains       = [1, 2, -1.3]  # in dB, ['st350, 'akg', 'h2']
+gains       = [1, 1, -1.3]  # in dB, ['st350, 'akg', 'h2']
 
 a_h2        = 0.58          # mic patern for H2
 k_h2        = db_to_amp(4.8) # Y scale for H2
@@ -167,7 +166,7 @@ for i in range(len(mic_names)):
     if (numframes % blocksize) != 0:
         blocks = blocks + [ numframes % blocksize ]
 
-    print '\n'
+    print '\nDecoding:', mic_name
 
     # --------------------------------------------------
     # set up filter states for decoding (psycho_shelf, nfc):
@@ -189,7 +188,7 @@ for i in range(len(mic_names)):
                 in_sig,
                 zeros((nframes(in_sig), 1))
                 ))
-        elif mic_name is 'h2':              # encode ZoomH2 to b-format
+        elif mic_name is 'h2':              # ZoomH2 to b-format
             in_sig = hstack((               # re-order channels as required
                 in_sig[:, 2:],              # by zoomH2_to_b()
                 in_sig[:, :2]
@@ -203,11 +202,10 @@ for i in range(len(mic_names)):
                                             # Courville's H2 is reversed
                                             # from zoomH2_to_b() convention
 
-        # decode to quad (and scale)
-        b_dec = scale * quad_sbd(b_sig, angle, k)
-        b_dec, zi_ps = psycho_shelf(b_dec, Wn_ps, C.k_2D, zi_ps)
-        b_dec, zi_nf = nfc(b_dec, nf_r, 1./sr, zi_nf)
-
+        # nearfield compensate, decode to quad (and scale)
+        b_sig, zi_nf = nfc(b_sig, nf_r, 1./sr, zi_nf)
+        b_dec, zi_ps = quad_dbd(b_sig, angle, Wn_ps, zi_ps)
+        b_dec *= scale
 
         peak_db = amp_to_db(peak(b_dec))
 
