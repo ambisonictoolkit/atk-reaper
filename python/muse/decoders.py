@@ -251,6 +251,12 @@ def decoder_gain_matrix(positions, k):
 
     # build decoder matrix 
     # rows are W, X, and Y gains
+    # NOTE: this matrix construction can be simplified
+    #       with a concatenation (hstack) of a column
+    #       of ones and sm
+    # ALSO: the below code calls for the complex conjugate
+    #       of decoder_matrix. As we are expecting real vaules,
+    #       we may regard this call as redundant.
     decoder_matrix = ones((m + 1, n))
     for i in range(n):
         for j in range(m):
