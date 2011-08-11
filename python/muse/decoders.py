@@ -244,7 +244,7 @@ def decoder_gain_matrix(positions, k):
     #       is assigned as an argument to this function.
     sm = speaker_matrix(positions2, k)
 
-    # n = number of speaker pairs
+    # n = number of speakers (NOTE: Heller says 'speaker pairs')
     # m = number of dimensions,
     #        2=horizontal, 3=periphonic 
     m, n = shape(sm)     
