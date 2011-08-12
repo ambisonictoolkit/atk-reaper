@@ -9,9 +9,60 @@
 //
 // -------------------------------------------------------
 
-//#------------------------------------------------------------------------//# (Gerzon's) Diametric Decoder Theorem (DDT)//#------------------------------------------------------------------------//#//# Much of the code below is a transcoding of Aaron Heller's Octave//# code available at: http://www.ai.sri.com/ajh/ambisonics///#//# Benjamin, et al., "Localization in Horizontal-Only Ambisonic Systems"//# Preprint from AES-121, 10/2006, San Francisco//#//# Heller's original functions are noted through comments in each//# functions help field.//#//# Transcoding to Python/Numpy for use in muse/ATK/SC3 by//# Joseph Anderson <josephlloydanderson@mac.com>//#//# aes_paper.m (expanded version of speaker_matrix.m) contains the//# following functions://#//#   velocity_gain_matrix()**            : compute alpha, beta, and gamma//#   speaker_matrix()                    : compute alpha, beta, and gamma//#   decoder_gain_matrix()               : compute decoder matrix//#//#   rV()                                : compute the Makita direction and rV//#   rE()                                : compute rE (and direction?)//#//#   _virtual_mic()                      : virtual mic angle and directivity//#   decoder_matrix_to_virtual_mic()     : computes loudspeaker 'virtual mics' //#//# ----------------------------------------//# the following functions are not included//# as they duplicate muse/ATK functionality//#//#   az2dir()                            : convert azimuth to directon cosines//#   degrees()                           : convert radians to degrees//#   radians()                           : convert degrees to radians//#   gain_to_db()//#//#   rectangular_speaker_arrays()        : example decodes//#   hexagonal_speaker_arrays()          : example decodes//#//#//# NOTE: speaker_matrix() and velocity_gain_matrix() are the same code.//#       It appears these two separate names are used (in error) in Heller's//#       code. The expanded version, aes_paper.m defines velocity_gain_matrix(),//#       but calls speaker_matrix().//#//#------------------------------------------------------------------------//////#------------------------------------------------------------------------//# DDT and related decoder matrix gains//#//#   NOTE:   These are the functions that compute gains to generate//#           loudspeaker feeds, and are not the functions which return//#           decoded B-format. See decoders, below.//#//#//#   speaker_matrix                  Heller's DDT (helper function)//#   decoder_gain_matrix             Heller's DDT (returns decoder gains)//#   panto_reg_decoder_gain_matrix   pantophonic//#   peri_reg_decoder_gain_matrix    periphonic//#   quad_decoder_gain_matrix        quad//#//#------------------------------------------------------------------------
+//------------------------------------------------------------------------// (Gerzon's) Diametric Decoder Theorem (DDT)//------------------------------------------------------------------------//// Much of the code below is a transcoding of Aaron Heller's Octave// code available at: http://www.ai.sri.com/ajh/ambisonics///// Benjamin, et al., "Localization in Horizontal-Only Ambisonic Systems"// Preprint from AES-121, 10/2006, San Francisco//// Heller's original functions are noted through comments in each// functions help field.//// Transcoding to Python/Numpy for use in muse/ATK/SC3 by// Joseph Anderson <josephlloydanderson@mac.com>//// aes_paper.m (expanded version of speaker_matrix.m) contains the// following functions:////   velocity_gain_matrix()**            : compute alpha, beta, and gamma//   speaker_matrix()                    : compute alpha, beta, and gamma//   decoder_gain_matrix()               : compute decoder matrix//// ----------------------------------------
+// the following functions are not included in SC3
+// as are included in muse/ATK and not immediately
+// useful in SC3 implementations
+//
+//   rV()                                : compute the Makita direction and rV
+//   rE()                                : compute rE (and direction?)
+//
+//   _virtual_mic()                      : virtual mic angle and directivity
+//   decoder_matrix_to_virtual_mic()     : computes loudspeaker 'virtual mics' 
+//
+// ----------------------------------------// the following functions are not included// as they duplicate muse/ATK functionality////   az2dir()                            : convert azimuth to directon cosines//   degrees()                           : convert radians to degrees//   radians()                           : convert degrees to radians//   gain_to_db()////   rectangular_speaker_arrays()        : example decodes//   hexagonal_speaker_arrays()          : example decodes////
+//// NOTE: speaker_matrix() and velocity_gain_matrix() are the same code.//       It appears these two separate names are used (in error) in Heller's//       code. The expanded version, aes_paper.m defines velocity_gain_matrix(),//       but calls speaker_matrix().////------------------------------------------------------------------------//////------------------------------------------------------------------------// DDT and related decoder matrix gains////   NOTE:   These are the functions that compute gains to generate//           loudspeaker feeds, and are not the functions which return//           decoded B-format. See decoders, below.//////   speaker_matrix                  Heller's DDT (helper function)//   decoder_gain_matrix             Heller's DDT (returns decoder gains)//   panto_reg_decoder_gain_matrix   pantophonic//   peri_reg_decoder_gain_matrix    periphonic//   quad_decoder_gain_matrix        quad////------------------------------------------------------------------------
 
-// speaker_matrix
+// NOTE: the addition of a spherical coordinates class (like Polar.sc)
+//		to convert between spherical and cartesian coordinates
+//		will replace the following global functions, and improve
+//		usability -------> TBD!!
+(
+	~spherToCart = { arg spher;		// [ r, theta, phi ]
+			var r, theta, phi;
+			
+			r 		= spher.at(0);
+			theta	= spher.at(1);
+			phi 		= spher.at(2);
+		
+			[
+				r * phi.cos * theta.cos,
+				r * phi.cos * theta.sin,
+				r * phi.sin
+			]
+		};
+
+	~cartToSpher = { arg cart;		// [ x, y, z ]
+			var x, y, z;
+			
+			x = cart.at(0);
+			y = cart.at(1);
+			z = cart.at(2);
+			
+			r = (x.squared + y.squared + z.squared).sqrt;
+		
+			[
+				r,
+				y.atan2(x),
+				(z/r).asin
+			]
+		};
+
+)
+
+
+
+//   speaker_matrix                  Heller's DDT (helper function)
 (
 	~atkSpeakerMatrix = { arg positions, k;
 		var m, n, s;
@@ -45,7 +96,7 @@
 )
 
 
-// decoder_gain_matrix
+//   decoder_gain_matrix             Heller's DDT (returns decoder gains)
 (
 	~atkDecoderGainMatrix = { arg positions, k;
 		var positions2;
@@ -78,6 +129,83 @@
 )
 
 
+//   panto_reg_decoder_gain_matrix   pantophonic
+(
+	~atkPantoRegDecoderGainMatrix = { arg numSpeakers, orientation, k;
+		var theta;
+		var g0, g1;
+		var decoderMatrix;
+
+		// define (local) function to return theta from speaker number		theta = { arg speaker;
+			if ( orientation == 'point',
+				{ ((2.0 * speaker)/numSpeakers) * pi },        // 'point' case
+				{ ((1.0 + (2.0 * speaker))/numSpeakers) * pi } // 'flat' case, default
+			)
+		};
+
+	    // define constants	    g0 = 1.0;	    g1 = 2.sqrt;
+
+		// calculate decoding matrix	
+		decoderMatrix = Matrix.newClear(numSpeakers, 3); // start w/ empty matrix
+	
+		numSpeakers.do({ arg i;
+			decoderMatrix.putRow(i, [
+				g0,
+	              k * g1 * theta.value(i).cos,
+	              k * g1 * theta.value(i).sin
+			])
+			});
+		
+		// return resulting matrix
+		2.sqrt/numSpeakers * decoderMatrix
+	}
+)
+
+
+//   peri_reg_decoder_gain_matrix    periphonic
+(
+	~atkPeriRegDecoderGainMatrix = { arg numSpeakerPairs, elevation, orientation, k;
+		var theta, spher, positions;
+		var top, bottom;
+		var decoderMatrix;
+
+		// generate speaker pair positions		// start with polar positions. . .
+		theta = [];
+		numSpeakerPairs.do({arg i;
+			theta = theta ++ [2 * pi * i / numSpeakerPairs]}
+		);
+		if ( orientation == 'flat',
+			{ theta = theta + (pi / numSpeakerPairs) });       // 'flat' case
+
+		// convert to spherical coordinates [ [r], [theta], [phi] ]...
+		spher = [
+			Array.newClear(numSpeakerPairs).fill(1),
+			theta,
+			Array.newClear(numSpeakerPairs).fill(elevation)
+		];
+		
+		// . . . then convert from spherical to cartesian [ [x, y, z] ]		positions = Matrix.with(~spherToCart.value(spher)).flop;
+
+		// compute the decoder
+		decoderMatrix = ~atkDecoderGainMatrix.value(positions, k);
+
+		// reorder the bottom polygon
+		top = decoderMatrix[..(numSpeakerPairs-1)];
+		bottom = decoderMatrix[(numSpeakerPairs)..];
+
+		bottom = if ( (orientation == 'flat') && (numSpeakerPairs.mod(2) == 1),
+			{ bottom.rotate((numSpeakerPairs/2 + 1).asInteger) }, // odd, 'flat'
+			{ bottom.rotate((numSpeakerPairs/2).asInteger) }     // 'flat' case, default
+		);
+		
+		decoderMatrix = top ++ bottom;
+
+		decoderMatrix
+	}
+)
+
+
+//--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 // test
 (
@@ -89,6 +217,20 @@
 //	k = 2.sqrt.reciprocal;
 
 //	~atkSpeakerMatrix.value(positions, k);
-	~atkDecoderGainMatrix.value(positions, k);
+//	~atkDecoderGainMatrix.value(positions, k);
+
+//	~atkPantoRegDecoderGainMatrix.value(4, 'flat', k);
+//	~atkPantoRegDecoderGainMatrix.value(4, 'point', k);
+//	~atkPantoRegDecoderGainMatrix.value(5, 'flat', k);
+//	~atkPantoRegDecoderGainMatrix.value(5, 'point', k);
+//	~atkPantoRegDecoderGainMatrix.value(6, 'flat', k);
+//	~atkPantoRegDecoderGainMatrix.value(6, 'point', k);
+
+//	~atkPeriRegDecoderGainMatrix.value(3, pi/3, 'flat', k);
+//	~atkPeriRegDecoderGainMatrix.value(3, pi/3, 'point', k);
+//	~atkPeriRegDecoderGainMatrix.value(4, pi/3, 'flat', k);
+//	~atkPeriRegDecoderGainMatrix.value(4, pi/3, 'point', k);
+//	~atkPeriRegDecoderGainMatrix.value(5, pi/3, 'flat', k);
+	~atkPeriRegDecoderGainMatrix.value(5, pi/3, 'point', k);
 
 )
