@@ -103,7 +103,7 @@
 		var sm, m, n;
 		var decoderMatrix;
 
-		// list all of the speakers		// i.e., expand to actual pairs		positions2 = positions ++ (-1 * positions);		
+		// list all of the speakers		// i.e., expand to actual pairs		positions2 = positions ++ (positions.neg);		
 	    	// get velocity gains	    	// NOTE: this comment from Heller seems to be slightly	    	//       misleading, in that the gains returned will be	    	//       scaled by k, which may not request a velocity	    	//       gain. I.e., k = 1 isn't necessarily true, as it	    	//       is assigned as an argument to this function.
 	    	sm = ~atkSpeakerMatrix.value(positions2, k);
 	    
@@ -169,7 +169,8 @@
 		var top, bottom;
 		var decoderMatrix;
 
-		// generate speaker pair positions		// start with polar positions. . .
+		// generate speaker pair positions
+		// start with polar positions. . .
 		theta = [];
 		numSpeakerPairs.do({arg i;
 			theta = theta ++ [2 * pi * i / numSpeakerPairs]}
@@ -184,7 +185,8 @@
 			Array.newClear(numSpeakerPairs).fill(elevation)
 		];
 		
-		// . . . then convert from spherical to cartesian [ [x, y, z] ]		positions = Matrix.with(~spherToCart.value(spher)).flop;
+		// . . . then convert from spherical to cartesian [ [x, y, z] ]
+		positions = Matrix.with(~spherToCart.value(spher)).flop;
 
 		// compute the decoder
 		decoderMatrix = ~atkDecoderGainMatrix.value(positions, k);
@@ -205,6 +207,30 @@
 )
 
 
+//   quad_decoder_gain_matrix        quad
+(
+	~atkQuadDecoderGainMatrix = { arg angle, k;
+		var alpha, beta;
+		var decoderMatrix;
+
+		// calculate alpha, beta (scaled by k)
+		alpha   = k / (2.sqrt * angle.cos);
+		beta    = k / (2.sqrt * angle. sin);
+
+
+		// fill decoding matrix
+	    decoderMatrix = Matrix.with([
+	    		[1, alpha, beta],
+	        	[1, alpha.neg, beta],
+	        	[1, alpha.neg, beta.neg],
+	        	[1, alpha, beta.neg]
+	    ]);
+	    
+	    2.sqrt/4 * decoderMatrix
+	}
+)
+
+
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 // test
@@ -213,8 +239,8 @@
 	
 	positions = Matrix.with([[1, 1, 1], [1, -1, 1], [1, 1, -1], [1, -1, -1]]);
 //	positions = Matrix.with([[1, 1], [1, -1]]);
-	k = 1;
-//	k = 2.sqrt.reciprocal;
+//	k = 1;
+	k = 2.sqrt.reciprocal;
 
 //	~atkSpeakerMatrix.value(positions, k);
 //	~atkDecoderGainMatrix.value(positions, k);
@@ -231,6 +257,9 @@
 //	~atkPeriRegDecoderGainMatrix.value(4, pi/3, 'flat', k);
 //	~atkPeriRegDecoderGainMatrix.value(4, pi/3, 'point', k);
 //	~atkPeriRegDecoderGainMatrix.value(5, pi/3, 'flat', k);
-	~atkPeriRegDecoderGainMatrix.value(5, pi/3, 'point', k);
+//	~atkPeriRegDecoderGainMatrix.value(5, pi/3, 'point', k);
+
+//	~atkQuadDecoderGainMatrix.value(0.5, k);
+	~atkQuadDecoderGainMatrix.value(pi/3, k);
 
 )
