@@ -313,6 +313,126 @@
 )
 
 
+//------------------------------------------------------------------------// Dual Band Regular Decoders////   panto_dbr           pantophonic//   peri_dbr            periphonic//------------------------------------------------------------------------
+
+
+//   panto_dbr           pantophonic
+(
+	~atkPantoDBR = { arg bSig, numSpeakers = 4, orientation = 'flat', freq = 400.0;
+		var decoder;
+		var k, psychoK;
+		
+		// constants
+		k = 1.0;							// k for gain matrix (velocity)
+		psychoK = [(3/2).sqrt, 3.sqrt/2];	// panto k (energy at HF)
+
+		
+		// return decoder gain matrix
+		decoder = ~atkPantoRegDecoderGainMatrix.value(numSpeakers, orientation, k);
+		
+		// shelf filter
+		bSig = ~atkPsychoShelf.value(bSig, freq, psychoK);
+
+		// decode here!
+		decoder.asArray.collect({arg channel;
+			(channel * bSig[..2]).sum			// panto, need 1st 3 bSig channels
+			})
+
+
+	}
+)
+
+
+//   peri_dbr            periphonic
+(
+	~atkPeriDBR = { arg bSig, numSpeakerPairs = 4, elevation = 0.6155, orientation = 'flat',
+						freq = 400.0;
+		var decoder;
+		var k, psychoK;
+
+		// constants
+		k = 1.0;							// k for gain matrix (velocity)
+		psychoK = [2.sqrt, (2/3).sqrt];		// peri k (energy at HF)
+
+		
+		//return decoder gain matrix
+		decoder = ~atkPeriRegDecoderGainMatrix.value(numSpeakerPairs, elevation, orientation, k);
+
+		// shelf filter
+		bSig = ~atkPsychoShelf.value(bSig, freq, psychoK);
+
+		// decode here!
+		decoder.asArray.collect({arg channel;
+			(channel * bSig).sum
+			})
+
+
+	}
+)
+
+
+//------------------------------------------------------------------------// Dual Band Diametric Decoder////   decode_dbd//   quad_dbd//------------------------------------------------------------------------
+
+//   decode_dbd
+(
+	~atkDecodeDBD = { arg bSig, positions, freq = 400.0;
+		var decoder;
+		var k, psychoK;
+
+		// constants
+		k = 1.0;									// k for gain matrix (velocity)
+		if ( positions.rows == 2,
+			{ psychoK = [(3/2).sqrt, 3.sqrt/2] },		// panto k (energy at HF)
+			{ psychoK = [2.sqrt, (2/3).sqrt] }		// peri k (energy at HF)
+		);
+
+
+		//return decoder gain matrix
+		decoder = ~atkDecoderGainMatrix.value(positions, k);
+
+		// shelf filter
+		bSig = ~atkPsychoShelf.value(bSig, freq, psychoK);
+
+		// pantophonic or periphonic?
+		//    if panto, discard z
+		if ( positions.rows == 2, { bSig = bSig[..2]} );
+
+
+		// decode here!
+		decoder.asArray.collect({arg channel;
+			(channel * bSig).sum
+			})
+
+
+	}
+)
+
+
+//   quad_dbd
+(
+	~atkQuadDBD = { arg bSig, angle = 0.7854, freq = 400.0;
+		var decoder;
+		var k, psychoK;
+		
+		// constants
+		k = 1.0;							// k for gain matrix (velocity)
+		psychoK = [(3/2).sqrt, 3.sqrt/2];	// panto k (energy at HF)
+
+
+		//return decoder gain matrix
+		decoder = ~atkQuadDecoderGainMatrix.value(angle, k);
+
+		// shelf filter
+		bSig = ~atkPsychoShelf.value(bSig, freq, psychoK);
+
+		// decode here!
+		decoder.asArray.collect({arg channel;
+			(channel * bSig[..2]).sum			// panto, need 1st 3 bSig channels
+			})
+
+
+	}
+)
 
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
@@ -353,7 +473,7 @@
 
 // -------------------------------------------------------
 // pantoSBR
-// decorrelated pink noise, sound synth function
+// mono pink noise, sound synth function
 (
 {
 	var fl, bl, br, fr,					// for quad output
@@ -379,7 +499,7 @@
 )
 
 // periSBR
-// decorrelated pink noise, sound synth function
+// mono pink noise, sound synth function
 (
 {
 	var flu, blu, bru, fru,					// for 3D cube output
@@ -408,7 +528,7 @@
 
 // -------------------------------------------------------
 // decodeSBD (2D, narrow-quad)
-// decorrelated pink noise, sound synth function
+// mono pink noise, sound synth function
 (
 {
 	var fl, bl, br, fr,					// for quad output
@@ -440,7 +560,7 @@
 
 // -------------------------------------------------------
 // decodeSBD (3D, cube)
-// decorrelated pink noise, sound synth function
+// mono pink noise, sound synth function
 (
 {
 	var flu, blu, bru, fru,					// for 3D cube output
@@ -473,7 +593,7 @@
 
 // -------------------------------------------------------
 // quadSBD
-// decorrelated pink noise, sound synth function
+// mono pink noise, sound synth function
 (
 {
 	var fl, bl, br, fr,					// for quad output
@@ -501,3 +621,158 @@
 )
 
 
+// -------------------------------------------------------
+// -------------------------------------------------------
+// -------------------------------------------------------
+// pantoDBR
+// mono pink noise, sound synth function
+// including NFC (called distance!)
+(
+{
+	var fl, bl, br, fr,					// for quad output
+		azim, bSig;
+	var numSpeakers, distance;
+
+	// constants
+	numSpeakers = 4;
+	distance = 1.1;				// speaker distance (radius) in meters
+	
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+
+	// split...
+	#w, x, y, z = bSig;
+	
+	// nearfield compensate
+	bSig = AtkDistance.ar(w, x, y, z, distance);
+
+	// decode to output
+	#fl, bl, br, fr = ~atkPantoDBR.value(bSig, numSpeakers);
+	
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+// periDBR
+// mono pink noise, sound synth function
+// including NFC (called distance!)
+(
+{
+	var flu, blu, bru, fru,					// for 3D cube output
+		fld, bld, brd, frd,
+		azim, bSig;
+	var numSpeakerPairs, distance;
+	
+	// constants
+	numSpeakerPairs = 4;
+	distance = 1.1;				// speaker distance (radius) in meters
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+
+	// split...
+	#w, x, y, z = bSig;
+	
+	// nearfield compensate
+	bSig = AtkDistance.ar(w, x, y, z, distance);
+
+	// decode to output
+	#flu, blu, bru, fru, fld, bld, brd, frd = ~atkPeriDBR.value(bSig, numSpeakerPairs);
+	
+	[flu, fru, blu, bru, fld, frd, bld, brd]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+// -------------------------------------------------------
+// decodeDBD (2D, narrow-quad)
+// mono pink noise, sound synth function
+// including NFC (called distance!)
+(
+{
+	var fl, bl, br, fr,					// for quad output
+		azim, bSig;
+	var angle;
+	var positions, distance;
+	
+
+	// constants
+	angle = (30/180) * pi;
+	positions = Matrix.with([[angle.cos, angle.sin], [angle.cos, angle.sin.neg]]);
+	distance = 1.1;				// speaker distance (radius) in meters
+
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+
+	// split...
+	#w, x, y, z = bSig;
+	
+	// nearfield compensate
+	bSig = AtkDistance.ar(w, x, y, z, distance);
+
+	// decode to output
+	#fl, fr, br, bl = ~atkDecodeDBD.value(bSig, positions);
+	
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+// -------------------------------------------------------
+// quadDBD
+// mono pink noise, sound synth function
+// including NFC (called distance!)
+(
+{
+	var fl, bl, br, fr,					// for quad output
+		azim, bSig;
+	var angle, distance;
+
+
+	// constants
+	angle = (30 / 180) * pi;
+	distance = 1.1;				// speaker distance (radius) in meters
+
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+
+	// split...
+	#w, x, y, z = bSig;
+	
+	// nearfield compensate
+	bSig = AtkDistance.ar(w, x, y, z, distance);
+
+	// decode to output
+	#fl, bl, br, fr = ~atkQuadDBD.value(bSig, angle);
+	
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
