@@ -231,19 +231,102 @@
 )
 
 
+//------------------------------------------------------------------------// Muse/ATK decoders built using the above decoder gain matrices//   Developed and coded by J Anderson//////   ++++ Single Band Regular Decoders////   panto_sbr//   peri_sbr////   ++++ Single Band Diametric Decoders////   decode_sbd//   quad_sbd//////   ++++ Dual Band Regular Decoders (Shelf-filtered)////   panto_dbr//   peri_dbr////   ++++ Dual Band Diametric Decoders (Shelf-filtered)////   decode_dbd//   quad_dbd        (See special decoders)////------------------------------------------------------------------------
+
+//------------------------------------------------------------------------// Single Band Regular Decoders////   panto_sbr           pantophonic//   peri_sbr            periphonic//------------------------------------------------------------------------
+
+
+//   panto_sbr           pantophonic
+(
+	~atkPantoSBR = { arg bSig, numSpeakers = 4, orientation = 'flat', k = 0.7071;
+		var decoder;
+
+		//return decoder gain matrix		decoder = ~atkPantoRegDecoderGainMatrix.value(numSpeakers, orientation, k);
+
+		// decode here!		decoder.asArray.collect({arg channel;
+			(channel * bSig[..2]).sum			// panto, need 1st 3 bSig channels
+			})
+
+
+	}
+)
+
+
+//   peri_sbr            periphonic
+(
+	~atkPeriSBR = { arg bSig, numSpeakerPairs = 4, elevation = 0.6155, orientation = 'flat',
+						k = 0.5774;
+		var decoder;
+
+		//return decoder gain matrix
+		decoder = ~atkPeriRegDecoderGainMatrix.value(numSpeakerPairs, elevation, orientation, k);
+
+		// decode here!
+		decoder.asArray.collect({arg channel;
+			(channel * bSig).sum
+			})
+
+
+	}
+)
+
+
+//------------------------------------------------------------------------// Single Band Diametric Decoder////   decode_sbd//   quad_sbd//------------------------------------------------------------------------
+
+
+//   decode_sbd
+(
+	~atkDecodeSBD = { arg bSig, positions, k = 0.7071;
+		var decoder;
+
+		//return decoder gain matrix
+		decoder = ~atkDecoderGainMatrix.value(positions, k);
+
+		// pantophonic or periphonic?		//    if panto, discard z		if ( positions.rows == 2, { bSig = bSig[..2]} );
+
+
+		// decode here!
+		decoder.asArray.collect({arg channel;
+			(channel * bSig).sum
+			})
+
+
+	}
+)
+
+
+//   quad_sbd
+(
+	~atkQuadSBD = { arg bSig, angle = 0.7854, k = 0.7071;
+		var decoder;
+
+		//return decoder gain matrix
+		decoder = ~atkQuadDecoderGainMatrix.value(angle, k);
+
+		// decode here!
+		decoder.asArray.collect({arg channel;
+			(channel * bSig[..2]).sum			// panto, need 1st 3 bSig channels
+			})
+
+
+	}
+)
+
+
+
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
-// test
+// test (gain matricies)
 (
 	var positions, k;
 	
-	positions = Matrix.with([[1, 1, 1], [1, -1, 1], [1, 1, -1], [1, -1, -1]]);
-//	positions = Matrix.with([[1, 1], [1, -1]]);
-//	k = 1;
-	k = 2.sqrt.reciprocal;
+//	positions = Matrix.with([[1, 1, 1], [1, -1, 1], [1, 1, -1], [1, -1, -1]]);
+	positions = Matrix.with([[1, 1], [1, -1]]);
+	k = 1;
+//	k = 2.sqrt.reciprocal;
 
 //	~atkSpeakerMatrix.value(positions, k);
-//	~atkDecoderGainMatrix.value(positions, k);
+	~atkDecoderGainMatrix.value(positions, k);
 
 //	~atkPantoRegDecoderGainMatrix.value(4, 'flat', k);
 //	~atkPantoRegDecoderGainMatrix.value(4, 'point', k);
@@ -260,6 +343,161 @@
 //	~atkPeriRegDecoderGainMatrix.value(5, pi/3, 'point', k);
 
 //	~atkQuadDecoderGainMatrix.value(0.5, k);
-	~atkQuadDecoderGainMatrix.value(pi/3, k);
+//	~atkQuadDecoderGainMatrix.value(pi/3, k);
 
 )
+
+
+// -------------------------------------------------------
+// test (decoders)
+
+// -------------------------------------------------------
+// pantoSBR
+// decorrelated pink noise, sound synth function
+(
+{
+	var fl, bl, br, fr,					// for quad output
+		azim, bSig;
+	var numSpeakers;
+
+	// constants
+	numSpeakers = 4;
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+	// decode to output
+	#fl, bl, br, fr = ~atkPantoSBR.value(bSig, numSpeakers);
+	
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+// periSBR
+// decorrelated pink noise, sound synth function
+(
+{
+	var flu, blu, bru, fru,					// for 3D cube output
+		fld, bld, brd, frd,
+		azim, bSig;
+	var numSpeakerPairs;
+	
+	// constants
+	numSpeakerPairs = 4;
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+	// decode to output
+	#flu, blu, bru, fru, fld, bld, brd, frd = ~atkPeriSBR.value(bSig, numSpeakerPairs);
+	
+	[flu, fru, blu, bru, fld, frd, bld, brd]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+// -------------------------------------------------------
+// decodeSBD (2D, narrow-quad)
+// decorrelated pink noise, sound synth function
+(
+{
+	var fl, bl, br, fr,					// for quad output
+		azim, bSig;
+	var angle;
+	var positions;
+	
+
+	// constants
+	angle = (30/180) * pi;
+	positions = Matrix.with([[angle.cos, angle.sin], [angle.cos, angle.sin.neg]]);
+
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+	// decode to output
+	#fl, fr, br, bl = ~atkDecodeSBD.value(bSig, positions);
+	
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+// -------------------------------------------------------
+// decodeSBD (3D, cube)
+// decorrelated pink noise, sound synth function
+(
+{
+	var flu, blu, bru, fru,					// for 3D cube output
+		fld, bld, brd, frd,
+		azim, bSig;
+	var positions;
+	var k;
+	
+
+	// constants
+	positions = Matrix.with([[1, 1, 1], [-1, 1, 1], [-1, -1, 1], [1, -1, 1]]);
+	k = 3.sqrt.reciprocal;					// energy for 3D
+
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+	// decode to output
+	#flu, blu, bru, fru, brd, frd, fld, bld = ~atkDecodeSBD.value(bSig, positions);
+	
+	[flu, fru, blu, bru, fld, frd, bld, brd]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+// -------------------------------------------------------
+// quadSBD
+// decorrelated pink noise, sound synth function
+(
+{
+	var fl, bl, br, fr,					// for quad output
+		azim, bSig;
+	var angle;
+
+
+	// constants
+	angle = (30 / 180) * pi;
+
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+	// decode to output
+	#fl, bl, br, fr = ~atkQuadSBD.value(bSig, angle);
+	
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
