@@ -43,4 +43,4 @@
 //
 //------------------------------------------------------------------------
 
-// b_to_uhj(b, decoder_kernels)//
+// b_to_uhj(b, decoder_kernels)// SEE: UHU.scd
