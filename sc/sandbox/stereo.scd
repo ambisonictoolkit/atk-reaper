@@ -44,3 +44,58 @@
 //------------------------------------------------------------------------
 
 // b_to_uhj(b, decoder_kernels)// SEE: UHU.scd
+
+
+//   b_to_stereo(a, angle = 0.7854, k = 1.0)
+(
+	~atkBToStereo = { arg bSig, angle = 0.7854, k = 1.0;
+		var decoder;
+
+		//return decoder gain matrix
+		decoder = [	        [(1-k) * 2.sqrt, k * angle.cos, k * angle.sin],	        [(1-k) * 2.sqrt, k * angle.cos, k.neg * angle.sin]        ];
+
+		// decode here!
+		decoder.asArray.collect({arg channel;
+			(channel * bSig[..2]).sum			// panto, need 1st 3 bSig channels
+			})
+
+
+	}
+)
+
+
+// b_to_binaural(b, decoder_kernels)
+// SEE: binaural.scd
+
+
+
+
+// -------------------------------------------------------
+// test (decoders)
+
+
+// -------------------------------------------------------
+// b_to_stereo
+// mono pink noise, sound synth function
+(
+{
+	var azim, bSig;
+	var angle, pattern;
+
+	// constants
+	angle	= 0.7854;				// +-45 deg (Blumlein)	pattern	= 1.0;				// fig-8//	angle	= 110/2 * pi/180;		// +-55 deg (Hyper-cardioid coincident)//	pattern	= 0.75;				// hyper-cardioid//	angle	= 135/2 * pi/180;		// +-67.5 deg (Cardioid coincident)//	pattern	= 0.5;				// cardioid//	angle	= pi/3;				// +-60 deg (Uniform reverb)//	pattern	= 0.5;				// cardioid//	angle	= pi/2;				// +-90 deg (Sphere)//	pattern	= 0.5;				// cardioid	
+
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// synth and process
+	bSig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+	// decode to output
+	~atkBToStereo.value(bSig, angle, pattern);
+	
+}.scope;
+)
+
