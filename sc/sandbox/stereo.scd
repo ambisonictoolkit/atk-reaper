@@ -28,8 +28,8 @@
 		
 		#l, r = sterSig;
 		
-		[ 0.5 * (l + r), 1/2.sqrt * sin(angle) * (l + r),
-			1/2.sqrt * cos(angle) * (l - r), Silent.ar(1) ]
+		[ 1/2.sqrt *  (l + r), sin(angle) * (l + r),
+			cos(angle) * (l - r), Silent.ar(1) ]
 	}
 )
 

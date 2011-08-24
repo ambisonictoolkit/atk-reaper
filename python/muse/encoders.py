@@ -546,9 +546,9 @@ def simplestereo(a, theta = 0.):
     """
 
     # coefficients
-    k0 = 0.5 * ones_like(theta)
-    k1 = C.rec_sqrt2 * sin(theta)
-    k2 = C.rec_sqrt2 * cos(theta)
+    k0 = C.rec_sqrt2 * ones_like(theta)
+    k1 = sin(theta)
+    k2 = cos(theta)
 
     # construct appropriate transform
     transform = array([
