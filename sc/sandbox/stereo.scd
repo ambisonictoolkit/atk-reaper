@@ -17,6 +17,15 @@
 //
 //------------------------------------------------------------------------
 
+
+//   uhj_to_b            "Ambisonic Decoders for HDTV" (1992)
+// SEE: UHJ_encode.scd
+
+
+//   superstereo
+// SEE: sstereo_encode.scd
+
+
 // simple stereo
 
 // NOTE: angle is framed as the 'distortion' angle rather than width,
