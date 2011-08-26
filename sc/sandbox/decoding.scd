@@ -49,12 +49,10 @@
 			y = cart.at(1);
 			z = cart.at(2);
 			
-			r = (x.squared + y.squared + z.squared).sqrt;
-		
 			[
-				r,
+				(x.squared + y.squared + z.squared).sqrt,
 				y.atan2(x),
-				(z/r).asin
+				z.atan2((x.squared + y.squared).sqrt)
 			]
 		};
 
