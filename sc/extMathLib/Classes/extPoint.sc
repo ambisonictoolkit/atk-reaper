@@ -17,5 +17,17 @@
 
 	// conversion
 	asCartesian { ^Cartesian.new(this.x, this.y, 0) }
-	@@ { arg aNumber; ^Cartesian.new(this.x, this.y, aNumber) }
+//	@@ { arg aNumber; ^Cartesian.new(this.x, this.y, aNumber) }
+	@ { arg aValue;								// overload default method
+		aValue.isKindOf(SimpleNumber).if(
+			{ ^Cartesian.new(this.x, this.y, aValue) },
+			{ ^Rect.fromPoints(this, aValue) }		// default SC
+		)
+		}
+		
+	// mirror
+	mirrorX { ^x.neg @ y }
+	mirrorY { ^x @ y.neg }
+	mirrorO { ^x.neg @ y.neg }
+	
 }

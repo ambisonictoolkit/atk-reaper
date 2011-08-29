@@ -4,44 +4,100 @@
 // NOTE: include license, etc before public release
 //---------------------------------------------------------------------
 
-//Polar : Number {
-//	var <>rho, <>theta;
-//
-//	*new { arg rho, theta;
-//		^super.newCopyArgs(rho, theta)
-//	}
-//
-//	magnitude { ^rho }
-//
-//	angle { ^theta }
-//	phase { ^theta }
-//
-//	real { ^rho * cos(theta) }
-//	imag { ^rho * sin(theta) }
-//
-//	asPolar { ^this }
-//	asComplex { ^Complex.new(this.real, this.imag) }
-//	asPoint { ^Point.new(this.real, this.imag) }
-//
-//	scale { arg scale;
-//		^Polar.new(rho * scale, theta)
-//	}
-//	rotate { arg angle; // in radians
-//		^Polar.new(rho, theta + angle)
-//	}
-//
-//	// do math as Complex
-//	+ { arg aNumber;  ^this.asComplex + aNumber  }
-//	- { arg aNumber;  ^this.asComplex - aNumber  }
-//  	* { arg aNumber;  ^this.asComplex * aNumber  }
-//	/ { arg aNumber;  ^this.asComplex / aNumber  }
-//
-//	== { arg aPolar;
-//		^aPolar respondsTo: #[\rho, \theta] and: { rho == aPolar.rho and: { theta == aPolar.theta } }
-//	}
-//	
-//	neg { ^Polar.new(rho, theta + pi) }
-//
+Spherical : Number {
+	var <>rho, <>theta, <>phi;
+
+	*new { arg rho, theta, phi;
+		^super.newCopyArgs(rho, theta, phi)
+	}
+
+	magnitude { ^rho }
+
+	angle { ^theta }						// implemented as a projection
+	phase { ^theta }						// implemented as a projection
+	angles { ^[theta, phi] }
+	phases { ^[theta, phi] }
+
+	x { ^rho * cos(theta) * cos(phi) }
+	y { ^rho * sin(theta) * cos(phi) }
+	z { ^rho * sin(phi) }
+	real { ^this.x }
+	imag { ^this.y }
+
+	asSpherical { ^this }
+	asPolar { ^Polar.new(rho, theta) }				// implemented as a projection
+	asComplex { ^Complex.new(this.real, this.imag) }	// implemented as a projection
+	asPoint { ^Point.new(this.x, this.y) }			// implemented as a projection
+	asCartesian { ^Cartesian.new(this.x, this.y, this.z) }
+	scale { arg scale;
+		^Spherical.new(rho * scale, theta, phi)
+	}
+	rotate { arg angle; // XY-plane, in radians
+		^Spherical.new(rho, theta + angle, phi)
+	}
+	tilt { arg angle; // YZ-plane, in radians
+		^this.asCartesian.tilt(angle).asSpherical
+	}
+	tumble { arg angle; // XZ-plane, in radians
+		^this.asCartesian.tumble(angle).asSpherical
+	}
+	rotateXY { arg angle; // XY-plane,in radians
+		^Spherical.new(rho, theta + angle, phi)
+	}
+	rotateYZ { arg angle; // YZ-plane,in radians
+		^this.asCartesian.tilt(angle).asSpherical
+	}
+	rotateXZ { arg angle; // XZ-plane, in radians
+		^this.asCartesian.tumble(angle).asSpherical
+	}
+
+	// do math as Cartesian
+	// NOTE: it may be useful to consider n-dim complex (tricomplex) numbers here,
+	//		although these aren't directly analogous to complex
+	+ { arg aValue;
+		aValue.isKindOf(SimpleNumber).if(
+			{ ^(this.asCartesian + Cartesian.new(aValue, 0, 0)).asSpherical },
+			{ ^(this.asCartesian + aValue.asCartesian).asSpherical }
+		)
+	}
+	- { arg aValue;
+		aValue.isKindOf(SimpleNumber).if(
+			{ ^(this.asCartesian - Cartesian.new(aValue, 0, 0)).asSpherical },
+			{ ^(this.asCartesian - aValue.asCartesian).asSpherical }
+		)
+	}
+	* { arg aValue;
+		aValue.isKindOf(SimpleNumber).if(
+			{ ^(this.asCartesian * Cartesian.new(aValue, 0, 0)).asSpherical },
+			{ ^(this.asCartesian * aValue.asCartesian).asSpherical }
+		)
+	}
+	/ { arg aValue;
+		aValue.isKindOf(SimpleNumber).if(
+			{ ^(this.asCartesian / Cartesian.new(aValue, 0, 0)).asSpherical },
+			{ ^(this.asCartesian / aValue.asCartesian).asSpherical }
+		)
+	}
+
+	== { arg aSpherical;
+		^aSpherical respondsTo: #[\rho, \theta, \phi ] and:
+			{ rho == aSpherical.rho and:
+				{ theta == aSpherical.theta and:
+					{ phi == aSpherical.phi }
+				}
+			}
+	}
+
+	hash { ^(rho.hash bitXor: theta.hash) bitXor: phi.hash }
+	
+//	neg { ^Spherical.new(rho, theta + pi, phi.neg) }
+	neg { ^Spherical.new(rho, (theta + 2pi).mod(2pi) - pi, phi.neg) }
+	mirrorX { ^this.asCartesian.mirrorX.asSpherical }
+	mirrorY { ^this.asCartesian.mirrorY.asSpherical }
+	mirrorZ { ^Spherical.new(rho, theta, phi.neg) }
+//	mirrorO { ^Spherical.new(rho, theta + pi, phi.neg) }
+	mirrorO { ^Spherical.new(rho, (theta + 2pi).mod(2pi) - pi, phi.neg) }
+
 //	performBinaryOpOnUGen { arg aSelector, aUGen;
 //		^Complex.new(
 //			BinaryOpUGen.new(aSelector, aUGen, this.real),
@@ -49,8 +105,8 @@
 //		);
 //	}
 //
-//	printOn { arg stream;
-//		stream << "Polar( " << rho << ", " << theta << " )";
-//	}
-//	storeArgs { ^[rho,theta] }
-//}
+	printOn { arg stream;
+		stream << "Spherical( " << rho << ", " << theta << ", " << phi << " )";
+	}
+	storeArgs { ^[rho,theta,phi] }
+}
