@@ -1,0 +1,56 @@
+//---------------------------------------------------------------------
+// Joseph Anderson 2011
+//
+// NOTE: include license, etc before public release
+//---------------------------------------------------------------------
+
+//Polar : Number {
+//	var <>rho, <>theta;
+//
+//	*new { arg rho, theta;
+//		^super.newCopyArgs(rho, theta)
+//	}
+//
+//	magnitude { ^rho }
+//
+//	angle { ^theta }
+//	phase { ^theta }
+//
+//	real { ^rho * cos(theta) }
+//	imag { ^rho * sin(theta) }
+//
+//	asPolar { ^this }
+//	asComplex { ^Complex.new(this.real, this.imag) }
+//	asPoint { ^Point.new(this.real, this.imag) }
+//
+//	scale { arg scale;
+//		^Polar.new(rho * scale, theta)
+//	}
+//	rotate { arg angle; // in radians
+//		^Polar.new(rho, theta + angle)
+//	}
+//
+//	// do math as Complex
+//	+ { arg aNumber;  ^this.asComplex + aNumber  }
+//	- { arg aNumber;  ^this.asComplex - aNumber  }
+//  	* { arg aNumber;  ^this.asComplex * aNumber  }
+//	/ { arg aNumber;  ^this.asComplex / aNumber  }
+//
+//	== { arg aPolar;
+//		^aPolar respondsTo: #[\rho, \theta] and: { rho == aPolar.rho and: { theta == aPolar.theta } }
+//	}
+//	
+//	neg { ^Polar.new(rho, theta + pi) }
+//
+//	performBinaryOpOnUGen { arg aSelector, aUGen;
+//		^Complex.new(
+//			BinaryOpUGen.new(aSelector, aUGen, this.real),
+//			BinaryOpUGen.new(aSelector, aUGen, this.imag)
+//		);
+//	}
+//
+//	printOn { arg stream;
+//		stream << "Polar( " << rho << ", " << theta << " )";
+//	}
+//	storeArgs { ^[rho,theta] }
+//}
