@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------
 // Joseph Anderson 2011
 //
-// expansion of Polar to support spherical coordinates
+// extension of Polar to support spherical and cartesian (3d) coordinates
 //
 // NOTE: include license, etc before public release
 //---------------------------------------------------------------------

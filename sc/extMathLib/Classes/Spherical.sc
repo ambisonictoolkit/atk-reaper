@@ -52,31 +52,20 @@ Spherical : Number {
 	}
 
 	// do math as Cartesian
-	// NOTE: it may be useful to consider n-dim complex (tricomplex) numbers here,
-	//		although these aren't directly analogous to complex
+	// NOTE: value returned is different than Polar.sc, which returns complex values.
+	//		One thought was to consider Olariu's 3d complex (tricomplex) numbers here,
+	//		although these aren't directly analogous to complex.
 	+ { arg aValue;
-		aValue.isKindOf(SimpleNumber).if(
-			{ ^(this.asCartesian + Cartesian.new(aValue, 0, 0)).asSpherical },
-			{ ^(this.asCartesian + aValue.asCartesian).asSpherical }
-		)
+		^(this.asCartesian + aValue.asCartesian).asSpherical
 	}
 	- { arg aValue;
-		aValue.isKindOf(SimpleNumber).if(
-			{ ^(this.asCartesian - Cartesian.new(aValue, 0, 0)).asSpherical },
-			{ ^(this.asCartesian - aValue.asCartesian).asSpherical }
-		)
+		^(this.asCartesian - aValue.asCartesian).asSpherical
 	}
 	* { arg aValue;
-		aValue.isKindOf(SimpleNumber).if(
-			{ ^(this.asCartesian * Cartesian.new(aValue, 0, 0)).asSpherical },
-			{ ^(this.asCartesian * aValue.asCartesian).asSpherical }
-		)
+		^(this.asCartesian * aValue.asCartesian).asSpherical
 	}
 	/ { arg aValue;
-		aValue.isKindOf(SimpleNumber).if(
-			{ ^(this.asCartesian / Cartesian.new(aValue, 0, 0)).asSpherical },
-			{ ^(this.asCartesian / aValue.asCartesian).asSpherical }
-		)
+		^(this.asCartesian / aValue.asCartesian).asSpherical
 	}
 
 	== { arg aSpherical;
@@ -90,21 +79,24 @@ Spherical : Number {
 
 	hash { ^(rho.hash bitXor: theta.hash) bitXor: phi.hash }
 	
-//	neg { ^Spherical.new(rho, theta + pi, phi.neg) }
 	neg { ^Spherical.new(rho, (theta + 2pi).mod(2pi) - pi, phi.neg) }
 	mirrorX { ^this.asCartesian.mirrorX.asSpherical }
 	mirrorY { ^this.asCartesian.mirrorY.asSpherical }
 	mirrorZ { ^Spherical.new(rho, theta, phi.neg) }
-//	mirrorO { ^Spherical.new(rho, theta + pi, phi.neg) }
 	mirrorO { ^Spherical.new(rho, (theta + 2pi).mod(2pi) - pi, phi.neg) }
 
-//	performBinaryOpOnUGen { arg aSelector, aUGen;
-//		^Complex.new(
-//			BinaryOpUGen.new(aSelector, aUGen, this.real),
-//			BinaryOpUGen.new(aSelector, aUGen, this.imag)
-//		);
-//	}
-//
+	// do math as Cartesian
+	// NOTE: value returned is different than Polar.sc, which returns complex values.
+	//		One thought was to consider Olariu's 3d complex (tricomplex) numbers here,
+	//		although these aren't directly analogous to complex.
+	performBinaryOpOnUGen { arg aSelector, aUGen;
+		^Cartesian.new(
+			BinaryOpUGen.new(aSelector, aUGen, this.x),
+			BinaryOpUGen.new(aSelector, aUGen, this.y),
+			BinaryOpUGen.new(aSelector, aUGen, this.z)
+		).asSpherical;
+	}
+
 	printOn { arg stream;
 		stream << "Spherical( " << rho << ", " << theta << ", " << phi << " )";
 	}
