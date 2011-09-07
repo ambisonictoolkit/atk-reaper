@@ -146,7 +146,7 @@ Return the distance from the receiver to aCart.
 METHOD:: transpose
 Return a Cartesian point whose x and y coordinates are swapped.
 
-discussion:: Matches the return value for link::Classes/Point::.transpose.
+discussion:: Matches the return value for link::Classes/Point#-transpose::.
 
 METHOD:: transposeXY
 Return a Cartesian point whose x and y coordinates are swapped.
