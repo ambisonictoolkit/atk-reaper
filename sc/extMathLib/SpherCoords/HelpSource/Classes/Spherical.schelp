@@ -1,7 +1,7 @@
 CLASS:: Spherical
 summary:: Spherical coordinates
 categories:: Math
-related:: Polar, Cartesian
+related:: Cartesian, Polar, Point
 
 DESCRIPTION::
 Represents spherical coordinates.
@@ -24,6 +24,8 @@ elevation angle
 
 
 INSTANCEMETHODS::
+
+subsection:: Accessing
 
 METHOD:: rho
 Get or set the rho coordinate value.
@@ -146,14 +148,14 @@ METHOD:: asSpherical
 Returns the receiver.
 
 METHOD:: asPolar
-Convert to Polar, discarding phi.
+Convert to link::Classes/Polar::, discarding phi.
 
 METHOD:: asComplex
-Answers a complex number with x as the real part and y as the imaginary part.
+Answers a link::Classes/Complex:: with x as the real part and y as the imaginary part, discarding phi.
 
 METHOD:: asPoint
-Convert to Point, discarding z.
+Convert to link::Classes/Point::, discarding z.
 
 METHOD:: asCartesian
-Convert to Cartesian.
+Convert to link::Classes/Cartesian::.
 

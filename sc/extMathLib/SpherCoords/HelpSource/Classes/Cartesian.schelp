@@ -1,7 +1,7 @@
 CLASS:: Cartesian
 summary:: Cartesian point in 3D space
 categories:: Geometry
-related:: Point, Spherical
+related:: Spherical, Point, Polar
 
 DESCRIPTION::
 Defines a point in 3D Cartesian space.
@@ -10,10 +10,12 @@ Defines a point in 3D Cartesian space.
 CLASSMETHODS::
 
 METHOD:: new
-Defines a new Cartesian Point.
+Defines a new Cartesian point.
 
 
 INSTANCEMETHODS::
+
+subsection:: Accessing
 
 METHOD:: x
 Get or set the x coordinate value.
@@ -26,7 +28,7 @@ Get or set the z coordinate value.
 
 
 METHOD:: set
-Sets the Cartesian Point x, y and z values.
+Sets the Cartesian point x, y and z values.
 
 subsection:: Testing
 
@@ -43,43 +45,43 @@ METHOD:: +
 Addition.
 
 argument:: delta
-May be a simple number, a Point, an array or a Cartesian Point.
+May be a link::Classes/Number::, a link::Classes/Point::, an link::Classes/Array:: or a Cartesian point.
 
 METHOD:: -
 Subtraction.
 
 argument:: delta
-May be a simple number, a Point, an array or a Cartesian Point.
+May be a link::Classes/Number::, a link::Classes/Point::, an link::Classes/Array:: or a Cartesian point.
 
 METHOD:: *
 Multiplication.
 
 argument:: scale
-May be a simple number, a Point, an array or a Cartesian Point.
+May be a link::Classes/Number::, a link::Classes/Point::, an link::Classes/Array:: or a Cartesian point.
 
 returns:: Cartesian.new(this.x * scale.x, this.y * scale.y, this.z * scale.z)
 
-discussion:: Note that the result of * for a 3D Cartesian Point does not match that of sclang's Point class, where the result is interpreted as the multiplication of complex numbers.
+discussion:: Note that the result of * for a 3D Cartesian point does not match that of link::Classes/Point::, where the result is interpreted as the multiplication of complex numbers.
 
 METHOD:: /
 Division.
 
 argument:: scale
-May be a simple number, a Point, an array or a Cartesian Point.
+May be a link::Classes/Number::, a link::Classes/Point::, an link::Classes/Array:: or a Cartesian point.
 
 returns:: Cartesian.new(this.x / scale.x, this.y / scale.y, this.z / scale.z)
 
-discussion:: Note that the result of / for a 3D Cartesian Point does not match that of sclang's Point class, where the result is interpreted as the division of complex numbers.
+discussion:: Note that the result of / for a 3D Cartesian point does not match that of link::Classes/Point::, where the result is interpreted as the division of complex numbers.
 
 
 METHOD:: translate
-Addition by a Cartesian Point.
+Addition by a Cartesian point.
 
 METHOD:: scale
-Multiplication by a Cartesian Point.
+Multiplication by a Cartesian point.
 
 METHOD:: div
-Division by a Cartesian Point.
+Division by a Cartesian point.
 
 
 METHOD:: rotate
@@ -127,7 +129,7 @@ METHOD:: mirrorO
 Mirror across the origin.
 
 METHOD:: abs
-Absolute value of the Point.
+Absolute value of the point.
 
 METHOD:: rho
 Return the spherical coordinate radius of the receiver.
@@ -142,20 +144,20 @@ METHOD:: dist
 Return the distance from the receiver to aCart.
 
 METHOD:: transpose
-Return a Cartesian Point whose x and y coordinates are swapped.
+Return a Cartesian point whose x and y coordinates are swapped.
 
-discussion:: This matches the return value for Point.transpose.
+discussion:: Matches the return value for link::Classes/Point::.transpose.
 
 METHOD:: transposeXY
-Return a Cartesian Point whose x and y coordinates are swapped.
+Return a Cartesian point whose x and y coordinates are swapped.
 
 discussion:: A synonym for transpose.
 
 METHOD:: transposeYZ
-Return a Cartesian Point whose y and z coordinates are swapped.
+Return a Cartesian point whose y and z coordinates are swapped.
 
 METHOD:: transposeXZ
-Return a Cartesian Point whose x and z coordinates are swapped.
+Return a Cartesian point whose x and z coordinates are swapped.
 
 METHOD:: round
 Round the coordinate values to a multiple of quantum.
@@ -170,19 +172,19 @@ METHOD:: asCartesian
 Returns the receiver.
 
 METHOD:: asPoint
-Returns a Point, discarding z.
+Returns a link::Classes/Point::, discarding z.
 
 METHOD:: asComplex
-Returns a complex number with x as the real part and y as the imaginary part.
+Returns a link::Classes/Complex:: with x as the real part and y as the imaginary part, discarding z.
 
 METHOD:: asPolar
-Returns a Polar value, discarding z.
+Returns a link::Classes/Polar::, discarding z.
 
 METHOD:: asSpherical
-Returns a Spherical value.
+Returns a link::Classes/Spherical::.
 
 METHOD:: asArray
-Returns an Array.
+Returns an link::Classes/Array::.
 
 returns:: [ x, y, z ]
 

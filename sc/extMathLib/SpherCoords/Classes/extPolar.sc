@@ -29,6 +29,7 @@
 	// mirror
 	mirrorX { ^this.asPoint.mirrorX.asPolar }
 	mirrorY { ^this.asPoint.mirrorY.asPolar }
-	mirrorO { ^this.asPoint.mirrorO.asPolar }
+	mirrorZ { ^this }
+	mirrorO { ^this.neg }
 	
 }

@@ -8,6 +8,9 @@
 
 + Point {
 
+	// cartesian support
+	z { ^0 }
+
 	// spherical support
 	phi { ^0.0 }
 
@@ -23,6 +26,7 @@
 	// mirror
 	mirrorX { ^x.neg @ y }
 	mirrorY { ^x @ y.neg }
+	mirrorZ { ^this }
 	mirrorO { ^x.neg @ y.neg }
 	
 }

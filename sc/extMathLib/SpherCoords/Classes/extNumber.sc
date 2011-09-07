@@ -26,6 +26,5 @@
 			{ ^Cartesian.new(this, aValue.x, aValue.y) }
 		)
 		}
-	asCartesian { ^Cartesian.new(this, this, this) }
 	spherical { arg theta, phi; ^Spherical.new(this, theta, phi) }
 }
