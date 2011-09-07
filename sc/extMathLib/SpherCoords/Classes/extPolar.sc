@@ -16,10 +16,6 @@
 	y { this.imag }
 	z { ^0 }
 
-//	// complex support
-//	real { ^this }
-//	imag { ^0.0 }
-
 //	// conversion
 //	asCartesian { ^Cartesian.new(this.x, this.y, 0) }
 ////	@@ { arg aNumber; ^Cartesian.new(this.x, this.y, aNumber) }
@@ -30,9 +26,9 @@
 //		)
 //		}
 		
-//	// mirror
-//	mirrorX { ^x.neg @ y }
-//	mirrorY { ^x @ y.neg }
-//	mirrorO { ^x.neg @ y.neg }
+	// mirror
+	mirrorX { ^this.asPoint.mirrorX.asPolar }
+	mirrorY { ^this.asPoint.mirrorY.asPolar }
+	mirrorO { ^this.asPoint.mirrorO.asPolar }
 	
 }
