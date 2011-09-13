@@ -23,41 +23,10 @@
 // ----------------------------------------// the following functions are not included// as they duplicate muse/ATK functionality////   az2dir()                            : convert azimuth to directon cosines//   degrees()                           : convert radians to degrees//   radians()                           : convert degrees to radians//   gain_to_db()////   rectangular_speaker_arrays()        : example decodes//   hexagonal_speaker_arrays()          : example decodes////
 //// NOTE: speaker_matrix() and velocity_gain_matrix() are the same code.//       It appears these two separate names are used (in error) in Heller's//       code. The expanded version, aes_paper.m defines velocity_gain_matrix(),//       but calls speaker_matrix().////------------------------------------------------------------------------//////------------------------------------------------------------------------// DDT and related decoder matrix gains////   NOTE:   These are the functions that compute gains to generate//           loudspeaker feeds, and are not the functions which return//           decoded B-format. See decoders, below.//////   speaker_matrix                  Heller's DDT (helper function)//   decoder_gain_matrix             Heller's DDT (returns decoder gains)//   panto_reg_decoder_gain_matrix   pantophonic//   peri_reg_decoder_gain_matrix    periphonic//   quad_decoder_gain_matrix        quad////------------------------------------------------------------------------
 
-// NOTE: the addition of a spherical coordinates class (like Polar.sc)
-//		to convert between spherical and cartesian coordinates
-//		will replace the following global functions, and improve
-//		usability -------> TBD!!
-(
-	~spherToCart = { arg spher;		// [ r, theta, phi ]
-			var r, theta, phi;
-			
-			r 		= spher.at(0);
-			theta	= spher.at(1);
-			phi 		= spher.at(2);
-		
-			[
-				r * phi.cos * theta.cos,
-				r * phi.cos * theta.sin,
-				r * phi.sin
-			]
-		};
-
-	~cartToSpher = { arg cart;		// [ x, y, z ]
-			var x, y, z;
-			
-			x = cart.at(0);
-			y = cart.at(1);
-			z = cart.at(2);
-			
-			[
-				(x.squared + y.squared + z.squared).sqrt,
-				y.atan2(x),
-				z.atan2((x.squared + y.squared).sqrt)
-			]
-		};
-
-)
-
+// NOTE: The Spherical and Cartesian classes (sclang extensions) are required
+//		for peri_reg_decoder_gain_matrix(). Additionally, these classes are
+//		necessary from a usability perspective to specify speaker positions
+//		(with correct radii) for decoder_gain_matrix(), the DDT decoder
 
 
 //   speaker_matrix                  Heller's DDT (helper function)
@@ -176,15 +145,19 @@
 		if ( orientation == 'flat',
 			{ theta = theta + (pi / numSpeakerPairs) });       // 'flat' case
 
-		// convert to spherical coordinates [ [r], [theta], [phi] ]...
+		// convert to spherical coordinates [ [r, theta, phi], ... ]
 		spher = [
 			Array.newClear(numSpeakerPairs).fill(1),
 			theta,
 			Array.newClear(numSpeakerPairs).fill(elevation)
-		];
+		].flop;
 		
-		// . . . then convert from spherical to cartesian [ [x, y, z] ]
-		positions = Matrix.with(~spherToCart.value(spher)).flop;
+		// . . . then convert from spherical to cartesian [ [x, y, z], ... ]
+		positions = Matrix.with(
+			spher.collect({ arg item;
+				Spherical.new(item.at(0), item.at(1), item.at(2)).asCartesian.asArray
+			})
+		);
 
 		// compute the decoder
 		decoderMatrix = ~atkDecoderGainMatrix.value(positions, k);
@@ -445,7 +418,7 @@
 //	k = 2.sqrt.reciprocal;
 
 //	~atkSpeakerMatrix.value(positions, k);
-	~atkDecoderGainMatrix.value(positions, k);
+//	~atkDecoderGainMatrix.value(positions, k);
 
 //	~atkPantoRegDecoderGainMatrix.value(4, 'flat', k);
 //	~atkPantoRegDecoderGainMatrix.value(4, 'point', k);
@@ -454,7 +427,7 @@
 //	~atkPantoRegDecoderGainMatrix.value(6, 'flat', k);
 //	~atkPantoRegDecoderGainMatrix.value(6, 'point', k);
 
-//	~atkPeriRegDecoderGainMatrix.value(3, pi/3, 'flat', k);
+	~atkPeriRegDecoderGainMatrix.value(3, pi/3, 'flat', k);
 //	~atkPeriRegDecoderGainMatrix.value(3, pi/3, 'point', k);
 //	~atkPeriRegDecoderGainMatrix.value(4, pi/3, 'flat', k);
 //	~atkPeriRegDecoderGainMatrix.value(4, pi/3, 'point', k);
