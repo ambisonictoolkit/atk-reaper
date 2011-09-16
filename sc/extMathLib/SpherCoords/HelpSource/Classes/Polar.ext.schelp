@@ -39,6 +39,16 @@ discussion:: A synonym for neg.
 
 subsection:: Conversion
 
+METHOD:: angles
+Answer the azimuth and elevation angles, theta and phi, in radians.
+
+returns:: [ theta, 0 ]
+
+METHOD:: phases
+Answer the azimuth and elevation angles, theta and phi, in radians.
+
+returns:: [ theta, 0 ]
+
 METHOD:: x
 Answer the cartesian coordinate x of the receiver.
 

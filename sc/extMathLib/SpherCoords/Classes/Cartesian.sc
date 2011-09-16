@@ -18,7 +18,7 @@ Cartesian {
 	asCartesian { ^this }
 	asPoint { ^Point.new(x,y) }					// implemented as a projection
 	asComplex { ^Complex.new(x,y) }				// implemented as a projection
-	asPolar { ^Polar.new(this.rho, this.theta) }	// implemented as a projection
+	asPolar { ^Point.new(x,y).asPolar }			// implemented as a projection
 	asSpherical { ^Spherical.new(this.rho, this.theta, this.phi) }	asRect { ^Rect.new(0,0,x,y) }				// implemented as a projection
 	asArray { ^[this.x, this.y, this.z] }
 
@@ -111,6 +111,9 @@ Cartesian {
 	rho { ^(x.squared + y.squared + z.squared).sqrt }
 	theta { ^atan2(y, x) }
 	phi { ^atan2(z, (x.squared + y.squared).sqrt) }
+
+	angle { ^this.theta }					// implemented as a projection
+	angles { ^[ this.theta, this.phi] }
 
 	dist { arg aCart;
 		aCart = aCart.asCartesian;

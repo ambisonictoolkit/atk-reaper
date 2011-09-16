@@ -140,6 +140,14 @@ Return the spherical coordinate azimuth angle of the receiver.
 METHOD:: phi
 Return the spherical coordinate elevation angle of the receiver.
 
+METHOD:: angle
+Return the spherical coordinate azimuth angle of the receiver.
+
+METHOD:: angles
+Return the spherical coordinate azimuth and elevation angles of the receiver.
+
+returns:: [ theta, phi]
+
 METHOD:: dist
 Return the distance from the receiver to aCart.
 

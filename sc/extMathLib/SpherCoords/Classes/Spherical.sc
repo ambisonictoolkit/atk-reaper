@@ -25,7 +25,7 @@ Spherical : Number {
 	imag { ^this.y }
 
 	asSpherical { ^this }
-	asPolar { ^Polar.new(rho, theta) }				// implemented as a projection
+	asPolar { ^this.asPoint.asPolar }				// implemented as a projection
 	asComplex { ^Complex.new(this.real, this.imag) }	// implemented as a projection
 	asPoint { ^Point.new(this.x, this.y) }			// implemented as a projection
 	asCartesian { ^Cartesian.new(this.x, this.y, this.z) }

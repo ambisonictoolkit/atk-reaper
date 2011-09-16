@@ -148,10 +148,10 @@ METHOD:: asSpherical
 Returns the receiver.
 
 METHOD:: asPolar
-Convert to link::Classes/Polar::, discarding phi.
+Convert to link::Classes/Polar::, discarding z.
 
 METHOD:: asComplex
-Answers a link::Classes/Complex:: with x as the real part and y as the imaginary part, discarding phi.
+Answers a link::Classes/Complex:: with x as the real part and y as the imaginary part, discarding z.
 
 METHOD:: asPoint
 Convert to link::Classes/Point::, discarding z.

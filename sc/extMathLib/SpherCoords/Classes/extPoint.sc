@@ -8,11 +8,14 @@
 
 + Point {
 
+	angle { ^this.theta }
+
 	// cartesian support
 	z { ^0 }
 
 	// spherical support
 	phi { ^0.0 }
+	angles { ^[ this.theta, 0.0 ] }
 
 	// conversion
 	asCartesian { ^Cartesian.new(this.x, this.y, 0) }

@@ -10,6 +10,8 @@
 
 	// spherical support
 	phi { ^0.0 }
+	angles { ^[ this.theta, 0.0 ] }
+	phases { ^[ this.theta, 0.0 ] }
 	
 	// Point, Cartesian
 	x { this.real }
