@@ -39,6 +39,15 @@ discussion:: A synonym for neg.
 
 subsection:: Conversion
 
+METHOD:: asSpherical
+Convert to Spherical
+
+METHOD:: asCartesian
+Convert to Cartesian
+
+METHOD:: angles
+Answer the azimuth and elevation angles, theta and phi, in radians.
+
 METHOD:: angles
 Answer the azimuth and elevation angles, theta and phi, in radians.
 

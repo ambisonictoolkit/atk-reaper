@@ -1,9 +1,18 @@
+/*
+Copyright the ATK Community and Joseph Anderson, 2011
+	J Anderson	j.anderson@ambisonictoolkit.net 
+
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //---------------------------------------------------------------------
-// Joseph Anderson 2011
-//
-// extension of Polar to support spherical and cartesian (3d) coordinates
-//
-// NOTE: include license, etc before public release
+// 	Extension: Polar
+//	Support for spherical and cartesion (3d) coordinates
 //---------------------------------------------------------------------
 
 + Polar {
@@ -14,19 +23,13 @@
 	phases { ^[ this.theta, 0.0 ] }
 	
 	// Point, Cartesian
-	x { this.real }
-	y { this.imag }
+	x { ^this.real }
+	y { ^this.imag }
 	z { ^0 }
 
-//	// conversion
-//	asCartesian { ^Cartesian.new(this.x, this.y, 0) }
-////	@@ { arg aNumber; ^Cartesian.new(this.x, this.y, aNumber) }
-//	@ { arg aValue;								// overload default method
-//		aValue.isNumber.if(
-//			{ ^Cartesian.new(this.x, this.y, aValue) },
-//			{ ^Rect.fromPoints(this, aValue) }		// default SC
-//		)
-//		}
+	// conversion
+	asSpherical { ^Spherical.new(this.rho, this.theta, 0.0) }
+	asCartesian { ^Cartesian.new(this.real, this.imag, 0.0) }
 		
 	// mirror
 	mirrorX { ^this.asPoint.mirrorX.asPolar }
