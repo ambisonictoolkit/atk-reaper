@@ -1,0 +1,18 @@
+This is the [SOFTWARE PLATFORM] version of the Ambisonic Toolkit (ATK).
+
+Copyright the ATK Community and [DEVELOPER NAME(S)], [YEAR(S)]
+	[DEVELOPER_1 NAME]	[[DEVELOPER_1 NAME EMAIL]] 
+	[DEVELOPER_2 NAME]	[[DEVELOPER_2 NAME EMAIL]] 
+	[DEVELOPER_3 NAME]	[[DEVELOPER_3 NAME EMAIL]] 
+
+------------------------------------------------------------------------
+
+
+The Ambisonic Toolkit (ATK) is intended to bring together a number of tools and methods for working with Ambisonic surround sound. The intention is for the toolset to be both ergonomic and comprehensive, providing both classic and novel algorithms to creatively manipulate and synthesise complex Ambisonic soundfields.
+
+The tools are framed for the user to think in terms of the soundfield kernel. By this, it is meant the ATK addresses the holistic problem of creatively controlling a complete soundfield, allowing and encouraging the composer to think beyond the placement of sounds in a sound-space and instead attend to the impression and image of a soundfield. This approach takes advantage of the model the Ambisonic technology presents, and is viewed to be the idiomatic mode for working with the Ambisonic technique.
+
+
+We hope you enjoy the ATK!
+
+For more information visit http://ambisonictoolkit.net/ or email info@ambisonictoolkit.net
