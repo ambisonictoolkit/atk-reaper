@@ -14,7 +14,7 @@ p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0p
 p.p6 {margin: 0.0px 0.0px 16.0px 0.0px; font: 12.0px Helvetica}
 p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 16.0px Times; min-height: 19.0px}
 span.s1 {font: 18.0px Helvetica}
-span.s2 {text-decoration: underline}
+span.s2 {font: 12.0px Arial; color: #3332aa}
 span.Apple-tab-span {white-space:pre}
 </style>
 </head>
@@ -27,19 +27,19 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2">Part of SpherCoords, a spherical and 3D cartesian coordinate support library.</p>
 <p class="p3"><br></p>
 <p class="p3"><br></p>
-<p class="p2">See also: Spherical, Polar, Point</p>
+<p class="p2">See also: <a href="Spherical.html">Spherical</a>, <a href="../../../../../../../../Library/Application Support/SuperCollider/Help/Polar.html"><span class="s2">Polar</span></a>, <a href="Point.html">Point</a></p>
 <p class="p3"><br></p>
 <p class="p2">Credits: Joseph Anderson, 2011 [j.anderson[at]ambisonictoolkit.net]</p>
 <p class="p3"><br></p>
 <p class="p3"><br></p>
-<p class="p4"><b><span class="s2">Creation</span></b></p>
+<p class="p4"><b>Creation</b></p>
 <p class="p3"><br></p>
 <p class="p2"><b>new(inX, inY,inZ)</b></p>
 <p class="p3"><br></p>
 <p class="p2">Defines a new Cartesian point.</p>
 <p class="p3"><br></p>
-<p class="p5"><b><span class="s2"></span></b><br></p>
-<p class="p4"><b><span class="s2">Accessing</span></b></p>
+<p class="p5"><br></p>
+<p class="p4"><b>Accessing</b></p>
 <p class="p3"><br></p>
 <p class="p2"><b>x</b></p>
 <p class="p3"><br></p>
@@ -52,7 +52,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2"><b>Z</b></p>
 <p class="p3"><br></p>
 <p class="p2">Get the y coordinate value.</p>
-<p class="p3"><b></b><br></p>
+<p class="p3"><br></p>
 <p class="p2"><b>x_(aValue)</b></p>
 <p class="p3"><br></p>
 <p class="p2">Set the x coordinate value.</p>
@@ -64,12 +64,12 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2"><b>z_(aValue)</b></p>
 <p class="p3"><br></p>
 <p class="p2">Set the z coordinate value.</p>
-<p class="p3"><b></b><br></p>
+<p class="p3"><br></p>
 <p class="p2"><b>set(inX, inY,inZ)</b></p>
 <p class="p3"><br></p>
 <p class="p6">Sets the Cartesian point x, y and z values.</p>
 <p class="p5"><br></p>
-<p class="p4"><b><span class="s2">Testing</span></b></p>
+<p class="p4"><b>Testing</b></p>
 <p class="p3"><br></p>
 <p class="p2"><b>== aPoint</b></p>
 <p class="p3"><br></p>
@@ -80,7 +80,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2">returns a hash value for the receiver.</p>
 <p class="p3"><br></p>
 <p class="p3"><br></p>
-<p class="p4"><b><span class="s2">Math</span></b></p>
+<p class="p4"><b>Math</b></p>
 <p class="p3"><br></p>
 <p class="p2"><b>+ aCartesianOrPointOrScalar</b></p>
 <p class="p3"><br></p>
@@ -96,7 +96,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><br></p>
 <p class="p2">Returns: Cartesian.new(this.x * scale.x, this.y * scale.y, this.z * scale.z)</p>
 <p class="p3"><br></p>
-<p class="p2">Note that the result of * for a 3D Cartesian point does not match that of Point, where the result is interpreted as the multiplication of complex numbers.</p>
+<p class="p2">Note that the result of * for a 3D Cartesian point does not match that of <a href="Point.html">Point</a>, where the result is interpreted as the multiplication of complex numbers.</p>
 <p class="p3"><br></p>
 <p class="p3"><br></p>
 <p class="p2"><b>/ aCartesianOrPointOrScalar</b></p>
@@ -105,7 +105,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><br></p>
 <p class="p2">Returns: Cartesian.new(this.x / scale.x, this.y / scale.y, this.z / scale.z)</p>
 <p class="p3"><br></p>
-<p class="p2">Note that the result of / for a 3D Cartesian point does not match that of Point, where the result is interpreted as the division of complex numbers.</p>
+<p class="p2">Note that the result of / for a 3D Cartesian point does not match that of <a href="Point.html">Point</a>, where the result is interpreted as the division of complex numbers.</p>
 <p class="p3"><br></p>
 <p class="p2"><b>translate(aCartesian)</b></p>
 <p class="p3"><br></p>
@@ -167,7 +167,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2">Return the spherical coordinate elevation angle of the receiver.</p>
 <p class="p3"><br></p>
 <p class="p2"><b>angle</b></p>
-<p class="p3"><b></b><br></p>
+<p class="p3"><br></p>
 <p class="p2">Return the spherical coordinate azimuth angle of the receiver.</p>
 <p class="p3"><br></p>
 <p class="p2"><b>angles</b></p>
@@ -182,7 +182,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><br></p>
 <p class="p2">Return a Cartesian point whose x and y coordinates are swapped.</p>
 <p class="p3"><br></p>
-<p class="p2">Discussion: Matches the return value for Point.transpose.</p>
+<p class="p2">Discussion: Matches the return value for <a href="Point.html">Point</a>.transpose.</p>
 <p class="p3"><br></p>
 <p class="p2"><b>transpose</b></p>
 <p class="p3"><br></p>
@@ -197,17 +197,17 @@ span.Apple-tab-span {white-space:pre}
 <p class="p2"><b>transposeXZ</b></p>
 <p class="p3"><br></p>
 <p class="p2">Return a Cartesian point whose x and z coordinates are swapped.</p>
-<p class="p3"><b></b><br></p>
+<p class="p3"><br></p>
 <p class="p2"><b>round(quantum)</b></p>
 <p class="p3"><br></p>
 <p class="p2">Round the coordinate values to a multiple of quantum.</p>
-<p class="p3"><b></b><br></p>
+<p class="p3"><br></p>
 <p class="p2"><b>trunc(quantum)</b></p>
 <p class="p3"><br></p>
 <p class="p2">Truncate the coordinate values to a multiple of quantum.</p>
 <p class="p8"><br></p>
 <p class="p8"><br></p>
-<p class="p4"><b><span class="s2">Conversion</span></b></p>
+<p class="p4"><b>Conversion</b></p>
 <p class="p5"><br></p>
 <p class="p2"><b>asCartesian</b></p>
 <p class="p3"><br></p>
@@ -215,7 +215,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><br></p>
 <p class="p2"><b>asPoint</b></p>
 <p class="p3"><br></p>
-<p class="p2">Returns a Point, discarding z.</p>
+<p class="p2">Returns a <a href="Point.html">Point</a>, discarding z.</p>
 <p class="p3"><br></p>
 <p class="p2"><b>asComplex</b></p>
 <p class="p3"><br></p>
@@ -223,11 +223,11 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><br></p>
 <p class="p2"><b>asPolar</b></p>
 <p class="p3"><br></p>
-<p class="p2">Returns a Polar, discarding z.</p>
+<p class="p2">Returns a <a href="../../../../../../../../Library/Application Support/SuperCollider/Help/Polar.html"><span class="s2">Polar</span></a>, discarding z.</p>
 <p class="p3"><br></p>
 <p class="p2"><b>asSpherical</b></p>
 <p class="p3"><br></p>
-<p class="p2">Returns a Spherical.</p>
+<p class="p2">Returns a <a href="Spherical.html">Spherical</a>.</p>
 <p class="p3"><br></p>
 <p class="p2"><b>asArray</b></p>
 <p class="p3"><br></p>

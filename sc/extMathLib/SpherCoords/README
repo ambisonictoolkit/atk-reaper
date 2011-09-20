@@ -5,5 +5,34 @@ Copyright the ATK Community and Joseph Anderson, 2011
 
 ------------------------------------------------------------------------
 
+SpherCoords consists of the following files.
+
+sc-lang classes:
+	Cartesian.sc
+	Spherical.sc
+	extNumber.sc
+	extPoint.sc
+	extPolar.sc
+	extSequenceableCollection.sc
+	extSimpleNumber.sc
+
+'old style' html help:
+	Cartesian.html
+	Spherical.html
+	extNumber.html
+	extPoint.html
+	extPolar.html
+
+
+'new style' SCDoc help:
+	Cartesian.schelp
+	Spherical.schelp
+	Point.ext.schelp
+	SimpleNumber.ext.schelp
+	Number.ext.schelp
+	Polar.ext.schelp
+
+
+
 For more information visit http://ambisonictoolkit.net/ or
 email info[at]ambisonictoolkit.net
