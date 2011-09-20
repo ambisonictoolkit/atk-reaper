@@ -184,10 +184,19 @@ AtkSpeakerMatrix {
 }
 
 
-////   decoder_gain_matrix             Heller's DDT (returns decoder gains)
-////   panto_reg_decoder_gain_matrix   pantophonic
-////   peri_reg_decoder_gain_matrix    periphonic
-////   quad_decoder_gain_matrix        quad
+//   decoder_gain_matrix             Heller's DDT (returns decoder gains)
+//   panto_reg_decoder_gain_matrix   pantophonic
+//   peri_reg_decoder_gain_matrix    periphonic
+//   quad_decoder_gain_matrix        quad
+
+//   b_to_ITU5					Wiggins coefficients (Single Band Decoders)
+//   b_to_7           				Wiggins coefficients (Single Band Decoders)
+
+//	b_to_stereo					virtual stereo microphone decoding
+//	b_to_mono						virtual mono microphone decoding
+
+//	b_to_uhj            			"Ambisonic Decoders for HDTV" (1992)
+//	b_to_binaural       			HRTF decoding
 AtkDecoderMatrix {
 	var <k, <kind, decoderMatrix;
 
@@ -201,25 +210,35 @@ AtkDecoderMatrix {
 	var up, down;
 	var <angle;						// quadraphonic
 	var alpha, beta;
-		
+	var <pattern;						// stereo
+	var gamma;
+	var phi;							// mono
 
 	*newDiametric { arg directions, k;
 		^super.newCopyArgs(k, 'diametric').initDiametric(directions);
 	}
 	
-	*newPantophonic { arg numSpeakers, orientation, k;
-		^super.newCopyArgs(k, 'pantophonic').initPantophonic(numSpeakers, orientation);
+	*newPanto { arg numSpeakers, orientation, k;
+		^super.newCopyArgs(k, 'panto').initPanto(numSpeakers, orientation);
 	}
 	
-	*newPeriphonic { arg numSpeakerPairs, elevation, orientation, k;
-		^super.newCopyArgs(k, 'periphonic').initPeriphonic(numSpeakerPairs, elevation,
+	*newPeri { arg numSpeakerPairs, elevation, orientation, k;
+		^super.newCopyArgs(k, 'peri').initPeri(numSpeakerPairs, elevation,
 			orientation);
 	}
 	
-	*newQuadraphonic { arg angle, k;
-		^super.newCopyArgs(k, 'quadraphonic').initQuadraphonic(angle);
+	*newQuad { arg angle, k;
+		^super.newCopyArgs(k, 'quad').initquad(angle);
 	}
 	
+	*newStereo { arg angle, pattern;
+		^super.newCopyArgs(nil, 'stereo').initStereo(angle, pattern);
+	}
+
+	*newMono { arg theta, phi, pattern;
+		^super.newCopyArgs(nil, 'mono').initMono(theta, phi, pattern); // set a k?
+	}
+
 	initDiametric { arg directions;
 
 		switch (directions.rank,					// 2D or 3D?
@@ -256,7 +275,7 @@ AtkDecoderMatrix {
 		n = sm.cols;
 	}
 	
-	initPantophonic { arg numSpeaks, orient;
+	initPanto { arg numSpeaks, orient;
 		numSpeakers = numSpeaks;
 		orientation = orient;
 	    	g0 = 1.0;
@@ -269,9 +288,15 @@ AtkDecoderMatrix {
 				'point',	{ ((2.0 * speaker)/numSpeakers) * pi }
 			)
 		};
+		
+//		// n = number of speakers
+//	    	// m = number of dimensions,
+//		//        2=horizontal, 3=periphonic 
+//		m = 2;
+//		n = numSpeaks;
 	}
 	
-	initPeriphonic { arg numSpeakPairs, elev, orient;
+	initPeri { arg numSpeakPairs, elev, orient;
 		numSpeakerPairs = numSpeakPairs;
 		elevation = elev;
 		orientation = orient;
@@ -291,27 +316,66 @@ AtkDecoderMatrix {
 			theta,
 			Array.newClear(numSpeakerPairs).fill(elevation)
 		].flop;
+
+//		// n = number of speakers
+//	    	// m = number of dimensions,
+//		//        2=horizontal, 3=periphonic 
+//		m = 3;
+//		n = numSpeakPairs * 2;
 	}
 	
-	initQuadraphonic { arg ang;
+	initQuad { arg ang;
 		angle = ang;
+
+//		// n = number of speakers
+//	    	// m = number of dimensions,
+//		//        2=horizontal, 3=periphonic 
+//		m = 2;
+//		n = 4;
 	}
 	
+	initStereo { arg ang, pat;
+		angle = ang;
+		pattern = pat;
+
+//		// n = number of speakers
+//	    	// m = number of dimensions,
+//		//        2=horizontal, 3=periphonic 
+//		m = 2;
+//		n = 2;
+	}
+	
+	initMono { arg th, ph, pat;
+		theta = th;
+		phi = ph;
+		pattern = pat;
+
+//		// n = number of speakers
+//	    	// m = number of dimensions,
+//		//        2=horizontal, 3=periphonic 
+//		m = 3;
+//		n = 1;
+	}
+
 	dim {
 		switch (kind,
 			'diametric',		{ ^AtkSpeakerMatrix.newPositions(positions, k).dim },
-			'pantophonic',	{ ^2 },
-			'periphonic',		{ ^3 },
-			'quadraphonic',	{ ^2 }
+			'panto',	{ ^2 },
+			'peri',	{ ^3 },
+			'quad',	{ ^2 },
+			'stereo',	{ ^1 },
+			'mono',	{ ^0 }
 		) 
 	}
 
 	numSpeakers {
 		switch (kind,
 			'diametric',		{ ^AtkSpeakerMatrix.newPositions(positions, k).numSpeakers },
-			'pantophonic',	{ ^numSpeakers },
-			'periphonic',		{ ^numSpeakers },
-			'quadraphonic',	{ ^4 }
+			'panto',	{ ^numSpeakers },
+			'peri',	{ ^numSpeakers },
+			'quad',	{ ^4 },
+			'stereo',	{ ^2 },
+			'mono',	{ ^1 }
 		) 
 	}
 	
@@ -330,13 +394,13 @@ AtkDecoderMatrix {
 				);
 			},
 
-			'pantophonic', {
+			'panto', {
 				^(numSpeakers.collect({ arg i;
 					theta.value(i)
 				}) + pi).mod(2pi) - pi;
 			},
 
-			'periphonic', {
+			'peri', {
 				up = (directions + pi).mod(2pi) - pi;
 				
 				down = up.collect({ arg angles;
@@ -350,7 +414,9 @@ AtkDecoderMatrix {
 				
 				^up ++ down;
 			},
-			'quadraphonic', { ^[ angle, pi - angle, (pi - angle).neg, angle.neg] }
+			'quad', { ^[ angle, pi - angle, (pi - angle).neg, angle.neg ] },
+			'stereo', { ^[ pi/6, pi.neg/6 ] },
+			'mono', { ^[ 0 ] }
 		) 
 	}
 
@@ -378,9 +444,9 @@ AtkDecoderMatrix {
 				^2.sqrt/n * decoderMatrix.flop;
 			},
 
-			'pantophonic', {
+			'panto', {
 
-				// calculate decoding matrix
+				// build decoder matrix 
 				decoderMatrix = Matrix.newClear(numSpeakers, 3); // start w/ empty matrix
 			
 				numSpeakers.do({ arg i;
@@ -395,9 +461,9 @@ AtkDecoderMatrix {
 				^2.sqrt/numSpeakers * decoderMatrix
 			},
 
-			'periphonic',	{
+			'peri',	{
 		
-				// compute the decoder
+				// build decoder matrix 
 				decoderMatrix = AtkDecoderMatrix.newDiametric(directions, k).matrix;
 
 				// reorder the lower polygon
@@ -414,22 +480,56 @@ AtkDecoderMatrix {
 				^decoderMatrix
 			},
 
-			'quadraphonic', {
+			'quad', {
 
 				// calculate alpha, beta (scaled by k)
-				alpha   = k / (2.sqrt * angle.cos);
-				beta    = k / (2.sqrt * angle. sin);
+				alpha	= k / (2.sqrt * angle.cos);
+				beta		= k / (2.sqrt * angle. sin);
 		
 		
-				// fill decoding matrix
+				// build decoder matrix 
 			    decoderMatrix = Matrix.with([
-			    		[1, alpha, beta],
-			        	[1, alpha.neg, beta],
-			        	[1, alpha.neg, beta.neg],
-			        	[1, alpha, beta.neg]
+			    		[ 1, alpha, 		beta 	],
+			        	[ 1, alpha.neg, 	beta 	],
+			        	[ 1, alpha.neg, 	beta.neg	],
+			        	[ 1, alpha, 		beta.neg	]
 			    ]);
 			    
 			    ^2.sqrt/4 * decoderMatrix
+			},
+
+			'stereo', {
+
+				// calculate alpha, beta, gamma (scaled by pattern)
+				alpha	= pattern * angle.cos;
+				beta		= pattern * angle.sin;
+				gamma	= (1.0 - pattern) * 2.sqrt;
+		
+				// build decoder matrix 
+			    decoderMatrix = Matrix.with([
+			    		[ gamma, alpha, beta		],
+			        	[ gamma, alpha, beta.neg	]
+			    ]);
+			    
+			    ^decoderMatrix
+			},
+
+			'mono', {
+
+				// calculate gamma (scaled by pattern)
+				gamma	= (1.0 - pattern) * 2.sqrt;
+
+				// build decoder matrix 
+			    decoderMatrix = Matrix.with([
+			    		[
+			    			gamma,
+			    			pattern * theta.cos * phi.cos,
+			    			pattern * theta.sin * phi.cos,
+			    			pattern * phi.sin
+			    		]
+			    ]);
+			    
+			    ^decoderMatrix
 			}
 		) 
 	}
