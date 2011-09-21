@@ -231,7 +231,7 @@ AtkDecoderMatrix {
 	}
 	
 	*newQuad { arg angle, k;
-		^super.newCopyArgs(k, 'quad').initquad(angle);
+		^super.newCopyArgs(k, 'quad').initQuad(angle);
 	}
 	
 	*newStereo { arg angle, pattern;
