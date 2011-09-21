@@ -183,6 +183,11 @@ AtkSpeakerMatrix {
 	}
 }
 
+//   speaker_kernel                  (helper function)
+//	*put together a kernel helper function?
+//AtkSpeakerKernel {
+
+
 
 //   decoder_gain_matrix             Heller's DDT (returns decoder gains)
 //   panto_reg_decoder_gain_matrix   pantophonic
@@ -195,8 +200,6 @@ AtkSpeakerMatrix {
 //	b_to_stereo					virtual stereo microphone decoding
 //	b_to_mono						virtual mono microphone decoding
 
-//	b_to_uhj            			"Ambisonic Decoders for HDTV" (1992)
-//	b_to_binaural       			HRTF decoding
 AtkDecoderMatrix {
 	var <k, <kind, decoderMatrix;
 
@@ -281,19 +284,14 @@ AtkDecoderMatrix {
 	    	g0 = 1.0;
 	    	g1 = 2.sqrt;
 
-		// define function to return theta from speaker number
-		theta = { arg speaker;
+		// return theta from speaker number
+		theta = numSpeakers.collect({ arg speaker;
 			switch (orientation,
 				'flat',	{ ((1.0 + (2.0 * speaker))/numSpeakers) * pi },
 				'point',	{ ((2.0 * speaker)/numSpeakers) * pi }
 			)
-		};
-		
-//		// n = number of speakers
-//	    	// m = number of dimensions,
-//		//        2=horizontal, 3=periphonic 
-//		m = 2;
-//		n = numSpeaks;
+		});
+		theta = (theta + pi).mod(2pi) - pi;
 	}
 	
 	initPeri { arg numSpeakPairs, elev, orient;
@@ -316,45 +314,21 @@ AtkDecoderMatrix {
 			theta,
 			Array.newClear(numSpeakerPairs).fill(elevation)
 		].flop;
-
-//		// n = number of speakers
-//	    	// m = number of dimensions,
-//		//        2=horizontal, 3=periphonic 
-//		m = 3;
-//		n = numSpeakPairs * 2;
 	}
 	
 	initQuad { arg ang;
 		angle = ang;
-
-//		// n = number of speakers
-//	    	// m = number of dimensions,
-//		//        2=horizontal, 3=periphonic 
-//		m = 2;
-//		n = 4;
 	}
 	
 	initStereo { arg ang, pat;
 		angle = ang;
 		pattern = pat;
-
-//		// n = number of speakers
-//	    	// m = number of dimensions,
-//		//        2=horizontal, 3=periphonic 
-//		m = 2;
-//		n = 2;
 	}
 	
 	initMono { arg th, ph, pat;
 		theta = th;
 		phi = ph;
 		pattern = pat;
-
-//		// n = number of speakers
-//	    	// m = number of dimensions,
-//		//        2=horizontal, 3=periphonic 
-//		m = 3;
-//		n = 1;
 	}
 
 	dim {
@@ -395,9 +369,7 @@ AtkDecoderMatrix {
 			},
 
 			'panto', {
-				^(numSpeakers.collect({ arg i;
-					theta.value(i)
-				}) + pi).mod(2pi) - pi;
+				^theta;
 			},
 
 			'peri', {
@@ -452,8 +424,8 @@ AtkDecoderMatrix {
 				numSpeakers.do({ arg i;
 					decoderMatrix.putRow(i, [
 						g0,
-			              k * g1 * theta.value(i).cos,
-			              k * g1 * theta.value(i).sin
+			              k * g1 * theta.at(i).cos,
+			              k * g1 * theta.at(i).sin
 					])
 					});
 				
@@ -534,3 +506,10 @@ AtkDecoderMatrix {
 		) 
 	}
 }
+
+
+//	b_to_uhj            			"Ambisonic Decoders for HDTV" (1992)
+//	b_to_binaural       			HRTF decoding
+
+// kernel matrix for kernel decoders
+//AtkDecoderKernel {
