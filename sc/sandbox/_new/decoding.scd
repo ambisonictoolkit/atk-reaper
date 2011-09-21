@@ -16,10 +16,6 @@
 
 //------------------------------------------------------------------------// Single Band Diametric Decoder////   decode_sbd//   quad_sbd//------------------------------------------------------------------------
 
-//------------------------------------------------------------------------// Dual Band Regular Decoders////   panto_dbr           pantophonic//   peri_dbr            periphonic//------------------------------------------------------------------------
-
-//------------------------------------------------------------------------// Dual Band Diametric Decoder////   decode_dbd//   quad_dbd//------------------------------------------------------------------------
-
 
 // -------------------------------------------------------
 // test (decoders built using Mix.ar)
@@ -49,10 +45,6 @@
 
 
 	// decode to output
-//	#fl, bl, br, fr = Mix.fill( decoderMatrix.matrix.cols, { arg speaker;
-//		decoderMatrix.matrix.flop.asArray.at(speaker) * sig.at(speaker)
-//	});
-
 	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
 
 	[fl, fr, bl, br]		// reorder output to match speaker arrangement
@@ -84,10 +76,6 @@
 
 
 	// decode to output
-//	#fl, fr, br, bl = Mix.fill( decoderMatrix.matrix.cols, { arg speaker;
-//		decoderMatrix.matrix.flop.asArray.at(speaker) * sig.at(speaker)
-//	});
-
 	#fl, fr, br, bl = AtkDecode.ar(sig, decoderMatrix);
 
 	[fl, fr, bl, br]		// reorder output to match speaker arrangement
@@ -120,10 +108,6 @@
 
 
 	// decode to output
-//	#fl, bl, br, fr = Mix.fill( decoderMatrix.matrix.cols, { arg speaker;
-//		decoderMatrix.matrix.flop.asArray.at(speaker) * sig.at(speaker)
-//	});
-
 	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
 
 	[fl, fr, bl, br]		// reorder output to match speaker arrangement
@@ -157,10 +141,6 @@
 
 
 	// decode to output
-//	#flu, blu, bru, fru, fld, bld, brd, frd = Mix.fill( decoderMatrix.matrix.cols, { arg speaker;
-//		decoderMatrix.matrix.flop.asArray.at(speaker) * sig.at(speaker)
-//	});
-
 	#flu, blu, bru, fru, fld, bld, brd, frd = AtkDecode.ar(sig, decoderMatrix);
 
 	[flu, fru, blu, bru]		// reorder output to match speaker arrangement
@@ -192,10 +172,6 @@
 
 
 	// decode to output
-//	Mix.fill( decoderMatrix.matrix.cols, { arg speaker;
-//		decoderMatrix.matrix.flop.asArray.at(speaker) * sig.at(speaker)
-//	});
-
 	AtkDecode.ar(sig, decoderMatrix);
 
 }.scope;
@@ -223,12 +199,64 @@
 	sig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
 
 
-//	// decode to output
-//	Mix.fill( decoderMatrix.matrix.cols, { arg speaker;
-//		decoderMatrix.matrix.flop.asArray.at(speaker) * sig.at(speaker)
-//	});
-
+	// decode to output
 	AtkDecode.ar(sig, decoderMatrix);
 
 }.scope;
 )
+
+
+
+//------------------------------------------------------------------------
+// Dual Band Regular Decoders
+//
+//   panto_dbr           pantophonic
+//   peri_dbr            periphonic
+//------------------------------------------------------------------------
+
+//------------------------------------------------------------------------
+// Dual Band Diametric Decoder
+//
+//   decode_dbd
+//   quad_dbd
+//------------------------------------------------------------------------
+
+// -------------------------------------------------------
+// test (decoders built using Mix.ar)
+//
+// -------------------------------------------------------
+// quad (spec'd as narrow quad)
+// dual band test dev
+// mono pink noise, sound synth function
+(
+{
+	var	fl, bl, br, fr;					// for quad output
+	var	azim, sig;
+	var	decoderMatrix, angle, k;
+
+	// constants
+	angle = pi/6;
+	k = 1;
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// set up matrix
+	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
+
+	// test sig
+//	sig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+	#w, x, y, z = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+	// test psychoShelf
+	sig = AtkPsychoShelf.ar(w, x, y, z, 400, [(3/2).sqrt, 3.sqrt/2]);
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+

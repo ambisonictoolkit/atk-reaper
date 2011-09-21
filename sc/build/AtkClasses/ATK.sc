@@ -1,4 +1,8 @@
 /* FOA wrappers */
+// NOTE: we may wish to rename all ATK as FOA
+// 		for clarity, and to assist with further development
+//		of HOA implementations
+
 
 FOA {
 	var <w, <x, <y, <z;
@@ -46,6 +50,9 @@ ATKRotate {
 	}
 }
 
+// ATKPantoF is now redundant, and replaced by matrix style decoder
+// See AtkDecode built using Mix and ATKMatrix below
+/*
 ATKPantoF {
 	*ar {arg numChannels, in, orientation = 1, directivity = 1, mul = 1, add = 1;
 		(in.isKindOf(FOA)).if({
@@ -53,6 +60,7 @@ ATKPantoF {
 		})
 	}
 }
+*/
 		
 AtkMonoToB : Panner {
 	
@@ -96,7 +104,7 @@ Atk : Panner {
  	
  	}
 
-// See Decoder built using Mix and ATKMatrix below
+// See AtkDecode built using Mix and ATKMatrix below
 /*
 AtkDecode : UGen {
 	*ar {arg w, x, y, z, azimuth, elevation, mul = 1, add = 0;
@@ -113,6 +121,9 @@ AtkDecode : UGen {
  		}
 	}
 */
+// ATKPantoF is now redundant, and replaced by matrix style decoder
+// See AtkDecode built using Mix and ATKMatrix below
+/*
 AtkPantoF : Panner {
 	*ar {arg numChans, w, x, y, orientation = 1, directivity = 1, mul = 1, add = 0;
 		^this.multiNew('audio', numChans, w, x, y, orientation, directivity).madd(mul, add)
@@ -126,6 +137,7 @@ AtkPantoF : Panner {
  	checkInputs { ^this.checkNInputs(3) }
  	
 	}
+*/
 	
 AtkDirect : Atk {
 	*ar { arg w, x, y, z, angle = pi/2, mul = 1, add = 0;
@@ -179,6 +191,8 @@ AtkDominateY : AtkDominateX { }
 AtkDominateZ : AtkDominateX { }
 
 
+//------------------------------------------------------------------------
+// Filters
 
 AtkProximity : Atk { 
 	*ar { arg w, x, y, z, distance = 0, mul = 1, add = 0;
@@ -187,6 +201,7 @@ AtkProximity : Atk {
 
 }
 
+// RENAME to NFC
 AtkDistance : Atk { 
 	*ar { arg w, x, y, z, distance = 0, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, distance).madd(mul, add);
@@ -194,6 +209,35 @@ AtkDistance : Atk {
 		
 }
 
+// realised directly, rather than using RMShelf
+AtkPsychoShelf { 
+	*ar { arg w, x, y, z, frequency = 400, k = [(3/2).sqrt, 3.sqrt/2], mul = 1, add = 0;
+		
+		var k2;
+		var wc, c;
+		var a0, a1, a2, b1, b2;
+
+		// expand k from degree (order) gains to channel gains
+		k2 = k.collect({ arg item, i;
+			Array.fill(2 * i + 1, {item})}).flat;
+
+		// calculate coefficients
+//		wc = (pi * frequency / SampleRate.ir(0)).tan;
+//		wc = (pi * frequency / 44100).tan;
+		wc = (pi * frequency / Server.default.sampleRate).tan; // I'm sure there's a better way!!
+		c = (wc - 1) / (wc + 1);
+
+		a0 = (((1 - k2)/4) * (1 + (c**2))) + (((1 + k2)/2) * c);
+		a1 = ((1 - k2) * c) + (((1 + k2)/2) * (1 + (c**2)));
+		a2 = a0;
+
+		b1 = Array.fill( k2.size, { (2*c).neg } );
+		b2 = Array.fill( k2.size, { (c**2).neg } );
+
+		^SOS.ar([w, x, y, z], a0, a1, a2, b1, b2, mul, add);
+	}
+		
+}
 
 
 
