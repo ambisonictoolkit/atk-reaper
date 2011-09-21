@@ -95,6 +95,8 @@ Atk : Panner {
  	checkInputs { ^this.checkNInputs(4) }
  	
  	}
+
+// See Decoder built using Mix and ATKMatrix below
 /*
 AtkDecode : UGen {
 	*ar {arg w, x, y, z, azimuth, elevation, mul = 1, add = 0;
@@ -190,4 +192,22 @@ AtkDistance : Atk {
 		^this.multiNew('audio', w, x, y, z, distance).madd(mul, add);
 	}
 		
+}
+
+
+
+
+//------------------------------------------------------------------------
+// Decoder built using Mix and ATKMatrix
+//
+// Likely, we'll want to integrate this much better with FOA, checking for
+// valid inputs etc.
+
+AtkDecode {
+	*ar { arg in, decoderMatrix, mul = 1, add = 0;
+
+		^Mix.fill( decoderMatrix.matrix.cols, { arg speaker;
+			decoderMatrix.matrix.flop.asArray.at(speaker) * in.at(speaker)
+		}).madd(mul, add);
+	}
 }
