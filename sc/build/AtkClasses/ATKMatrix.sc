@@ -201,61 +201,95 @@ AtkSpeakerMatrix {
 //	b_to_mono						virtual mono microphone decoding
 
 AtkDecoderMatrix {
-	var <k, <kind, decoderMatrix;
+	var <kind, decoderMatrix;
 
-	var <positions, positions2;			// diametric
+	var <k, positions, positions2;		// diametric
 	var sm, m, n;
-	var numSpeakers, <orientation;		// pantophonic
+	var numSpeakers, orientation;		// pantophonic
 	var theta;
 	var g0, g1;
-	var numSpeakerPairs, <elevation;		// periphonic
+	var numSpeakerPairs, elevation;		// periphonic
 	var directions;
 	var up, down;
-	var <angle;						// quadraphonic
+	var angle;						// quadraphonic
 	var alpha, beta;
-	var <pattern;						// stereo
+	var pattern;						// stereo
 	var gamma;
 	var phi;							// mono
 
 	*newDiametric { arg directions, k;
-		^super.newCopyArgs(k, 'diametric').initDiametric(directions);
+		^super.newCopyArgs('diametric').initDiametric(directions, k);
 	}
 	
 	*newPanto { arg numSpeakers, orientation, k;
-		^super.newCopyArgs(k, 'panto').initPanto(numSpeakers, orientation);
+		^super.newCopyArgs('panto').initPanto(numSpeakers, orientation, k);
 	}
 	
 	*newPeri { arg numSpeakerPairs, elevation, orientation, k;
-		^super.newCopyArgs(k, 'peri').initPeri(numSpeakerPairs, elevation,
-			orientation);
+		^super.newCopyArgs('peri').initPeri(numSpeakerPairs, elevation,
+			orientation, k);
 	}
 	
 	*newQuad { arg angle, k;
-		^super.newCopyArgs(k, 'quad').initQuad(angle);
+		^super.newCopyArgs('quad').initQuad(angle, k);
 	}
 	
 	*newStereo { arg angle, pattern;
-		^super.newCopyArgs(nil, 'stereo').initStereo(angle, pattern);
+		^super.newCopyArgs('stereo').initStereo(angle, pattern);
 	}
 
 	*newMono { arg theta, phi, pattern;
-		^super.newCopyArgs(nil, 'mono').initMono(theta, phi, pattern); // set a k?
+		^super.newCopyArgs('mono').initMono(theta, phi, pattern); // set a k?
 	}
 
-	initDiametric { arg directions;
+	initK2D { arg argK;
+
+		if ( argK.isNumber, {
+				k = argK
+			}, {
+				switch ( argK,
+					'velocity', 	{ k = 1 },
+					'energy', 	{ k = 2.reciprocal.sqrt },
+					'controlled', { k = 2.reciprocal },
+					'single', 	{ k = 2.reciprocal.sqrt },
+					'dual', 		{ k = 1 }
+				)
+			}
+		)
+	}
+
+	initK3D { arg argK;
+
+		if ( argK.isNumber, {
+				k = argK
+			}, {
+				switch ( argK,
+					'velocity', 	{ k = 1 },
+					'energy', 	{ k = 3.reciprocal.sqrt },
+					'controlled', { k = 3.reciprocal },
+					'single', 	{ k = 3.reciprocal.sqrt },
+					'dual', 		{ k = 1 }
+				)
+			}
+		)
+	}
+
+	initDiametric { arg directions, argK;
 
 		switch (directions.rank,					// 2D or 3D?
 			1, { positions = Matrix.with(			// 2D
 					directions.collect({ arg item;
 						Polar.new(1, item).asPoint.asArray
 					})
-				)
+				);
+				this.initK2D(argK)					// initialise k
 			},
 			2, { positions = Matrix.with(			// 3D
 					directions.collect({ arg item;
 						Spherical.new(1, item.at(0), item.at(1)).asCartesian.asArray
 					})
-				)
+				);
+				this.initK3D(argK)					// initialise k
 			}
 		);
 
@@ -278,11 +312,13 @@ AtkDecoderMatrix {
 		n = sm.cols;
 	}
 	
-	initPanto { arg numSpeaks, orient;
-		numSpeakers = numSpeaks;
-		orientation = orient;
+	initPanto { arg argNumSpeakers, argOrientation, argK;
+		numSpeakers = argNumSpeakers;
+		orientation = argOrientation;
 	    	g0 = 1.0;
 	    	g1 = 2.sqrt;
+
+		this.initK2D(argK);					// initialise k
 
 		// return theta from speaker number
 		theta = numSpeakers.collect({ arg speaker;
@@ -294,11 +330,13 @@ AtkDecoderMatrix {
 		theta = (theta + pi).mod(2pi) - pi;
 	}
 	
-	initPeri { arg numSpeakPairs, elev, orient;
-		numSpeakerPairs = numSpeakPairs;
-		elevation = elev;
-		orientation = orient;
-		numSpeakers = numSpeakPairs * 2;
+	initPeri { arg argNumSpeakerPairs, argElevation, argOrientation, argK;
+		numSpeakerPairs = argNumSpeakerPairs;
+		elevation = argElevation;
+		orientation = argOrientation;
+		numSpeakers = argNumSpeakerPairs * 2;
+
+		this.initK3D(argK);					// initialise k
 
 		// generate speaker pair positions
 		// start with polar positions. . .
@@ -316,19 +354,21 @@ AtkDecoderMatrix {
 		].flop;
 	}
 	
-	initQuad { arg ang;
-		angle = ang;
+	initQuad { arg argAngle, argK;
+		angle = argAngle;
+
+		this.initK2D(argK);					// initialise k
 	}
 	
-	initStereo { arg ang, pat;
-		angle = ang;
-		pattern = pat;
+	initStereo { arg argAngle, argPattern;
+		angle = argAngle;
+		pattern = argPattern;
 	}
 	
-	initMono { arg th, ph, pat;
-		theta = th;
-		phi = ph;
-		pattern = pat;
+	initMono { arg argTheta, argPhi, argPattern;
+		theta = argTheta;
+		phi = argPhi;
+		pattern = argPattern;
 	}
 
 	dim {

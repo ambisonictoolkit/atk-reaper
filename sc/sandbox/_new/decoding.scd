@@ -247,7 +247,8 @@
 
 	// test sig
 //	sig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
-	#w, x, y, z = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+	sig = PinkNoise.ar;
+	#w, x, y, z = AtkMonoToB.ar(sig, azim); // mono pink noise
 
 	// test psychoShelf
 	sig = AtkPsychoShelf.ar(w, x, y, z, 400, [(3/2).sqrt, 3.sqrt/2]);

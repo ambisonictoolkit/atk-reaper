@@ -210,6 +210,9 @@ AtkDistance : Atk {
 }
 
 // realised directly, rather than using RMShelf
+// default k --> 2D
+// better to code this up as a UGen, to get access to SR
+// the below code polls SR from the default server--which won't work in all cases!!
 AtkPsychoShelf { 
 	*ar { arg w, x, y, z, frequency = 400, k = [(3/2).sqrt, 3.sqrt/2], mul = 1, add = 0;
 		
