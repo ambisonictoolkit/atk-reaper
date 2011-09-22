@@ -12,13 +12,12 @@
 
 //------------------------------------------------------------------------// Muse/ATK decoders built using the above decoder gain matrices//   Developed and coded by J Anderson//////   ++++ Single Band Regular Decoders////   panto_sbr//   peri_sbr////   ++++ Single Band Diametric Decoders////   decode_sbd//   quad_sbd//////   ++++ Dual Band Regular Decoders (Shelf-filtered)////   panto_dbr//   peri_dbr////   ++++ Dual Band Diametric Decoders (Shelf-filtered)////   decode_dbd//   quad_dbd        (See special decoders)////------------------------------------------------------------------------
 
-//------------------------------------------------------------------------// Single Band Regular Decoders////   panto_sbr           pantophonic//   peri_sbr            periphonic//------------------------------------------------------------------------
-
-//------------------------------------------------------------------------// Single Band Diametric Decoder////   decode_sbd//   quad_sbd//------------------------------------------------------------------------
-
 
 // -------------------------------------------------------
 // test (decoders built using Mix.ar)
+//
+// shelf filtering, if required, is built into decoder
+// specify use through matrix choice
 //
 // -------------------------------------------------------
 // quad (spec'd as narrow quad)
@@ -31,7 +30,14 @@
 
 	// constants
 	angle = pi/6;
-	k = 1;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
 
 	// kr....
 	azim = MouseX.kr(pi, -pi);
@@ -62,7 +68,14 @@
 
 	// constants
 	directions = [ pi/6, -pi/6 ];
-	k = 1;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
 
 	// kr....
 	azim = MouseX.kr(pi, -pi);
@@ -94,7 +107,14 @@
 	// constants
 	numSpeakers = 4;
 	orientation = 'flat';
-	k = 1;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
 
 	// kr....
 	azim = MouseX.kr(pi, -pi);
@@ -127,7 +147,14 @@
 	numSpeakerPairs = 4;
 	elevation = pi/6;
 	orientation = 'flat';
-	k = 1;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/3.sqrt;				// energy, for 3D
+//	k = 1/3;					// controlled opposites, for 3D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
 
 	// kr....
 	azim = MouseX.kr(pi, -pi);
@@ -205,59 +232,4 @@
 }.scope;
 )
 
-
-
-//------------------------------------------------------------------------
-// Dual Band Regular Decoders
-//
-//   panto_dbr           pantophonic
-//   peri_dbr            periphonic
-//------------------------------------------------------------------------
-
-//------------------------------------------------------------------------
-// Dual Band Diametric Decoder
-//
-//   decode_dbd
-//   quad_dbd
-//------------------------------------------------------------------------
-
-// -------------------------------------------------------
-// test (decoders built using Mix.ar)
-//
-// -------------------------------------------------------
-// quad (spec'd as narrow quad)
-// dual band test dev
-// mono pink noise, sound synth function
-(
-{
-	var	fl, bl, br, fr;					// for quad output
-	var	azim, sig;
-	var	decoderMatrix, angle, k;
-
-	// constants
-	angle = pi/6;
-	k = 1;
-
-	// kr....
-	azim = MouseX.kr(pi, -pi);
-
-
-	// set up matrix
-	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
-
-	// test sig
-//	sig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
-	sig = PinkNoise.ar;
-	#w, x, y, z = AtkMonoToB.ar(sig, azim); // mono pink noise
-
-	// test psychoShelf
-	sig = AtkPsychoShelf.ar(w, x, y, z, 400, [(3/2).sqrt, 3.sqrt/2]);
-
-	// decode to output
-	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
-
-	[fl, fr, bl, br]		// reorder output to match speaker arrangement
-
-}.scope;
-)
 

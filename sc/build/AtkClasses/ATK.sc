@@ -252,6 +252,11 @@ AtkPsychoShelf {
 
 AtkDecode {
 	*ar { arg in, decoderMatrix, mul = 1, add = 0;
+		
+		if ( decoderMatrix.shelfFreq.isNumber, {		// shelf filter?
+			in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
+				decoderMatrix.shelfFreq, decoderMatrix.shelfK)
+		});
 
 		^Mix.fill( decoderMatrix.matrix.cols, { arg speaker;
 			decoderMatrix.matrix.flop.asArray.at(speaker) * in.at(speaker)

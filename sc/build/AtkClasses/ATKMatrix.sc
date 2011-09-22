@@ -201,7 +201,7 @@ AtkSpeakerMatrix {
 //	b_to_mono						virtual mono microphone decoding
 
 AtkDecoderMatrix {
-	var <kind, decoderMatrix;
+	var <kind, decoderMatrix, <>shelfFreq, <shelfK;
 
 	var <k, positions, positions2;		// diametric
 	var sm, m, n;
@@ -217,29 +217,30 @@ AtkDecoderMatrix {
 	var gamma;
 	var phi;							// mono
 
-	*newDiametric { arg directions, k;
+	*newDiametric { arg directions = [ pi/4, 3*pi/4 ], k = 'single';
 		^super.newCopyArgs('diametric').initDiametric(directions, k);
 	}
 	
-	*newPanto { arg numSpeakers, orientation, k;
+	*newPanto { arg numSpeakers = 4, orientation = 'flat', k = 'single';
 		^super.newCopyArgs('panto').initPanto(numSpeakers, orientation, k);
 	}
 	
-	*newPeri { arg numSpeakerPairs, elevation, orientation, k;
+	*newPeri { arg numSpeakerPairs = 4, elevation = 0.61547970867039,
+				orientation = 'flat';, k = 'single';
 		^super.newCopyArgs('peri').initPeri(numSpeakerPairs, elevation,
 			orientation, k);
 	}
 	
-	*newQuad { arg angle, k;
-		^super.newCopyArgs('quad').initQuad(angle, k);
+	*newQuad { arg angle = pi/4, k = 'single';
+		^super.newCopyArgs('quad').initQuad(angle, k = 'single');
 	}
 	
-	*newStereo { arg angle, pattern;
+	*newStereo { arg angle = pi/2, pattern = 0.5;
 		^super.newCopyArgs('stereo').initStereo(angle, pattern);
 	}
 
-	*newMono { arg theta, phi, pattern;
-		^super.newCopyArgs('mono').initMono(theta, phi, pattern); // set a k?
+	*newMono { arg theta = 0, phi = 0, pattern = 0;
+		^super.newCopyArgs('mono').initMono(theta, phi, pattern);
 	}
 
 	initK2D { arg argK;
@@ -252,7 +253,11 @@ AtkDecoderMatrix {
 					'energy', 	{ k = 2.reciprocal.sqrt },
 					'controlled', { k = 2.reciprocal },
 					'single', 	{ k = 2.reciprocal.sqrt },
-					'dual', 		{ k = 1 }
+					'dual', 		{
+						k = 1;
+						shelfFreq = 400.0;
+						shelfK = [(3/2).sqrt, 3.sqrt/2];
+					}
 				)
 			}
 		)
@@ -268,7 +273,11 @@ AtkDecoderMatrix {
 					'energy', 	{ k = 3.reciprocal.sqrt },
 					'controlled', { k = 3.reciprocal },
 					'single', 	{ k = 3.reciprocal.sqrt },
-					'dual', 		{ k = 1 }
+					'dual', 		{
+						k = 1;
+						shelfFreq = 400.0;
+						shelfK = [2.sqrt, (2/3).sqrt];
+					}
 				)
 			}
 		)
