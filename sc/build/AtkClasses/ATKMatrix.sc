@@ -200,6 +200,10 @@ AtkSpeakerMatrix {
 //	b_to_stereo					virtual stereo microphone decoding
 //	b_to_mono						virtual mono microphone decoding
 
+//	NOTE: b_to_a conversion can go in here, too, and there is an
+//			attraction to do so--in terms of consistency
+//			and that AtkDecoderMatrix reports back angles!
+
 AtkDecoderMatrix {
 	var <kind, decoderMatrix, <>shelfFreq, <shelfK;
 
@@ -216,6 +220,7 @@ AtkDecoderMatrix {
 	var pattern;						// stereo
 	var gamma;
 	var phi;							// mono
+	var irregKind;					// 5_0, irregular decoders
 
 	*newDiametric { arg directions = [ pi/4, 3*pi/4 ], k = 'single';
 		^super.newCopyArgs('diametric').initDiametric(directions, k);
@@ -226,7 +231,7 @@ AtkDecoderMatrix {
 	}
 	
 	*newPeri { arg numSpeakerPairs = 4, elevation = 0.61547970867039,
-				orientation = 'flat';, k = 'single';
+				orientation = 'flat', k = 'single';
 		^super.newCopyArgs('peri').initPeri(numSpeakerPairs, elevation,
 			orientation, k);
 	}
@@ -241,6 +246,10 @@ AtkDecoderMatrix {
 
 	*newMono { arg theta = 0, phi = 0, pattern = 0;
 		^super.newCopyArgs('mono').initMono(theta, phi, pattern);
+	}
+
+	*new5_0 { arg irregKind = 'focused';
+		^super.newCopyArgs('5.0').init5_0(irregKind);
 	}
 
 	initK2D { arg argK;
@@ -380,6 +389,10 @@ AtkDecoderMatrix {
 		pattern = argPattern;
 	}
 
+	init5_0 { arg argIrregKind;
+		irregKind = argIrregKind;
+	}
+
 	dim {
 		switch (kind,
 			'diametric',		{ ^AtkSpeakerMatrix.newPositions(positions, k).dim },
@@ -387,7 +400,8 @@ AtkDecoderMatrix {
 			'peri',	{ ^3 },
 			'quad',	{ ^2 },
 			'stereo',	{ ^1 },
-			'mono',	{ ^0 }
+			'mono',	{ ^0 },
+			'5.0',	{ ^2 }
 		) 
 	}
 
@@ -398,7 +412,8 @@ AtkDecoderMatrix {
 			'peri',	{ ^numSpeakers },
 			'quad',	{ ^4 },
 			'stereo',	{ ^2 },
-			'mono',	{ ^1 }
+			'mono',	{ ^1 },
+			'5.0',	{ ^5 }
 		) 
 	}
 	
@@ -437,7 +452,8 @@ AtkDecoderMatrix {
 			},
 			'quad', { ^[ angle, pi - angle, (pi - angle).neg, angle.neg ] },
 			'stereo', { ^[ pi/6, pi.neg/6 ] },
-			'mono', { ^[ 0 ] }
+			'mono', { ^[ 0 ] },
+			'5.0', { ^[ 0, pi/6, 110/180 * pi, 110/180 * pi.neg, pi.neg/6 ] }
 		) 
 	}
 
@@ -551,7 +567,36 @@ AtkDecoderMatrix {
 			    ]);
 			    
 			    ^decoderMatrix
+			},
+
+			'5.0', {
+
+				// build decoder matrix
+				// Wigging's Matricies (credit contribution/copyright at top)
+				switch (irregKind,
+					'focused', {
+					    decoderMatrix = Matrix.with([
+					    		[ 0.2000,  0.1600,  0.0000 ],
+					        	[ 0.4250,  0.3600,  0.4050 ],
+					        	[ 0.4700, -0.3300,  0.4150 ],
+					        	[ 0.4700, -0.3300, -0.4150 ],
+					        	[ 0.4250,  0.3600, -0.4050 ]
+					    ])
+					},
+					'equal', {
+					    decoderMatrix = Matrix.with([
+					    		[ 0.0000,  0.0850,  0.0000 ],
+					        	[ 0.3650,  0.4350,  0.3400 ],
+					        	[ 0.5550, -0.2850,  0.4050 ],
+					        	[ 0.5550, -0.2850, -0.4050 ],
+					        	[ 0.3650,  0.4350, -0.3400 ]
+					    ])
+					}
+				);
+			    
+			    ^decoderMatrix
 			}
+			
 		) 
 	}
 }
