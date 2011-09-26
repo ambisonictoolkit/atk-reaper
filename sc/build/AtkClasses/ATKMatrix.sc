@@ -5,6 +5,8 @@
 //
 // -------------------------------------------------------
 
+// NOTE: Really need to clean up these comments!!!
+
 //------------------------------------------------------------------------
 // (Gerzon's) Diametric Decoder Theorem (DDT)
 //------------------------------------------------------------------------
@@ -183,8 +185,96 @@ AtkSpeakerMatrix {
 	}
 }
 
+
+//        - orientation    : Orientation of the A-format channel tetrahedron//            flu = front left up:          FLU, FRD, BLD, BRU//            fld = front left down:        FLD, FRU, BLU, BRD//            flr = front left-right:       FL, FR, BU, BD//            fud = front up-down:          FU, FD, BL, BR//            fbd = front and back down:    F, BD, BLU, BRU //            fbu = front and back up:      F, BU, BLD, BRD//            flru = front left-right up:   FLU, FRU, FD, B//            flrd = front left-right down: FLD, FRD, FU, B////        - weight : The scaling on W in the output a-format signal://            can = canonical scaling of 1/sqrt(2)//            dec = scaling for decorrelated soundfields, weight of 1/sqrt(3) on W//            car = scaling for cardioid response, weight of sqrt(3) on W//            uns = unscaled, weight of 1 on W////            dec is the usual choice for use in reverberators
+
+//   bToA_matrix
+AtkBtoAMatrix {
+	var <orientation, <weight;
+	var decoderMatrix;
+
+	*new { arg orientation = 'flu', weight = 'can';
+		^super.newCopyArgs(orientation).initWeight(weight);
+	}
+	
+	initWeight { arg weightArg;
+		switch ( weightArg,
+			'can', { weight = 1 },			// canonical
+			'dec', { weight = (2/3).sqrt },	// decorrelated (on the sphere)
+			'car', { weight = 6.sqrt },		// cardioid
+			'uns', { weight = 2.sqrt }		// unscaled, W_gain = 1
+		)
+	}
+
+	dim { ^3 }
+
+	numSpeakers { ^4 }			// hardwired for FOA
+
+	dirSpeakers {
+		^this.matrix.removeCol(0).asArray.collect({arg item;
+			item.asCartesian.asSpherical.angles
+		})
+	}
+
+	matrix {
+		var recSqrt2 = 2.sqrt.reciprocal;
+		var sqrt3Div2 = 3.sqrt/2;
+		var sqrt3Div6 = 3.sqrt/6;
+		var sqrt6Div3 = 6.sqrt/3;
+		var recSqrt6 = 6.sqrt.reciprocal;
+
+		switch ( orientation,
+
+			// 0 - orthogonal (front left up)
+			// [ FLU, FRD, BLD, BRU ]
+			'flu', { decoderMatrix = [
+					[ 0.5, 0.5, 0.5, 0.5 ],					[ 0.5, 0.5, -0.5, -0.5 ],					[ 0.5, -0.5, 0.5, -0.5 ],					[ 0.5, -0.5, -0.5, 0.5 ]
+				]
+			},
+			// 1 - front left down
+			// [ FLD, FRU, BLU, BRD ]
+			'fld', { decoderMatrix = [
+					[ 0.5, 0.5, 0.5, -0.5 ],					[ 0.5, 0.5, -0.5, 0.5 ],					[ 0.5, -0.5, 0.5, 0.5 ],					[ 0.5, -0.5, -0.5, -0.5 ]				]
+			},
+			// 2 - front left-right
+			// [ FL, FR, BU, BD ]
+			'flr', { decoderMatrix = [
+					[ 0.5, 0.5, recSqrt2, 0 ],					[ 0.5, 0.5, recSqrt2.neg, 0 ],					[ 0.5, -0.5, 0, recSqrt2 ],					[ 0.5, -0.5, 0, recSqrt2.neg ]				]
+			},
+			// 3 - front up-down
+			// [ FU, FD, BL, BR ]
+			'fud', { decoderMatrix = [
+					[ 0.5, 0.5, 0, recSqrt2 ],					[ 0.5, 0.5, 0, recSqrt2.neg ],					[ 0.5, -0.5, recSqrt2, 0 ],					[ 0.5, -0.5, recSqrt2.neg, 0 ]				]
+			},
+			// 4 - front & back down
+			// [ F, BD, BLU, BRU ]
+			'fbd', { decoderMatrix = [
+					[ 0.5, sqrt3Div2, 0, 0 ],					[ 0.5, sqrt3Div6.neg, 0, sqrt6Div3.neg ],					[ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6 ],					[ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6 ]				]
+			},
+			// 5 - front & back up
+			// [ F, BU, BLD, BRD ]
+			'fbu', { decoderMatrix = [
+					[ 0.5, sqrt3Div2, 0, 0 ],					[ 0.5, sqrt3Div6.neg, 0, sqrt6Div3 ],					[ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6.neg ],					[ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6.neg ]				]
+			},
+			// 6 - front left-right up
+			// [ FLU, FRU, FD, B ]
+			'flru', { decoderMatrix = [
+					[ 0.5, sqrt3Div6, recSqrt2, recSqrt6 ],					[ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6 ],					[ 0.5, sqrt3Div6, 0, sqrt6Div3.neg ],					[ 0.5, sqrt3Div2.neg, 0, 0 ]				]
+			},
+			// 7 - front left-right down
+			// [ FLD, FRD, FU, B ]
+			'flrd', { decoderMatrix = [
+					[ 0.5, sqrt3Div6, recSqrt2, recSqrt6.neg ],					[ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6.neg ],					[ 0.5, sqrt3Div6, 0, sqrt6Div3 ],					[ 0.5, sqrt3Div2.neg, 0, 0 ]				]
+			}
+		);
+		decoderMatrix = Matrix.with(decoderMatrix);
+		^decoderMatrix.putCol(0, weight * decoderMatrix.getCol(0))
+	}
+}
+
+
 //   speaker_kernel                  (helper function)
-//	*put together a kernel helper function?
+//	*put together a kernel helper function for kernel decoders?
 //AtkSpeakerKernel {
 
 
