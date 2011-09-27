@@ -388,7 +388,7 @@ AtkDecoderMatrix {
 		k = this.initK2D(k);
 
 
-		// build decoder matrix 
+		// build decoder matrix
 		matrix = Matrix.newClear(numChans, 3); // start w/ empty matrix
 	
 		numChans.do({ arg i;
@@ -460,7 +460,7 @@ AtkDecoderMatrix {
 	
 	initQuad { arg angle, k;
 
-		var alpha, beta;
+		var g0, g1, g2;
 
 	    // set output channel (speaker) directions for instance
 	    dirChans = [ angle, pi - angle, (pi - angle).neg, angle.neg ];
@@ -469,35 +469,36 @@ AtkDecoderMatrix {
 		// initialise k
 		k = this.initK2D(k);
 
-		// calculate alpha, beta (scaled by k)
-		alpha	= k / (2.sqrt * angle.cos);
-		beta		= k / (2.sqrt * angle. sin);
+		// calculate g1, g2 (scaled by k)
+		g0	= 1;
+		g1	= k / (2.sqrt * angle.cos);
+		g2	= k / (2.sqrt * angle.sin);
 
 		// build decoder matrix 
 	    matrix = 2.sqrt/4 * Matrix.with([
-	    		[ 1, alpha, 		beta 	],
-	        	[ 1, alpha.neg, 	beta 	],
-	        	[ 1, alpha.neg, 	beta.neg	],
-	        	[ 1, alpha, 		beta.neg	]
+	    		[ g0, g1, 	g2 		],
+	        	[ g0, g1.neg, g2 		],
+	        	[ g0, g1.neg, g2.neg	],
+	        	[ g0, g1, 	g2.neg	]
 	    ])
 	}
 	
 	initStereo { arg angle, pattern;
 
-		var alpha, beta, gamma;
+		var g0, g1, g2;
 	    
 	    // set output channel (speaker) directions for instance
 	    dirChans = [ pi/6, pi.neg/6 ];
 
-		// calculate alpha, beta, gamma (scaled by pattern)
-		alpha	= pattern * angle.cos;
-		beta		= pattern * angle.sin;
-		gamma	= (1.0 - pattern) * 2.sqrt;
+		// calculate g0, g1, g2 (scaled by pattern)
+		g0	= (1.0 - pattern) * 2.sqrt;
+		g1	= pattern * angle.cos;
+		g2	= pattern * angle.sin;
 
 		// build decoder matrix, and set for instance
 	    matrix = Matrix.with([
-	    		[ gamma, alpha, beta		],
-	        	[ gamma, alpha, beta.neg	]
+	    		[ g0, g1, g2		],
+	        	[ g0, g1, g2.neg	]
 	    ])
 	}
 	
@@ -650,3 +651,284 @@ AtkDecoderMatrix {
 
 // kernel matrix for kernel decoders
 //AtkDecoderKernel {
+
+
+//-----------------------------------------------------------------------
+//encoders
+
+
+//uhj_to_b(a, encoder_kernels, mode = 'z', kind = 'fft', zi = None):
+//superstereo(a, encoder_kernels, mode = 'z', kind = 'fft', zi = None):
+
+
+AtkEncoderMatrix {
+	var <kind;
+	var <matrix;
+	var <dirChans;
+
+
+	*newB {
+		^super.newCopyArgs('b').initB;
+	}
+
+	*newAtoB { arg orientation = 'flu', weight = 'dec';
+		^super.newCopyArgs('AtoB').initAtoB(orientation, weight);
+	}
+
+	*newOmni {
+		^super.newCopyArgs('omni').initOmni;
+	}
+
+	*newDirection { arg theta = 0, phi = 0;
+		^super.newCopyArgs('dir').initDirection(theta, phi);
+	}
+
+	*newStereo { arg angle = 0;
+		^super.newCopyArgs('stereo').initStereo(angle);
+	}
+
+	*newQuad {
+		^super.newCopyArgs('quad').initQuad;
+	}
+
+	*new5_0 {
+		^super.newCopyArgs('5.0').init5_0;
+	}
+
+	*new7_0 {
+		^super.newCopyArgs('7.0').init7_0;
+	}
+
+	*newDirections { arg directions;
+		^super.newCopyArgs('dirs').initDirections(directions);
+	}
+
+	*newPanto { arg numChans = 4, orientation = 'flat';
+		^super.newCopyArgs('panto').initPanto(numChans, orientation);
+	}
+
+	*newPeri { arg numChanPairs = 4, elevation = 0.61547970867039,
+				orientation = 'flat';
+		^super.newCopyArgs('peri').initPeri(numChanPairs, elevation,
+			orientation);
+	}
+	
+	*newZoomH2 { arg angles = [pi/3, 3/4*pi], pattern = 0.5857, k = 1;
+		^super.newCopyArgs('zoomH2').initZoomH2(angles, pattern, k);
+	}
+
+	init2D {
+
+		var g0 = 2.sqrt.reciprocal;
+	    
+		// build decoder matrix, and set for instance
+		matrix = Matrix.newClear(3, dirChans.size); // start w/ empty matrix
+	
+		dirChans.do({ arg theta, i;
+			matrix.putCol(i, [
+				g0,
+	              theta.cos,
+	              theta.sin
+			])
+		})
+	}
+
+	init3D {
+
+		var g0 = 2.sqrt.reciprocal;
+	    
+		// build decoder matrix, and set for instance
+		matrix = Matrix.newClear(4, dirChans.size); // start w/ empty matrix
+	
+		dirChans.do({ arg thetaPhi, i;
+			matrix.putCol(i, [
+				g0,
+	              thetaPhi.at(1).cos * thetaPhi.at(0).cos,
+	              thetaPhi.at(1).cos * thetaPhi.at(0).sin,
+	              thetaPhi.at(1).sin
+			])
+		})
+	}
+
+	initB {
+
+	    // set input channel directions for instance
+	    dirChans = [ inf ];
+
+		// build encoder matrix, and set for instance
+	    matrix = Matrix.newIdentity(4)
+	}
+
+	initAtoB { arg orientation, weight;
+		var bToAMatrix;
+
+		bToAMatrix = AtkDecoderMatrix.newBtoA(orientation, weight);
+
+	    // set input channel directions for instance
+	    dirChans = bToAMatrix.dirChans;
+
+		// build encoder matrix, and set for instance
+	    matrix = bToAMatrix.matrix.inverse
+	}
+
+	initOmni {
+
+	    // set input channel directions for instance
+	    dirChans = [ inf ];
+
+		// build encoder matrix, and set for instance
+	    matrix = Matrix.with([
+		    	[ 2.sqrt.reciprocal ]
+		])
+	}
+
+	initDirection { arg theta, phi;
+
+	    // set input channel directions for instance
+	    (phi == 0).if (
+		    {
+				dirChans = [ theta ];
+    				this.init2D
+			}, {
+	    			dirChans = [ [theta, phi] ];
+    				this.init3D
+			}
+		)
+	}
+
+	initStereo { arg angle;
+
+	    // set input channel directions for instance
+	    dirChans = [ pi/2 - angle, (pi/2 - angle).neg ];
+
+	    this.init2D
+	}
+
+	initQuad {
+		
+	    // set input channel directions for instance
+	    dirChans = [ pi/4, pi * 3/4, pi.neg * 3/4, pi.neg/4 ];
+
+	    this.init2D
+	}
+	
+	init5_0 {
+
+	    // set input channel directions for instance
+	    dirChans = [ 0, pi/6, 110/180 * pi, 110/180 * pi.neg, pi.neg/6 ];
+	    
+	    this.init2D
+	}
+
+	init7_0 {
+
+	    // set input channel directions for instance
+	    dirChans = [ 0, pi/6, pi/2, 135/180 * pi, 135/180 * pi.neg, pi.neg/2, pi.neg/6 ];
+	    
+	    this.init2D
+	}
+
+	initDirections { arg directions;
+
+	    // set input channel directions for instance
+	    dirChans = directions;
+
+		switch (directions.rank,					// 2D or 3D?
+			1, {	this.init2D },
+			2, { this.init3D }
+		)
+	}
+
+	initPanto { arg numChans, orientation;
+
+		var theta;
+
+		// return theta from output channel (speaker) number
+		theta = numChans.collect({ arg channel;
+			switch (orientation,
+				'flat',	{ ((1.0 + (2.0 * channel))/numChans) * pi },
+				'point',	{ ((2.0 * channel)/numChans) * pi }
+			)
+		});
+		theta = (theta + pi).mod(2pi) - pi;
+
+	    // set input channel directions for instance
+		dirChans = theta;
+
+		this.init2D
+	}
+	
+	initPeri { arg numChanPairs, elevation, orientation;
+
+		var theta, directions, upDirs, downDirs, upMatrix, downMatrix;
+
+		// generate input channel pair positions
+		// start with polar positions. . .
+		theta = [];
+		numChanPairs.do({arg i;
+			theta = theta ++ [2 * pi * i / numChanPairs]}
+		);
+		if ( orientation == 'flat',
+			{ theta = theta + (pi / numChanPairs) });       // 'flat' case
+
+		// collect directions [ [theta, phi], ... ]
+		// upper ring only
+		directions = [
+			theta,
+			Array.newClear(numChanPairs).fill(elevation)
+		].flop;
+
+
+	    // prepare output channel (speaker) directions for instance
+		upDirs = (directions + pi).mod(2pi) - pi;
+
+		downDirs = upDirs.collect({ arg angles;
+			Spherical.new(1, angles.at(0), angles.at(1)).neg.angles
+		});
+		
+		// reorder the lower polygon
+		if ( (orientation == 'flat') && (numChanPairs.mod(2) == 1),
+			{									 // odd, 'flat'
+				downDirs = downDirs.rotate((numChanPairs/2 + 1).asInteger);
+			}, {     								// 'flat' case, default
+				downDirs = downDirs.rotate((numChanPairs/2).asInteger);
+			}
+		);
+		
+	    // set input channel directions for instance
+		dirChans = upDirs ++ downDirs;
+
+		this.init3D
+	}
+
+	initZoomH2 { arg angles, pattern, k;
+
+		var g0, g10, g20, g11, g21;
+
+	    // set input channel directions for instance
+	    dirChans = [ angles.at(0), angles.at(0).neg, angles.at(1), angles.at(1).neg ];
+
+
+		// calculate g0, g1, g2 (scaled by pattern)
+		g0	= (1.0 - pattern) * 2.sqrt;
+		g10	= pattern * angles.at(0).cos;
+		g20	= pattern * angles.at(0).sin;
+		g11	= pattern * angles.at(1).cos;
+		g21	= pattern * angles.at(1).sin;
+
+		// return theta from output channel (speaker) number
+		matrix = Matrix.with([
+			[ g0, g10, g20 ],
+			[ g0, g10, g20.neg ],
+			[ g0, g11, g21 ],
+			[ g0, g11, g21.neg ]
+		]).pseudoInverse;
+
+		matrix = matrix.putRow(2, matrix.getRow(2) * k);
+	}
+	
+	dim { ^matrix.rows - 1}	
+
+	numChans { ^matrix.cols }
+
+}
