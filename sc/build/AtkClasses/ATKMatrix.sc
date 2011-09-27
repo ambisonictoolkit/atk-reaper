@@ -139,7 +139,7 @@ AtkSpeakerMatrix {
 
 	initDiametric {
 		
-    		// n = number of speaker pairs
+    		// n = number of output channel (speaker) pairs
     		// m = number of dimensions,
     		//        2=horizontal, 3=periphonic 
 		m = this.positions.cols;
@@ -147,7 +147,7 @@ AtkSpeakerMatrix {
 	}
 	
 	dim { ^m }
-	numSpeakers { ^n * 2 }
+	numChans { ^n * 2 }
 	
 	matrix {
 		var s, directions, pos, dir;
@@ -155,7 +155,7 @@ AtkSpeakerMatrix {
 	    	// scatter matrix accumulator
 	    	s = Matrix.newClear(m, m);
 
-		// speaker directions matrix
+		// output channel (speaker) directions matrix
         	// NOTE: this isn't the user supplied directions arg
 	    	directions = Matrix.newClear(m, n);
 	
@@ -163,9 +163,9 @@ AtkSpeakerMatrix {
 
 			// allow entry of positions as
 	    		// transpose for convenience
-	    		// e.g., speaker positions are now in columns
+	    		// e.g., output channel (speaker) positions are now in columns
 	    		// rather than rows, then
-	        	// get the i'th speaker position
+	        	// get the i'th output channel (speaker) position
 	        	// e.g., select the i'th column
         		pos = positions.flop.getCol(i);
 
@@ -175,7 +175,7 @@ AtkSpeakerMatrix {
         		// form scatter matrix and accumulate
         		s = s + Matrix.with(dir * dir.flop);
 
-        		// form matrix of speaker directions
+        		// form matrix of output channel (speaker) directions
         		directions.putCol(i, dir)
 
 			});
@@ -210,7 +210,7 @@ AtkSpeakerMatrix {
 AtkDecoderMatrix {
 	var <kind;
 	var <matrix;
-	var <dirSpeakers;
+	var <dirChans;
 	var <>shelfFreq, <shelfK;
 
 
@@ -218,13 +218,13 @@ AtkDecoderMatrix {
 		^super.newCopyArgs('diametric').initDiametric(directions, k);
 	}
 	
-	*newPanto { arg numSpeakers = 4, orientation = 'flat', k = 'single';
-		^super.newCopyArgs('panto').initPanto(numSpeakers, orientation, k);
+	*newPanto { arg numChans = 4, orientation = 'flat', k = 'single';
+		^super.newCopyArgs('panto').initPanto(numChans, orientation, k);
 	}
 	
-	*newPeri { arg numSpeakerPairs = 4, elevation = 0.61547970867039,
+	*newPeri { arg numChanPairs = 4, elevation = 0.61547970867039,
 				orientation = 'flat', k = 'single';
-		^super.newCopyArgs('peri').initPeri(numSpeakerPairs, elevation,
+		^super.newCopyArgs('peri').initPeri(numChanPairs, elevation,
 			orientation, k);
 	}
 	
@@ -303,13 +303,13 @@ AtkDecoderMatrix {
 					})
 				);
 
-				// list all of the speakers
+				// list all of the output channels (speakers)
 				// i.e., expand to actual pairs
 				positions2 = positions ++ (positions.neg);
 		
 
-			    // set speaker directions for instance
-				dirSpeakers = positions2.asArray.collect({ arg item;
+			    // set output channel (speaker) directions for instance
+				dirChans = positions2.asArray.collect({ arg item;
 					item.asPoint.asPolar.angle
 				});
 			
@@ -325,13 +325,13 @@ AtkDecoderMatrix {
 					})
 				);
 
-				// list all of the speakers
+				// list all of the output channels (speakers)
 				// i.e., expand to actual pairs
 				positions2 = positions ++ (positions.neg);
 		
 
-			    // set speaker directions for instance
-				dirSpeakers = positions2.asArray.collect({ arg item;
+			    // set output channel (speaker) directions for instance
+				dirChans = positions2.asArray.collect({ arg item;
 					item.asCartesian.asSpherical.angles
 				});
 				
@@ -349,7 +349,7 @@ AtkDecoderMatrix {
 	    	//       is assigned as an argument to this function.
 	    	speakerMatrix = AtkSpeakerMatrix.newPositions(positions2, k).matrix;
 	    
-	    	// n = number of speakers
+	    	// n = number of output channels (speakers)
 		n = speakerMatrix.cols;
 
 		// build decoder matrix 
@@ -364,7 +364,7 @@ AtkDecoderMatrix {
 		matrix = 2.sqrt/n * matrix.flop;
 	}
 	
-	initPanto { arg numSpeakers, orientation, k;
+	initPanto { arg numChans, orientation, k;
 
 		var g0, g1, theta;
 
@@ -372,57 +372,57 @@ AtkDecoderMatrix {
 	    	g1 = 2.sqrt;							// 0, 1st order
 
 
-		// return theta from speaker number
-		theta = numSpeakers.collect({ arg speaker;
+		// return theta from output channel (speaker) number
+		theta = numChans.collect({ arg channel;
 			switch (orientation,
-				'flat',	{ ((1.0 + (2.0 * speaker))/numSpeakers) * pi },
-				'point',	{ ((2.0 * speaker)/numSpeakers) * pi }
+				'flat',	{ ((1.0 + (2.0 * channel))/numChans) * pi },
+				'point',	{ ((2.0 * channel)/numChans) * pi }
 			)
 		});
 		theta = (theta + pi).mod(2pi) - pi;
 
-	    // set speaker directions for instance
-		dirSpeakers = theta;
+	    // set output channel (speaker) directions for instance
+		dirChans = theta;
 
 		// initialise k
 		k = this.initK2D(k);
 
 
 		// build decoder matrix 
-		matrix = Matrix.newClear(numSpeakers, 3); // start w/ empty matrix
+		matrix = Matrix.newClear(numChans, 3); // start w/ empty matrix
 	
-		numSpeakers.do({ arg i;
+		numChans.do({ arg i;
 			matrix.putRow(i, [
 				g0,
 	              k * g1 * theta.at(i).cos,
 	              k * g1 * theta.at(i).sin
 			])
 			});
-		matrix = 2.sqrt/numSpeakers * matrix
+		matrix = 2.sqrt/numChans * matrix
 	}
 	
-	initPeri { arg numSpeakerPairs, elevation, orientation, k;
+	initPeri { arg numChanPairs, elevation, orientation, k;
 
 		var theta, directions, upDirs, downDirs, upMatrix, downMatrix;
 
-		// generate speaker pair positions
+		// generate output channel (speaker) pair positions
 		// start with polar positions. . .
 		theta = [];
-		numSpeakerPairs.do({arg i;
-			theta = theta ++ [2 * pi * i / numSpeakerPairs]}
+		numChanPairs.do({arg i;
+			theta = theta ++ [2 * pi * i / numChanPairs]}
 		);
 		if ( orientation == 'flat',
-			{ theta = theta + (pi / numSpeakerPairs) });       // 'flat' case
+			{ theta = theta + (pi / numChanPairs) });       // 'flat' case
 
 		// collect directions [ [theta, phi], ... ]
 		// upper ring only
 		directions = [
 			theta,
-			Array.newClear(numSpeakerPairs).fill(elevation)
+			Array.newClear(numChanPairs).fill(elevation)
 		].flop;
 
 
-	    // prepare speaker directions for instance
+	    // prepare output channel (speaker) directions for instance
 		upDirs = (directions + pi).mod(2pi) - pi;
 
 		downDirs = upDirs.collect({ arg angles;
@@ -437,23 +437,23 @@ AtkDecoderMatrix {
 		matrix = AtkDecoderMatrix.newDiametric(directions, k).matrix;
 
 		// reorder the lower polygon
-		upMatrix = matrix[..(numSpeakerPairs-1)];
-		downMatrix = matrix[(numSpeakerPairs)..];
+		upMatrix = matrix[..(numChanPairs-1)];
+		downMatrix = matrix[(numChanPairs)..];
 
-		if ( (orientation == 'flat') && (numSpeakerPairs.mod(2) == 1),
+		if ( (orientation == 'flat') && (numChanPairs.mod(2) == 1),
 			{									 // odd, 'flat'
 
-				downDirs = downDirs.rotate((numSpeakerPairs/2 + 1).asInteger);
-				downMatrix = downMatrix.rotate((numSpeakerPairs/2 + 1).asInteger)
+				downDirs = downDirs.rotate((numChanPairs/2 + 1).asInteger);
+				downMatrix = downMatrix.rotate((numChanPairs/2 + 1).asInteger)
 
 			}, {     								// 'flat' case, default
 
-				downDirs = downDirs.rotate((numSpeakerPairs/2).asInteger);
-				downMatrix = downMatrix.rotate((numSpeakerPairs/2).asInteger)
+				downDirs = downDirs.rotate((numChanPairs/2).asInteger);
+				downMatrix = downMatrix.rotate((numChanPairs/2).asInteger)
 			}
 		);
 		
-		dirSpeakers = upDirs ++ downDirs;		// set speaker directions
+		dirChans = upDirs ++ downDirs;		// set output channel (speaker) directions
 		matrix = upMatrix ++ downMatrix;			// set matrix
 
 	}
@@ -462,8 +462,8 @@ AtkDecoderMatrix {
 
 		var alpha, beta;
 
-	    // set speaker directions for instance
-	    dirSpeakers = [ angle, pi - angle, (pi - angle).neg, angle.neg ];
+	    // set output channel (speaker) directions for instance
+	    dirChans = [ angle, pi - angle, (pi - angle).neg, angle.neg ];
 
 
 		// initialise k
@@ -486,8 +486,8 @@ AtkDecoderMatrix {
 
 		var alpha, beta, gamma;
 	    
-	    // set speaker directions for instance
-	    dirSpeakers = [ pi/6, pi.neg/6 ];
+	    // set output channel (speaker) directions for instance
+	    dirChans = [ pi/6, pi.neg/6 ];
 
 		// calculate alpha, beta, gamma (scaled by pattern)
 		alpha	= pattern * angle.cos;
@@ -503,8 +503,8 @@ AtkDecoderMatrix {
 	
 	initMono { arg theta, phi, pattern;
 
-	    // set speaker directions for instance
-	    dirSpeakers = [ 0 ];
+	    // set output channel (speaker) directions for instance
+	    dirChans = [ 0 ];
 
 		// build decoder matrix, and set for instance
 	    matrix = Matrix.with([
@@ -519,8 +519,8 @@ AtkDecoderMatrix {
 
 	init5_0 { arg irregKind;
 
-	    // set speaker directions for instance
-	    dirSpeakers = [ 0, pi/6, 110/180 * pi, 110/180 * pi.neg, pi.neg/6 ];
+	    // set output channel (speaker) directions for instance
+	    dirChans = [ 0, pi/6, 110/180 * pi, 110/180 * pi.neg, pi.neg/6 ];
 
 		// build decoder matrix
 		// Wigging's Matricies (credit contribution/copyright at top)
@@ -632,15 +632,15 @@ AtkDecoderMatrix {
 		matrix = matrix.putCol(0, g0 * matrix.getCol(0));
 		
 			    
-	    // set speaker directions for instance
-	    dirSpeakers = matrix.removeCol(0).asArray.collect({arg item;
+	    // set output channel (speaker) directions for instance
+	    dirChans = matrix.removeCol(0).asArray.collect({arg item;
 			item.asCartesian.asSpherical.angles
 		})
 	}
 	
 	dim { ^matrix.cols - 1}
 
-	numSpeakers { ^matrix.rows }
+	numChans { ^matrix.rows }
 
 }
 
