@@ -902,10 +902,6 @@ AtkEncoderMatrix {
 	    // set input channel directions for instance
 	    dirChans = directions;
 
-//		switch (directions.rank,					// 2D or 3D?
-//			1, {	this.init2D },
-//			2, { this.init3D }
-//		)
 		switch (directions.rank,					// 2D or 3D?
 			1, {									// 2D
 				if ( pattern == nil, {

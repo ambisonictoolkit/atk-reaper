@@ -4,6 +4,8 @@
 //		of HOA implementations
 
 
+// it may be useful to subclass much of this as UGens--in order to use UGen methods
+
 FOA {
 	var <w, <x, <y, <z;
 	
@@ -195,7 +197,7 @@ AtkDominateZ : AtkDominateX { }
 // Filters
 
 AtkProximity : Atk { 
-	*ar { arg w, x, y, z, distance = 0, mul = 1, add = 0;
+	*ar { arg w, x, y, z, distance = 1, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, distance).madd(mul, add);
 	}
 
@@ -203,7 +205,7 @@ AtkProximity : Atk {
 
 // RENAME to NFC
 AtkDistance : Atk { 
-	*ar { arg w, x, y, z, distance = 0, mul = 1, add = 0;
+	*ar { arg w, x, y, z, distance = 1, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, distance).madd(mul, add);
 	}
 		
@@ -258,8 +260,39 @@ AtkDecode {
 				decoderMatrix.shelfFreq, decoderMatrix.shelfK)
 		});
 
-		^Mix.fill( decoderMatrix.matrix.cols, { arg speaker;
-			decoderMatrix.matrix.flop.asArray.at(speaker) * in.at(speaker)
+		^Mix.fill( decoderMatrix.matrix.cols, { arg i; // fill harmonics
+			UGen.replaceZeroesWithSilence(
+				decoderMatrix.matrix.flop.asArray.at(i) * in.at(i)
+			)
 		}).madd(mul, add);
+	}
+}
+
+
+//------------------------------------------------------------------------
+// Encoder built using Mix and ATKMatrix
+//
+// Likely, we'll want to integrate this much better with FOA, etc., outputting
+// an FOA instance
+
+AtkEncode {
+	*ar { arg in, encoderMatrix, mul = 1, add = 0;
+		
+		var out;
+
+		// wrap input as array if needed, for mono inputs
+		in.isArray.not.if({ in = [in] });
+		
+		out = Mix.fill( encoderMatrix.matrix.cols, { arg i; // fill input mics/plane waves
+			UGen.replaceZeroesWithSilence(
+				encoderMatrix.matrix.flop.asArray.at(i) * in.at(i)
+			)
+		});
+		
+		if ( out.size < 4, {			// 1st order, fill missing harms with zeros
+			out = out ++ Silent.ar(4 - out.size)
+		});
+		
+		^out.madd(mul, add)
 	}
 }
