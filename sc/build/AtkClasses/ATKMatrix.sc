@@ -699,8 +699,8 @@ AtkEncoderMatrix {
 		^super.newCopyArgs('7.0').init7_0;
 	}
 
-	*newDirections { arg directions;
-		^super.newCopyArgs('dirs').initDirections(directions);
+	*newDirections { arg directions, pattern = nil;
+		^super.newCopyArgs('dirs').initDirections(directions, pattern);
 	}
 
 	*newPanto { arg numChans = 4, orientation = 'flat';
@@ -721,7 +721,7 @@ AtkEncoderMatrix {
 
 		var g0 = 2.sqrt.reciprocal;
 	    
-		// build decoder matrix, and set for instance
+		// build encoder matrix, and set for instance
 		matrix = Matrix.newClear(3, dirChans.size); // start w/ empty matrix
 	
 		dirChans.do({ arg theta, i;
@@ -737,7 +737,7 @@ AtkEncoderMatrix {
 
 		var g0 = 2.sqrt.reciprocal;
 	    
-		// build decoder matrix, and set for instance
+		// build encoder matrix, and set for instance
 		matrix = Matrix.newClear(4, dirChans.size); // start w/ empty matrix
 	
 		dirChans.do({ arg thetaPhi, i;
@@ -748,6 +748,74 @@ AtkEncoderMatrix {
 	              thetaPhi.at(1).sin
 			])
 		})
+	}
+
+	initInv2D { arg pattern;
+
+		var g0 = 2.sqrt.reciprocal;
+	    
+		// build 'decoder' matrix, and set for instance
+		matrix = Matrix.newClear(dirChans.size, 3); 	// start w/ empty matrix
+
+		if ( pattern.isArray,
+			{
+				dirChans.do({ arg theta, i;			// mic positions, indivd patterns
+					matrix.putRow(i, [
+						(1.0 - pattern.at(i)),
+			              pattern.at(i) * theta.cos,
+			              pattern.at(i) * theta.sin
+					])
+				})
+			}, {
+				dirChans.do({ arg theta, i;			// mic positions
+					matrix.putRow(i, [
+						(1.0 - pattern),
+			              pattern * theta.cos,
+			              pattern * theta.sin
+					])
+				})
+			}
+		);
+
+		// invert to encoder matrix
+		matrix = matrix.pseudoInverse;
+
+		matrix = matrix.putRow(0, matrix.getRow(0) * g0); // scale W
+	}
+
+	initInv3D { arg pattern;
+
+		var g0 = 2.sqrt.reciprocal;
+	    
+		// build 'decoder' matrix, and set for instance
+		matrix = Matrix.newClear(dirChans.size, 4); 	// start w/ empty matrix
+
+		if ( pattern.isArray,
+			{
+				dirChans.do({ arg thetaPhi, i;		// mic positions, indivd patterns
+					matrix.putRow(i, [
+						(1.0 - pattern.at(i)),
+			              pattern.at(i) * thetaPhi.at(1).cos * thetaPhi.at(0).cos,
+			              pattern.at(i) * thetaPhi.at(1).cos * thetaPhi.at(0).sin,
+			              pattern.at(i) * thetaPhi.at(1).sin
+					])
+				})
+			}, {
+				dirChans.do({ arg thetaPhi, i;		// mic positions
+					matrix.putRow(i, [
+						(1.0 - pattern),
+			              pattern * thetaPhi.at(1).cos * thetaPhi.at(0).cos,
+			              pattern * thetaPhi.at(1).cos * thetaPhi.at(0).sin,
+			              pattern * thetaPhi.at(1).sin
+					])
+				})
+			}
+		);
+
+		// invert to encoder matrix
+		matrix = matrix.pseudoInverse;
+
+		matrix = matrix.putRow(0, matrix.getRow(0) * g0); // scale W
 	}
 
 	initB {
@@ -762,6 +830,7 @@ AtkEncoderMatrix {
 	initAtoB { arg orientation, weight;
 		var bToAMatrix;
 
+		// retrieve corresponding A-format decoder
 		bToAMatrix = AtkDecoderMatrix.newBtoA(orientation, weight);
 
 	    // set input channel directions for instance
@@ -828,14 +897,30 @@ AtkEncoderMatrix {
 	    this.init2D
 	}
 
-	initDirections { arg directions;
+	initDirections { arg directions, pattern;
 
 	    // set input channel directions for instance
 	    dirChans = directions;
 
+//		switch (directions.rank,					// 2D or 3D?
+//			1, {	this.init2D },
+//			2, { this.init3D }
+//		)
 		switch (directions.rank,					// 2D or 3D?
-			1, {	this.init2D },
-			2, { this.init3D }
+			1, {									// 2D
+				if ( pattern == nil, {
+					this.init2D					// plane wave
+				}, {
+					this.initInv2D(pattern)			// mic inversion
+				})
+			},
+			2, {									// 3D
+				if ( pattern == nil, {
+					this.init3D					// plane wave
+				}, {
+					this.initInv3D(pattern)			// mic inversion
+				})
+			}
 		)
 	}
 
@@ -903,28 +988,12 @@ AtkEncoderMatrix {
 
 	initZoomH2 { arg angles, pattern, k;
 
-		var g0, g10, g20, g11, g21;
-
 	    // set input channel directions for instance
 	    dirChans = [ angles.at(0), angles.at(0).neg, angles.at(1), angles.at(1).neg ];
 
+		this.initInv2D(pattern);
 
-		// calculate g0, g1, g2 (scaled by pattern)
-		g0	= (1.0 - pattern) * 2.sqrt;
-		g10	= pattern * angles.at(0).cos;
-		g20	= pattern * angles.at(0).sin;
-		g11	= pattern * angles.at(1).cos;
-		g21	= pattern * angles.at(1).sin;
-
-		// return theta from output channel (speaker) number
-		matrix = Matrix.with([
-			[ g0, g10, g20 ],
-			[ g0, g10, g20.neg ],
-			[ g0, g11, g21 ],
-			[ g0, g11, g21.neg ]
-		]).pseudoInverse;
-
-		matrix = matrix.putRow(2, matrix.getRow(2) * k);
+		matrix = matrix.putRow(2, matrix.getRow(2) * k); // scale Y
 	}
 	
 	dim { ^matrix.rows - 1}	
