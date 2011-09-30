@@ -18,6 +18,7 @@
 // -------------------------------------------------------
 // quad (spec'd as narrow quad)
 // mono pink noise, sound synth function
+// various encoders
 (
 {
 	var fl, bl, br, fr;					// for quad output
@@ -51,14 +52,14 @@
 
 //	encoderMatrix = AtkEncoderMatrix.newOmni;			// 1 channel only...
 
-	encoderMatrix = AtkEncoderMatrix.newDirection;		// 3 channels only...
+//	encoderMatrix = AtkEncoderMatrix.newDirection;		// 3 channels only...
 //	encoderMatrix = AtkEncoderMatrix.newDirection(pi.neg/2);// 3 channels only...
 
 //	encoderMatrix = AtkEncoderMatrix.newDirections([[0, 0]]);
 //	encoderMatrix = AtkEncoderMatrix.newDirections([[pi/4, 0]]);
 //	encoderMatrix = AtkEncoderMatrix.newDirections([[pi.neg/2, 0]]);
 
-//	encoderMatrix = AtkEncoderMatrix.newB;
+	encoderMatrix = AtkEncoderMatrix.newB;
 
 
 	// ------------------------------------------------------------
@@ -68,9 +69,9 @@
 
 	// ------------------------------------------------------------
 	// encode
-//	sig = AtkEncode.ar(PanB.ar(sig, azim.neg/pi), encoderMatrix); // SC3s encoder is +/-1, CW
+	sig = AtkEncode.ar(PanB.ar(sig, azim.neg/pi), encoderMatrix); // SC3s encoder is +/-1, CW
 //	sig = AtkEncode.ar([sig], encoderMatrix);
-	sig = AtkEncode.ar(sig, encoderMatrix);
+//	sig = AtkEncode.ar(sig, encoderMatrix);
 //	sig;				// test raw b-format out
 	sig.dump;
 	
@@ -80,6 +81,565 @@
 	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
 
 	sig.dump;
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+// quad (spec'd as narrow quad)
+// mono pink noise, sound synth function
+// stereo encoder
+(
+{
+	var fl, bl, br, fr;					// for quad output
+	var azim, sig;
+	var decoderMatrix, angle, k;
+	var encoderMatrix;
+
+	// ------------------------------------------------------------
+	// constants
+	angle = pi/6;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
+
+	// kr.... for SC3's internal encoder
+	azim = MouseX.kr(pi, -pi);
+
+
+	// ------------------------------------------------------------
+	// set up decoder matrix
+	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
+
+
+	// ------------------------------------------------------------
+	// set up encoder matrix;
+
+//	encoderMatrix = AtkEncoderMatrix.newStereo; // +/-pi/2
+	encoderMatrix = AtkEncoderMatrix.newStereo(pi/4); // +/-pi/4
+//	encoderMatrix = AtkEncoderMatrix.newStereo((pi/2) - (pi/6)); // +/-pi/6
+
+
+	// ------------------------------------------------------------
+	// test sig
+	sig = PinkNoise.ar; 					// mono pink noise
+
+
+	// ------------------------------------------------------------
+	// encode
+	sig = AtkEncode.ar(Pan2.ar(sig, azim.neg/pi), encoderMatrix);
+//	sig;				// test raw b-format out
+	sig.dump;
+	
+
+	// ------------------------------------------------------------
+	// distance filter
+	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+
+	sig.dump;
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+// quad (spec'd as narrow quad)
+// mono pink noise, sound synth function
+// quad encoder
+(
+{
+	var fl, bl, br, fr;					// for quad output
+	var azim, sig;
+	var decoderMatrix, angle, k;
+	var encoderMatrix;
+
+	// ------------------------------------------------------------
+	// constants
+	angle = pi/6;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
+
+	// kr.... for SC3's internal encoder
+	azim = MouseX.kr(pi, -pi);
+
+
+	// ------------------------------------------------------------
+	// set up decoder matrix
+	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
+
+
+	// ------------------------------------------------------------
+	// set up encoder matrix;
+
+	encoderMatrix = AtkEncoderMatrix.newQuad;
+	encoderMatrix.dirChans.postln;
+
+
+	// ------------------------------------------------------------
+	// test sig
+	sig = PinkNoise.ar; 					// mono pink noise
+
+
+	// ------------------------------------------------------------
+	// SC3 quad encode
+	#fl, fr, bl, br = Pan4.ar(sig, azim.sin.neg, azim.cos);
+
+
+	// ------------------------------------------------------------
+	// encode
+	sig = AtkEncode.ar([fl, bl, br, fr], encoderMatrix);
+//	sig;				// test raw b-format out
+//	sig.dump;
+	
+
+	// ------------------------------------------------------------
+	// distance filter
+	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+
+//	sig.dump;
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+// quad (spec'd as narrow quad)
+// mono pink noise, sound synth function
+// quad encoder -- using directions
+(
+{
+	var fl, bl, br, fr;					// for quad output
+	var azim, sig;
+	var decoderMatrix, angle, k;
+	var encoderMatrix;
+
+	// ------------------------------------------------------------
+	// constants
+	angle = pi/6;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
+
+	// kr.... for SC3's internal encoder
+	azim = MouseX.kr(pi, -pi);
+
+
+	// ------------------------------------------------------------
+	// set up decoder matrix
+	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
+
+
+	// ------------------------------------------------------------
+	// set up encoder matrix;
+
+	encoderMatrix = AtkEncoderMatrix.newDirections([pi/4, pi * 3/4, pi.neg * 3/4, pi.neg/4]);
+	encoderMatrix.dirChans.postln;
+
+
+	// ------------------------------------------------------------
+	// test sig
+	sig = PinkNoise.ar; 					// mono pink noise
+
+
+	// ------------------------------------------------------------
+	// SC3 quad encode
+	#fl, fr, bl, br = Pan4.ar(sig, azim.sin.neg, azim.cos);
+
+
+	// ------------------------------------------------------------
+	// encode
+	sig = AtkEncode.ar([fl, bl, br, fr], encoderMatrix);
+//	sig;				// test raw b-format out
+//	sig.dump;
+	
+
+	// ------------------------------------------------------------
+	// distance filter
+	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+
+//	sig.dump;
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+// quad (spec'd as narrow quad)
+// mono pink noise, sound synth function
+// panto (hex) encoder, flat
+(
+{
+	var fl, bl, br, fr;					// for quad output
+	var ll, rr;
+	var azim, sig;
+	var decoderMatrix, angle, k;
+	var encoderMatrix;
+	var numChans;
+
+	// ------------------------------------------------------------
+	// constants
+	angle = pi/6;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
+
+	numChans = 6;
+
+	// kr.... for SC3's internal encoder
+	azim = MouseX.kr(pi, -pi);
+
+
+	// ------------------------------------------------------------
+	// set up decoder matrix
+	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
+
+
+	// ------------------------------------------------------------
+	// set up encoder matrix;
+
+	encoderMatrix = AtkEncoderMatrix.newPanto(numChans);
+	encoderMatrix.dirChans.postln;
+
+
+	// ------------------------------------------------------------
+	// test sig
+	sig = PinkNoise.ar; 					// mono pink noise
+
+
+	// ------------------------------------------------------------
+	// SC3 hex encode
+	#fl, fr, rr, br, bl, ll = PanAz.ar(numChans, sig, azim.neg/pi);
+
+
+	// ------------------------------------------------------------
+	// encode
+	sig = AtkEncode.ar([fl, ll, bl, br, rr, fr], encoderMatrix);
+//	sig;				// test raw b-format out
+//	sig.dump;
+	
+
+	// ------------------------------------------------------------
+	// distance filter
+	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+
+//	sig.dump;
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+// quad (spec'd as narrow quad)
+// mono pink noise, sound synth function
+// panto (hex) encoder, point
+(
+{
+	var fl, bl, br, fr;					// for quad output
+	var ff, bb;
+	var azim, sig;
+	var decoderMatrix, angle, k;
+	var encoderMatrix;
+	var numChans;
+
+	// ------------------------------------------------------------
+	// constants
+	angle = pi/6;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
+
+	numChans = 6;
+
+	// kr.... for SC3's internal encoder
+	azim = MouseX.kr(pi, -pi);
+
+
+	// ------------------------------------------------------------
+	// set up decoder matrix
+	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
+
+
+	// ------------------------------------------------------------
+	// set up encoder matrix;
+
+	encoderMatrix = AtkEncoderMatrix.newPanto(numChans, 'point');
+	encoderMatrix.dirChans.postln;
+
+
+	// ------------------------------------------------------------
+	// test sig
+	sig = PinkNoise.ar; 					// mono pink noise
+
+
+	// ------------------------------------------------------------
+	// SC3 hex encode
+	#ff, fr, br, bb, bl, fl = PanAz.ar(numChans, sig, azim.neg/pi, 1, 2, 0);
+
+
+	// ------------------------------------------------------------
+	// encode
+	sig = AtkEncode.ar([ff, fl, bl, bb, br, fr], encoderMatrix);
+//	sig;				// test raw b-format out
+//	sig.dump;
+	
+
+	// ------------------------------------------------------------
+	// distance filter
+	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+
+//	sig.dump;
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+// quad (spec'd as narrow quad)
+// mono pink noise, sound synth function
+// peri (cube) encoder, point
+(
+{
+	var fl, bl, br, fr;					// for quad output
+	var flu, blu, bru, fru, fld, bld, brd, frd;
+	var azim, sig;
+	var decoderMatrix, angle, k;
+	var encoderMatrix;
+	var numChanPairs;
+
+	// ------------------------------------------------------------
+	// constants
+	angle = pi/6;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
+
+	numChanPairs = 4;
+
+	// kr.... for SC3's internal encoder
+	azim = MouseX.kr(pi, -pi);
+
+
+	// ------------------------------------------------------------
+	// set up decoder matrix
+	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
+
+
+	// ------------------------------------------------------------
+	// set up encoder matrix;
+
+	encoderMatrix = AtkEncoderMatrix.newPeri(numChanPairs, 0.61547970867039, 'flat');
+	encoderMatrix.dirChans.postln;
+
+
+	// ------------------------------------------------------------
+	// test sig
+	sig = PinkNoise.ar; 					// mono pink noise
+
+
+	// ------------------------------------------------------------
+	// SC3 quad encode
+	#fl, fr, bl, br = Pan4.ar(sig, azim.sin.neg, azim.cos);
+
+
+	// ------------------------------------------------------------
+	// encode
+	sig = AtkEncode.ar([fl, bl, br, fr, fl, bl, br, fr], encoderMatrix);
+//	sig;				// test raw b-format out
+//	sig.dump;
+	
+
+	// ------------------------------------------------------------
+	// distance filter
+	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+
+//	sig.dump;
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+// quad (spec'd as narrow quad)
+// mono pink noise, sound synth function
+// a_to_b encoder
+(
+{
+	var fl, bl, br, fr;					// for quad output
+	var azim, sig;
+	var decoderMatrix, angle, k;
+	var encoderMatrix;
+
+	// ------------------------------------------------------------
+	// constants
+	angle = pi/6;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
+
+
+	// kr.... for SC3's internal encoder
+	azim = MouseX.kr(pi, -pi);
+
+
+	// ------------------------------------------------------------
+	// set up decoder matrix
+	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
+
+
+	// ------------------------------------------------------------
+	// set up encoder matrix;
+
+	encoderMatrix = AtkEncoderMatrix.newAtoB;
+	encoderMatrix.dirChans.postln;
+
+
+	// ------------------------------------------------------------
+	// test sig
+	sig = PinkNoise.ar([1, 1, 1, 1]); 			// 4 chans decorrelated pink noise
+
+
+	// ------------------------------------------------------------
+	// encode
+	sig = AtkEncode.ar(sig, encoderMatrix);
+//	sig;				// test raw b-format out
+//	sig.dump;
+	
+
+	// ------------------------------------------------------------
+	// distance filter
+	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+
+//	sig.dump;
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+// quad (spec'd as narrow quad)
+// mono pink noise, sound synth function
+// a_to_b encoder
+(
+{
+	var fl, bl, br, fr;					// for quad output
+	var azim, sig;
+	var decoderMatrix, angle, k;
+	var encoderMatrix;
+	var freq, detune;
+
+	// ------------------------------------------------------------
+	// constants
+	angle = pi/6;
+//	k = 1;					// velocity, or 'strict' soundfield
+//	k = 1/2.sqrt;				// energy, for 2D
+//	k = 1/2;					// controlled opposites, for 2D
+//	k = 'velocity';			// velocity
+//	k = 'energy';				// energy
+//	k = 'controlled';			// controlled opposites
+//	k = 'single';				// synonym for energy
+	k = 'dual';				// dual band
+
+	freq = 110.0;
+	detune = 0.01;
+
+
+	// kr.... for SC3's internal encoder
+	azim = MouseX.kr(pi, -pi);
+
+
+	// ------------------------------------------------------------
+	// set up decoder matrix
+	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
+
+
+	// ------------------------------------------------------------
+	// set up encoder matrix;
+
+	encoderMatrix = AtkEncoderMatrix.newAtoB;
+	encoderMatrix.dirChans.postln;
+
+
+	// ------------------------------------------------------------
+	// test sig
+	sig = Saw.ar(Array.fill(4, { freq * (1 + detune.rand2) })); 			// 4 chans detuned saw
+
+
+	// ------------------------------------------------------------
+	// encode
+	sig = AtkEncode.ar(sig, encoderMatrix);
+//	sig;				// test raw b-format out
+//	sig.dump;
+	
+
+	// ------------------------------------------------------------
+	// distance filter
+	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+
+//	sig.dump;
 
 	// decode to output
 	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
