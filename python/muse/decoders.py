@@ -1553,10 +1553,11 @@ def b_to_ITU5(a, kind = 'foc'):
     
     Args:
         - a         : Input B-format signal
-        - decoder : Two decoders are available. 
+        - decoder : Three decoders are available. 
 
                 'foc': LF and HF optimised with angular distortions
                 'equ': Another potential full range decoder, less angular distortion
+                'fou': Four speakers only (no centre), less angular distortion
 
     Decode a three dimensional ambisonic B-format signal to ITU-5.0.
     Embeded Wiggins coefficients used by agreement between:
@@ -1586,6 +1587,12 @@ def b_to_ITU5(a, kind = 'foc'):
     # C1 (X)  0.0850  0.4350  -0.2850 -0.2850 0.4350
     # S1 (Y)  0.0000  0.3400  0.4050  -0.4050 -0.3400
 
+    # Hi Joseph, here are some more 5.1 coeffs
+    #         C       FL      BL      BR      FR
+
+    # W       0.0000  0.4250  0.6300  0.6300  0.4250
+    # C1 (X)  0.0000  0.3850  -0.2750 -0.2750 0.3850
+    # S1 (Y)  0.0000  0.3300  0.2850  -0.2850 -0.3300
 
     # define decoders, as a dictionary
     decoder_dict = {
@@ -1595,7 +1602,11 @@ def b_to_ITU5(a, kind = 'foc'):
 
         'equ' : [[.0000, .3650,  .5550,  .5550,  .3650],
                  [.0850, .4350, -.2850, -.2850,  .4350],
-                 [.0000, .3400,  .4050, -.4050, -.3400]]
+                 [.0000, .3400,  .4050, -.4050, -.3400]],
+
+        'fou' : [[.0000, .4250,  .6300,  .6300,  .4250],
+                 [.0000, .3850, -.2750, -.2750,  .3850],
+                 [.0000, .3300,  .2850, -.2850, -.3300]]
         }
 
     # construct decoder
