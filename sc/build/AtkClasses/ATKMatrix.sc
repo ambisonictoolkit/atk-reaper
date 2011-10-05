@@ -653,13 +653,6 @@ AtkDecoderMatrix {
 }
 
 
-//	b_to_uhj            			"Ambisonic Decoders for HDTV" (1992)
-//	b_to_binaural       			HRTF decoding
-
-// kernel matrix for kernel decoders
-//AtkDecoderKernel {
-
-
 //-----------------------------------------------------------------------
 //encoders
 
@@ -1002,5 +995,164 @@ AtkEncoderMatrix {
 	dim { ^matrix.rows - 1}	
 
 	numChans { ^matrix.cols }
+
+}
+
+
+//------------------------------------------------------------------------
+// kernel type decoders
+//------------------------------------------------------------------------
+
+
+//	b_to_uhj            			"Ambisonic Decoders for HDTV" (1992)
+//	b_to_binaural       			HRTF decoding
+
+// kernel matrix for kernel decoders
+//AtkDecoderKernel {
+
+// NOTE:
+//	Need to include a way to catch errors for SRs, kernelSizes, subjectIDs
+//
+// ALSO:
+//	Add a way to list SRs, kernelSizes, subjectIDs.
+
+AtkDecoderKernel {
+	var <kind, <subjectID;
+	var <kernel;
+	var <dirChans;
+
+	*newSpherical { arg subjectID = 0004, kernelSize = 512, server = Server.default;
+		^super.newCopyArgs('spherical', subjectID).initKernel(kernelSize, server);
+	}
+	
+	*newListen { arg subjectID = 1002, server = Server.default;
+		^super.newCopyArgs('listen', subjectID).initKernel(512, server);
+	}
+	
+	*newCIPIC { arg subjectID = 0021, server = Server.default;
+		^super.newCopyArgs('cipic', subjectID).initKernel(256, server);
+	}
+	
+	*newCIPICRaw { arg subjectID = 0021, server = Server.default;
+		^super.newCopyArgs('cipicRaw', subjectID).initKernel(256, server);
+	}
+	
+	*newUHJ { arg kernelSize = 512, server = Server.default;
+		^super.newCopyArgs('uhj', 0).initKernel(kernelSize, server);
+	}
+	
+	initPath {
+		
+		var kernelLibPath;
+		var sphericalPath, listenPath, cipicPath, cipicRawPath, uhjPath;
+		
+		kernelLibPath = PathName.new(
+			"~/Library/Application Support/SuperCollider/kernels/ATK_kernels"
+		);
+
+		sphericalPath	= PathName.new("/FOA/decoders" ++ "/Spherical_HRIR");
+		listenPath 	= PathName.new("/FOA/decoders" ++ "/Listen_HRIR");
+		cipicPath 	= PathName.new("/FOA/decoders" ++ "/CIPIC_EQ_HRIR");
+		cipicRawPath 	= PathName.new("/FOA/decoders" ++ "/CIPIC_HRIR");
+		uhjPath 		= PathName.new("/FOA/decoders" ++ "/UHJ");
+
+		switch ( kind,
+			'spherical', 	{ ^kernelLibPath +/+ sphericalPath },
+			'listen', 	{ ^kernelLibPath +/+ listenPath },
+			'cipic', 		{ ^kernelLibPath +/+ cipicPath },
+			'cipicRaw', 	{ ^kernelLibPath +/+ cipicRawPath },
+			'uhj', 		{ ^kernelLibPath +/+ uhjPath }
+		)
+	}
+
+	initKernel { arg kernelSize, server;
+		
+		var databasePath, subjectPath;
+		var chans;
+		var sampleRate;
+		var errorMsg;
+		
+		// constants
+		chans = 2;			// stereo kernel
+		
+		// init dirChans (output channel (speaker) directions) and kernel sr
+		if ( kind == 'uhj', {
+		    dirChans = [ pi/6, pi.neg/6 ];
+			sampleRate = "None";
+		}, {
+			dirChans = [ 5/9 * pi, 5/9 * pi.neg ];
+			sampleRate = server.sampleRate.asString;
+		});
+		
+
+		// init kernel root, generate subjectPath and kernelFiles
+		databasePath = this.initPath;
+
+		subjectPath = databasePath +/+ PathName.new(
+			"/SR_" ++ sampleRate.padLeft(6, "0") ++ "/N_" ++ 
+				kernelSize.asString.padLeft(4, "0") ++ "/" ++
+				subjectID.asString.padLeft(4, "0")
+		);
+		
+		
+		// load kernel
+		if ( server.serverRunning, {		// is server running?
+
+			if ( subjectPath.isFolder, {	// if kernel path exists, load
+	
+				kernel = subjectPath.files.collect({ arg kernelPath;
+					chans.collect({ arg chan;
+						Buffer.readChannel(server, kernelPath.fullPath, channels: [chan])
+					})
+				})
+	
+			}, {
+				
+				// else, catch errors
+				if ( databasePath.isFolder.not, {
+					Error("ATK kernel database missing.").throw
+				}, {
+					if ( PathName.new(
+							PathName.new(
+								subjectPath.parentPath
+							).parentPath
+						).isFolder.not, {
+						errorMsg = "Samplerate = % is not available for % kernel decoder.".format(sampleRate, kind);
+					}, {
+						if ( PathName.new(subjectPath.parentPath).isFolder.not, {
+							errorMsg = "Kernel size = % is not available for % kernel decoder.".format(kernelSize, kind);
+						}, {
+							if ( subjectPath.isFolder.not, {
+								errorMsg = "Subject % is not available for % kernel decoder.".format(subjectID, kind);
+							})
+						})
+					})
+				});
+				Error(errorMsg).throw
+			})
+
+		}, {								// error, server not booted!
+			Error(
+				"Please boot server: %. Decoder kernel failed to load.".format(
+					server.name.asString
+				)
+			).throw
+		})
+	}
+
+	freeKernel {
+		kernel.shape.at(0).do({ arg i;
+			kernel.shape.at(1).do({ arg j;
+				kernel.at(i).at(j).close
+			})
+		});
+		"Kernel buffer freed.".postln
+	}
+
+	dim { ^kernel.shape.at(0) - 1}
+
+	numChans { ^kernel.shape.at(1) }
+
+	kernelSize { ^kernel.at(0).at(0).numFrames }
 
 }
