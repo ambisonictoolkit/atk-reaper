@@ -233,3 +233,45 @@
 )
 
 
+
+
+// -------------------------------------------------------
+// test for kernel type decoders
+//
+// -------------------------------------------------------
+
+// uhj test
+// mono pink noise, sound synth function
+(
+{
+	var	azim, sig;
+	var	decoderKernel;
+
+	// kr....
+	azim = MouseX.kr(pi, -pi);
+
+
+	// set up kernel
+	decoderKernel = AtkDecoderKernel.newUHJ;
+
+	// test sig
+	sig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
+
+
+	// decode to output
+	AtkDecode.ar(sig, a);
+//	AtkDecode.ar(0, a);
+//	AtkDecode.ar(sig, decoderKernel);
+
+}.scope;
+//}
+)
+
+a.kernel.at(0).at(0)
+
+a.kernel.shape.at(0)
+a.kernel.shape.at(1)
+a.kernel.at(0).at(0).numFrames
+
+a.kernel.shape
+b.shape

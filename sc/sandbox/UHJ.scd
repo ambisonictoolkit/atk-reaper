@@ -25,9 +25,10 @@
 	res = decoderKernels.shape.at(0).collect({ arg i;	// harmonic [W, X, Y]
 		decoderKernels.shape.at(1).collect({ arg j;	// channel [L, R]
 			Convolution2.ar(
-			bSig.at(i),
-			decoderKernels.at(i).at(j),
-			framesize: decoderKernels.at(i).at(j).numFrames)
+				bSig.at(i),
+				decoderKernels.at(i).at(j),
+				framesize: decoderKernels.at(i).at(j).numFrames
+			)
 		})
 	});
 	Mix.ar(res);								// mix
@@ -99,7 +100,8 @@ azim = MouseX.kr(pi, -pi);
 // test signal
 bSig = AtkMonoToB.ar(PinkNoise.ar, azim);
 
-~atkBtoUHJ.value(bSig, b)
+//~atkBtoUHJ.value(bSig, b)
+~atkBtoUHJ.value(bSig, a.kernel)
 
 }.scope;
 )

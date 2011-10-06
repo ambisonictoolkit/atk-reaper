@@ -254,17 +254,73 @@ AtkPsychoShelf {
 
 AtkDecode {
 	*ar { arg in, decoderMatrix, mul = 1, add = 0;
-		
-		if ( decoderMatrix.shelfFreq.isNumber, {		// shelf filter?
-			in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
-				decoderMatrix.shelfFreq, decoderMatrix.shelfK)
-		});
 
-		^Mix.fill( decoderMatrix.matrix.cols, { arg i; // fill harmonics
-			UGen.replaceZeroesWithSilence(
-				decoderMatrix.matrix.flop.asArray.at(i) * in.at(i)
-			)
-		}).madd(mul, add);
+//		var res;
+
+		switch ( decoderMatrix.class, 
+
+			AtkDecoderMatrix, {
+
+				if ( decoderMatrix.shelfFreq.isNumber, { // shelf filter?
+					in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
+						decoderMatrix.shelfFreq, decoderMatrix.shelfK)
+				});
+		
+				^Mix.fill( decoderMatrix.matrix.cols, { arg i; // fill harmonics
+					UGen.replaceZeroesWithSilence(
+						decoderMatrix.matrix.flop.asArray.at(i) * in.at(i)
+					)
+				}).madd(mul, add)
+			},
+			
+			AtkDecoderKernel, {
+
+				// this works is the kernel has already been loaded
+				^Mix.ar(
+					decoderMatrix.kernel.shape.at(0).collect({ arg i; // harmonic [W, X, Y]
+						decoderMatrix.kernel.shape.at(1).collect({ arg j; // channel [L, R]
+							Convolution2.ar(
+								in.at(i),
+								decoderMatrix.kernel.at(i).at(j),
+								framesize: decoderMatrix.kernel.at(i).at(j).numFrames
+							)
+						})
+					})
+				).madd(mul, add)
+
+//				res = Array.newClear(decoderMatrix.kernel.size * decoderMatrix.kernel.rank);
+//
+//
+//				"before decoderMatrix".postln;
+//
+//				decoderMatrix.kernel.size.do({ arg i; // harmonic [W, X, Y]
+//					decoderMatrix.kernel.rank.do({ arg j; // channel [L, R]
+//						decoderMatrix.kernel.at(i).at(j).updateInfo({ arg buf;
+////							res.put((i * decoderMatrix.kernel.rank) + j,
+////								Convolution2.ar(
+////									in.at(i),
+////									buf,
+////									framesize: buf.numFrames
+////								)
+////							);
+////							if ((i * decoderMatrix.kernel.rank) + j + 1 == 
+////								decoderMatrix.kernel.size * decoderMatrix.kernel.rank, {
+////									res = res.reshape(decoderMatrix.kernel.size,
+////										decoderMatrix.kernel.rank);
+////									^Mix.ar(res).madd(mul, add)
+////							})
+//
+//							"i = %".format(i).postln;
+//							"j = %".format(j).postln;
+//
+//						})
+//					})
+//				});
+//
+////				^res.asArray
+////				^Mix.ar(res).madd(mul, add)
+			}
+		)
 	}
 }
 
