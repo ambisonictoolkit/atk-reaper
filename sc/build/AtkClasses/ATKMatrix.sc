@@ -1010,16 +1010,11 @@ AtkEncoderMatrix {
 // kernel matrix for kernel decoders
 //AtkDecoderKernel {
 
-// NOTE:
-//	Need to include a way to catch errors for SRs, kernelSizes, subjectIDs
-//
-// ALSO:
-//	Add a way to list SRs, kernelSizes, subjectIDs.
-
 AtkDecoderKernel {
 	var <kind, <subjectID;
 	var <kernel;
 	var <dirChans;
+	
 
 	*newSpherical { arg subjectID = 0004, kernelSize = 512, server = Server.default;
 		^super.newCopyArgs('spherical', subjectID).initKernel(kernelSize, server);
@@ -1095,48 +1090,76 @@ AtkDecoderKernel {
 		);
 		
 		
-		// load kernel
-		if ( server.serverRunning, {		// is server running?
-
-			if ( subjectPath.isFolder, {	// if kernel path exists, load
-	
-				kernel = subjectPath.files.collect({ arg kernelPath;
-					chans.collect({ arg chan;
-						Buffer.readChannel(server, kernelPath.fullPath, channels: [chan])
-					})
-				})
-	
-			}, {
-				
-				// else, catch errors
-				if ( databasePath.isFolder.not, {
-					Error("ATK kernel database missing.").throw
-				}, {
-					if ( PathName.new(
-							PathName.new(
-								subjectPath.parentPath
-							).parentPath
-						).isFolder.not, {
-						errorMsg = "Samplerate = % is not available for % kernel decoder.".format(sampleRate, kind);
-					}, {
-						if ( PathName.new(subjectPath.parentPath).isFolder.not, {
-							errorMsg = "Kernel size = % is not available for % kernel decoder.".format(kernelSize, kind);
-						}, {
-							if ( subjectPath.isFolder.not, {
-								errorMsg = "Subject % is not available for % kernel decoder.".format(subjectID, kind);
-							})
-						})
-					})
-				});
-				Error(errorMsg).throw
-			})
-
-		}, {								// error, server not booted!
+		// attempt to load kernel
+		if ( server.serverRunning.not, {		// is server running?
+			
+			// throw server error!
 			Error(
 				"Please boot server: %. Decoder kernel failed to load.".format(
 					server.name.asString
 				)
 			).throw
+		}, {
+			if ( subjectPath.isFolder.not, {	// does kernel path exist?
+
+				case
+				// --> missing kernel database
+					{ databasePath.isFolder.not }
+					{ errorMsg = "ATK kernel database missing!" }
+
+				// --> unsupported SR
+					{ PathName.new(subjectPath.parentLevelPath(2)).isFolder.not }
+					{
+						"Supported samplerates:".warn;
+						PathName.new(subjectPath.parentLevelPath(3)).folders.do({
+							arg folder;
+							("\t" + folder.folderName[3..].asInteger.asString).postln;
+					});
+
+						errorMsg = "Samplerate = % is not available for".format(sampleRate)
+							+
+							"% kernel decoder.".format(kind)
+					}
+
+				// --> unsupported kernelSize
+					{ PathName.new(subjectPath.parentLevelPath(1)).isFolder.not }
+					{
+						"Supported kernel sizes:".warn;
+						PathName.new(subjectPath.parentLevelPath(2)).folders.do({
+							arg folder;
+							("\t" + folder.folderName[2..].asInteger.asString).postln;
+					});
+
+						errorMsg = "Kernel size = % is not available for".format(kernelSize)
+						+
+						"% kernel decoder.".format(kind)
+					}
+
+				// --> unsupported subject
+					{ subjectPath.isFolder.not }
+					{
+						"Supported subjects:".warn;
+						PathName.new(subjectPath.parentLevelPath(1)).folders.do({
+							arg folder;
+							("\t" + folder.folderName).postln;
+					});
+
+						errorMsg = "Subject % is not available for".format(subjectID)
+						+
+						"% kernel decoder.".format(kind)
+					};
+
+				// throw error!
+				"\n".post;
+				Error(errorMsg).throw
+			}, {
+				// Else... everything is fine! Load kernel.
+				kernel = subjectPath.files.collect({ arg kernelPath;
+					chans.collect({ arg chan;
+						Buffer.readChannel(server, kernelPath.fullPath, channels: [chan])
+					})
+				})
+			})
 		})
 	}
 
@@ -1155,4 +1178,25 @@ AtkDecoderKernel {
 
 	kernelSize { ^kernel.at(0).at(0).numFrames }
 
+}
+
+
+//------------------------------------------------------------------------
+// Extension to PathName... here for the time being
++ PathName {
+
+	parentLevelPath { arg index;
+		
+		var ci = this.colonIndices;
+
+		^if( index == 0, {
+			fullPath
+		}, {		
+			if((fullPath.last.isPathSeparator) && (ci.size > 1), {
+				fullPath.copyRange(0, ci[ci.size - (1 + index)])
+			}, {
+				fullPath.copyRange(0, ci[ci.size - index])
+			})
+		})
+	}
 }
