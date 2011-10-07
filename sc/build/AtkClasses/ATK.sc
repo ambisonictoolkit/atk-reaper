@@ -255,8 +255,6 @@ AtkPsychoShelf {
 AtkDecode {
 	*ar { arg in, decoderMatrix, mul = 1, add = 0;
 
-//		var res;
-
 		switch ( decoderMatrix.class, 
 
 			AtkDecoderMatrix, {
@@ -287,38 +285,6 @@ AtkDecode {
 						})
 					})
 				).madd(mul, add)
-
-//				res = Array.newClear(decoderMatrix.kernel.size * decoderMatrix.kernel.rank);
-//
-//
-//				"before decoderMatrix".postln;
-//
-//				decoderMatrix.kernel.size.do({ arg i; // harmonic [W, X, Y]
-//					decoderMatrix.kernel.rank.do({ arg j; // channel [L, R]
-//						decoderMatrix.kernel.at(i).at(j).updateInfo({ arg buf;
-////							res.put((i * decoderMatrix.kernel.rank) + j,
-////								Convolution2.ar(
-////									in.at(i),
-////									buf,
-////									framesize: buf.numFrames
-////								)
-////							);
-////							if ((i * decoderMatrix.kernel.rank) + j + 1 == 
-////								decoderMatrix.kernel.size * decoderMatrix.kernel.rank, {
-////									res = res.reshape(decoderMatrix.kernel.size,
-////										decoderMatrix.kernel.rank);
-////									^Mix.ar(res).madd(mul, add)
-////							})
-//
-//							"i = %".format(i).postln;
-//							"j = %".format(j).postln;
-//
-//						})
-//					})
-//				});
-//
-////				^res.asArray
-////				^Mix.ar(res).madd(mul, add)
 			}
 		)
 	}
