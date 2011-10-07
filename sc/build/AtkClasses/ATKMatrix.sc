@@ -650,6 +650,10 @@ AtkDecoderMatrix {
 
 	numChans { ^matrix.rows }
 
+	printOn { arg stream;
+		stream << this.class.name << "(" <<* [kind, this.dim, this.numChans] <<")";
+	}
+
 }
 
 
@@ -996,6 +1000,9 @@ AtkEncoderMatrix {
 
 	numChans { ^matrix.cols }
 
+	printOn { arg stream;
+		stream << this.class.name << "(" <<* [kind, this.dim, this.numChans] <<")";
+	}
 }
 
 
@@ -1156,14 +1163,22 @@ AtkDecoderKernel {
 				// Else... everything is fine! Load kernel.
 				kernel = subjectPath.files.collect({ arg kernelPath;
 					chans.collect({ arg chan;
-						Buffer.readChannel(server, kernelPath.fullPath, channels: [chan])
+						Buffer.readChannel(server, kernelPath.fullPath, channels: [chan],
+							action: { arg buf;
+								(
+									"Kernel %, channel % loaded.".format(
+										kernelPath.fileName, chan
+									)
+								).postln
+							}
+						)
 					})
 				})
 			})
 		})
 	}
 
-	freeKernel {
+	free {
 		kernel.shape.at(0).do({ arg i;
 			kernel.shape.at(1).do({ arg j;
 				kernel.at(i).at(j).close
@@ -1178,6 +1193,10 @@ AtkDecoderKernel {
 
 	kernelSize { ^kernel.at(0).at(0).numFrames }
 
+	printOn { arg stream;
+		stream << this.class.name << "(" <<*
+			[kind, this.dim, this.numChans, subjectID, this.kernelSize] <<")";
+	}
 }
 
 
