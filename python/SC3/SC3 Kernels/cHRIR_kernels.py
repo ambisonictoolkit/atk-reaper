@@ -6,8 +6,14 @@
 #
 # Kernels are classified by kernel size, N, subject, and stored in directory: 
 #
+
 #       'ATK_kernels/FOA/decoders/CIPIC_HRIR/SR_[sr]/N_[kernel_size]/ \
 #           [subject_ID]'
+
+#       '(root or ~)/Library/Application Support/ATK/kernels/FOA/decoders/ \
+#           cipic_raw/[sr]/[kernel_size]/[subject_id]'
+#
+
 #
 # Within, four [W,X,Y,Z] two channel [L,R] kernels are found, named:
 #
@@ -50,25 +56,33 @@ pos = spher_to_cart(
     )
 
 # HRIR dirs
-database_dir = '/Users/josephla/Documents/Developer/CIPIC_hrtf_database/standard_hrir_database/'
+#database_dir = '/Users/josephla/Documents/Developer/CIPIC_hrtf_database/standard_hrir_database/'
+hrir_database_dir = '/Library/Application Support/HRTF/CIPIC/standard_hrir_database'
 
 
 file_type   = 'wav'         # write file...
-#encoding    = 'pcm24'
 encoding    = 'pcm32'
 endianness  = 'file'
 
 
-target_dir  = '/Volumes/Audio/test'      # temp write dir
-file_dir    = '/ATK_kernels/FOA/decoders/CIPIC_HRIR'
+##target_dir  = '/Volumes/Audio/test'      # temp write dir
+##file_dir    = '/ATK_kernels/FOA/decoders/CIPIC_HRIR'
+user_dir        = True                              # write library to user dir?
+library_dir     = '/Library/Application Support/ATK'      # library location
+database_dir    = '/kernels/FOA/decoders/cipic_raw'
 
 file_names  = ['HRIR_W', 'HRIR_X', 'HRIR_Y', 'HRIR_Z']
 
 
+# is user dir set?
+if user_dir:
+    library_dir = os.path.expanduser('~' + library_dir)
+    hrir_database_dir = os.path.expanduser('~' + hrir_database_dir)
+
 # generate subject IDs
 subject_ids = []
-for dir_name in os.listdir(database_dir):
-    if os.path.isdir(os.path.join(database_dir, dir_name)):
+for dir_name in os.listdir(hrir_database_dir):
+    if os.path.isdir(os.path.join(hrir_database_dir, dir_name)):
         name = dir_name[8:]
         if name.isdigit():
             subject_ids += [name]
@@ -85,7 +99,8 @@ for sr in srs:                          # SR
 
             # ----- generate decoder kernels
             decoder_kernels = cHRIR_decoder_kernel(pos, k, \
-                                                   subject_id, database_dir)
+                                                   subject_id, \
+                                                   hrir_database_dir)
             # ----- normalise against spherical HRIR
             decoder_kernels *= sphere_rms / rms(decoder_kernels[0])
 
@@ -105,10 +120,15 @@ for sr in srs:                          # SR
             # ----- generate file names
             write_files = [] 
             for name in file_names:
+##                write_files += [
+##                    target_dir + file_dir + \
+##                    '/SR_' + str(sr).zfill(6) + '/N_' + str(N).zfill(4) + '/' + \
+##                    '0' + subject_id + '/' + name + '.' + file_type[:3]
+##                    ]
                 write_files += [
-                    target_dir + file_dir + \
-                    '/SR_' + str(sr).zfill(6) + '/N_' + str(N).zfill(4) + '/' + \
-                    '0' + subject_id + '/' + name + '.' + file_type[:3]
+                    os.path.join(library_dir + database_dir, str(sr), str(N), \
+                                 '0' + subject_id, \
+                                 name + '.' + file_type[:3])
                     ]
 
             # ----- write out decoder kernels

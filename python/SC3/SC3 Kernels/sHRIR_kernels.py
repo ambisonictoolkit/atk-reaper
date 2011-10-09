@@ -6,8 +6,8 @@
 #
 # Kernels are classified by kernel size, N, and stored in directory: 
 #
-#       'ATK_kernels/FOA/decoders/Spherical_HRIR/SR_[sr]/N_[kernel_size]/ \
-#           [subject_id]'
+#       '(root or ~)/Library/Application Support/ATK/kernels/FOA/decoders/ \
+#           spherical/[sr]/[kernel_size]/[subject_id]'
 #
 # Within, three [W,X,Y] two channel [L,R] kernels are found, named:
 #
@@ -32,8 +32,8 @@ from muse import *
 import os
 
 # params
-srs         = array([44100, 48000, 88200, 96000, 192000]) # sample rates
-Ns          = array([512, 1024, 2048, 4096, 8192])    # kernel lengths
+srs         = array([44100, 48000, 88200, 96000, 192000])   # sample rates
+Ns          = array([256, 512, 1024, 2048, 4096, 8192])     # kernel lengths
 
 a           = 2./3              # Duda anthro model values
 var         = 0.123494002733    # used to generate radius map
@@ -50,17 +50,20 @@ pos = pol_to_cart(                    # horzontal loudspeaker layout
            [1, deg_to_rad(90)]])
     )
 
-
 file_type   = 'wav'         # write file...
-#encoding    = 'pcm24'
 encoding    = 'pcm32'
 endianness  = 'file'
 
 
-target_dir  = '/Volumes/Audio/test'      # temp write dir
-file_dir    = '/ATK_kernels/FOA/decoders/Spherical_HRIR'
+user_dir        = True                              # write library to user dir?
+library_dir     = '/Library/Application Support/ATK'      # library location
+database_dir    = '/kernels/FOA/decoders/spherical'
 
 file_names  = ['HRIR_W', 'HRIR_X', 'HRIR_Y']
+
+# is user dir set?
+if user_dir:
+    library_dir = os.path.expanduser('~' + library_dir)
 
 
 # generate subjects and subject data
@@ -72,7 +75,6 @@ mod_r = (var * (                        # model to match duda's measured rs
 subject_ids = []                        # subject ids
 for i in range(num_subjects):
     subject_ids += [str(i).zfill(4)]
-
 
 
 # ----- loop
@@ -122,10 +124,11 @@ for sr in srs:                          # SR
             write_files = [] 
             for name in file_names:
                 write_files += [
-                    target_dir + file_dir + \
-                    '/SR_' + str(sr).zfill(6) + '/N_' + str(N).zfill(4) + '/' + \
-                    subject_ids[subject] + '/' + name + '.' + file_type[:3]
+                    os.path.join(library_dir + database_dir, str(sr), str(N), \
+                                 subject_ids[subject], \
+                                 name + '.' + file_type[:3])
                     ]
+
 
             # ----- write out decoder kernels
             for i in range(len(write_files)):
