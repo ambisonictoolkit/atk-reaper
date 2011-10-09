@@ -2453,7 +2453,7 @@ def lHRIR(azimuth, elevation, subject_id, database_dir, status = 'C'):
     az = int(round(rad_to_deg(azimuth))) % 360
     el = int(round(rad_to_deg(elevation))) % 360
 
-    index = argmax(equal(azimuth, azs) & equal(elevation, els))
+    index = argmax(equal(az, azs) & equal(el, els))
 
     # retrieve HRIR
     res = interleave(array([
