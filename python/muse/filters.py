@@ -22,6 +22,7 @@ from generators import *
 from sndfile import *          # uses sndfile rather than scikits.audiolab
 
 import scipy.io as sio
+import os
 from scipy.signal import *
 from scipy.signal.signaltools import *
 from numpy.fft import fft, ifft, rfft, irfft
@@ -2425,31 +2426,40 @@ def lHRIR(azimuth, elevation, subject_id, database_dir, status = 'C'):
     """
 
     # lHRIR dirs, constants
-    database_status_dir = {
-        'C' : '/COMPENSATED/WAV/',
-        'R' : '/RAW/WAV/'
+    status_dir = {
+        'C' : '/COMPENSATED/MAT/HRIR',
+        'R' : '/RAW/MAT//HRIR'
         }
-    radius = '0195'
-
-    # generate az, el from azimuth, elevation
-    az = str(int(round(rad_to_deg(azimuth))) % 360).zfill(3)
-    el = str(int(round(rad_to_deg(elevation))) % 360).zfill(3)
+    status_key = {
+        'C' : 'eq_hrir_S',
+        'R' : 'hrir_S'
+        }
 
     # generate lHRIR path
-    HRIR_file = database_dir + 'IRC_' + subject_id + \
-                  database_status_dir[status] + \
-                  'IRC_' + subject_id + '_' + status + \
-                  '/' + 'IRC_' + subject_id + '_' + status + \
-                  '_R' + radius + '_T' + az + '_P' + el + '.wav'
+    HRIR_file = os.path.join(
+        database_dir, 'IRC_' + subject_id + status_dir[status], \
+        'IRC_' + subject_id + '_' + status + '_HRIR.mat'
+        )
 
-    # set up sndfile for reading:
-    HRIR_sndfile = Sndfile(HRIR_file, 'r')
+    # Read matlab file:
+    HRIR_matfile = sio.loadmat(HRIR_file)
 
-    # read in HRIR
-    res = HRIR_sndfile.read_frames(HRIR_sndfile.nframes)
+    # Read measured azimuths and elevations (from left)...
+    azs = HRIR_matfile['l_' + status_key[status]]['azim_v'][0][0]
+    els = HRIR_matfile['l_' + status_key[status]]['elev_v'][0][0]
 
-    # close file
-    HRIR_sndfile.close()
+    # convert azimuth, elevation to degrees
+    # ... and determine index of desired HRIR
+    az = int(round(rad_to_deg(azimuth))) % 360
+    el = int(round(rad_to_deg(elevation))) % 360
+
+    index = argmax(equal(azimuth, azs) & equal(elevation, els))
+
+    # retrieve HRIR
+    res = interleave(array([
+        HRIR_matfile['l_' + status_key[status]]['content_m'][0][0][index],
+        HRIR_matfile['r_' + status_key[status]]['content_m'][0][0][index]
+        ]))
 
     return res
 
@@ -2515,9 +2525,11 @@ def cHRIR(azimuth, elevation, subject_id, database_dir):
     el = where(c_elevations == c_elevation)[0][0]
 
 
-    # generate lHRIR path
-    HRIR_file = database_dir + 'subject_' + subject_id + '/' + \
-                'hrir_final.mat'
+    # generate cHRIR path
+    HRIR_file = os.path.join(
+        database_dir, 'subject_' + subject_id, \
+        'hrir_final.mat'
+        )
 
     # Read matlab file:
     HRIR_matfile = sio.loadmat(HRIR_file)
