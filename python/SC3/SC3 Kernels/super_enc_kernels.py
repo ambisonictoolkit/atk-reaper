@@ -6,7 +6,9 @@
 #
 # Kernels are classified by kernel size, N, and stored in directory: 
 #
-#       'ATK_kernels/FOA/encoders/Super/SR_00None/N_[kernel_size]/'
+#       '(root or ~)/Library/Application Support/ATK/kernels/FOA/encoders/ \
+#           super/None/[kernel_size]/[subject_id]'
+#
 #
 # Within, two [L, R] three channel [W, X, Y] kernels are found, named:
 #
@@ -25,20 +27,26 @@ import os
 
 # params
 srs         = array([None])                     # sample rates (Super = none!)
-Ns          = array([512, 1024, 2048, 4096, 8192])    # kernel lengths
+Ns          = array([256, 512, 1024, 2048, 4096, 8192])    # kernel lengths
 
 
 file_type   = 'wav'         # write file...
-#encoding    = 'pcm24'
 encoding    = 'pcm32'
 endianness  = 'file'
 
 
-target_dir  = '/Volumes/Audio/test'      #temp write dir
-file_dir    = '/ATK_kernels/FOA/encoders/Super'
+user_dir        = True                              # write library to user dir?
+library_dir     = '/Library/Application Support/ATK'      # library location
+database_dir    = '/kernels/FOA/encoders/super'
 
 file_names  = ['Super_L', 'Super_R']
 
+# is user dir set?
+if user_dir:
+    library_dir = os.path.expanduser('~' + library_dir)
+
+
+# generate subjects and subject data
 subject_ids = ['0000']                  # only one subject
 
 # ----- loop
@@ -54,9 +62,9 @@ for sr in srs:                          # SR
             write_files = []
             for name in file_names:
                 write_files += [
-                    target_dir + file_dir + \
-                    '/SR_' + str(sr).zfill(6) + '/N_' + str(N).zfill(4) + '/' + \
-                    subject_id + '/' + name + '.' + file_type[:3]
+                    os.path.join(library_dir + database_dir, str(sr), str(N), \
+                                 subject_id, \
+                                 name + '.' + file_type[:3])
                     ]
 
             # ----- write out encoder kernels
