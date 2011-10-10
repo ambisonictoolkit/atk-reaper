@@ -1243,7 +1243,7 @@ AtkEncoderKernel {
 		// init dirChans (output channel (speaker) directions) and kernel sr
 		switch ( kind,
 			'super', {
-				dirChans = [ pi/4, pi.neg/4 ];	 // for now, may want to measure
+				dirChans = [ pi/4, pi.neg/4 ];	 // approx, doesn't include phasiness
 				sampleRate = "None"
 			},
 			'uhj', {

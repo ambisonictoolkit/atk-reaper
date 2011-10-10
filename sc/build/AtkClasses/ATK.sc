@@ -273,7 +273,6 @@ AtkDecode {
 			
 			AtkDecoderKernel, {
 
-				// this works is the kernel has already been loaded
 				^Mix.ar(
 					decoderMatrix.kernel.shape.at(0).collect({ arg i; // harmonic [W, X, Y]
 						decoderMatrix.kernel.shape.at(1).collect({ arg j; // channel [L, R]
@@ -305,12 +304,33 @@ AtkEncode {
 		// wrap input as array if needed, for mono inputs
 		in.isArray.not.if({ in = [in] });
 		
-		out = Mix.fill( encoderMatrix.matrix.cols, { arg i; // fill input mics/plane waves
-			UGen.replaceZeroesWithSilence(
-				encoderMatrix.matrix.flop.asArray.at(i) * in.at(i)
-			)
-		});
-		
+		switch ( encoderMatrix.class, 
+
+			AtkEncoderMatrix, {
+
+				out = Mix.fill( encoderMatrix.matrix.cols, { arg i; // fill input mics/plane waves
+					UGen.replaceZeroesWithSilence(
+						encoderMatrix.matrix.flop.asArray.at(i) * in.at(i)
+					)
+				})
+			},
+			
+			AtkEncoderKernel, {
+
+				out = Mix.ar(
+					encoderMatrix.kernel.shape.at(0).collect({ arg i; // channel [L, R]
+						encoderMatrix.kernel.shape.at(1).collect({ arg j; // harmonic [W, X, Y]
+							Convolution2.ar(
+								in.at(i),
+								encoderMatrix.kernel.at(i).at(j),
+								framesize: encoderMatrix.kernel.at(i).at(j).numFrames
+							)
+						})
+					})
+				).madd(mul, add)
+			}
+		);
+
 		if ( out.size < 4, {			// 1st order, fill missing harms with zeros
 			out = out ++ Silent.ar(4 - out.size)
 		});
