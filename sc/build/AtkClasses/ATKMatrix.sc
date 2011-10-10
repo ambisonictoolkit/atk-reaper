@@ -1035,10 +1035,6 @@ AtkDecoderKernel {
 		^super.newCopyArgs('cipic', subjectID).initKernel(256, server);
 	}
 	
-	*newCIPICRaw { arg subjectID = 0021, server = Server.default;
-		^super.newCopyArgs('cipicRaw', subjectID).initKernel(256, server);
-	}
-	
 	*newUHJ { arg kernelSize = 512, server = Server.default;
 		^super.newCopyArgs('uhj', 0).initKernel(kernelSize, server);
 	}
@@ -1046,25 +1042,17 @@ AtkDecoderKernel {
 	initPath {
 		
 		var kernelLibPath;
-		var sphericalPath, listenPath, cipicPath, cipicRawPath, uhjPath;
+		var decodersPath;
 		
-		kernelLibPath = PathName.new(
-			"~/Library/Application Support/SuperCollider/kernels/ATK_kernels"
-		);
+		kernelLibPath = PathName.new("/Library/Application Support/ATK/kernels");
 
-		sphericalPath	= PathName.new("/FOA/decoders" ++ "/Spherical_HRIR");
-		listenPath 	= PathName.new("/FOA/decoders" ++ "/Listen_HRIR");
-		cipicPath 	= PathName.new("/FOA/decoders" ++ "/CIPIC_EQ_HRIR");
-		cipicRawPath 	= PathName.new("/FOA/decoders" ++ "/CIPIC_HRIR");
-		uhjPath 		= PathName.new("/FOA/decoders" ++ "/UHJ");
+		if ( kernelLibPath.isFolder.not, {	// is kernel lib installed for all users?
+			kernelLibPath = PathName.new("~") +/+ kernelLibPath // no? set for single user
+		});
 
-		switch ( kind,
-			'spherical', 	{ ^kernelLibPath +/+ sphericalPath },
-			'listen', 	{ ^kernelLibPath +/+ listenPath },
-			'cipic', 		{ ^kernelLibPath +/+ cipicPath },
-			'cipicRaw', 	{ ^kernelLibPath +/+ cipicRawPath },
-			'uhj', 		{ ^kernelLibPath +/+ uhjPath }
-		)
+		decodersPath	= PathName.new("/FOA/decoders");
+
+		^kernelLibPath +/+ decodersPath +/+ PathName.new(kind.asString)
 	}
 
 	initKernel { arg kernelSize, server;
@@ -1091,9 +1079,9 @@ AtkDecoderKernel {
 		databasePath = this.initPath;
 
 		subjectPath = databasePath +/+ PathName.new(
-			"/SR_" ++ sampleRate.padLeft(6, "0") ++ "/N_" ++ 
-				kernelSize.asString.padLeft(4, "0") ++ "/" ++
-				subjectID.asString.padLeft(4, "0")
+			sampleRate ++ "/" ++ 
+			kernelSize ++ "/" ++
+			subjectID.asString.padLeft(4, "0")
 		);
 		
 		
@@ -1112,7 +1100,10 @@ AtkDecoderKernel {
 				case
 				// --> missing kernel database
 					{ databasePath.isFolder.not }
-					{ errorMsg = "ATK kernel database missing!" }
+					{
+						errorMsg = "ATK kernel database missing!" +
+							"Please install % database.".format(kind)
+					}
 
 				// --> unsupported SR
 					{ PathName.new(subjectPath.parentLevelPath(2)).isFolder.not }
@@ -1120,7 +1111,7 @@ AtkDecoderKernel {
 						"Supported samplerates:".warn;
 						PathName.new(subjectPath.parentLevelPath(3)).folders.do({
 							arg folder;
-							("\t" + folder.folderName[3..].asInteger.asString).postln;
+							("\t" + folder.folderName).postln;
 					});
 
 						errorMsg = "Samplerate = % is not available for".format(sampleRate)
@@ -1134,7 +1125,7 @@ AtkDecoderKernel {
 						"Supported kernel sizes:".warn;
 						PathName.new(subjectPath.parentLevelPath(2)).folders.do({
 							arg folder;
-							("\t" + folder.folderName[2..].asInteger.asString).postln;
+							("\t" + folder.folderName).postln;
 					});
 
 						errorMsg = "Kernel size = % is not available for".format(kernelSize)
@@ -1181,10 +1172,14 @@ AtkDecoderKernel {
 	free {
 		kernel.shape.at(0).do({ arg i;
 			kernel.shape.at(1).do({ arg j;
-				kernel.at(i).at(j).close
+				kernel.at(i).at(j).free;
+				(
+					"Kernel %, channel % freed.".format(
+						PathName.new(kernel.at(i).at(j).path).fileName, j
+					)
+				).postln
 			})
-		});
-		"Kernel buffer freed.".postln
+		})
 	}
 
 	dim { ^kernel.shape.at(0) - 1}
