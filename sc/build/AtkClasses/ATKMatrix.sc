@@ -1014,9 +1014,6 @@ AtkEncoderMatrix {
 //	b_to_uhj            			"Ambisonic Decoders for HDTV" (1992)
 //	b_to_binaural       			HRTF decoding
 
-// kernel matrix for kernel decoders
-//AtkDecoderKernel {
-
 AtkDecoderKernel {
 	var <kind, <subjectID;
 	var <kernel;
@@ -1185,6 +1182,186 @@ AtkDecoderKernel {
 	dim { ^kernel.shape.at(0) - 1}
 
 	numChans { ^kernel.shape.at(1) }
+
+	kernelSize { ^kernel.at(0).at(0).numFrames }
+
+	printOn { arg stream;
+		stream << this.class.name << "(" <<*
+			[kind, this.dim, this.numChans, subjectID, this.kernelSize] <<")";
+	}
+}
+
+
+//------------------------------------------------------------------------
+// kernel type encoders
+//------------------------------------------------------------------------
+
+
+//	uhj_to_b            			"Ambisonic Decoders for HDTV" (1992)
+//	superstereo	       			superstereo
+
+AtkEncoderKernel {
+	var <kind, <subjectID;
+	var <kernel;
+	var <dirChans;
+	
+
+	*newUHJ { arg kernelSize = 512, server = Server.default;
+		^super.newCopyArgs('uhj', 0).initKernel(kernelSize, server);
+	}
+
+	*newSuper { arg kernelSize = 512, server = Server.default;
+		^super.newCopyArgs('super', 0).initKernel(kernelSize, server);
+	}
+
+	initPath {
+		
+		var kernelLibPath;
+		var encodersPath;
+		
+		kernelLibPath = PathName.new("/Library/Application Support/ATK/kernels");
+
+		if ( kernelLibPath.isFolder.not, {	// is kernel lib installed for all users?
+			kernelLibPath = PathName.new("~") +/+ kernelLibPath // no? set for single user
+		});
+
+		encodersPath	= PathName.new("/FOA/encoders");
+
+		^kernelLibPath +/+ encodersPath +/+ PathName.new(kind.asString)
+	}
+
+	initKernel { arg kernelSize, server;
+		
+		var databasePath, subjectPath;
+		var chans;
+		var sampleRate;
+		var errorMsg;
+		
+		// constants
+		chans = 3;			// horizontal only kernel (at the moment), [w, x, y]
+		
+		// init dirChans (output channel (speaker) directions) and kernel sr
+		switch ( kind,
+			'super', {
+				dirChans = [ pi/4, pi.neg/4 ];	 // for now, may want to measure
+				sampleRate = "None"
+			},
+			'uhj', {
+				dirChans = [ inf, inf ];
+				sampleRate = server.sampleRate.asString;
+			}
+		);
+
+
+		// init kernel root, generate subjectPath and kernelFiles
+		databasePath = this.initPath;
+
+		subjectPath = databasePath +/+ PathName.new(
+			sampleRate ++ "/" ++ 
+			kernelSize ++ "/" ++
+			subjectID.asString.padLeft(4, "0")
+		);
+
+		// attempt to load kernel
+		if ( server.serverRunning.not, {		// is server running?
+			
+			// throw server error!
+			Error(
+				"Please boot server: %. Encoder kernel failed to load.".format(
+					server.name.asString
+				)
+			).throw
+		}, {
+			if ( subjectPath.isFolder.not, {	// does kernel path exist?
+
+				case
+				// --> missing kernel database
+					{ databasePath.isFolder.not }
+					{
+						errorMsg = "ATK kernel database missing!" +
+							"Please install % database.".format(kind)
+					}
+
+				// --> unsupported SR
+					{ PathName.new(subjectPath.parentLevelPath(2)).isFolder.not }
+					{
+						"Supported samplerates:".warn;
+						PathName.new(subjectPath.parentLevelPath(3)).folders.do({
+							arg folder;
+							("\t" + folder.folderName).postln;
+					});
+
+						errorMsg = "Samplerate = % is not available for".format(sampleRate)
+							+
+							"% kernel encoder.".format(kind)
+					}
+
+				// --> unsupported kernelSize
+					{ PathName.new(subjectPath.parentLevelPath(1)).isFolder.not }
+					{
+						"Supported kernel sizes:".warn;
+						PathName.new(subjectPath.parentLevelPath(2)).folders.do({
+							arg folder;
+							("\t" + folder.folderName).postln;
+					});
+
+						errorMsg = "Kernel size = % is not available for".format(kernelSize)
+						+
+						"% kernel encoder.".format(kind)
+					}
+
+				// --> unsupported subject
+					{ subjectPath.isFolder.not }
+					{
+						"Supported subjects:".warn;
+						PathName.new(subjectPath.parentLevelPath(1)).folders.do({
+							arg folder;
+							("\t" + folder.folderName).postln;
+					});
+
+						errorMsg = "Subject % is not available for".format(subjectID)
+						+
+						"% kernel encoder.".format(kind)
+					};
+
+				// throw error!
+				"\n".post;
+				Error(errorMsg).throw
+			}, {
+				// Else... everything is fine! Load kernel.
+				kernel = subjectPath.files.collect({ arg kernelPath;
+					chans.collect({ arg chan;
+						Buffer.readChannel(server, kernelPath.fullPath, channels: [chan],
+							action: { arg buf;
+								(
+									"Kernel %, channel % loaded.".format(
+										kernelPath.fileName, chan
+									)
+								).postln
+							}
+						)
+					})
+				})
+			})
+		})
+	}
+
+	free {
+		kernel.shape.at(0).do({ arg i;
+			kernel.shape.at(1).do({ arg j;
+				kernel.at(i).at(j).free;
+				(
+					"Kernel %, channel % freed.".format(
+						PathName.new(kernel.at(i).at(j).path).fileName, j
+					)
+				).postln
+			})
+		})
+	}
+
+	dim { ^kernel.shape.at(1) - 1}
+
+	numChans { ^kernel.shape.at(0) }
 
 	kernelSize { ^kernel.at(0).at(0).numFrames }
 
