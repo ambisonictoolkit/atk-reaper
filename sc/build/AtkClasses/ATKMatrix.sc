@@ -189,7 +189,7 @@ AtkSpeakerMatrix {
 }
 
 
-AtkDecoderMatrix {
+FOADecoderMatrix {
 	var <kind;
 	var <matrix;
 	var <dirChans;
@@ -416,7 +416,7 @@ AtkDecoderMatrix {
 
 
 		// build decoder matrix
-		matrix = AtkDecoderMatrix.newDiametric(directions, k).matrix;
+		matrix = FOADecoderMatrix.newDiametric(directions, k).matrix;
 
 		// reorder the lower polygon
 		upMatrix = matrix[..(numChanPairs-1)];
@@ -642,7 +642,7 @@ AtkDecoderMatrix {
 //-----------------------------------------------------------------------
 // martrix encoders
 
-AtkEncoderMatrix {
+FOAEncoderMatrix {
 	var <kind;
 	var <matrix;
 	var <dirChans;
@@ -812,7 +812,7 @@ AtkEncoderMatrix {
 		var bToAMatrix;
 
 		// retrieve corresponding A-format decoder
-		bToAMatrix = AtkDecoderMatrix.newBtoA(orientation, weight);
+		bToAMatrix = FOADecoderMatrix.newBtoA(orientation, weight);
 
 	    // set input channel directions for instance
 	    dirChans = bToAMatrix.dirChans;
@@ -1214,7 +1214,7 @@ AtkEncoderMatrix {
 //------------------------------------------------------------------------
 // kernel decoders
 
-AtkDecoderKernel {
+FOADecoderKernel {
 	var <kind, <subjectID;
 	var <kernel;
 	var <dirChans;
@@ -1395,7 +1395,7 @@ AtkDecoderKernel {
 //------------------------------------------------------------------------
 // kernel encoders
 
-AtkEncoderKernel {
+FOAEncoderKernel {
 	var <kind, <subjectID;
 	var <kernel;
 	var <dirChans;

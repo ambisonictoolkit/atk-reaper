@@ -53,7 +53,7 @@ ATKRotate {
 }
 
 // ATKPantoF is now redundant, and replaced by matrix style decoder
-// See AtkDecode built using Mix and ATKMatrix below
+// See FOADecode built using Mix and ATKMatrix below
 /*
 ATKPantoF {
 	*ar {arg numChannels, in, orientation = 1, directivity = 1, mul = 1, add = 1;
@@ -106,7 +106,7 @@ Atk : Panner {
  	
  	}
 
-// See AtkDecode built using Mix and ATKMatrix below
+// See FOADecode built using Mix and ATKMatrix below
 /*
 AtkDecode : UGen {
 	*ar {arg w, x, y, z, azimuth, elevation, mul = 1, add = 0;
@@ -124,7 +124,7 @@ AtkDecode : UGen {
 	}
 */
 // ATKPantoF is now redundant, and replaced by matrix style decoder
-// See AtkDecode built using Mix and ATKMatrix below
+// See FOADecode built using Mix and ATKMatrix below
 /*
 AtkPantoF : Panner {
 	*ar {arg numChans, w, x, y, orientation = 1, directivity = 1, mul = 1, add = 0;
@@ -252,12 +252,12 @@ AtkPsychoShelf {
 // Likely, we'll want to integrate this much better with FOA, checking for
 // valid inputs etc.
 
-AtkDecode {
+FOADecode {
 	*ar { arg in, decoderMatrix, mul = 1, add = 0;
 
 		switch ( decoderMatrix.class, 
 
-			AtkDecoderMatrix, {
+			FOADecoderMatrix, {
 
 				if ( decoderMatrix.shelfFreq.isNumber, { // shelf filter?
 					in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
@@ -271,7 +271,7 @@ AtkDecode {
 				}).madd(mul, add)
 			},
 			
-			AtkDecoderKernel, {
+			FOADecoderKernel, {
 
 				^Mix.ar(
 					decoderMatrix.kernel.shape.at(0).collect({ arg i; // harmonic [W, X, Y]
@@ -296,7 +296,7 @@ AtkDecode {
 // Likely, we'll want to integrate this much better with FOA, etc., outputting
 // an FOA instance
 
-AtkEncode {
+FOAEncode {
 	*ar { arg in, encoderMatrix, mul = 1, add = 0;
 		
 		var out;
@@ -306,7 +306,7 @@ AtkEncode {
 		
 		switch ( encoderMatrix.class, 
 
-			AtkEncoderMatrix, {
+			FOAEncoderMatrix, {
 
 				out = Mix.fill( encoderMatrix.matrix.cols, { arg i; // fill input mics/plane waves
 					UGen.replaceZeroesWithSilence(
@@ -315,7 +315,7 @@ AtkEncode {
 				})
 			},
 			
-			AtkEncoderKernel, {
+			FOAEncoderKernel, {
 
 				out = Mix.ar(
 					encoderMatrix.kernel.shape.at(0).collect({ arg i; // channel [L, R]
