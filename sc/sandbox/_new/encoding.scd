@@ -23,44 +23,10 @@
 {
 	var fl, bl, br, fr;					// for quad output
 	var azim, sig;
-	var decoderMatrix, angle, k;
-	var encoderMatrix;
 
-	// ------------------------------------------------------------
-	// constants
-	angle = pi/6;
-//	k = 1;					// velocity, or 'strict' soundfield
-//	k = 1/2.sqrt;				// energy, for 2D
-//	k = 1/2;					// controlled opposites, for 2D
-//	k = 'velocity';			// velocity
-//	k = 'energy';				// energy
-//	k = 'controlled';			// controlled opposites
-//	k = 'single';				// synonym for energy
-	k = 'dual';				// dual band
 
 	// kr.... for SC3's internal encoder
 	azim = MouseX.kr(pi, -pi);
-
-
-	// ------------------------------------------------------------
-	// set up decoder matrix
-	decoderMatrix = AtkDecoderMatrix.newQuad(angle, k);
-
-
-	// ------------------------------------------------------------
-	// set up encoder matrix;
-
-//	encoderMatrix = AtkEncoderMatrix.newOmni;			// 1 channel only...
-
-//	encoderMatrix = AtkEncoderMatrix.newDirection;		// 3 channels only...
-//	encoderMatrix = AtkEncoderMatrix.newDirection(pi.neg/2);// 3 channels only...
-
-//	encoderMatrix = AtkEncoderMatrix.newDirections([[0, 0]]);
-//	encoderMatrix = AtkEncoderMatrix.newDirections([[pi/4, 0]]);
-//	encoderMatrix = AtkEncoderMatrix.newDirections([[pi.neg/2, 0]]);
-
-	encoderMatrix = AtkEncoderMatrix.newB;
-
 
 	// ------------------------------------------------------------
 	// test sig
@@ -643,6 +609,72 @@
 
 	// decode to output
 	#fl, bl, br, fr = AtkDecode.ar(sig, decoderMatrix);
+
+	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+
+
+// -------------------------------------------------------
+// test for kernel type encoders
+//
+// -------------------------------------------------------
+
+// choose an encoder
+
+a = AtkEncoderKernel.newSuper
+a = AtkEncoderKernel.newUHJ
+
+a = AtkEncoderMatrix.newStereo(pi/4)
+
+// inspect
+a.kind
+a.subjectID
+a.kernelSize
+a.dim				// encoder dimensions
+a.numChans			// input channels
+a.dirChans * 180/pi	// 'directions' of input channels
+a.kernel				// kernel
+
+a.free				// free the kerne when finishedl!
+
+
+// choose a decoder
+b = AtkDecoderMatrix.newQuad(pi/6, 'dual')
+
+
+
+
+// quad (spec'd as narrow quad)
+// mono pink noise, sound synth function
+// stereo encoder
+(
+{
+	var fl, bl, br, fr;					// for quad output
+	var azim, sig;
+
+	// kr.... for SC3's internal encoder
+	azim = MouseX.kr(pi, -pi);
+
+
+	// ------------------------------------------------------------
+	// test sig
+	sig = PinkNoise.ar; 					// mono pink noise
+
+
+	// ------------------------------------------------------------
+	// encode
+	sig = AtkEncode.ar(Pan2.ar(sig, azim.neg/pi), a);
+	
+
+	// ------------------------------------------------------------
+	// distance filter
+	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+
+	// decode to output
+	#fl, bl, br, fr = AtkDecode.ar(sig, b);
 
 	[fl, fr, bl, br]		// reorder output to match speaker arrangement
 

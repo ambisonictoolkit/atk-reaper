@@ -240,38 +240,53 @@
 //
 // -------------------------------------------------------
 
-// uhj test
+// choose a decoder
+
+a = AtkDecoderKernel.newSpherical
+a = AtkDecoderKernel.newListen
+a = AtkDecoderKernel.newCIPIC
+a = AtkDecoderKernel.newUHJ
+
+a = AtkDecoderKernel.newCIPIC(3)
+a = AtkDecoderKernel.newSpherical(4, 256)
+
+
+// inspect
+a.kind
+a.subjectID
+a.kernelSize
+a.dim				// decoder dimensions
+a.numChans			// output channels
+a.dirChans * 180/pi	// 'directions' of output channels
+a.kernel				// kernel
+
+a.free				// free the kerne when finishedl!
+
+// kernel test
 // mono pink noise, sound synth function
 (
 {
 	var	azim, sig;
-	var	decoderKernel;
+	var 	scale;
+
+
+	// ir....
+	scale = 12.neg.dbamp;
 
 	// kr....
 	azim = MouseX.kr(pi, -pi);
+	
+	// poll azim to screen
+	Poll.kr(Impulse.kr(10), azim * 180/pi, 'azimuth');
 
-
-	// set up kernel
-	decoderKernel = AtkDecoderKernel.newUHJ;
-
+	// set up decoder...
+	// ...do so above
+	
 	// test sig
 	sig = AtkMonoToB.ar(PinkNoise.ar, azim); // mono pink noise
 
 
 	// decode to output
-	AtkDecode.ar(sig, a);
-//	AtkDecode.ar(0, a);
-//	AtkDecode.ar(sig, decoderKernel);
-
+	scale * AtkDecode.ar(sig, a);
 }.scope;
-//}
 )
-
-a.kernel.at(0).at(0)
-
-a.kernel.shape.at(0)
-a.kernel.shape.at(1)
-a.kernel.at(0).at(0).numFrames
-
-a.kernel.shape
-b.shape
