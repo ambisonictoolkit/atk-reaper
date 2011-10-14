@@ -248,58 +248,62 @@ AtkPsychoShelf {
 
 //------------------------------------------------------------------------
 // Decoder built using Mix and ATKMatrix
-//
-// Likely, we'll want to integrate this much better with FOA, checking for
-// valid inputs etc.
 
 FOADecode {
 	*ar { arg in, decoderMatrix, mul = 1, add = 0;
 
-		switch ( decoderMatrix.class, 
-
-			FOADecoderMatrix, {
-
-				if ( decoderMatrix.shelfFreq.isNumber, { // shelf filter?
-					in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
-						decoderMatrix.shelfFreq, decoderMatrix.shelfK)
-				});
-		
-				^Mix.fill( decoderMatrix.matrix.cols, { arg i; // fill harmonics
-					UGen.replaceZeroesWithSilence(
-						decoderMatrix.matrix.flop.asArray.at(i) * in.at(i)
-					)
-				}).madd(mul, add)
-			},
+		(in.isKindOf(FOA)).if({
 			
-			FOADecoderKernel, {
+			switch ( decoderMatrix.class, 
+	
+				FOADecoderMatrix, {
+	
+					if ( decoderMatrix.shelfFreq.isNumber, { // shelf filter?
+						// This will probably be updated when PsychoShelf is wrapped!?!
+//						in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
+						in = AtkPsychoShelf.ar(in.w, in.x, in.y, in.z,
+							decoderMatrix.shelfFreq, decoderMatrix.shelfK)
+					});
+			
+					^Mix.fill( decoderMatrix.matrix.cols, { arg i; // fill harmonics
+						UGen.replaceZeroesWithSilence(
+							decoderMatrix.matrix.flop.asArray.at(i) * in.asAudioRateInput.at(i)
+						)
+					}).madd(mul, add)
+				},
+				
+				FOADecoderKernel, {
 
-				^Mix.ar(
-					decoderMatrix.kernel.shape.at(0).collect({ arg i; // harmonic [W, X, Y]
-						decoderMatrix.kernel.shape.at(1).collect({ arg j; // channel [L, R]
-							Convolution2.ar(
-								in.at(i),
-								decoderMatrix.kernel.at(i).at(j),
-								framesize: decoderMatrix.kernel.at(i).at(j).numFrames
-							)
+					^Mix.ar(
+						decoderMatrix.kernel.shape.at(0).collect({ arg i; // harmonic [W, X, Y]
+							decoderMatrix.kernel.shape.at(1).collect({ arg j; // channel [L, R]
+								Convolution2.ar(
+									in.asAudioRateInput.at(i),
+									decoderMatrix.kernel.at(i).at(j),
+									framesize: decoderMatrix.kernel.at(i).at(j).numFrames
+								)
+							})
 						})
-					})
-				).madd(mul, add)
-			}
-		)
+					).madd(mul, add)
+				}
+			)
+		}, {
+			// throw error!
+			"\n".post;
+			Error("FOA Decoder input is %! It should be FOA.".format(in.class)).throw
+		})
 	}
 }
 
 
 //------------------------------------------------------------------------
 // Encoder built using Mix and ATKMatrix
-//
-// Likely, we'll want to integrate this much better with FOA, etc., outputting
-// an FOA instance
 
 FOAEncode {
 	*ar { arg in, encoderMatrix, mul = 1, add = 0;
 		
 		var out;
+		var w, x, y, z;
 
 		// wrap input as array if needed, for mono inputs
 		in.isArray.not.if({ in = [in] });
@@ -335,6 +339,7 @@ FOAEncode {
 			out = out ++ Silent.ar(4 - out.size)
 		});
 		
-		^out.madd(mul, add)
+		#w, x, y, z = out.madd(mul, add)
+		^FOA.ar(w, x, y, z);
 	}
 }

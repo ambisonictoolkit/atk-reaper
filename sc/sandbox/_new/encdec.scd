@@ -3,23 +3,34 @@
 
 // define encoder / decoder matrices
 
-~encodeMatrix = FOAEncoderMatrix.newStereo(pi/4)		// kernel options available
-~decoderMatrix = FOADecoderMatrix.newQuad(pi/6, 'dual')	// kernel options available
+~encoder = FOAEncoderMatrix.newStereo(pi/4)
+~encoder = FOAEncoderKernel.newSuper				// remember to free!!
+
+~decoder = FOADecoderMatrix.newQuad(pi/6, 'dual')
+~decoder = FOADecoderKernel.newUHJ				// remember to free!!
+
+// inspect
+~encoder.kind
+~decoder.kind
 
 
-// ------------------------------------------------------------
-// encode
-sig = FOAEncode.ar(Pan2.ar(sig, azim.neg/pi), ~encodeMatrix);
+~encoder.free				// free the kerne when finishedl!
+~decoder.free				// free the kerne when finishedl!
 
 
-// ------------------------------------------------------------
-// transform
-sig = FOATransform.ar('tras', sig, arg0, arg1, arg2, arg3, arg4);
-	
-
-
-// decode to output
-outSig = FOADecode.ar(sig, ~decoderMatrix);
+//// ------------------------------------------------------------
+//// encode
+//sig = FOAEncode.ar(Pan2.ar(sig, azim.neg/pi), ~encodeMatrix);
+//
+//
+//// ------------------------------------------------------------
+//// transform
+//sig = FOATransform.ar('tras', sig, arg0, arg1, arg2, arg3, arg4);
+//	
+//
+//
+//// decode to output
+//outSig = FOADecode.ar(sig, ~decoderMatrix);
 
 
 
@@ -32,7 +43,7 @@ outSig = FOADecode.ar(sig, ~decoderMatrix);
 (
 {
 	var fl, bl, br, fr;					// for quad output
-	var azim, sig;
+	var azim, sig, foaSig;
 
 	// kr.... for SC3's internal encoder
 	azim = MouseX.kr(pi, -pi);
@@ -45,17 +56,25 @@ outSig = FOADecode.ar(sig, ~decoderMatrix);
 
 	// ------------------------------------------------------------
 	// encode
-	sig = FOAEncode.ar(Pan2.ar(sig, azim.neg/pi), ~encodeMatrix);
+	foaSig = FOAEncode.ar(Pan2.ar(sig, azim.neg/pi), ~encoder);
 	
+	
+	// test... out as array?
+//	foaSig = foaSig.asAudioRateInput;
+//	foaSig = foaSig.x;
 
 	// ------------------------------------------------------------
 	// distance filter
-	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+//	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
 
-	// decode to output
-	#fl, bl, br, fr = FOADecode.ar(sig, ~decoderMatrix);
+//	// decode to output (quad)
+//	#fl, bl, br, fr = FOADecode.ar(foaSig, ~decoder);
+//
+//	[fl, fr, bl, br]		// reorder output to match speaker arrangement
 
-	[fl, fr, bl, br]		// reorder output to match speaker arrangement
+	// decode to output (UHJ)
+	FOADecode.ar(foaSig, ~decoder);
+
 
 }.scope;
 )
