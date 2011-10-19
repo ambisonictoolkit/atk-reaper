@@ -244,94 +244,96 @@ AtkPsychoShelf {
 		
 }
 
-
-
 //------------------------------------------------------------------------
-// Decoder built using Mix and ATKMatrix
+// ATKMatrixMix & ATKKernelConv
 
-FOADecode {
-	*ar { arg in, decoderMatrix, mul = 1, add = 0;
+ATKMatrixMix {
+	*ar { arg in, matrix, mul = 1, add = 0;
+		
+		var out;
 
-		(in.isKindOf(FOA)).if({
-			
-			switch ( decoderMatrix.class, 
-	
-				FOADecoderMatrix, {
-	
-					if ( decoderMatrix.shelfFreq.isNumber, { // shelf filter?
-						// This will probably be updated when PsychoShelf is wrapped!?!
-//						in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
-						in = AtkPsychoShelf.ar(in.w, in.x, in.y, in.z,
-							decoderMatrix.shelfFreq, decoderMatrix.shelfK)
-					});
-			
-					^Mix.fill( decoderMatrix.matrix.cols, { arg i; // fill harmonics
-						UGen.replaceZeroesWithSilence(
-							decoderMatrix.matrix.flop.asArray.at(i) * in.asAudioRateInput.at(i)
-						)
-					}).madd(mul, add)
-				},
-				
-				FOADecoderKernel, {
-
-					^Mix.ar(
-						decoderMatrix.kernel.shape.at(0).collect({ arg i; // harmonic [W, X, Y]
-							decoderMatrix.kernel.shape.at(1).collect({ arg j; // channel [L, R]
-								Convolution2.ar(
-									in.asAudioRateInput.at(i),
-									decoderMatrix.kernel.at(i).at(j),
-									framesize: decoderMatrix.kernel.at(i).at(j).numFrames
-								)
-							})
-						})
-					).madd(mul, add)
-				}
+		// wrap input as array if needed, for mono inputs
+		in.isArray.not.if({ in = [in] });
+		
+		out = Mix.fill( matrix.cols, { arg i; // fill input
+			UGen.replaceZeroesWithSilence(
+				matrix.flop.asArray.at(i) * in.at(i)
 			)
-		}, {
-			// throw error!
-			"\n".post;
-			Error("FOA Decoder input is %! It should be FOA.".format(in.class)).throw
-		})
+		});
+
+		^out.madd(mul, add)
+	}
+}
+
+ATKKernelConv {
+	*ar { arg in, kernel, mul = 1, add = 0;
+		
+		var out;
+
+		// wrap input as array if needed, for mono inputs
+		in.isArray.not.if({ in = [in] });
+		
+		out = Mix.ar(
+			kernel.shape.at(0).collect({ arg i;
+				kernel.shape.at(1).collect({ arg j;
+					Convolution2.ar(
+						in.at(i),
+						kernel.at(i).at(j),
+						framesize: kernel.at(i).at(j).numFrames
+					)
+				})
+			})
+		);
+
+		^out.madd(mul, add)
 	}
 }
 
 
 //------------------------------------------------------------------------
-// Encoder built using Mix and ATKMatrix
+// Decoder built using ATKMatrixMix & ATKKernelConv
+
+FOADecode {
+	*ar { arg in, decoder, mul = 1, add = 0;
+
+		switch ( decoder.class, 
+
+			FOADecoderMatrix, {
+
+				if ( decoder.shelfFreq.isNumber, { // shelf filter?
+					// This will probably be updated when PsychoShelf is wrapped
+					// rename to FOAPsychoShelf
+					in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
+						decoder.shelfFreq, decoder.shelfK)
+				});
+
+				^ATKMatrixMix.ar(in, decoder.matrix, mul, add)
+			},
+			
+			FOADecoderKernel, {
+				^ATKKernelConv.ar(in, decoder.kernel, mul, add)
+			}
+		)
+	}
+}
+
+
+//------------------------------------------------------------------------
+// Encoder built using ATKMatrixMix & ATKKernelConv
 
 FOAEncode {
-	*ar { arg in, encoderMatrix, mul = 1, add = 0;
+	*ar { arg in, encoder, mul = 1, add = 0;
 		
 		var out;
-		var w, x, y, z;
 
-		// wrap input as array if needed, for mono inputs
-		in.isArray.not.if({ in = [in] });
-		
-		switch ( encoderMatrix.class, 
+		switch ( encoder.class, 
 
 			FOAEncoderMatrix, {
-
-				out = Mix.fill( encoderMatrix.matrix.cols, { arg i; // fill input mics/plane waves
-					UGen.replaceZeroesWithSilence(
-						encoderMatrix.matrix.flop.asArray.at(i) * in.at(i)
-					)
-				})
+				out = ATKMatrixMix.ar(in, encoder.matrix, mul, add)
 			},
 			
 			FOAEncoderKernel, {
-
-				out = Mix.ar(
-					encoderMatrix.kernel.shape.at(0).collect({ arg i; // channel [L, R]
-						encoderMatrix.kernel.shape.at(1).collect({ arg j; // harmonic [W, X, Y]
-							Convolution2.ar(
-								in.at(i),
-								encoderMatrix.kernel.at(i).at(j),
-								framesize: encoderMatrix.kernel.at(i).at(j).numFrames
-							)
-						})
-					})
-				).madd(mul, add)
+				out = ATKKernelConv.ar(in, encoder.kernel, mul, add)
 			}
 		);
 
@@ -339,7 +341,34 @@ FOAEncode {
 			out = out ++ Silent.ar(4 - out.size)
 		});
 		
-		#w, x, y, z = out.madd(mul, add)
-		^FOA.ar(w, x, y, z);
+		^out
 	}
 }
+
+
+//------------------------------------------------------------------------
+// Transformer built using ATKMatrixMix & ATKKernelConv
+
+FOAXform {
+	*ar { arg in, xformer, mul = 1, add = 0;
+		
+		var out;
+
+//		switch ( xformer.class,
+//
+//			FOAXformerMatrix, {
+//				out = ATKMatrixMix.ar(in, xformer.matrix, mul, add)
+//			},
+//			
+//			FOAXformerKernel, {
+//				out = ATKKernelConv.ar(in, xformer.kernel, mul, add)
+//			}
+//		);
+//
+//		^out
+
+		// for now...
+		^ATKMatrixMix.ar(in, xformer.matrix, mul, add)
+	}
+}
+

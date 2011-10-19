@@ -190,7 +190,7 @@ ATKSpeakerMatrix {
 	}
 	
 	dim { ^m }
-//	numChans { ^n * 2 }
+
 	numChannels { ^n * 2 }
 	
 	matrix {
