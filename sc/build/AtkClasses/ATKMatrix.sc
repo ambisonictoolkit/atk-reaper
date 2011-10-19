@@ -79,40 +79,80 @@
 //
 //------------------------------------------------------------------------
 
-//FOA {
-//	var <w, <x, <y, <z;
-//	
-//	*new {arg w, x, y, z;
-//		^super.newCopyArgs(w, x, y, z);
-//	}
-//	
-//	*ar {arg w, x, y, z;
-//		^this.new(w, x, y, z);
-//	}
-//	
-//	madd {arg mul = 1, add = 0;
-//		^MulAdd.ar([w, x, y, z], mul, add);	
-//	}
-//	
-//	sig {arg mul = 1, add = 0;
-//		^[w, x, y, z] * mul + add;
-//	}
-//	
-//	asUGenInput {
-//		^[w, x, y, z];
-//	}
-//	
-//	asAudioRateInput {
-//		^[w, x, y, z];
-//	}
-//}
 
+////-----------------------------------------------------------------------
+//// superclass for all ATK matricies
+//
+//ATKMatrix {
+//	var <kind;
+//	var <matrix;
+//	var <dirOutputs, <dirInputs;
+//
+//	*new { arg kind;
+//		^super.newCopyArgs(kind)
+//	}
+//
+//	*with { arg array;
+//		^super.newCopyArgs(nil).init(array);
+//	}
+//
+//	*withMatrix { arg matrix;
+//		^super.newCopyArgs(nil, matrix);
+//	}
+//
+//	init { arg array;
+//		matrix = Matrix.with(array);
+//	}
+//
+//	numInputs { ^matrix.cols }
+//
+//	numOutputs { ^matrix.rows }
+//	
+//	// add numChannels?
+//
+//	dim { ^3 }				// all transforms are 3D
+//
+//}
+//
+//
+//FOAMatrix : ATKMatrix {
+//
+//	// multiplication, etc., here
+//	// note: robust error checking isn't completed
+//	* { arg that;
+//		var thisMatFl, thatMatFl;
+//
+//		thisMatFl = this.matrix.flop;
+//		thatMatFl = that.matrix.flop;
+//
+//		case
+//			{ (this.dim == 2) && (that.dim == 3) } 	// from 2D encoder
+//				{ thisMatFl = this.matrix.addRow(Array.fill(this.numInputs, {0})).flop }
+//
+//			{ (this.dim == 3) && (that.dim == 2) } 	// to 2D decoder
+//				{ thisMatFl = this.matrix.removeRow(3).flop }
+//
+//			{ (this.dim == 0) && (that.dim == 3) } 	// from 0D encoder (omni) to 3D
+//				{ thisMatFl = Matrix.newClear(1, 4).put(0, 0, this.matrix.at(0, 0)) }
+//
+//			{ (this.dim == 0) && (that.dim == 2) } 	// from 0D encoder (omni) to 2D
+//				{ thisMatFl = Matrix.newClear(1, 3).put(0, 0, this.matrix.at(0, 0)) };
+//
+//		^FOAMatrix.withMatrix((thisMatFl * thatMatFl).flop)
+//
+//	}
+//	
+//}
+//
+//
+//
 
 //-----------------------------------------------------------------------
 // matrix decoders
 
 //   speaker_matrix                  Heller's DDT (helper function)
-AtkSpeakerMatrix {
+//	rename to FOASpeakerMatrix?
+ATKSpeakerMatrix {
 	var <positions, <k, m, n;
 
 	*new { arg directions, k;
@@ -150,7 +190,8 @@ AtkSpeakerMatrix {
 	}
 	
 	dim { ^m }
-	numChans { ^n * 2 }
+//	numChans { ^n * 2 }
+	numChannels { ^n * 2 }
 	
 	matrix {
 		var s, directions, pos, dir;
@@ -192,7 +233,7 @@ AtkSpeakerMatrix {
 FOADecoderMatrix {
 	var <kind;
 	var <matrix;
-	var <dirChans;
+	var <dirOutputs;
 	var <>shelfFreq, <shelfK;
 
 
@@ -291,7 +332,7 @@ FOADecoderMatrix {
 		
 
 			    // set output channel (speaker) directions for instance
-				dirChans = positions2.asArray.collect({ arg item;
+				dirOutputs = positions2.asArray.collect({ arg item;
 					item.asPoint.asPolar.angle
 				});
 			
@@ -313,7 +354,7 @@ FOADecoderMatrix {
 		
 
 			    // set output channel (speaker) directions for instance
-				dirChans = positions2.asArray.collect({ arg item;
+				dirOutputs = positions2.asArray.collect({ arg item;
 					item.asCartesian.asSpherical.angles
 				});
 				
@@ -329,7 +370,7 @@ FOADecoderMatrix {
 	    	//       scaled by k, which may not request a velocity
 	    	//       gain. I.e., k = 1 isn't necessarily true, as it
 	    	//       is assigned as an argument to this function.
-	    	speakerMatrix = AtkSpeakerMatrix.newPositions(positions2, k).matrix;
+	    	speakerMatrix = ATKSpeakerMatrix.newPositions(positions2, k).matrix;
 	    
 	    	// n = number of output channels (speakers)
 		n = speakerMatrix.cols;
@@ -364,7 +405,7 @@ FOADecoderMatrix {
 		theta = (theta + pi).mod(2pi) - pi;
 
 	    // set output channel (speaker) directions for instance
-		dirChans = theta;
+		dirOutputs = theta;
 
 		// initialise k
 		k = this.initK2D(k);
@@ -435,7 +476,7 @@ FOADecoderMatrix {
 			}
 		);
 		
-		dirChans = upDirs ++ downDirs;		// set output channel (speaker) directions
+		dirOutputs = upDirs ++ downDirs;		// set output channel (speaker) directions
 		matrix = upMatrix ++ downMatrix;			// set matrix
 
 	}
@@ -445,7 +486,7 @@ FOADecoderMatrix {
 		var g0, g1, g2;
 
 	    // set output channel (speaker) directions for instance
-	    dirChans = [ angle, pi - angle, (pi - angle).neg, angle.neg ];
+	    dirOutputs = [ angle, pi - angle, (pi - angle).neg, angle.neg ];
 
 
 		// initialise k
@@ -470,7 +511,7 @@ FOADecoderMatrix {
 		var g0, g1, g2;
 	    
 	    // set output channel (speaker) directions for instance
-	    dirChans = [ pi/6, pi.neg/6 ];
+	    dirOutputs = [ pi/6, pi.neg/6 ];
 
 		// calculate g0, g1, g2 (scaled by pattern)
 		g0	= (1.0 - pattern) * 2.sqrt;
@@ -487,7 +528,7 @@ FOADecoderMatrix {
 	initMono { arg theta, phi, pattern;
 
 	    // set output channel (speaker) directions for instance
-	    dirChans = [ 0 ];
+	    dirOutputs = [ 0 ];
 
 		// build decoder matrix, and set for instance
 	    matrix = Matrix.with([
@@ -503,7 +544,7 @@ FOADecoderMatrix {
 	init5_0 { arg irregKind;
 
 	    // set output channel (speaker) directions for instance
-	    dirChans = [ 0, pi/6, 110/180 * pi, 110/180 * pi.neg, pi.neg/6 ];
+	    dirOutputs = [ 0, pi/6, 110/180 * pi, 110/180 * pi.neg, pi.neg/6 ];
 
 		// build decoder matrix
 		// Wigging's Matricies (credit contribution/copyright at top)
@@ -623,17 +664,25 @@ FOADecoderMatrix {
 		
 			    
 	    // set output channel (speaker) directions for instance
-	    dirChans = matrix.removeCol(0).asArray.collect({arg item;
+	    dirOutputs = matrix.removeCol(0).asArray.collect({arg item;
 			item.asCartesian.asSpherical.angles
 		})
 	}
 	
-	dim { ^matrix.cols - 1}
+	dirInputs { ^this.numInputs.collect({ inf }) }
+	
+	dirChannels { ^this.dirOutputs }
 
-	numChans { ^matrix.rows }
+	numInputs { ^matrix.cols }
+
+	numOutputs { ^matrix.rows }
+	
+	numChannels { ^this.numOutputs }
+	
+	dim { ^this.numInputs - 1}
 
 	printOn { arg stream;
-		stream << this.class.name << "(" <<* [kind, this.dim, this.numChans] <<")";
+		stream << this.class.name << "(" <<* [this.kind, this.dim, this.numChannels] <<")";
 	}
 
 }
@@ -645,8 +694,7 @@ FOADecoderMatrix {
 FOAEncoderMatrix {
 	var <kind;
 	var <matrix;
-	var <dirChans;
-
+	var <dirInputs;
 
 	*newB {
 		^super.newCopyArgs('b').initB;
@@ -703,9 +751,9 @@ FOAEncoderMatrix {
 		var g0 = 2.sqrt.reciprocal;
 	    
 		// build encoder matrix, and set for instance
-		matrix = Matrix.newClear(3, dirChans.size); // start w/ empty matrix
+		matrix = Matrix.newClear(3, dirInputs.size); // start w/ empty matrix
 	
-		dirChans.do({ arg theta, i;
+		dirInputs.do({ arg theta, i;
 			matrix.putCol(i, [
 				g0,
 	              theta.cos,
@@ -719,9 +767,9 @@ FOAEncoderMatrix {
 		var g0 = 2.sqrt.reciprocal;
 	    
 		// build encoder matrix, and set for instance
-		matrix = Matrix.newClear(4, dirChans.size); // start w/ empty matrix
+		matrix = Matrix.newClear(4, dirInputs.size); // start w/ empty matrix
 	
-		dirChans.do({ arg thetaPhi, i;
+		dirInputs.do({ arg thetaPhi, i;
 			matrix.putCol(i, [
 				g0,
 	              thetaPhi.at(1).cos * thetaPhi.at(0).cos,
@@ -736,11 +784,11 @@ FOAEncoderMatrix {
 		var g0 = 2.sqrt.reciprocal;
 	    
 		// build 'decoder' matrix, and set for instance
-		matrix = Matrix.newClear(dirChans.size, 3); 	// start w/ empty matrix
+		matrix = Matrix.newClear(dirInputs.size, 3); 	// start w/ empty matrix
 
 		if ( pattern.isArray,
 			{
-				dirChans.do({ arg theta, i;			// mic positions, indivd patterns
+				dirInputs.do({ arg theta, i;			// mic positions, indivd patterns
 					matrix.putRow(i, [
 						(1.0 - pattern.at(i)),
 			              pattern.at(i) * theta.cos,
@@ -748,7 +796,7 @@ FOAEncoderMatrix {
 					])
 				})
 			}, {
-				dirChans.do({ arg theta, i;			// mic positions
+				dirInputs.do({ arg theta, i;			// mic positions
 					matrix.putRow(i, [
 						(1.0 - pattern),
 			              pattern * theta.cos,
@@ -769,11 +817,11 @@ FOAEncoderMatrix {
 		var g0 = 2.sqrt.reciprocal;
 	    
 		// build 'decoder' matrix, and set for instance
-		matrix = Matrix.newClear(dirChans.size, 4); 	// start w/ empty matrix
+		matrix = Matrix.newClear(dirInputs.size, 4); 	// start w/ empty matrix
 
 		if ( pattern.isArray,
 			{
-				dirChans.do({ arg thetaPhi, i;		// mic positions, indivd patterns
+				dirInputs.do({ arg thetaPhi, i;		// mic positions, indivd patterns
 					matrix.putRow(i, [
 						(1.0 - pattern.at(i)),
 			              pattern.at(i) * thetaPhi.at(1).cos * thetaPhi.at(0).cos,
@@ -782,7 +830,7 @@ FOAEncoderMatrix {
 					])
 				})
 			}, {
-				dirChans.do({ arg thetaPhi, i;		// mic positions
+				dirInputs.do({ arg thetaPhi, i;		// mic positions
 					matrix.putRow(i, [
 						(1.0 - pattern),
 			              pattern * thetaPhi.at(1).cos * thetaPhi.at(0).cos,
@@ -802,7 +850,7 @@ FOAEncoderMatrix {
 	initB {
 
 	    // set input channel directions for instance
-	    dirChans = [ inf ];
+	    dirInputs = [ inf ];
 
 		// build encoder matrix, and set for instance
 	    matrix = Matrix.newIdentity(4)
@@ -815,7 +863,7 @@ FOAEncoderMatrix {
 		bToAMatrix = FOADecoderMatrix.newBtoA(orientation, weight);
 
 	    // set input channel directions for instance
-	    dirChans = bToAMatrix.dirChans;
+	    dirInputs = bToAMatrix.dirInputs;
 
 		// build encoder matrix, and set for instance
 	    matrix = bToAMatrix.matrix.inverse
@@ -824,7 +872,7 @@ FOAEncoderMatrix {
 	initOmni {
 
 	    // set input channel directions for instance
-	    dirChans = [ inf ];
+	    dirInputs = [ inf ];
 
 		// build encoder matrix, and set for instance
 	    matrix = Matrix.with([
@@ -837,10 +885,10 @@ FOAEncoderMatrix {
 	    // set input channel directions for instance
 	    (phi == 0).if (
 		    {
-				dirChans = [ theta ];
+				dirInputs = [ theta ];
     				this.init2D
 			}, {
-	    			dirChans = [ [theta, phi] ];
+	    			dirInputs = [ [theta, phi] ];
     				this.init3D
 			}
 		)
@@ -849,7 +897,7 @@ FOAEncoderMatrix {
 	initStereo { arg angle;
 
 	    // set input channel directions for instance
-	    dirChans = [ pi/2 - angle, (pi/2 - angle).neg ];
+	    dirInputs = [ pi/2 - angle, (pi/2 - angle).neg ];
 
 	    this.init2D
 	}
@@ -857,7 +905,7 @@ FOAEncoderMatrix {
 	initQuad {
 		
 	    // set input channel directions for instance
-	    dirChans = [ pi/4, pi * 3/4, pi.neg * 3/4, pi.neg/4 ];
+	    dirInputs = [ pi/4, pi * 3/4, pi.neg * 3/4, pi.neg/4 ];
 
 	    this.init2D
 	}
@@ -865,7 +913,7 @@ FOAEncoderMatrix {
 	init5_0 {
 
 	    // set input channel directions for instance
-	    dirChans = [ 0, pi/6, 110/180 * pi, 110/180 * pi.neg, pi.neg/6 ];
+	    dirInputs = [ 0, pi/6, 110/180 * pi, 110/180 * pi.neg, pi.neg/6 ];
 	    
 	    this.init2D
 	}
@@ -873,7 +921,7 @@ FOAEncoderMatrix {
 	init7_0 {
 
 	    // set input channel directions for instance
-	    dirChans = [ 0, pi/6, pi/2, 135/180 * pi, 135/180 * pi.neg, pi.neg/2, pi.neg/6 ];
+	    dirInputs = [ 0, pi/6, pi/2, 135/180 * pi, 135/180 * pi.neg, pi.neg/2, pi.neg/6 ];
 	    
 	    this.init2D
 	}
@@ -881,7 +929,7 @@ FOAEncoderMatrix {
 	initDirections { arg directions, pattern;
 
 	    // set input channel directions for instance
-	    dirChans = directions;
+	    dirInputs = directions;
 
 		switch (directions.rank,					// 2D or 3D?
 			1, {									// 2D
@@ -915,7 +963,7 @@ FOAEncoderMatrix {
 		theta = (theta + pi).mod(2pi) - pi;
 
 	    // set input channel directions for instance
-		dirChans = theta;
+		dirInputs = theta;
 
 		this.init2D
 	}
@@ -958,7 +1006,7 @@ FOAEncoderMatrix {
 		);
 		
 	    // set input channel directions for instance
-		dirChans = upDirs ++ downDirs;
+		dirInputs = upDirs ++ downDirs;
 
 		this.init3D
 	}
@@ -966,250 +1014,593 @@ FOAEncoderMatrix {
 	initZoomH2 { arg angles, pattern, k;
 
 	    // set input channel directions for instance
-	    dirChans = [ angles.at(0), angles.at(0).neg, angles.at(1), angles.at(1).neg ];
+	    dirInputs = [ angles.at(0), angles.at(0).neg, angles.at(1), angles.at(1).neg ];
 
 		this.initInv2D(pattern);
 
 		matrix = matrix.putRow(2, matrix.getRow(2) * k); // scale Y
 	}
 	
-	dim { ^matrix.rows - 1}	
+	dirOutputs { ^this.numOutputs.collect({ inf }) }
+	
+	dirChannels { ^this.dirInputs }
 
-	numChans { ^matrix.cols }
+	numInputs { ^matrix.cols }
+
+	numOutputs { ^matrix.rows }
+	
+	numChannels { ^this.numInputs }
+	
+	dim { ^this.numOutputs - 1}	
 
 	printOn { arg stream;
-		stream << this.class.name << "(" <<* [kind, this.dim, this.numChans] <<")";
+		stream << this.class.name << "(" <<* [kind, this.dim, this.numInputs] <<")";
 	}
 }
 
 
-////-----------------------------------------------------------------------
-//// martrix transforms
-//
-//AtkTransMatrix {
-//	var <kind;
-//	var <matrix;
-//
-//
-//	*newMirrorX {
-//		^super.newCopyArgs('mirrorX').initMirrorX;
-//	}
-//
-//	*newMirrorY {
-//		^super.newCopyArgs('mirrorY').initMirrorY;
-//	}
-//
-//	*newMirrorZ {
-//		^super.newCopyArgs('mirrorZ').initMirrorZ;
-//	}
-//
-//	*newMirrorO {
-//		^super.newCopyArgs('mirrorO').initMirrorO;
-//	}
-//
-//	*newRotate { arg angle = 0;
-//		^super.newCopyArgs('rotate').initRotate(angle);
-//	}
-//
-//	*newTilt { arg angle = 0;
-//		^super.newCopyArgs('tilt').initTilt(angle);
-//	}
-//
-//	*newTumble { arg angle = 0;
-//		^super.newCopyArgs('tumble').initTumble(angle);
-//	}
-//
-//	*newDirect { arg angle = 0;
-//		^super.newCopyArgs('direct').initDirect(angle);
-//	}
-//
-//	*newDirectX { arg angle = 0;
-//		^super.newCopyArgs('directX').initDirectX(angle);
-//	}
-//
-//	*newDirectY { arg angle = 0;
-//		^super.newCopyArgs('directY').initDirectY(angle);
-//	}
-//
-//	*newDirectZ { arg angle = 0;
-//		^super.newCopyArgs('directZ').initDirectZ(angle);
-//	}
-//
-//	initMirrorChan { arg chan;
-//		matrix = matrix.put(chan, chan, matrix.get(chan, chan).neg)
-//	}
-//
-//	initMirrorX {
-//		var chan;
-//		
-//		// ambisonic channel index
-//		chan = 1;
-//
-//		// build identity matrix 
-//		matrix = Matrix.newIdentity(4);
-//
-//		// mirror it 
-//		this.initMirrorChan(chan)
-//	}
-//
-//	initMirrorY {
-//		var chan;
-//		
-//		// ambisonic channel index
-//		chan = 2;
-//
-//		// build identity matrix 
-//		matrix = Matrix.newIdentity(4);
-//
-//		// mirror it 
-//		this.initMirrorChan(chan)
-//	}
-//
-//	initMirrorZ {
-//		var chan;
-//		
-//		// ambisonic channel index
-//		chan = 3;
-//
-//		// build identity matrix 
-//		matrix = Matrix.newIdentity(4);
-//
-//		// mirror it 
-//		this.initMirrorChan(chan)
-//	}
-//
-//	initMirrorO {
-//		var chans;
-//		
-//		// ambisonic channel index
-//		chans = [1, 2, 3];
-//
-//		// build identity matrix 
-//		matrix = Matrix.newIdentity(4);
-//
-//		// mirror it
-//		chans.do({arg chan;
-//			this.initMirrorChan(chan)
-//		})
-//	}
-//
-//	initRotate { arg angle;
-//		var cosAngle, sinAngle;
-//
-//		// build transform matrix, and set for instance
-//		// calculate cos, sin
-//		cosAngle	= angle.cos;
-//		sinAngle	= angle.sin;
-//
-//	    matrix = Matrix.with([
-//	    		[ 1, 0, 			0,			0 ],
-//	    		[ 0, cosAngle,	sinAngle.neg,	0 ],
-//	    		[ 0, sinAngle, 	cosAngle,		0 ],
-//	    		[ 0, 0, 			0,			1 ]
-//	    ])
-//	}
-//	
-//	initTilt { arg angle;
-//		var cosAngle, sinAngle;
-//
-//		// build transform matrix, and set for instance
-//		// calculate cos, sin
-//		cosAngle	= angle.cos;
-//		sinAngle	= angle.sin;
-//
-//	    matrix = Matrix.with([
-//	    		[ 1, 0, 0,		0 			],
-//	    		[ 0, 1, 0,		0 			],
-//	    		[ 0,	0, cosAngle,	sinAngle.neg 	],
-//	    		[ 0,	0, sinAngle, 	cosAngle 		]
-//	    ])
-//	}
-//
-//	initTumble { arg angle;
-//		var cosAngle, sinAngle;
-//
-//		// build transform matrix, and set for instance
-//		// calculate cos, sin
-//		cosAngle	= angle.cos;
-//		sinAngle	= angle.sin;
-//
-//	    matrix = Matrix.with([
-//	    		[ 1, 0, 			0,	0 			],
-//	    		[ 0, cosAngle,	0,	sinAngle.neg	],
-//	    		[ 0, 0,			1, 	0 			],
-//	    		[ 0, sinAngle,	0, 	cosAngle 		]
-//	    ])
-//	}
-//
-//	initDirect { arg angle;
-//		var g0, g1;
-//
-//		// build transform matrix, and set for instance
-//		g0 = (1 + angle.sin).sqrt;
-//		g1 = (1 - angle.sin).sqrt;
-//
-//	    matrix = Matrix.with([
-//	    		[ g0,	0,	0,	0 	],
-//	    		[ 0, 	g1,	0,	0	],
-//	    		[ 0, 	0,	g1, 	0 	],
-//	    		[ 0, 	0,	0, 	g1 	]
-//	    ])
-//	}
-//
-//	initDirectX { arg angle;
-//		var g0, g1;
-//
-//		// build transform matrix, and set for instance
-//		g0 = (1 + angle.sin).sqrt;
-//		g1 = (1 - angle.sin).sqrt;
-//
-//	    matrix = Matrix.with([
-//	    		[ g0,	0,	0,	0 	],
-//	    		[ 0, 	g1,	0,	0	],
-//	    		[ 0, 	0,	g0, 	0 	],
-//	    		[ 0, 	0,	0, 	g0 	]
-//	    ])
-//	}
-//
-//	initDirectY { arg angle;
-//		var g0, g1;
-//
-//		// build transform matrix, and set for instance
-//		g0 = (1 + angle.sin).sqrt;
-//		g1 = (1 - angle.sin).sqrt;
-//
-//	    matrix = Matrix.with([
-//	    		[ g0,	0,	0,	0 	],
-//	    		[ 0, 	g0,	0,	0	],
-//	    		[ 0, 	0,	g1, 	0 	],
-//	    		[ 0, 	0,	0, 	g0 	]
-//	    ])
-//	}
-//
-//	initDirectZ { arg angle;
-//		var g0, g1;
-//
-//		// build transform matrix, and set for instance
-//		g0 = (1 + angle.sin).sqrt;
-//		g1 = (1 - angle.sin).sqrt;
-//
-//	    matrix = Matrix.with([
-//	    		[ g0,	0,	0,	0 	],
-//	    		[ 0, 	g0,	0,	0	],
-//	    		[ 0, 	0,	g0, 	0 	],
-//	    		[ 0, 	0,	0, 	g1 	]
-//	    ])
-//	}
-//
-//	dim { ^matrix.rows - 1}	
-//
-//	numChans { ^matrix.cols }
-//
-//	printOn { arg stream;
-//		stream << this.class.name << "(" <<* [kind, this.dim, this.numChans] <<")";
-//	}
-//}
-//
+
+//-----------------------------------------------------------------------
+// martrix transforms
+
+
+FOAXformerMatrix {
+	var <kind;
+	var <matrix;
+
+	*newMirrorX {
+		^super.newCopyArgs('mirrorX').initMirrorX;
+	}
+
+	*newMirrorY {
+		^super.newCopyArgs('mirrorY').initMirrorY;
+	}
+
+	*newMirrorZ {
+		^super.newCopyArgs('mirrorZ').initMirrorZ;
+	}
+
+	*newMirrorO {
+		^super.newCopyArgs('mirrorO').initMirrorO;
+	}
+
+	*newRotate { arg angle = 0;
+		^super.newCopyArgs('rotate').initRotate(angle);
+	}
+
+	*newTilt { arg angle = 0;
+		^super.newCopyArgs('tilt').initTilt(angle);
+	}
+
+	*newTumble { arg angle = 0;
+		^super.newCopyArgs('tumble').initTumble(angle);
+	}
+
+	*newDirectO { arg angle = 0;
+		^super.newCopyArgs('directO').initDirectO(angle);
+	}
+
+	*newDirectX { arg angle = 0;
+		^super.newCopyArgs('directX').initDirectX(angle);
+	}
+
+	*newDirectY { arg angle = 0;
+		^super.newCopyArgs('directY').initDirectY(angle);
+	}
+
+	*newDirectZ { arg angle = 0;
+		^super.newCopyArgs('directZ').initDirectZ(angle);
+	}
+
+	*newDominateX { arg gain = 0;
+		^super.newCopyArgs('dominateX').initDominateX(gain);
+	}
+
+	*newDominateY { arg gain = 0;
+		^super.newCopyArgs('dominateY').initDominateY(gain);
+	}
+
+	*newDominateZ { arg gain = 0;
+		^super.newCopyArgs('dominateZ').initDominateZ(gain);
+	}
+
+	*newZoomX { arg angle = 0;
+		^super.newCopyArgs('zoomX').initZoomX(angle);
+	}
+
+	*newZoomY { arg angle = 0;
+		^super.newCopyArgs('zoomY').initZoomY(angle);
+	}
+
+	*newZoomZ { arg angle = 0;
+		^super.newCopyArgs('zoomZ').initZoomZ(angle);
+	}
+
+	*newFocusX { arg angle = 0;
+		^super.newCopyArgs('focusX').initFocusX(angle);
+	}
+
+	*newFocusY { arg angle = 0;
+		^super.newCopyArgs('focusY').initFocusY(angle);
+	}
+
+	*newFocusZ { arg angle = 0;
+		^super.newCopyArgs('focusZ').initFocusZ(angle);
+	}
+
+	*newPushX { arg angle = 0;
+		^super.newCopyArgs('pushX').initPushX(angle);
+	}
+
+	*newPushY { arg angle = 0;
+		^super.newCopyArgs('pushY').initPushY(angle);
+	}
+
+	*newPushZ { arg angle = 0;
+		^super.newCopyArgs('pushZ').initPushZ(angle);
+	}
+
+	*newPressX { arg angle = 0;
+		^super.newCopyArgs('pressX').initPressX(angle);
+	}
+
+	*newPressY { arg angle = 0;
+		^super.newCopyArgs('pressY').initPressY(angle);
+	}
+
+	*newPressZ { arg angle = 0;
+		^super.newCopyArgs('pressZ').initPressZ(angle);
+	}
+
+	*newAsymmetry { arg angle = 0;
+		^super.newCopyArgs('asymmetry').initAsymmetry(angle);
+	}
+
+	*newBalance { arg angle = 0;
+		^super.newCopyArgs('zoomY').initZoomY(angle);
+	}
+
+	initMirrorChan { arg chan;
+		matrix = matrix.put(chan, chan, matrix.get(chan, chan).neg)
+	}
+
+	initMirrorX {
+		var chan;
+		
+		// ambisonic channel index
+		chan = 1;
+
+		// build identity matrix 
+		matrix = Matrix.newIdentity(4);
+
+		// mirror it 
+		this.initMirrorChan(chan)
+	}
+
+	initMirrorY {
+		var chan;
+		
+		// ambisonic channel index
+		chan = 2;
+
+		// build identity matrix 
+		matrix = Matrix.newIdentity(4);
+
+		// mirror it 
+		this.initMirrorChan(chan)
+	}
+
+	initMirrorZ {
+		var chan;
+		
+		// ambisonic channel index
+		chan = 3;
+
+		// build identity matrix 
+		matrix = Matrix.newIdentity(4);
+
+		// mirror it 
+		this.initMirrorChan(chan)
+	}
+
+	initMirrorO {
+		var chans;
+		
+		// ambisonic channel index
+		chans = [1, 2, 3];
+
+		// build identity matrix 
+		matrix = Matrix.newIdentity(4);
+
+		// mirror it
+		chans.do({arg chan;
+			this.initMirrorChan(chan)
+		})
+	}
+
+	initRotate { arg angle;
+		var cosAngle, sinAngle;
+
+		// build transform matrix, and set for instance
+		// calculate cos, sin
+		cosAngle	= angle.cos;
+		sinAngle	= angle.sin;
+
+	    matrix = Matrix.with([
+	    		[ 1, 0, 			0,			0 ],
+	    		[ 0, cosAngle,	sinAngle.neg,	0 ],
+	    		[ 0, sinAngle, 	cosAngle,		0 ],
+	    		[ 0, 0, 			0,			1 ]
+	    ])
+	}
+	
+	initTilt { arg angle;
+		var cosAngle, sinAngle;
+
+		// build transform matrix, and set for instance
+		// calculate cos, sin
+		cosAngle	= angle.cos;
+		sinAngle	= angle.sin;
+
+	    matrix = Matrix.with([
+	    		[ 1, 0, 0,		0 			],
+	    		[ 0, 1, 0,		0 			],
+	    		[ 0,	0, cosAngle,	sinAngle.neg 	],
+	    		[ 0,	0, sinAngle, 	cosAngle 		]
+	    ])
+	}
+
+	initTumble { arg angle;
+		var cosAngle, sinAngle;
+
+		// build transform matrix, and set for instance
+		// calculate cos, sin
+		cosAngle	= angle.cos;
+		sinAngle	= angle.sin;
+
+	    matrix = Matrix.with([
+	    		[ 1, 0, 			0,	0 			],
+	    		[ 0, cosAngle,	0,	sinAngle.neg	],
+	    		[ 0, 0,			1, 	0 			],
+	    		[ 0, sinAngle,	0, 	cosAngle 		]
+	    ])
+	}
+
+	initDirectO { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = (1 + angle.sin).sqrt;
+		g1 = (1 - angle.sin).sqrt;
+
+	    matrix = Matrix.with([
+	    		[ g0,	0,	0,	0 	],
+	    		[ 0, 	g1,	0,	0	],
+	    		[ 0, 	0,	g1, 	0 	],
+	    		[ 0, 	0,	0, 	g1 	]
+	    ])
+	}
+
+	initDirectX { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = (1 + angle.sin).sqrt;
+		g1 = (1 - angle.sin).sqrt;
+
+	    matrix = Matrix.with([
+	    		[ g0,	0,	0,	0 	],
+	    		[ 0, 	g1,	0,	0	],
+	    		[ 0, 	0,	g0, 	0 	],
+	    		[ 0, 	0,	0, 	g0 	]
+	    ])
+	}
+
+	initDirectY { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = (1 + angle.sin).sqrt;
+		g1 = (1 - angle.sin).sqrt;
+
+	    matrix = Matrix.with([
+	    		[ g0,	0,	0,	0 	],
+	    		[ 0, 	g0,	0,	0	],
+	    		[ 0, 	0,	g1, 	0 	],
+	    		[ 0, 	0,	0, 	g0 	]
+	    ])
+	}
+
+	initDirectZ { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = (1 + angle.sin).sqrt;
+		g1 = (1 - angle.sin).sqrt;
+
+	    matrix = Matrix.with([
+	    		[ g0,	0,	0,	0 	],
+	    		[ 0, 	g0,	0,	0	],
+	    		[ 0, 	0,	g0, 	0 	],
+	    		[ 0, 	0,	0, 	g1 	]
+	    ])
+	}
+
+	initDominateX { arg gain;
+		var g0, g1, k;
+
+		// build transform matrix, and set for instance
+		k = gain.dbamp;
+		
+		g0 = (k + k.reciprocal) / 2;
+		g1 = (k - k.reciprocal) / 2.sqrt;
+
+	    matrix = Matrix.with([
+	    		[ g0,	g1/2,	0,	0 	],
+	    		[ g1, 	g0,		0,	0	],
+	    		[ 0, 	0,		1, 	0 	],
+	    		[ 0, 	0,		0, 	1 	]
+	    ])
+	}
+
+	initDominateY { arg gain;
+		var g0, g1, k;
+
+		// build transform matrix, and set for instance
+		k = gain.dbamp;
+		
+		g0 = (k + k.reciprocal) / 2;
+		g1 = (k - k.reciprocal) / 2.sqrt;
+
+	    matrix = Matrix.with([
+	    		[ g0,	0,	g1/2,	0 	],
+	    		[ 0, 	1,	0, 		0 	],
+	    		[ g1, 	0,	g0,		0	],
+	    		[ 0, 	0,	0, 		1 	]
+	    ])
+	}
+
+	initDominateZ { arg gain;
+		var g0, g1, k;
+
+		// build transform matrix, and set for instance
+		k = gain.dbamp;
+		
+		g0 = (k + k.reciprocal) / 2;
+		g1 = (k - k.reciprocal) / 2.sqrt;
+
+	    matrix = Matrix.with([
+	    		[ g0,	0,	0,	g1/2	],
+	    		[ 0, 	1,	0, 	0 	],
+	    		[ 0, 	0,	1, 	0 	],
+	    		[ g1, 	0,	0,	g0	]
+	    ])
+	}
+
+	initZoomX { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = angle.sin;
+		g1 = angle.cos;
+
+	    matrix = Matrix.with([
+	    		[ 1,			g0/2.sqrt,	0,	0 	],
+	    		[ 2.sqrt*g0, 	1,			0,	0	],
+	    		[ 0, 		0,			g1, 	0 	],
+	    		[ 0, 		0,			0, 	g1 	]
+	    ])
+	}
+
+	initZoomY { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = angle.sin;
+		g1 = angle.cos;
+
+	    matrix = Matrix.with([
+	    		[ 1,			0,	g0/2.sqrt,	0 	],
+	    		[ 0, 		g1,	0, 			0 	],
+	    		[ 2.sqrt*g0, 	0,	1,			0	],
+	    		[ 0, 		0,	0, 			g1 	]
+	    ])
+	}
+
+	initZoomZ { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = angle.sin;
+		g1 = angle.cos;
+
+	    matrix = Matrix.with([
+	    		[ 1,			0,	0,	g0/2.sqrt	],
+	    		[ 0, 		g1,	0, 	0 		],
+	    		[ 0, 		0, 	g1,	0 		],
+	    		[ 2.sqrt*g0, 	0,	0,	1		]
+	    ])
+	}
+
+	initFocusX { arg angle;
+		var g0, g1, g2;
+
+		// build transform matrix, and set for instance
+		g0 = (1 + angle.abs.sin).reciprocal;
+		g1 = 2.sqrt * angle.sin * g0;
+		g2 = angle.cos * g0;
+
+	    matrix = Matrix.with([
+	    		[ g0,	g1/2,	0,	0	],
+	    		[ g1,	g0,		0,	0	],
+	    		[ 0,		0,		g2, 	0 	],
+	    		[ 0,		0,		0, 	g2	]
+	    ])
+	}
+
+	initFocusY { arg angle;
+		var g0, g1, g2;
+
+		// build transform matrix, and set for instance
+		g0 = (1 + angle.abs.sin).reciprocal;
+		g1 = 2.sqrt * angle.sin * g0;
+		g2 = angle.cos * g0;
+
+	    matrix = Matrix.with([
+	    		[ g0,	0,	g1/2,	0	],
+	    		[ 0,		g2,	0, 		0 	],
+	    		[ g1,	0,	g0,		0	],
+	    		[ 0,		0,	0, 		g2	]
+	    ])
+	}
+
+	initFocusZ { arg angle;
+		var g0, g1, g2;
+
+		// build transform matrix, and set for instance
+		g0 = (1 + angle.abs.sin).reciprocal;
+		g1 = 2.sqrt * angle.sin * g0;
+		g2 = angle.cos * g0;
+
+	    matrix = Matrix.with([
+	    		[ g0,	0,	0,	g1/2	],
+	    		[ 0,		g2,	0, 	0 	],
+	    		[ 0,		0, 	g2,	0	],
+	    		[ g1,	0,	0,	g0	]
+	    ])
+	}
+
+	initPushX { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = 2.sqrt * angle.sin * angle.abs.sin;
+		g1 = angle.cos.squared;
+
+	    matrix = Matrix.with([
+	    		[ 1,		0,	0,	0	],
+	    		[ g0,	g1,	0,	0	],
+	    		[ 0,		0,	g1, 	0 	],
+	    		[ 0,		0,	0, 	g1	]
+	    ])
+	}
+
+	initPushY { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = 2.sqrt * angle.sin * angle.abs.sin;
+		g1 = angle.cos.squared;
+
+	    matrix = Matrix.with([
+	    		[ 1,		0,	0,	0	],
+	    		[ 0,		g1,	0, 	0 	],
+	    		[ g0,	0,	g1,	0	],
+	    		[ 0,		0,	0, 	g1	]
+	    ])
+	}
+
+	initPushZ { arg angle;
+		var g0, g1;
+
+		// build transform matrix, and set for instance
+		g0 = 2.sqrt * angle.sin * angle.abs.sin;
+		g1 = angle.cos.squared;
+
+	    matrix = Matrix.with([
+	    		[ 1,		0,	0,	0	],
+	    		[ 0,		g1,	0, 	0 	],
+	    		[ 0,		0, 	g1,	0	],
+	    		[ g0,	0,	0,	g1	]
+	    ])
+	}
+
+	initPressX { arg angle;
+		var g0, g1, g2;
+
+		// build transform matrix, and set for instance
+		g0 = 2.sqrt * angle.sin * angle.abs.sin;
+		g1 = angle.cos.squared;
+		g2 = angle.cos;
+
+	    matrix = Matrix.with([
+	    		[ 1,		0,	0,	0	],
+	    		[ g0,	g1,	0,	0	],
+	    		[ 0,		0,	g2, 	0 	],
+	    		[ 0,		0,	0, 	g2	]
+	    ])
+	}
+
+	initPressY { arg angle;
+		var g0, g1, g2;
+
+		// build transform matrix, and set for instance
+		g0 = 2.sqrt * angle.sin * angle.abs.sin;
+		g1 = angle.cos.squared;
+		g2 = angle.cos;
+
+	    matrix = Matrix.with([
+	    		[ 1,		0,	0,	0	],
+	    		[ 0,		g2,	0, 	0 	],
+	    		[ g0,	0,	g1,	0	],
+	    		[ 0,		0,	0, 	g2	]
+	    ])
+	}
+
+	initPressZ { arg angle;
+		var g0, g1, g2;
+
+		// build transform matrix, and set for instance
+		g0 = 2.sqrt * angle.sin * angle.abs.sin;
+		g1 = angle.cos.squared;
+		g2 = angle.cos;
+
+	    matrix = Matrix.with([
+	    		[ 1,		0,	0,	0	],
+	    		[ 0,		g2,	0, 	0 	],
+	    		[ 0,		0, 	g2,	0	],
+	    		[ g0,	0,	0,	g1	]
+	    ])
+	}
+
+	initAsymmetry { arg angle;
+		var g0, g1, g2, g3, g4;
+
+		// build transform matrix, and set for instance
+		g0 = angle.sin.neg;
+		g1 = angle.sin.squared;
+		g2 = angle.cos.squared;
+		g3 = angle.cos * angle.sin;
+		g4 = angle.cos;
+
+	    matrix = Matrix.with([
+	    		[ 1,			    0, 2.sqrt.reciprocal*g0, 0 ],
+	    		[ 2.sqrt*g1,	   g2, g0,				 0 ],
+	    		[ 2.sqrt.neg*g3, g3, g4, 				 0 ],
+	    		[ 0,			   0,  0, 				g4 ]
+	    ])
+	}
+
+	dirInputs { ^this.numInputs.collect({ inf }) }
+
+	dirOutputs { ^this.numOutputs.collect({ inf }) }
+	
+	dirChannels { ^this.dirOutputs }
+
+	dim { ^3 }				// all transforms are 3D
+
+	numInputs { ^matrix.cols }
+
+	numOutputs { ^matrix.rows }
+	
+	numChannels { ^4 }			// all transforms are 3D
+
+	printOn { arg stream;
+		stream << this.class.name << "(" <<* [kind, this.dim, this.numChannels] <<")";
+	}
+}
+
+
 
 //------------------------------------------------------------------------
 // kernel decoders
