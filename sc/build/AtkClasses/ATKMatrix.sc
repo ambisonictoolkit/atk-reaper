@@ -1160,6 +1160,38 @@ FOAXformerMatrix {
 		^super.newCopyArgs('zoomY').initZoomY(angle);
 	}
 
+	*newRTT { arg rotAngle = 0, tilAngle = 0, tumAngle = 0;
+		^super.newCopyArgs('rtt').initRTT(rotAngle, tilAngle, tumAngle);
+	}
+
+	*newMirror { arg theta = 0, phi = 0;
+		^super.newCopyArgs('mirror').initMirror(theta, phi);
+	}
+
+	*newDirect { arg angle = 0, theta = 0, phi = 0;
+		^super.newCopyArgs('direct').initDirect(angle, theta, phi);
+	}
+
+	*newDominate { arg gain = 0, theta = 0, phi = 0;
+		^super.newCopyArgs('dominate').initDominate(gain, theta, phi);
+	}
+
+	*newZoom { arg angle = 0, theta = 0, phi = 0;
+		^super.newCopyArgs('zoom').initZoom(angle, theta, phi);
+	}
+
+	*newFocus { arg angle = 0, theta = 0, phi = 0;
+		^super.newCopyArgs('focus').initFocus(angle, theta, phi);
+	}
+
+	*newPush { arg angle = 0, theta = 0, phi = 0;
+		^super.newCopyArgs('push').initPush(angle, theta, phi);
+	}
+
+	*newPress { arg angle = 0, theta = 0, phi = 0;
+		^super.newCopyArgs('press').initPress(angle, theta, phi);
+	}
+
 	initMirrorChan { arg chan;
 		matrix = matrix.put(chan, chan, matrix.get(chan, chan).neg)
 	}
@@ -1579,6 +1611,92 @@ FOAXformerMatrix {
 	    		[ 2.sqrt.neg*g3, g3, g4, 				 0 ],
 	    		[ 0,			   0,  0, 				g4 ]
 	    ])
+	}
+
+	initRTT { arg rotAngle, tilAngle, tumAngle;
+	
+		matrix = (
+		    	FOAXformerMatrix.newRotate(rotAngle).matrix.flop *
+		    	FOAXformerMatrix.newTilt(tilAngle).matrix.flop *
+		    	FOAXformerMatrix.newTumble(tumAngle).matrix.flop
+	    	).flop
+	}
+
+	initMirror { arg theta, phi;
+	
+		matrix = (
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
+		    	FOAXformerMatrix.newMirrorX.matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
+		    	FOAXformerMatrix.newRotate(theta).matrix.flop
+	    	).flop
+	}
+	
+	initDirect { arg angle, theta, phi;
+	
+		matrix = (
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
+		    	FOAXformerMatrix.newDirectX(angle).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
+		    	FOAXformerMatrix.newRotate(theta).matrix.flop
+	    	).flop
+	}
+
+	initDominate { arg gain, theta, phi;
+	
+		matrix = (
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
+		    	FOAXformerMatrix.newDominateX(gain).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
+		    	FOAXformerMatrix.newRotate(theta).matrix.flop
+	    	).flop
+	}
+
+	initZoom { arg angle, theta, phi;
+	
+		matrix = (
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
+		    	FOAXformerMatrix.newZoomX(angle).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
+		    	FOAXformerMatrix.newRotate(theta).matrix.flop
+	    	).flop
+	}
+
+	initFocus { arg angle, theta, phi;
+	
+		matrix = (
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
+		    	FOAXformerMatrix.newFocusX(angle).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
+		    	FOAXformerMatrix.newRotate(theta).matrix.flop
+	    	).flop
+	}
+
+	initPush { arg angle, theta, phi;
+	
+		matrix = (
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
+		    	FOAXformerMatrix.newPushX(angle).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
+		    	FOAXformerMatrix.newRotate(theta).matrix.flop
+	    	).flop
+	}
+
+	initPress { arg angle, theta, phi;
+	
+		matrix = (
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
+		    	FOAXformerMatrix.newPressX(angle).matrix.flop *
+		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
+		    	FOAXformerMatrix.newRotate(theta).matrix.flop
+	    	).flop
 	}
 
 	dirInputs { ^this.numInputs.collect({ inf }) }
