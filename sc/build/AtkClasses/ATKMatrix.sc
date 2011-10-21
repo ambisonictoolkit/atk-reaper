@@ -1616,87 +1616,87 @@ FOAXformerMatrix {
 	initRTT { arg rotAngle, tilAngle, tumAngle;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(rotAngle).matrix.flop *
-		    	FOAXformerMatrix.newTilt(tilAngle).matrix.flop *
-		    	FOAXformerMatrix.newTumble(tumAngle).matrix.flop
-	    	).flop
+		    	FOAXformerMatrix.newTumble(tumAngle).matrix *
+		    	FOAXformerMatrix.newTilt(tilAngle).matrix *
+		    	FOAXformerMatrix.newRotate(rotAngle).matrix 
+	    	)
 	}
 
 	initMirror { arg theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
-		    	FOAXformerMatrix.newMirrorX.matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
-		    	FOAXformerMatrix.newRotate(theta).matrix.flop
-	    	).flop
+		    	FOAXformerMatrix.newRotate(theta).matrix *
+		    	FOAXformerMatrix.newTumble(phi).matrix *
+		    	FOAXformerMatrix.newMirrorX.matrix *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+	    	)
 	}
 	
 	initDirect { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
-		    	FOAXformerMatrix.newDirectX(angle).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
-		    	FOAXformerMatrix.newRotate(theta).matrix.flop
-	    	).flop
+		    	FOAXformerMatrix.newRotate(theta).matrix *
+		    	FOAXformerMatrix.newTumble(phi).matrix *
+		    	FOAXformerMatrix.newDirectX(angle).matrix *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+	    	)
 	}
 
 	initDominate { arg gain, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
-		    	FOAXformerMatrix.newDominateX(gain).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
-		    	FOAXformerMatrix.newRotate(theta).matrix.flop
-	    	).flop
+		    	FOAXformerMatrix.newRotate(theta).matrix *
+		    	FOAXformerMatrix.newTumble(phi).matrix *
+		    	FOAXformerMatrix.newDominateX(gain).matrix *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+	    	)
 	}
 
 	initZoom { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
-		    	FOAXformerMatrix.newZoomX(angle).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
-		    	FOAXformerMatrix.newRotate(theta).matrix.flop
-	    	).flop
+		    	FOAXformerMatrix.newRotate(theta).matrix *
+		    	FOAXformerMatrix.newTumble(phi).matrix *
+		    	FOAXformerMatrix.newZoomX(angle).matrix *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+	    	)
 	}
 
 	initFocus { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
-		    	FOAXformerMatrix.newFocusX(angle).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
-		    	FOAXformerMatrix.newRotate(theta).matrix.flop
-	    	).flop
+		    	FOAXformerMatrix.newRotate(theta).matrix *
+		    	FOAXformerMatrix.newTumble(phi).matrix *
+		    	FOAXformerMatrix.newFocusX(angle).matrix *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+	    	)
 	}
 
 	initPush { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
-		    	FOAXformerMatrix.newPushX(angle).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
-		    	FOAXformerMatrix.newRotate(theta).matrix.flop
-	    	).flop
+		    	FOAXformerMatrix.newRotate(theta).matrix *
+		    	FOAXformerMatrix.newTumble(phi).matrix *
+		    	FOAXformerMatrix.newPushX(angle).matrix *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+	    	)
 	}
 
 	initPress { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix.flop *
-		    	FOAXformerMatrix.newPressX(angle).matrix.flop *
-		    	FOAXformerMatrix.newTumble(phi).matrix.flop *
-		    	FOAXformerMatrix.newRotate(theta).matrix.flop
-	    	).flop
+		    	FOAXformerMatrix.newRotate(theta).matrix *
+		    	FOAXformerMatrix.newTumble(phi).matrix *
+		    	FOAXformerMatrix.newPressX(angle).matrix *
+		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
+		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+	    	)
 	}
 
 	dirInputs { ^this.numInputs.collect({ inf }) }
