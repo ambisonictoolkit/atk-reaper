@@ -67,8 +67,9 @@ ATKPantoF {
 */
 
 
-// rename to FOAPanB		
-AtkMonoToB : Panner {
+// rename to FOAPanB	
+//AtkMonoToB : Panner {
+FOAPanB : Panner {
 	
 	*ar { arg in, azimuth=0, elevation=0;
 		^this.multiNew('audio', in, azimuth, elevation )
@@ -145,21 +146,21 @@ AtkPantoF : Panner {
 	}
 */
 	
-AtkDirect : Atk {			// check matrix!!, appears to be the old matrix
+AtkDirectO : Atk {			// check matrix!!, appears to be the old matrix
 	*ar { arg w, x, y, z, angle = pi/2, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, angle).madd(mul, add);
 	}
 }
 
 
-AtkSquishX : Atk {			// check matrix!!, rename to directX
+AtkDirectX : Atk {
 	*ar { arg w, x, y, z, angle = pi/2, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, angle).madd(mul, add);
 	}
 }
 
-AtkSquishY : AtkSquishX { }	// check matrix!!, rename to directY
-AtkSquishZ : AtkSquishX { }	// check matrix!!, rename to directZ
+AtkDirectY : AtkDirectX { }
+AtkDirectZ : AtkDirectX { }
 
 AtkRotate : Atk { 
 	*ar { arg w, x, y, z, angle = 0, mul = 1, add = 0;
@@ -177,13 +178,13 @@ AtkPushX : AtkRotate { }
 AtkPushY : AtkRotate { }
 AtkPushZ : AtkRotate { }
 
-AtkPressX : AtkRotate { }		// review press matrix
-AtkPressY : AtkRotate { }		// not as smooth as expected
+AtkPressX : AtkRotate { }
+AtkPressY : AtkRotate { }
 AtkPressZ : AtkRotate { }
 
-AtkZoomX : AtkRotate { }		// review zoom matrix!!
-AtkZoomY : AtkRotate { }		// distorts!!
-AtkZoomZ : AtkRotate { }		// max gain should == 6db
+AtkZoomX : AtkRotate { }
+AtkZoomY : AtkRotate { }
+AtkZoomZ : AtkRotate { }
 
 
 AtkDominateX : Atk {	
@@ -297,46 +298,53 @@ AtkProximity : Atk {
 
 }
 
-// RENAME to NFC
-AtkDistance : Atk { 
+AtkNFC : Atk { 
 	*ar { arg w, x, y, z, distance = 1, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, distance).madd(mul, add);
 	}
 		
 }
 
-// realised directly, rather than using RMShelf
-// default k --> 2D
-// better to code this up as a UGen, to get access to SR
-// the below code polls SR from the default server--which won't work in all cases!!
-AtkPsychoShelf { 
-	*ar { arg w, x, y, z, frequency = 400, k = [(3/2).sqrt, 3.sqrt/2], mul = 1, add = 0;
-		
-		var k2;
-		var wc, c;
-		var a0, a1, a2, b1, b2;
+//// realised directly, rather than using RMShelf
+//// default k --> 2D
+//// better to code this up as a UGen, to get access to SR
+//// the below code polls SR from the default server--which won't work in all cases!!
+//AtkPsychoShelf { 
+//	*ar { arg w, x, y, z, frequency = 400, k = [(3/2).sqrt, 3.sqrt/2], mul = 1, add = 0;
+//		
+//		var k2;
+//		var wc, c;
+//		var a0, a1, a2, b1, b2;
+//
+//		// expand k from degree (order) gains to channel gains
+//		k2 = k.collect({ arg item, i;
+//			Array.fill(2 * i + 1, {item})}).flat;
+//
+//		// calculate coefficients
+////		wc = (pi * frequency / SampleRate.ir(0)).tan;
+////		wc = (pi * frequency / 44100).tan;
+//		wc = (pi * frequency / Server.default.sampleRate).tan; // I'm sure there's a better way!!
+//		c = (wc - 1) / (wc + 1);
+//
+//		a0 = (((1 - k2)/4) * (1 + (c**2))) + (((1 + k2)/2) * c);
+//		a1 = ((1 - k2) * c) + (((1 + k2)/2) * (1 + (c**2)));
+//		a2 = a0;
+//
+//		b1 = Array.fill( k2.size, { (2*c).neg } );
+//		b2 = Array.fill( k2.size, { (c**2).neg } );
+//
+//		^SOS.ar([w, x, y, z], a0, a1, a2, b1, b2, mul, add);
+//	}
+//		
+//}
 
-		// expand k from degree (order) gains to channel gains
-		k2 = k.collect({ arg item, i;
-			Array.fill(2 * i + 1, {item})}).flat;
-
-		// calculate coefficients
-//		wc = (pi * frequency / SampleRate.ir(0)).tan;
-//		wc = (pi * frequency / 44100).tan;
-		wc = (pi * frequency / Server.default.sampleRate).tan; // I'm sure there's a better way!!
-		c = (wc - 1) / (wc + 1);
-
-		a0 = (((1 - k2)/4) * (1 + (c**2))) + (((1 + k2)/2) * c);
-		a1 = ((1 - k2) * c) + (((1 + k2)/2) * (1 + (c**2)));
-		a2 = a0;
-
-		b1 = Array.fill( k2.size, { (2*c).neg } );
-		b2 = Array.fill( k2.size, { (c**2).neg } );
-
-		^SOS.ar([w, x, y, z], a0, a1, a2, b1, b2, mul, add);
+AtkPsychoShelf : Atk { 
+	*ar { arg w, x, y, z, freq = 400, k0 = (3/2).sqrt, k1 = 3.sqrt/2, mul = 1, add = 0;
+		^this.multiNew('audio', w, x, y, z, freq, k0, k1).madd(mul, add);
 	}
 		
 }
+
 
 //------------------------------------------------------------------------
 // ATKMatrixMix & ATKKernelConv
@@ -397,8 +405,10 @@ FOADecode {
 				if ( decoder.shelfFreq.isNumber, { // shelf filter?
 					// This will probably be updated when PsychoShelf is wrapped
 					// rename to FOAPsychoShelf
+//					in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
+//						decoder.shelfFreq, decoder.shelfK)
 					in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
-						decoder.shelfFreq, decoder.shelfK)
+						decoder.shelfFreq, decoder.shelfK.at(0), decoder.shelfK.at(1))
 				});
 
 				^ATKMatrixMix.ar(in, decoder.matrix, mul, add)
@@ -550,7 +560,7 @@ FOATransform {
 				
 			'directO', {
 
-				ugen = AtkDirect;
+				ugen = AtkDirectO;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -563,7 +573,7 @@ FOATransform {
 
 			'directX', {
 
-				ugen = AtkSquishX;			// rename to directX
+				ugen = AtkDirectX;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -576,7 +586,7 @@ FOATransform {
 
 			'directY', {
 
-				ugen = AtkSquishY;			// rename to directY
+				ugen = AtkDirectY;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -589,7 +599,7 @@ FOATransform {
 
 			'directZ', {
 
-				ugen = AtkSquishZ;			// rename to directZ
+				ugen = AtkDirectZ;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -933,8 +943,35 @@ FOATransform {
 					argDict.at(\angle), argDict.at(\theta), argDict.at(\phi),
 					argDict.at(\mul), argDict.at(\add)
 				)
-			}
+			},
 			
+			'nfc', {
+
+				ugen = AtkNFC;
+				argDefaults = [1, 1, 0];
+				
+				argDict = argDict.value(ugen, args, argDefaults);
+				
+				^ugen.ar(
+					in.at(0), in.at(1), in.at(2), in.at(3),
+					argDict.at(\distance),
+					argDict.at(\mul), argDict.at(\add)
+				)
+			},
+
+			'proximity', {
+
+				ugen = AtkProximity;
+				argDefaults = [1, 1, 0];
+				
+				argDict = argDict.value(ugen, args, argDefaults);
+				
+				^ugen.ar(
+					in.at(0), in.at(1), in.at(2), in.at(3),
+					argDict.at(\distance),
+					argDict.at(\mul), argDict.at(\add)
+				)
+			}
 		)
 	}
 }

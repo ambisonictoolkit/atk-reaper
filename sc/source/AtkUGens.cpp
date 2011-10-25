@@ -47,16 +47,17 @@ typedef struct
  };
  */
 
-struct AtkMonoToB : public Unit 
+struct FOAPanB : public Unit 
 {
     float m_azimuth, m_elevation, m_W_amp, m_X_amp, m_Y_amp, m_Z_amp;
 };
 
-struct AtkMonoToBWFocus : public Unit 
+/*
+struct FOAPanBWFocus : public Unit 
 {
     float m_azimuth, m_elevation, m_focus, m_W_amp, m_X_amp, m_Y_amp, m_Z_amp;
 };
-
+ 
 struct AtkSterToB : public Unit 
 {
     float m_azimuth, m_azimuthL, m_azimuthR, m_elevation, m_width;
@@ -69,36 +70,37 @@ struct AtkPantoF : public Unit
     float *m_Xamps;
     float *m_Yamps;
 };
+ */
 
-struct AtkDirect : public Unit
+struct AtkDirectO : public Unit
 {
     AtkMatrix matrix;
     float m_angle;
 };
 
-struct AtkSquishX : public AtkDirect { };
-struct AtkSquishY : public AtkDirect { };
-struct AtkSquishZ : public AtkDirect { };
+struct AtkDirectX : public AtkDirectO { };
+struct AtkDirectY : public AtkDirectO { };
+struct AtkDirectZ : public AtkDirectO { };
 
-struct AtkRotate : public AtkDirect { };
-struct AtkTilt : public AtkDirect { };
-struct AtkTumble : public AtkDirect { };
+struct AtkRotate : public AtkDirectO { };
+struct AtkTilt : public AtkDirectO { };
+struct AtkTumble : public AtkDirectO { };
 
-struct AtkFocusX : public AtkDirect { };
-struct AtkFocusY : public AtkDirect { };
-struct AtkFocusZ : public AtkDirect { };
+struct AtkFocusX : public AtkDirectO { };
+struct AtkFocusY : public AtkDirectO { };
+struct AtkFocusZ : public AtkDirectO { };
 
-struct AtkPushX : public AtkDirect { };
-struct AtkPushY : public AtkDirect { };
-struct AtkPushZ : public AtkDirect { };
+struct AtkPushX : public AtkDirectO { };
+struct AtkPushY : public AtkDirectO { };
+struct AtkPushZ : public AtkDirectO { };
 
-struct AtkPressX : public AtkDirect { };
-struct AtkPressY : public AtkDirect { };
-struct AtkPressZ : public AtkDirect { };
+struct AtkPressX : public AtkDirectO { };
+struct AtkPressY : public AtkDirectO { };
+struct AtkPressZ : public AtkDirectO { };
 
-struct AtkZoomX : public AtkDirect { };
-struct AtkZoomY : public AtkDirect { };
-struct AtkZoomZ : public AtkDirect { };
+struct AtkZoomX : public AtkDirectO { };
+struct AtkZoomY : public AtkDirectO { };
+struct AtkZoomZ : public AtkDirectO { };
 
 struct AtkDominateX : public Unit
 {
@@ -109,28 +111,35 @@ struct AtkDominateX : public Unit
 struct AtkDominateY : AtkDominateX { };
 struct AtkDominateZ : AtkDominateX { };
 
-struct AtkDistance : public Unit
+struct AtkNFC : public Unit
 {
-    float m_distanceStart, m_yx1, m_yy1, m_yz1;
+    float m_distanceStart, m_y1x, m_y1y, m_y1z;
 };
 
 struct AtkProximity : public Unit
 {
-    float m_distanceStart, m_yx1, m_yy1, m_yz1;
+    float m_distanceStart, m_y1x, m_y1y, m_y1z;
+};
+
+struct AtkPsychoShelf : public Unit
+{
+	float m_freq, m_k0, m_k1;
+	float m_y1w, m_y2w, m_y1x, m_y2x, m_y1y, m_y2y, m_y1z, m_y2z;
 };
 
 extern "C"
 {
     void load(InterfaceTable *inTable);
     
-    void AtkMonoToB_next_aa(AtkMonoToB *unit, int inNumSamples);
-    void AtkMonoToB_next_kk(AtkMonoToB *unit, int inNumSamples);
-    void AtkMonoToB_Ctor(AtkMonoToB *unit);
-    
-    void AtkMonoToBWFocus_next_aa(AtkMonoToBWFocus *unit, int inNumSamples);
-    void AtkMonoToBWFocus_next_kk(AtkMonoToBWFocus *unit, int inNumSamples);
-    void AtkMonoToBWFocus_Ctor(AtkMonoToBWFocus *unit);
-    
+    void FOAPanB_next_aa(FOAPanB *unit, int inNumSamples);
+    void FOAPanB_next_kk(FOAPanB *unit, int inNumSamples);
+    void FOAPanB_Ctor(FOAPanB *unit);
+
+    /*
+    void FOAPanBWFocus_next_aa(FOAPanBWFocus *unit, int inNumSamples);
+    void FOAPanBWFocus_next_kk(FOAPanBWFocus *unit, int inNumSamples);
+    void FOAPanBWFocus_Ctor(FOAPanBWFocus *unit);
+	 
     void AtkSterToB_next_aaa(AtkSterToB *unit, int inNumSamples);
     void AtkSterToB_next_kkk(AtkSterToB *unit, int inNumSamples);
     void AtkSterToB_Ctor(AtkSterToB *unit);
@@ -138,22 +147,23 @@ extern "C"
     void AtkPantoF_next(AtkPantoF *unit, int inNumSamples);
     void AtkPantoF_Ctor(AtkPantoF *unit);
     void AtkPantoF_Dtor(AtkPantoF *unit);
+	 */
     
-    void AtkDirect_next_a(AtkDirect *unit, int inNumSamples);
-    void AtkDirect_next_k(AtkDirect *unit, int inNumSamples);
-    void AtkDirect_Ctor(AtkDirect* unit);
+    void AtkDirectO_next_a(AtkDirectO *unit, int inNumSamples);
+    void AtkDirectO_next_k(AtkDirectO *unit, int inNumSamples);
+    void AtkDirectO_Ctor(AtkDirectO* unit);
     
-    void AtkSquishX_next_a(AtkSquishX *unit, int inNumSamples);
-    void AtkSquishX_next_k(AtkSquishX *unit, int inNumSamples);
-    void AtkSquishX_Ctor(AtkSquishX* unit);
+    void AtkDirectX_next_a(AtkDirectX *unit, int inNumSamples);
+    void AtkDirectX_next_k(AtkDirectX *unit, int inNumSamples);
+    void AtkDirectX_Ctor(AtkDirectX* unit);
     
-    void AtkSquishY_next_a(AtkSquishY *unit, int inNumSamples);
-    void AtkSquishY_next_k(AtkSquishY *unit, int inNumSamples);
-    void AtkSquishY_Ctor(AtkSquishY* unit);
+    void AtkDirectY_next_a(AtkDirectY *unit, int inNumSamples);
+    void AtkDirectY_next_k(AtkDirectY *unit, int inNumSamples);
+    void AtkDirectY_Ctor(AtkDirectY* unit);
     
-    void AtkSquishZ_next_a(AtkSquishZ *unit, int inNumSamples);
-    void AtkSquishZ_next_k(AtkSquishZ *unit, int inNumSamples);
-    void AtkSquishZ_Ctor(AtkSquishZ* unit);
+    void AtkDirectZ_next_a(AtkDirectZ *unit, int inNumSamples);
+    void AtkDirectZ_next_k(AtkDirectZ *unit, int inNumSamples);
+    void AtkDirectZ_Ctor(AtkDirectZ* unit);
     
     void AtkRotate_next_a(AtkRotate *unit, int inNumSamples);
     void AtkRotate_next_k(AtkRotate *unit, int inNumSamples);
@@ -227,13 +237,17 @@ extern "C"
     void AtkDominateZ_next_k(AtkDominateZ *unit, int inNumSamples);
     void AtkDominateZ_Ctor(AtkDominateZ* unit);
     
-    void AtkDistance_next_k(AtkDistance *unit, int inNumSamples);
-    void AtkDistance_next_a(AtkDistance *unit, int inNumSamples);
-    void AtkDistance_Ctor(AtkDistance* unit);
+    void AtkNFC_next_k(AtkNFC *unit, int inNumSamples);
+    void AtkNFC_next_a(AtkNFC *unit, int inNumSamples);
+    void AtkNFC_Ctor(AtkNFC* unit);
     
     void AtkProximity_next_k(AtkProximity *unit, int inNumSamples);
     void AtkProximity_next_a(AtkProximity *unit, int inNumSamples);
     void AtkProximity_Ctor(AtkProximity* unit);
+    
+    void AtkPsychoShelf_next_k(AtkPsychoShelf *unit, int inNumSamples);
+    void AtkPsychoShelf_next_a(AtkPsychoShelf *unit, int inNumSamples);
+    void AtkPsychoShelf_Ctor(AtkPsychoShelf* unit);
     
     
     //	void AtoB_Ctor(AtoB* unit);
@@ -313,14 +327,14 @@ sinb = sin(elevation); \
 cosa = cos(azimuth); \
 cosb = cos(elevation); \
 
-/* AtkMonoToB - basic encoder (places sound on the sphere) */
+/* FOAPanB - basic encoder (places sound on the sphere) */
 
-void AtkMonoToB_Ctor(AtkMonoToB *unit)
+void FOAPanB_Ctor(FOAPanB *unit)
 {
     if((INRATE(1) == calc_FullRate) && (INRATE(2) == calc_FullRate)){
-	SETCALC(AtkMonoToB_next_aa);//aa
+	SETCALC(FOAPanB_next_aa);//aa
     } else {
-	SETCALC(AtkMonoToB_next_kk);//ak
+	SETCALC(FOAPanB_next_kk);//ak
     }
     
     float azimuth = unit->m_azimuth = IN0(1);
@@ -334,10 +348,10 @@ void AtkMonoToB_Ctor(AtkMonoToB *unit)
     unit->m_Y_amp = sina * cosb;
     unit->m_Z_amp = sinb;
     
-    AtkMonoToB_next_kk(unit, 1);
+    FOAPanB_next_kk(unit, 1);
 }
 
-void AtkMonoToB_next_kk(AtkMonoToB *unit, int inNumSamples)
+void FOAPanB_next_kk(FOAPanB *unit, int inNumSamples)
 {
     float azimuth = IN0(1);
     float elevation = IN0(2);
@@ -390,7 +404,7 @@ void AtkMonoToB_next_kk(AtkMonoToB *unit, int inNumSamples)
     }
 }
 
-void AtkMonoToB_next_aa(AtkMonoToB *unit, int inNumSamples)
+void FOAPanB_next_aa(FOAPanB *unit, int inNumSamples)
 {
     float *pazimuth = IN(1);
     float *pelevation = IN(2);
@@ -437,14 +451,15 @@ void AtkMonoToB_next_aa(AtkMonoToB *unit, int inNumSamples)
 }
 
 
-/* AtkMonoToB - basic encoder (places sound on the sphere) */
+/* FOAPanB - basic encoder (places sound on the sphere) */
 
-void AtkMonoToBWFocus_Ctor(AtkMonoToBWFocus *unit)
+/*
+void FOAPanBWFocus_Ctor(FOAPanBWFocus *unit)
 {
     if((INRATE(1) == calc_FullRate) && (INRATE(2) == calc_FullRate) && (INRATE(3) == calc_FullRate)){
-	SETCALC(AtkMonoToBWFocus_next_aa);//aa
+	SETCALC(FOAPanBWFocus_next_aa);//aa
     } else {
-	SETCALC(AtkMonoToBWFocus_next_kk);//ak
+	SETCALC(FOAPanBWFocus_next_kk);//ak
     }
     
     float azimuth = unit->m_azimuth = IN0(1);
@@ -461,10 +476,10 @@ void AtkMonoToBWFocus_Ctor(AtkMonoToBWFocus *unit)
     unit->m_Y_amp = sina * cosb* sinf;
     unit->m_Z_amp = sinb * sinf;
     
-    AtkMonoToBWFocus_next_kk(unit, 1);
+    FOAPanBWFocus_next_kk(unit, 1);
 }
 
-void AtkMonoToBWFocus_next_kk(AtkMonoToBWFocus *unit, int inNumSamples)
+void FOAPanBWFocus_next_kk(FOAPanBWFocus *unit, int inNumSamples)
 {
     float azimuth = IN0(1);
     float elevation = IN0(2);
@@ -520,7 +535,7 @@ void AtkMonoToBWFocus_next_kk(AtkMonoToBWFocus *unit, int inNumSamples)
     }
 }
 
-void AtkMonoToBWFocus_next_aa(AtkMonoToBWFocus *unit, int inNumSamples)
+void FOAPanBWFocus_next_aa(FOAPanBWFocus *unit, int inNumSamples)
 {
     float *pazimuth = IN(1);
     float *pelevation = IN(2);
@@ -569,10 +584,9 @@ void AtkMonoToBWFocus_next_aa(AtkMonoToBWFocus *unit, int inNumSamples)
     unit->m_Y_amp = Yamp;
     unit->m_Z_amp = Zamp;
 }
-
-
+*/
 /* AtkSterToB - basic encoder (places stereo sound on the sphere) */
-
+/*
 void AtkSterToB_Ctor(AtkSterToB *unit)
 {
     if((INRATE(2) == calc_FullRate) && (INRATE(3) == calc_FullRate) && (INRATE(4) == calc_FullRate)){
@@ -747,9 +761,10 @@ void AtkSterToB_next_aaa(AtkSterToB *unit, int inNumSamples)
 	}
     }
 }
+*/
 
 /* AtkPantoF 2D decoder */
-
+/*
 void AtkPantoF_Ctor(AtkPantoF* unit)
 {
     // should be 0.0 or 1.0
@@ -798,6 +813,7 @@ void AtkPantoF_next(AtkPantoF *unit, int inNumSamples)
 	}
     }
 }
+*/
 
 ////////////////////// AtkRotate ///////////////////////
 // uses 'angle' var. 
@@ -1178,37 +1194,43 @@ void AtkFocusZ_next_k(AtkFocusZ *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkSquishX /////////////////////
+////////////////////// AtkDirectX /////////////////////
 // uses 'angle' var. 
 
-#define FILL_SQUISHX_MATRIX \
+/*
+#define FILL_DIRECTX_MATRIX \
 double sq2cosa2 = sqrt2 * cos(unit->m_angle * 0.5); \
 double sq2sina2 = sqrt2 * sin(unit->m_angle * 0.5); \
 matrix.coefs[0][0] = matrix.coefs[2][2] = matrix.coefs[3][3] =  sq2cosa2; \
 matrix.coefs[1][1] = sq2sina2; 
+*/
+#define FILL_DIRECTX_MATRIX \
+matrix.coefs[0][0]= matrix.coefs[2][2] = matrix.coefs[3][3]  = sqrt(1.0 + sin(unit->m_angle)); \
+matrix.coefs[1][1] = sqrt(1.0 - sin(unit->m_angle)); \
 
-void AtkSquishX_Ctor(AtkSquishX* unit)
+
+void AtkDirectX_Ctor(AtkDirectX* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
     AtkMatrix matrix = unit->matrix;
-    FILL_SQUISHX_MATRIX;
+    FILL_DIRECTX_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkSquishX_next_a);
+	SETCALC(AtkDirectX_next_a);
     else
-	SETCALC(AtkSquishX_next_k);
-    AtkSquishX_next_k(unit, 1); 
+	SETCALC(AtkDirectX_next_k);
+    AtkDirectX_next_k(unit, 1); 
 }
 
-void AtkSquishX_next_a(AtkSquishX *unit, int inNumSamples)
+void AtkDirectX_next_a(AtkDirectX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
     for(int i = 0; i < inNumSamples; i++){
 	if(angle[i] != unit->m_angle){
 	    unit->m_angle = angle[i];
-	    FILL_SQUISHX_MATRIX
+	    FILL_DIRECTX_MATRIX
 	}
 	CALC_MATRIX
     }
@@ -1216,7 +1238,7 @@ void AtkSquishX_next_a(AtkSquishX *unit, int inNumSamples)
     
 }
 
-void AtkSquishX_next_k(AtkSquishX *unit, int inNumSamples)
+void AtkDirectX_next_k(AtkDirectX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1226,7 +1248,7 @@ void AtkSquishX_next_k(AtkSquishX *unit, int inNumSamples)
 	for(int i = 0; i < inNumSamples; i++){
 	    CALC_MATRIX
 	    unit->m_angle += angleslope;
-	    FILL_SQUISHX_MATRIX
+	    FILL_DIRECTX_MATRIX
 	}	
     } else {
 	for(int i = 0; i < inNumSamples; i++){
@@ -1237,37 +1259,42 @@ void AtkSquishX_next_k(AtkSquishX *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkSquishY /////////////////////
+////////////////////// AtkDirectY /////////////////////
 // uses 'angle' var. 
 
-#define FILL_SQUISHY_MATRIX \
+/*
+#define FILL_DIRECTY_MATRIX \
 double sq2cosa2 = sqrt2 * cos(unit->m_angle * 0.5); \
 double sq2sina2 = sqrt2 * sin(unit->m_angle * 0.5); \
 matrix.coefs[0][0] = matrix.coefs[1][1] = matrix.coefs[3][3] =  sq2cosa2; \
 matrix.coefs[2][2] = sq2sina2; 
+*/
+#define FILL_DIRECTY_MATRIX \
+matrix.coefs[0][0]= matrix.coefs[1][1] = matrix.coefs[3][3]  = sqrt(1.0 + sin(unit->m_angle)); \
+matrix.coefs[2][2] = sqrt(1.0 - sin(unit->m_angle)); \
 
-void AtkSquishY_Ctor(AtkSquishY* unit)
+void AtkDirectY_Ctor(AtkDirectY* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
     AtkMatrix matrix = unit->matrix;
-    FILL_SQUISHY_MATRIX;
+    FILL_DIRECTY_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkSquishY_next_a);
+	SETCALC(AtkDirectY_next_a);
     else
-	SETCALC(AtkSquishY_next_k);
-    AtkSquishY_next_k(unit, 1); 
+	SETCALC(AtkDirectY_next_k);
+    AtkDirectY_next_k(unit, 1); 
 }
 
-void AtkSquishY_next_a(AtkSquishY *unit, int inNumSamples)
+void AtkDirectY_next_a(AtkDirectY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
     for(int i = 0; i < inNumSamples; i++){
 	if(angle[i] != unit->m_angle){
 	    unit->m_angle = angle[i];
-	    FILL_SQUISHY_MATRIX
+	    FILL_DIRECTY_MATRIX
 	}
 	CALC_MATRIX
     }
@@ -1275,7 +1302,7 @@ void AtkSquishY_next_a(AtkSquishY *unit, int inNumSamples)
     
 }
 
-void AtkSquishY_next_k(AtkSquishY *unit, int inNumSamples)
+void AtkDirectY_next_k(AtkDirectY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1285,7 +1312,7 @@ void AtkSquishY_next_k(AtkSquishY *unit, int inNumSamples)
 	for(int i = 0; i < inNumSamples; i++){
 	    CALC_MATRIX
 	    unit->m_angle += angleslope;
-	    FILL_SQUISHY_MATRIX
+	    FILL_DIRECTY_MATRIX
 	}	
     } else {
 	for(int i = 0; i < inNumSamples; i++){
@@ -1296,37 +1323,42 @@ void AtkSquishY_next_k(AtkSquishY *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkSquishZ /////////////////////
+////////////////////// AtkDirectZ /////////////////////
 // uses 'angle' var. 
 
-#define FILL_SQUISHZ_MATRIX \
+/*
+#define FILL_DIRECTZ_MATRIX \
 double sq2cosa2 = sqrt2 * cos(unit->m_angle * 0.5); \
 double sq2sina2 = sqrt2 * sin(unit->m_angle * 0.5); \
 matrix.coefs[0][0] = matrix.coefs[1][1] = matrix.coefs[2][2] =  sq2cosa2; \
 matrix.coefs[3][3] = sq2sina2; 
+*/
+#define FILL_DIRECTZ_MATRIX \
+matrix.coefs[0][0]= matrix.coefs[1][1] = matrix.coefs[2][2]  = sqrt(1.0 + sin(unit->m_angle)); \
+matrix.coefs[3][3] = sqrt(1.0 - sin(unit->m_angle)); \
 
-void AtkSquishZ_Ctor(AtkSquishZ* unit)
+void AtkDirectZ_Ctor(AtkDirectZ* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
     AtkMatrix matrix = unit->matrix;
-    FILL_SQUISHZ_MATRIX;
+    FILL_DIRECTZ_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkSquishZ_next_a);
+	SETCALC(AtkDirectZ_next_a);
     else
-	SETCALC(AtkSquishZ_next_k);
-    AtkSquishZ_next_k(unit, 1); 
+	SETCALC(AtkDirectZ_next_k);
+    AtkDirectZ_next_k(unit, 1); 
 }
 
-void AtkSquishZ_next_a(AtkSquishZ *unit, int inNumSamples)
+void AtkDirectZ_next_a(AtkDirectZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
     for(int i = 0; i < inNumSamples; i++){
 	if(angle[i] != unit->m_angle){
 	    unit->m_angle = angle[i];
-	    FILL_SQUISHZ_MATRIX
+	    FILL_DIRECTZ_MATRIX
 	}
 	CALC_MATRIX
     }
@@ -1334,7 +1366,7 @@ void AtkSquishZ_next_a(AtkSquishZ *unit, int inNumSamples)
     
 }
 
-void AtkSquishZ_next_k(AtkSquishZ *unit, int inNumSamples)
+void AtkDirectZ_next_k(AtkDirectZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1344,7 +1376,7 @@ void AtkSquishZ_next_k(AtkSquishZ *unit, int inNumSamples)
 	for(int i = 0; i < inNumSamples; i++){
 	    CALC_MATRIX
 	    unit->m_angle += angleslope;
-	    FILL_SQUISHZ_MATRIX
+	    FILL_DIRECTZ_MATRIX
 	}	
     } else {
 	for(int i = 0; i < inNumSamples; i++){
@@ -2118,14 +2150,19 @@ void AtkDominateZ_next_k(AtkDominateZ *unit, int inNumSamples)
 
 
 
-////////////////////// AtkDirect ///////////////////////
+////////////////////// AtkDirectO ///////////////////////
 // uses 'angle' var
 
+/*
 #define FILL_DIRECT_MATRIX \
 matrix.coefs[0][0] = sqrt2 * cos(unit->m_angle * 0.5); \
 matrix.coefs[1][1] = matrix.coefs[2][2] = matrix.coefs[3][3] = sqrt2 * sin(unit->m_angle * 0.5); \
+*/
+#define FILL_DIRECT_MATRIX \
+matrix.coefs[0][0] = sqrt(1.0 + sin(unit->m_angle)); \
+matrix.coefs[1][1] = matrix.coefs[2][2] = matrix.coefs[3][3] = sqrt(1.0 - sin(unit->m_angle)); \
 
-void AtkDirect_Ctor(AtkDirect* unit)
+void AtkDirectO_Ctor(AtkDirectO* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
@@ -2133,13 +2170,13 @@ void AtkDirect_Ctor(AtkDirect* unit)
     FILL_DIRECT_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkDirect_next_a);
+	SETCALC(AtkDirectO_next_a);
     else
-	SETCALC(AtkDirect_next_k);
-    AtkDirect_next_k(unit, 1); 
+	SETCALC(AtkDirectO_next_k);
+    AtkDirectO_next_k(unit, 1); 
 }
 
-void AtkDirect_next_a(AtkDirect *unit, int inNumSamples)
+void AtkDirectO_next_a(AtkDirectO *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -2155,7 +2192,7 @@ void AtkDirect_next_a(AtkDirect *unit, int inNumSamples)
 }
 
 
-void AtkDirect_next_k(AtkDirect *unit, int inNumSamples)
+void AtkDirectO_next_k(AtkDirectO *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -2181,22 +2218,22 @@ void AtkDirect_next_k(AtkDirect *unit, int inNumSamples)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// AtkDistance - 
-void AtkDistance_Ctor(AtkDistance* unit)
+// AtkNFC - 
+void AtkNFC_Ctor(AtkNFC* unit)
 {
-    unit->m_yx1 = 0.0f;
-    unit->m_yy1 = 0.0f;
-    unit->m_yz1 = 0.0f;
+    unit->m_y1x = 0.0f;
+    unit->m_y1y = 0.0f;
+    unit->m_y1z = 0.0f;
     unit->m_distanceStart = IN0(4);
     if (INRATE(4) == calc_FullRate) {
-	SETCALC(AtkDistance_next_a);
+	SETCALC(AtkNFC_next_a);
     } else {
-	SETCALC(AtkDistance_next_k);
+	SETCALC(AtkNFC_next_k);
     };
     ClearUnitOutputs(unit, 1);
 }
 
-void AtkDistance_next_k(AtkDistance *unit, int inNumSamples)
+void AtkNFC_next_k(AtkNFC *unit, int inNumSamples)
 {       
     float *Wout = OUT(0);
     float *Xout = OUT(1);
@@ -2212,37 +2249,37 @@ void AtkDistance_next_k(AtkDistance *unit, int inNumSamples)
     
     float distanceInc = CALCSLOPE(distanceEnd, distanceStart);
     
-    float yx1 = unit->m_yx1;
-    float yy1 = unit->m_yy1;
-    float yz1 = unit->m_yz1;
+    float y1x = unit->m_y1x;
+    float y1y = unit->m_y1y;
+    float y1z = unit->m_y1z;
     
     for(int i = 0; i < inNumSamples; i++){
 	float freq = 53.0 / distanceStart;
 	float wc = (twopi * freq) * SAMPLEDUR;
 	//	a0 = (1 + (wc.cos.neg * 2 + 2).sqrt).reciprocal;
 	float a0 = 1 / (sqrt((cos(wc) * -2) + 2) + 1);
-	float yx0 = Xin[i] + a0 * yx1;
-	Xout[i] = a0 * yx0 + -a0 * yx1;
-	yx1 = yx0;
-	float yy0 = Yin[i] + a0 * yy1;
-	Yout[i] = a0 * yy0 + -a0 * yy1;
-	yy1 = yy0;
-	float yz0 = Zin[i] + a0 * yz1;
-	Zout[i] = a0 * yz0 + -a0 * yz1;
-	yz1 = yz0;
+	float y0x = Xin[i] + a0 * y1x;
+	Xout[i] = a0 * y0x + -a0 * y1x;
+	y1x = y0x;
+	float y0y = Yin[i] + a0 * y1y;
+	Yout[i] = a0 * y0y + -a0 * y1y;
+	y1y = y0y;
+	float y0z = Zin[i] + a0 * y1z;
+	Zout[i] = a0 * y0z + -a0 * y1z;
+	y1z = y0z;
 	// W is passed straight out
 	Wout[i] = Win[i];
 	distanceStart += distanceInc;
     }
     
-    unit->m_yx1 = zapgremlins(yx1);
-    unit->m_yy1 = zapgremlins(yy1);
-    unit->m_yz1 = zapgremlins(yz1);
+    unit->m_y1x = zapgremlins(y1x);
+    unit->m_y1y = zapgremlins(y1y);
+    unit->m_y1z = zapgremlins(y1z);
     unit->m_distanceStart = distanceEnd;
     
 }
 
-void AtkDistance_next_a(AtkDistance *unit, int inNumSamples)
+void AtkNFC_next_a(AtkNFC *unit, int inNumSamples)
 {       
     float *Wout = OUT(0);
     float *Xout = OUT(1);
@@ -2255,30 +2292,30 @@ void AtkDistance_next_a(AtkDistance *unit, int inNumSamples)
     float *Zin = IN(3);
     float *distance = IN(4);
     
-    float yx1 = unit->m_yx1;
-    float yy1 = unit->m_yy1;
-    float yz1 = unit->m_yz1;
+    float y1x = unit->m_y1x;
+    float y1y = unit->m_y1y;
+    float y1z = unit->m_y1z;
     
     for(int i = 0; i < inNumSamples; i++){
 	float freq = 53.0 / distance[i];
 	float wc = (twopi * freq) * SAMPLEDUR;
 	float a0 = 1 / (sqrt((cos(wc) * -2) + 2) + 1);
-	float yx0 = Xin[i] + a0 * yx1;
-	Xout[i] = a0 * yx0 + -a0 * yx1;
-	yx1 = yx0;
-	float yy0 = Yin[i] + a0 * yy1;
-	Yout[i] = a0 * yy0 + -a0 * yy1;
-	yy1 = yy0;
-	float yz0 = Zin[i] + a0 * yz1;
-	Zout[i] = a0 * yz0 + -a0 * yz1;
-	yz1 = yz0;
+	float y0x = Xin[i] + a0 * y1x;
+	Xout[i] = a0 * y0x + -a0 * y1x;
+	y1x = y0x;
+	float y0y = Yin[i] + a0 * y1y;
+	Yout[i] = a0 * y0y + -a0 * y1y;
+	y1y = y0y;
+	float y0z = Zin[i] + a0 * y1z;
+	Zout[i] = a0 * y0z + -a0 * y1z;
+	y1z = y0z;
 	// W is passed straight out
 	Wout[i] = Win[i];
     }
     
-    unit->m_yx1 = zapgremlins(yx1);
-    unit->m_yy1 = zapgremlins(yy1);
-    unit->m_yz1 = zapgremlins(yz1);
+    unit->m_y1x = zapgremlins(y1x);
+    unit->m_y1y = zapgremlins(y1y);
+    unit->m_y1z = zapgremlins(y1z);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2286,9 +2323,9 @@ void AtkDistance_next_a(AtkDistance *unit, int inNumSamples)
 
 void AtkProximity_Ctor(AtkProximity* unit)
 {
-    unit->m_yx1 = 0.0f;
-    unit->m_yy1 = 0.0f;
-    unit->m_yz1 = 0.0f;
+    unit->m_y1x = 0.0f;
+    unit->m_y1y = 0.0f;
+    unit->m_y1z = 0.0f;
     unit->m_distanceStart = IN0(4);
     if (INRATE(4) == calc_FullRate) {
 	SETCALC(AtkProximity_next_a);
@@ -2314,32 +2351,32 @@ void AtkProximity_next_k(AtkProximity *unit, int inNumSamples)
     
     float distanceInc = CALCSLOPE(distanceEnd, distanceStart);
     
-    float yx1 = unit->m_yx1;
-    float yy1 = unit->m_yy1;
-    float yz1 = unit->m_yz1;
+    float y1x = unit->m_y1x;
+    float y1y = unit->m_y1y;
+    float y1z = unit->m_y1z;
     
     for(int i=0; i<inNumSamples;i++){
 	float freq = 53.0 / distanceStart;
 	float wc = (twopi * freq) * SAMPLEDUR;
 	//	a0 = 1 + (wc.cos.neg * 2 + 2).sqrt;
 	float a0 = 1 + sqrt((cos(wc) * -2) + 2);
-	float yx0 = Xin[i] + yx1;
-	Xout[i] = a0 * yx0 - yx1;
-	yx1 = yx0;
-	float yy0 = Yin[i] + yy1;
-	Yout[i] = a0 * yy0 - yy1;
-	yy1 = yy0;
-	float yz0 = Zin[i] + yz1;
-	Zout[i] = a0 * yz0 - yz1;
-	yz1 = yz0;
+	float y0x = Xin[i] + y1x;
+	Xout[i] = a0 * y0x - y1x;
+	y1x = y0x;
+	float y0y = Yin[i] + y1y;
+	Yout[i] = a0 * y0y - y1y;
+	y1y = y0y;
+	float y0z = Zin[i] + y1z;
+	Zout[i] = a0 * y0z - y1z;
+	y1z = y0z;
 	// W is passed straight out
 	Wout[i] = Win[i];
 	distanceStart += distanceInc;
     }
     
-    unit->m_yx1 = zapgremlins(yx1);
-    unit->m_yy1 = zapgremlins(yy1);
-    unit->m_yz1 = zapgremlins(yz1);
+    unit->m_y1x = zapgremlins(y1x);
+    unit->m_y1y = zapgremlins(y1y);
+    unit->m_y1z = zapgremlins(y1z);
     unit->m_distanceStart = distanceEnd;
     
 }
@@ -2357,30 +2394,254 @@ void AtkProximity_next_a(AtkProximity *unit, int inNumSamples)
     float *Zin = IN(3);
     float *distance = IN(4);
     
-    float yx1 = unit->m_yx1;
-    float yy1 = unit->m_yy1;
-    float yz1 = unit->m_yz1;
+    float y1x = unit->m_y1x;
+    float y1y = unit->m_y1y;
+    float y1z = unit->m_y1z;
     
     for(int i = 0; i<inNumSamples; i++){
 	float freq = 53.0 / distance[i];
 	float wc = (twopi * freq) * SAMPLEDUR;
 	float a0 = 1 + sqrt((cos(wc) * -2) + 2);
-	float yx0 = Xin[i] + yx1;
-	Xout[i] = a0 * yx0 - yx1;
-	yx1 = yx0;
-	float yy0 = Yin[i] + yy1;
-	Yout[i] = a0 * yy0 - yy1;
-	yy1 = yy0;
-	float yz0 = Zin[i] + yz1;
-	Zout[i] = a0 * yz0 - yz1;
-	yz1 = yz0;
+	float y0x = Xin[i] + y1x;
+	Xout[i] = a0 * y0x - y1x;
+	y1x = y0x;
+	float y0y = Yin[i] + y1y;
+	Yout[i] = a0 * y0y - y1y;
+	y1y = y0y;
+	float y0z = Zin[i] + y1z;
+	Zout[i] = a0 * y0z - y1z;
+	y1z = y0z;
 	// W is passed straight out
 	Wout[i] = Win[i];
     }
     
-    unit->m_yx1 = zapgremlins(yx1);
-    unit->m_yy1 = zapgremlins(yy1);
-    unit->m_yz1 = zapgremlins(yz1);
+    unit->m_y1x = zapgremlins(y1x);
+    unit->m_y1y = zapgremlins(y1y);
+    unit->m_y1z = zapgremlins(y1z);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// AtkPsychoShelf
+
+void AtkPsychoShelf_Ctor(AtkPsychoShelf* unit)
+{
+    unit->m_y1w = 0.0f;
+    unit->m_y2w = 0.0f;
+    unit->m_y1x = 0.0f;
+    unit->m_y2x = 0.0f;
+    unit->m_y1y = 0.0f;
+    unit->m_y2y = 0.0f;
+    unit->m_y1z = 0.0f;
+    unit->m_y2z = 0.0f;
+    unit->m_freq = IN0(4);
+    unit->m_k0 = IN0(5);
+    unit->m_k1 = IN0(6);
+    if (INRATE(4) == calc_FullRate || INRATE(5) == calc_FullRate || INRATE(6) == calc_FullRate) {
+		SETCALC(AtkPsychoShelf_next_a);
+    } else {
+		SETCALC(AtkPsychoShelf_next_k);
+    };
+    ClearUnitOutputs(unit, 1);
+}
+
+void AtkPsychoShelf_next_k(AtkPsychoShelf *unit, int inNumSamples)
+{       
+    float *Wout = OUT(0);
+    float *Xout = OUT(1);
+    float *Yout = OUT(2);
+    float *Zout = OUT(3);
+    
+    float *Win = IN(0);
+    float *Xin = IN(1);
+    float *Yin = IN(2);
+    float *Zin = IN(3);
+	float freqEnd = IN0(4);
+	float k0End = IN0(5);
+	float k1End = IN0(6);
+
+	float freqStart = unit->m_freq;
+	float k0Start = unit->m_k0;
+	float k1Start = unit->m_k1;
+
+	float freqInc = CALCSLOPE(freqEnd, freqStart);
+	float k0Inc = CALCSLOPE(k0End, k0Start);
+	float k1Inc = CALCSLOPE(k1End, k1Start);
+    
+	float y0w;
+    float y1w = unit->m_y1w;
+    float y2w = unit->m_y2w;
+	float y0x;
+    float y1x = unit->m_y1x;
+    float y2x = unit->m_y2x;
+	float y0y;
+    float y1y = unit->m_y1y;
+    float y2y = unit->m_y2y;
+	float y0z;
+    float y1z = unit->m_y1z;
+    float y2z = unit->m_y2z;
+    
+    for(int i=0; i<inNumSamples;i++){
+
+		// wc = (pi * frequency / Server.default.sampleRate).tan
+		// c = (wc - 1) / (wc + 1)
+		float wc = tan(pi * freqStart * SAMPLEDUR);
+		float c = (wc - 1.0) / (wc + 1.0);
+
+		// a0 = (((1 - k2)/4) * (1 + (c**2))) + (((1 + k2)/2) * c);
+		// a1 = ((1 - k2) * c) + (((1 + k2)/2) * (1 + (c**2)));
+		// a2 = a0;
+		//
+		// b1 = Array.fill( k2.size, { (2*c).neg } );
+		// b2 = Array.fill( k2.size, { (c**2).neg } );
+		
+		// 0 order coefficients
+		float a0w = (((1.0 - k0Start) * 0.25) * (1.0 + (c*c))) + (((1.0 + k0Start) * 0.5) * c);
+		float a1w = ((1.0 - k0Start) * c) + (((1.0 + k0Start) * 0.5) * (1.0 + (c*c)));
+		float a2w = a0w;
+		float b1w = -2.0 * c;
+		float b2w = -c * c;
+
+		// 1st order coefficients
+		float a0xyz = (((1.0 - k1Start) * 0.25) * (1.0 + (c*c))) + (((1.0 + k1Start) * 0.5) * c);
+		float a1xyz = ((1.0 - k1Start) * c) + (((1.0 + k1Start) * 0.5) * (1.0 + (c*c)));
+		float a2xyz = a0xyz;
+		float b1xyz = -2.0 * c;
+		float b2xyz = -c * c;
+		
+
+		// filter 0 order
+		y0w = Win[i] + b1w * y1w + b2w * y2w;
+		Wout[i] = a0w * y0w + a1w * y1w + a2w * y2w;
+		y2w = y1w;
+		y1w = y0w;
+		
+		
+		// filter 1st order
+		y0x = Xin[i] + b1xyz * y1x + b2xyz * y2x;
+		Xout[i] = a0xyz * y0x + a1xyz * y1x + a2xyz * y2x;
+		y2x = y1x;
+		y1x = y0x;
+
+		y0y = Yin[i] + b1xyz * y1y + b2xyz * y2y;
+		Yout[i] = a0xyz * y0y + a1xyz * y1y + a2xyz * y2y;
+		y2y = y1y;
+		y1y = y0y;
+		
+		y0z = Zin[i] + b1xyz * y1z + b2xyz * y2z;
+		Zout[i] = a0xyz * y0z + a1xyz * y1z + a2xyz * y2z;
+		y2z = y1z;
+		y1z = y0z;
+		
+		
+		freqStart += freqInc;
+		k0Start += k0Inc;
+		k1Start += k1Inc;
+    }
+    
+    unit->m_y1w = zapgremlins(y1w);
+    unit->m_y2w = zapgremlins(y2w);
+    unit->m_y1x = zapgremlins(y1x);
+    unit->m_y2x = zapgremlins(y2x);
+    unit->m_y1y = zapgremlins(y1y);
+    unit->m_y2y = zapgremlins(y2y);
+    unit->m_y1z = zapgremlins(y1z);
+    unit->m_y2z = zapgremlins(y2z);
+
+    unit->m_freq = freqEnd;
+    unit->m_k0 = k0End;
+    unit->m_k1 = k1End;
+    
+}
+
+void AtkPsychoShelf_next_a(AtkPsychoShelf *unit, int inNumSamples)
+{       
+    float *Wout = OUT(0);
+    float *Xout = OUT(1);
+    float *Yout = OUT(2);
+    float *Zout = OUT(3);
+    
+    float *Win = IN(0);
+    float *Xin = IN(1);
+    float *Yin = IN(2);
+    float *Zin = IN(3);
+	float *freq = IN(4);
+	float *k0 = IN(5);
+	float *k1 = IN(6);
+    
+	float y0w;
+    float y1w = unit->m_y1w;
+    float y2w = unit->m_y2w;
+	float y0x;
+    float y1x = unit->m_y1x;
+    float y2x = unit->m_y2x;
+	float y0y;
+    float y1y = unit->m_y1y;
+    float y2y = unit->m_y2y;
+	float y0z;
+    float y1z = unit->m_y1z;
+    float y2z = unit->m_y2z;
+    
+    for(int i = 0; i<inNumSamples; i++){
+		// wc = (pi * frequency / Server.default.sampleRate).tan
+		// c = (wc - 1) / (wc + 1)
+		float wc = tan(pi * freq[i] * SAMPLEDUR);
+		float c = (wc - 1.0) / (wc + 1.0);
+		
+		// a0 = (((1 - k2)/4) * (1 + (c**2))) + (((1 + k2)/2) * c);
+		// a1 = ((1 - k2) * c) + (((1 + k2)/2) * (1 + (c**2)));
+		// a2 = a0;
+		//
+		// b1 = Array.fill( k2.size, { (2*c).neg } );
+		// b2 = Array.fill( k2.size, { (c**2).neg } );
+		
+		// 0 order coefficients
+		float a0w = (((1.0 - k0[i]) * 0.25) * (1.0 + (c*c))) + (((1.0 + k0[i]) * 0.5) * c);
+		float a1w = ((1.0 - k0[i]) * c) + (((1.0 + k0[i]) * 0.5) * (1.0 + (c*c)));
+		float a2w = a0w;
+		float b1w = -2.0 * c;
+		float b2w = -c * c;
+		
+		// 1st order coefficients
+		float a0xyz = (((1.0 - k1[i]) * 0.25) * (1.0 + (c*c))) + (((1.0 + k1[i]) * 0.5) * c);
+		float a1xyz = ((1.0 - k1[i]) * c) + (((1.0 + k1[i]) * 0.5) * (1.0 + (c*c)));
+		float a2xyz = a0xyz;
+		float b1xyz = -2.0 * c;
+		float b2xyz = -c * c;
+		
+		
+		// filter 0 order
+		y0w = Win[i] + b1w * y1w + b2w * y2w;
+		Wout[i] = a0w * y0w + a1w * y1w + a2w * y2w;
+		y2w = y1w;
+		y1w = y0w;
+		
+		
+		// filter 1st order
+		y0x = Xin[i] + b1xyz * y1x + b2xyz * y2x;
+		Xout[i] = a0xyz * y0x + a1xyz * y1x + a2xyz * y2x;
+		y2x = y1x;
+		y1x = y0x;
+		
+		y0y = Yin[i] + b1xyz * y1y + b2xyz * y2y;
+		Yout[i] = a0xyz * y0y + a1xyz * y1y + a2xyz * y2y;
+		y2y = y1y;
+		y1y = y0y;
+		
+		y0z = Zin[i] + b1xyz * y1z + b2xyz * y2z;
+		Zout[i] = a0xyz * y0z + a1xyz * y1z + a2xyz * y2z;
+		y2z = y1z;
+		y1z = y0z;
+    }
+    
+    unit->m_y1w = zapgremlins(y1w);
+    unit->m_y2w = zapgremlins(y2w);
+    unit->m_y1x = zapgremlins(y1x);
+    unit->m_y2x = zapgremlins(y2x);
+    unit->m_y1y = zapgremlins(y1y);
+    unit->m_y2y = zapgremlins(y2y);
+    unit->m_y1z = zapgremlins(y1z);
+    unit->m_y2z = zapgremlins(y2z);
 }
 
 
@@ -2720,15 +2981,17 @@ void load(InterfaceTable *inTable)
 {
     ft = inTable;
     
-    DefineSimpleCantAliasUnit(AtkMonoToB);
-    DefineSimpleCantAliasUnit(AtkMonoToBWFocus);
+    DefineSimpleCantAliasUnit(FOAPanB);
+/*
+    DefineSimpleCantAliasUnit(FOAPanBWFocus);
     DefineSimpleCantAliasUnit(AtkSterToB);
     DefineDtorCantAliasUnit(AtkPantoF);
+ */
     
-    DefineSimpleCantAliasUnit(AtkDirect);
-    DefineSimpleCantAliasUnit(AtkSquishX);
-    DefineSimpleCantAliasUnit(AtkSquishY);
-    DefineSimpleCantAliasUnit(AtkSquishZ);
+    DefineSimpleCantAliasUnit(AtkDirectO);
+    DefineSimpleCantAliasUnit(AtkDirectX);
+    DefineSimpleCantAliasUnit(AtkDirectY);
+    DefineSimpleCantAliasUnit(AtkDirectZ);
     DefineSimpleCantAliasUnit(AtkRotate);
     DefineSimpleCantAliasUnit(AtkTilt);
     DefineSimpleCantAliasUnit(AtkTumble);
@@ -2749,8 +3012,9 @@ void load(InterfaceTable *inTable)
     DefineSimpleCantAliasUnit(AtkDominateZ);
     
     
-    DefineSimpleCantAliasUnit(AtkDistance);
+    DefineSimpleCantAliasUnit(AtkNFC);
     DefineSimpleCantAliasUnit(AtkProximity);
+    DefineSimpleCantAliasUnit(AtkPsychoShelf);
     //DefineSimpleUnit(Dominate);
     //DefineSimpleUnit(Push);
     //DefineSimpleUnit(AtoB);

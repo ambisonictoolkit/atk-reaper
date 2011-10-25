@@ -74,6 +74,7 @@
 // mono encoder
 ~encoder = FOAEncoderMatrix.newDirection
 ~decoder = FOADecoderMatrix.newQuad(pi/6, 'single')
+~decoder = FOADecoderMatrix.newQuad(pi/6, 'dual')
 
 (
 {
@@ -82,8 +83,8 @@
 
 	// kr.... for SC3's internal encoder
 	azim = MouseX.kr(pi, -pi);
-//	mouseY = MouseY.kr(1, -1);			// seems to be inverted from documentation
-	mouseY = MouseY.kr(pi/2, -pi/2);		// seems to be inverted from documentation
+	mouseY = MouseY.kr(1, -1);			// seems to be inverted from documentation
+//	mouseY = MouseY.kr(pi/2, -pi/2);		// seems to be inverted from documentation
 
 
 	// ------------------------------------------------------------
@@ -94,12 +95,24 @@
 	// ------------------------------------------------------------
 	// encode
 	sig = FOAEncode.ar(sig, ~encoder);
+//	sig = FOAPanB.ar(sig);
 
 
 	// ------------------------------------------------------------
 	// transform
+
+//	sig = AtkDirectO.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
+//		mouseY);
+//	sig = AtkDirectX.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
+//		mouseY);
+//	sig = AtkDirectY.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
+//		mouseY);
+//	sig = AtkDirectZ.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
+//		mouseY);
+
+
 //	sig = FOAXform.ar(sig, ~xformer);
-//	sig = FOATransform.ar(sig, 'rotate', azim);
+	sig = FOATransform.ar(sig, 'rotate', azim);
 //	sig = FOATransform.ar(sig, 'rotate', [azim, mul: 6.dbamp]);
 //	sig = FOATransform.ar(sig, 'rotate', azim, 0.dbamp);
 //	sig = FOATransform.ar(sig, 'tilt', azim);
@@ -145,12 +158,13 @@
 //	sig = FOATransform.ar(sig, 'push', mouseY, azim);
 //	sig = FOATransform.ar(sig, 'press', mouseY, azim);
 //	sig = FOATransform.ar(sig, 'direct', mouseY, azim);
-	sig = FOATransform.ar(sig, 'mirror', mouseY, azim);
+//	sig = FOATransform.ar(sig, 'mirror', mouseY, azim);
 
 
 	// ------------------------------------------------------------
 	// distance filter
-	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+//	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+	sig = AtkNFC.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
 
 	// decode to output
 	#fl, bl, br, fr = FOADecode.ar(sig, ~decoder);
