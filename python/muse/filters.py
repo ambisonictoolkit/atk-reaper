@@ -2549,6 +2549,69 @@ def cHRIR(azimuth, elevation, subject_id, database_dir):
     return res
 
 
+# --------------------------------------
+# RIR filters
+# --------------------------------------
+
+
+def isophonicsRIR(subject_id, database_dir):
+    """isophonicsRIR(subject_id, database_dir)
+
+    Return measured RIRs from the Isophonics RIR database.
+
+    See: http://isophonics.net/content/room-impulse-response-data-set
+    
+
+    Args:
+    
+        - subject_id    : 'xXXyYY', e.g., 'x00y00' (as string)
+                          
+        - database_dir  : path to local directory where subject directories
+                          for the Isophonics database are located
+                          (include desired space, e.g. 'greathall', 'octagon',
+                          'classroom')
+
+    Outputs:
+    
+        - b         : coefficients of measured FIR filter. Interleaved
+                        [W_FIR, X_FIR, Y_FIR, Z_FIR]
+
+
+    Please see documentation avaliable at the above link for measurement
+    details. Measurement points vary for each space.
+
+
+    Note: Returns the complete (asymmetric) HRIR
+
+    """
+
+    # harmonics
+    harms = [ 'W', 'X', 'Y', 'Z' ]
+
+
+    # generate RIR paths
+    RIR_files = []
+    for harm in harms:
+        RIR_files += [os.path.join(
+            database_dir, harm, \
+            harm + subject_id + '.wav'
+            )]
+
+    # read in
+    res = []        # start as list
+    for RIR_file in RIR_files:
+        RIR_sndfile = Sndfile(RIR_file)
+        res += [RIR_sndfile.read_frames(RIR_sndfile.nframes)]
+        RIR_sndfile.close()
+
+    # convert to array and interleave
+
+    res = interleave(array(res))
+
+    return res
+
+
+
 # **************************************
 # osc. . .
 # **************************************
