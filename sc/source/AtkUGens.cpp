@@ -39,91 +39,66 @@ static InterfaceTable *ft;
 typedef struct  
 {
     float coefs[4][4];
-} AtkMatrix;
-/*
- 
- struct AtoB: public Unit
- {
- };
- */
+} FoaMatrix;
 
-struct FOAPanB : public Unit 
+struct FoaPanB : public Unit 
 {
     float m_azimuth, m_elevation, m_W_amp, m_X_amp, m_Y_amp, m_Z_amp;
 };
 
-/*
-struct FOAPanBWFocus : public Unit 
-{
-    float m_azimuth, m_elevation, m_focus, m_W_amp, m_X_amp, m_Y_amp, m_Z_amp;
-};
- 
-struct AtkSterToB : public Unit 
-{
-    float m_azimuth, m_azimuthL, m_azimuthR, m_elevation, m_width;
-    float m_W_amp, m_X_ampL, m_Y_ampL, m_X_ampR, m_Y_ampR, m_Z_amp;
-};
 
-struct AtkPantoF : public Unit
+struct FoaDirectO : public Unit
 {
-    float m_orientation, m_directivity, m_angle, m_offset;
-    float *m_Xamps;
-    float *m_Yamps;
-};
- */
-
-struct AtkDirectO : public Unit
-{
-    AtkMatrix matrix;
+    FoaMatrix matrix;
     float m_angle;
 };
 
-struct AtkDirectX : public AtkDirectO { };
-struct AtkDirectY : public AtkDirectO { };
-struct AtkDirectZ : public AtkDirectO { };
+struct FoaDirectX : public FoaDirectO { };
+struct FoaDirectY : public FoaDirectO { };
+struct FoaDirectZ : public FoaDirectO { };
 
-struct AtkRotate : public AtkDirectO { };
-struct AtkTilt : public AtkDirectO { };
-struct AtkTumble : public AtkDirectO { };
+struct FoaRotate : public FoaDirectO { };
+struct FoaTilt : public FoaDirectO { };
+struct FoaTumble : public FoaDirectO { };
 
-struct AtkFocusX : public AtkDirectO { };
-struct AtkFocusY : public AtkDirectO { };
-struct AtkFocusZ : public AtkDirectO { };
+struct FoaFocusX : public FoaDirectO { };
+struct FoaFocusY : public FoaDirectO { };
+struct FoaFocusZ : public FoaDirectO { };
 
-struct AtkPushX : public AtkDirectO { };
-struct AtkPushY : public AtkDirectO { };
-struct AtkPushZ : public AtkDirectO { };
+struct FoaPushX : public FoaDirectO { };
+struct FoaPushY : public FoaDirectO { };
+struct FoaPushZ : public FoaDirectO { };
 
-struct AtkPressX : public AtkDirectO { };
-struct AtkPressY : public AtkDirectO { };
-struct AtkPressZ : public AtkDirectO { };
+struct FoaPressX : public FoaDirectO { };
+struct FoaPressY : public FoaDirectO { };
+struct FoaPressZ : public FoaDirectO { };
 
-struct AtkZoomX : public AtkDirectO { };
-struct AtkZoomY : public AtkDirectO { };
-struct AtkZoomZ : public AtkDirectO { };
+struct FoaZoomX : public FoaDirectO { };
+struct FoaZoomY : public FoaDirectO { };
+struct FoaZoomZ : public FoaDirectO { };
 
-struct AtkAsymmetry : public AtkDirectO { };
+struct FoaAsymmetry : public FoaDirectO { };
 
-struct AtkDominateX : public Unit
+struct FoaDominateX : public Unit
 {
     float m_gain;
-    AtkMatrix matrix;	
+    FoaMatrix matrix;	
 };
 
-struct AtkDominateY : AtkDominateX { };
-struct AtkDominateZ : AtkDominateX { };
+struct FoaDominateY : FoaDominateX { };
+struct FoaDominateZ : FoaDominateX { };
 
-struct AtkNFC : public Unit
+struct FoaNFC : public Unit
 {
     float m_distanceStart, m_y1x, m_y1y, m_y1z;
 };
 
-struct AtkProximity : public Unit
+struct FoaProximity : public Unit
 {
     float m_distanceStart, m_y1x, m_y1y, m_y1z;
 };
 
-struct AtkPsychoShelf : public Unit
+struct FoaPsychoShelf : public Unit
 {
 	float m_freq, m_k0, m_k1;
 	float m_y1w, m_y2w, m_y1x, m_y2x, m_y1y, m_y2y, m_y1z, m_y2z;
@@ -133,154 +108,114 @@ extern "C"
 {
     void load(InterfaceTable *inTable);
     
-    void FOAPanB_next_aa(FOAPanB *unit, int inNumSamples);
-    void FOAPanB_next_kk(FOAPanB *unit, int inNumSamples);
-    void FOAPanB_Ctor(FOAPanB *unit);
+    void FoaPanB_next_aa(FoaPanB *unit, int inNumSamples);
+    void FoaPanB_next_kk(FoaPanB *unit, int inNumSamples);
+    void FoaPanB_Ctor(FoaPanB *unit);
 
-    /*
-    void FOAPanBWFocus_next_aa(FOAPanBWFocus *unit, int inNumSamples);
-    void FOAPanBWFocus_next_kk(FOAPanBWFocus *unit, int inNumSamples);
-    void FOAPanBWFocus_Ctor(FOAPanBWFocus *unit);
-	 
-    void AtkSterToB_next_aaa(AtkSterToB *unit, int inNumSamples);
-    void AtkSterToB_next_kkk(AtkSterToB *unit, int inNumSamples);
-    void AtkSterToB_Ctor(AtkSterToB *unit);
+    void FoaDirectO_next_a(FoaDirectO *unit, int inNumSamples);
+    void FoaDirectO_next_k(FoaDirectO *unit, int inNumSamples);
+    void FoaDirectO_Ctor(FoaDirectO* unit);
     
-    void AtkPantoF_next(AtkPantoF *unit, int inNumSamples);
-    void AtkPantoF_Ctor(AtkPantoF *unit);
-    void AtkPantoF_Dtor(AtkPantoF *unit);
-	 */
+    void FoaDirectX_next_a(FoaDirectX *unit, int inNumSamples);
+    void FoaDirectX_next_k(FoaDirectX *unit, int inNumSamples);
+    void FoaDirectX_Ctor(FoaDirectX* unit);
     
-    void AtkDirectO_next_a(AtkDirectO *unit, int inNumSamples);
-    void AtkDirectO_next_k(AtkDirectO *unit, int inNumSamples);
-    void AtkDirectO_Ctor(AtkDirectO* unit);
+    void FoaDirectY_next_a(FoaDirectY *unit, int inNumSamples);
+    void FoaDirectY_next_k(FoaDirectY *unit, int inNumSamples);
+    void FoaDirectY_Ctor(FoaDirectY* unit);
     
-    void AtkDirectX_next_a(AtkDirectX *unit, int inNumSamples);
-    void AtkDirectX_next_k(AtkDirectX *unit, int inNumSamples);
-    void AtkDirectX_Ctor(AtkDirectX* unit);
+    void FoaDirectZ_next_a(FoaDirectZ *unit, int inNumSamples);
+    void FoaDirectZ_next_k(FoaDirectZ *unit, int inNumSamples);
+    void FoaDirectZ_Ctor(FoaDirectZ* unit);
     
-    void AtkDirectY_next_a(AtkDirectY *unit, int inNumSamples);
-    void AtkDirectY_next_k(AtkDirectY *unit, int inNumSamples);
-    void AtkDirectY_Ctor(AtkDirectY* unit);
+    void FoaRotate_next_a(FoaRotate *unit, int inNumSamples);
+    void FoaRotate_next_k(FoaRotate *unit, int inNumSamples);
+    void FoaRotate_Ctor(FoaRotate* unit);
     
-    void AtkDirectZ_next_a(AtkDirectZ *unit, int inNumSamples);
-    void AtkDirectZ_next_k(AtkDirectZ *unit, int inNumSamples);
-    void AtkDirectZ_Ctor(AtkDirectZ* unit);
+    void FoaTilt_next_a(FoaTilt *unit, int inNumSamples);
+    void FoaTilt_next_k(FoaTilt *unit, int inNumSamples);
+    void FoaTilt_Ctor(FoaTilt* unit);
     
-    void AtkRotate_next_a(AtkRotate *unit, int inNumSamples);
-    void AtkRotate_next_k(AtkRotate *unit, int inNumSamples);
-    void AtkRotate_Ctor(AtkRotate* unit);
+    void FoaTumble_next_a(FoaTumble *unit, int inNumSamples);
+    void FoaTumble_next_k(FoaTumble *unit, int inNumSamples);
+    void FoaTumble_Ctor(FoaTumble* unit);
     
-    void AtkTilt_next_a(AtkTilt *unit, int inNumSamples);
-    void AtkTilt_next_k(AtkTilt *unit, int inNumSamples);
-    void AtkTilt_Ctor(AtkTilt* unit);
+    void FoaFocusX_next_a(FoaFocusX *unit, int inNumSamples);
+    void FoaFocusX_next_k(FoaFocusX *unit, int inNumSamples);
+    void FoaFocusX_Ctor(FoaFocusX* unit);
     
-    void AtkTumble_next_a(AtkTumble *unit, int inNumSamples);
-    void AtkTumble_next_k(AtkTumble *unit, int inNumSamples);
-    void AtkTumble_Ctor(AtkTumble* unit);
+    void FoaFocusY_next_a(FoaFocusY *unit, int inNumSamples);
+    void FoaFocusY_next_k(FoaFocusY *unit, int inNumSamples);
+    void FoaFocusY_Ctor(FoaFocusY* unit);
     
-    void AtkFocusX_next_a(AtkFocusX *unit, int inNumSamples);
-    void AtkFocusX_next_k(AtkFocusX *unit, int inNumSamples);
-    void AtkFocusX_Ctor(AtkFocusX* unit);
+    void FoaFocusZ_next_a(FoaFocusZ *unit, int inNumSamples);
+    void FoaFocusZ_next_k(FoaFocusZ *unit, int inNumSamples);
+    void FoaFocusZ_Ctor(FoaFocusZ* unit);	    
     
-    void AtkFocusY_next_a(AtkFocusY *unit, int inNumSamples);
-    void AtkFocusY_next_k(AtkFocusY *unit, int inNumSamples);
-    void AtkFocusY_Ctor(AtkFocusY* unit);
+    void FoaPushX_next_a(FoaPushX *unit, int inNumSamples);
+    void FoaPushX_next_k(FoaPushX *unit, int inNumSamples);
+    void FoaPushX_Ctor(FoaPushX* unit);	
     
-    void AtkFocusZ_next_a(AtkFocusZ *unit, int inNumSamples);
-    void AtkFocusZ_next_k(AtkFocusZ *unit, int inNumSamples);
-    void AtkFocusZ_Ctor(AtkFocusZ* unit);	    
+    void FoaPushY_next_a(FoaPushY *unit, int inNumSamples);
+    void FoaPushY_next_k(FoaPushY *unit, int inNumSamples);
+    void FoaPushY_Ctor(FoaPushY* unit);	
     
-    void AtkPushX_next_a(AtkPushX *unit, int inNumSamples);
-    void AtkPushX_next_k(AtkPushX *unit, int inNumSamples);
-    void AtkPushX_Ctor(AtkPushX* unit);	
+    void FoaPushZ_next_a(FoaPushZ *unit, int inNumSamples);
+    void FoaPushZ_next_k(FoaPushZ *unit, int inNumSamples);
+    void FoaPushZ_Ctor(FoaPushZ* unit);	
     
-    void AtkPushY_next_a(AtkPushY *unit, int inNumSamples);
-    void AtkPushY_next_k(AtkPushY *unit, int inNumSamples);
-    void AtkPushY_Ctor(AtkPushY* unit);	
+    void FoaPressX_next_a(FoaPressX *unit, int inNumSamples);
+    void FoaPressX_next_k(FoaPressX *unit, int inNumSamples);
+    void FoaPressX_Ctor(FoaPressX* unit);
     
-    void AtkPushZ_next_a(AtkPushZ *unit, int inNumSamples);
-    void AtkPushZ_next_k(AtkPushZ *unit, int inNumSamples);
-    void AtkPushZ_Ctor(AtkPushZ* unit);	
+    void FoaPressY_next_a(FoaPressY *unit, int inNumSamples);
+    void FoaPressY_next_k(FoaPressY *unit, int inNumSamples);
+    void FoaPressY_Ctor(FoaPressY* unit);
     
-    void AtkPressX_next_a(AtkPressX *unit, int inNumSamples);
-    void AtkPressX_next_k(AtkPressX *unit, int inNumSamples);
-    void AtkPressX_Ctor(AtkPressX* unit);
+    void FoaPressZ_next_a(FoaPressZ *unit, int inNumSamples);
+    void FoaPressZ_next_k(FoaPressZ *unit, int inNumSamples);
+    void FoaPressZ_Ctor(FoaPressZ* unit);
     
-    void AtkPressY_next_a(AtkPressY *unit, int inNumSamples);
-    void AtkPressY_next_k(AtkPressY *unit, int inNumSamples);
-    void AtkPressY_Ctor(AtkPressY* unit);
+    void FoaZoomX_next_a(FoaZoomX *unit, int inNumSamples);
+    void FoaZoomX_next_k(FoaZoomX *unit, int inNumSamples);
+    void FoaZoomX_Ctor(FoaZoomX* unit);
     
-    void AtkPressZ_next_a(AtkPressZ *unit, int inNumSamples);
-    void AtkPressZ_next_k(AtkPressZ *unit, int inNumSamples);
-    void AtkPressZ_Ctor(AtkPressZ* unit);
+    void FoaZoomY_next_a(FoaZoomY *unit, int inNumSamples);
+    void FoaZoomY_next_k(FoaZoomY *unit, int inNumSamples);
+    void FoaZoomY_Ctor(FoaZoomY* unit);
     
-    void AtkZoomX_next_a(AtkZoomX *unit, int inNumSamples);
-    void AtkZoomX_next_k(AtkZoomX *unit, int inNumSamples);
-    void AtkZoomX_Ctor(AtkZoomX* unit);
+    void FoaZoomZ_next_a(FoaZoomZ *unit, int inNumSamples);
+    void FoaZoomZ_next_k(FoaZoomZ *unit, int inNumSamples);
+    void FoaZoomZ_Ctor(FoaZoomZ* unit);
     
-    void AtkZoomY_next_a(AtkZoomY *unit, int inNumSamples);
-    void AtkZoomY_next_k(AtkZoomY *unit, int inNumSamples);
-    void AtkZoomY_Ctor(AtkZoomY* unit);
+    void FoaDominateX_next_a(FoaDominateX *unit, int inNumSamples);
+    void FoaDominateX_next_k(FoaDominateX *unit, int inNumSamples);
+    void FoaDominateX_Ctor(FoaDominateX* unit);						
     
-    void AtkZoomZ_next_a(AtkZoomZ *unit, int inNumSamples);
-    void AtkZoomZ_next_k(AtkZoomZ *unit, int inNumSamples);
-    void AtkZoomZ_Ctor(AtkZoomZ* unit);
+    void FoaDominateY_next_a(FoaDominateY *unit, int inNumSamples);
+    void FoaDominateY_next_k(FoaDominateY *unit, int inNumSamples);
+    void FoaDominateY_Ctor(FoaDominateY* unit);
     
-    void AtkDominateX_next_a(AtkDominateX *unit, int inNumSamples);
-    void AtkDominateX_next_k(AtkDominateX *unit, int inNumSamples);
-    void AtkDominateX_Ctor(AtkDominateX* unit);						
+    void FoaDominateZ_next_a(FoaDominateZ *unit, int inNumSamples);
+    void FoaDominateZ_next_k(FoaDominateZ *unit, int inNumSamples);
+    void FoaDominateZ_Ctor(FoaDominateZ* unit);
     
-    void AtkDominateY_next_a(AtkDominateY *unit, int inNumSamples);
-    void AtkDominateY_next_k(AtkDominateY *unit, int inNumSamples);
-    void AtkDominateY_Ctor(AtkDominateY* unit);
+    void FoaAsymmetry_next_a(FoaAsymmetry *unit, int inNumSamples);
+    void FoaAsymmetry_next_k(FoaAsymmetry *unit, int inNumSamples);
+    void FoaAsymmetry_Ctor(FoaAsymmetry* unit);
     
-    void AtkDominateZ_next_a(AtkDominateZ *unit, int inNumSamples);
-    void AtkDominateZ_next_k(AtkDominateZ *unit, int inNumSamples);
-    void AtkDominateZ_Ctor(AtkDominateZ* unit);
+    void FoaNFC_next_k(FoaNFC *unit, int inNumSamples);
+    void FoaNFC_next_a(FoaNFC *unit, int inNumSamples);
+    void FoaNFC_Ctor(FoaNFC* unit);
     
-    void AtkAsymmetry_next_a(AtkAsymmetry *unit, int inNumSamples);
-    void AtkAsymmetry_next_k(AtkAsymmetry *unit, int inNumSamples);
-    void AtkAsymmetry_Ctor(AtkAsymmetry* unit);
+    void FoaProximity_next_k(FoaProximity *unit, int inNumSamples);
+    void FoaProximity_next_a(FoaProximity *unit, int inNumSamples);
+    void FoaProximity_Ctor(FoaProximity* unit);
     
-    void AtkNFC_next_k(AtkNFC *unit, int inNumSamples);
-    void AtkNFC_next_a(AtkNFC *unit, int inNumSamples);
-    void AtkNFC_Ctor(AtkNFC* unit);
+    void FoaPsychoShelf_next_k(FoaPsychoShelf *unit, int inNumSamples);
+    void FoaPsychoShelf_next_a(FoaPsychoShelf *unit, int inNumSamples);
+    void FoaPsychoShelf_Ctor(FoaPsychoShelf* unit);
     
-    void AtkProximity_next_k(AtkProximity *unit, int inNumSamples);
-    void AtkProximity_next_a(AtkProximity *unit, int inNumSamples);
-    void AtkProximity_Ctor(AtkProximity* unit);
-    
-    void AtkPsychoShelf_next_k(AtkPsychoShelf *unit, int inNumSamples);
-    void AtkPsychoShelf_next_a(AtkPsychoShelf *unit, int inNumSamples);
-    void AtkPsychoShelf_Ctor(AtkPsychoShelf* unit);
-    
-    
-    //	void AtoB_Ctor(AtoB* unit);
-    //	void AtoB_next_00(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_01(AtoB *unit, int inNumSamples);	
-    //	void AtoB_next_02(AtoB *unit, int inNumSamples);		
-    //	void AtoB_next_10(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_11(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_12(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_20(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_21(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_22(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_30(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_31(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_32(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_40(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_41(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_42(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_50(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_51(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_52(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_60(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_61(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_62(AtoB *unit, int inNumSamples);	
-    //	void AtoB_next_70(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_71(AtoB *unit, int inNumSamples);
-    //	void AtoB_next_72(AtoB *unit, int inNumSamples);	
 }
 
 inline float calcmatrixval(float coef, float curval){
@@ -317,7 +252,7 @@ float *Xout = OUT(1); \
 float *Yout = OUT(2); \
 float *Zout = OUT(3); \
 ClearUnitOutputs(unit, inNumSamples); \
-AtkMatrix matrix = unit->matrix; \
+FoaMatrix matrix = unit->matrix; \
 
 #define ZERO_MATRIX \
 for(int i = 0; i < 4; i++){ \
@@ -333,14 +268,14 @@ sinb = sin(elevation); \
 cosa = cos(azimuth); \
 cosb = cos(elevation); \
 
-/* FOAPanB - basic encoder (places sound on the sphere) */
+/* FoaPanB - basic encoder (places sound on the sphere) */
 
-void FOAPanB_Ctor(FOAPanB *unit)
+void FoaPanB_Ctor(FoaPanB *unit)
 {
     if((INRATE(1) == calc_FullRate) && (INRATE(2) == calc_FullRate)){
-	SETCALC(FOAPanB_next_aa);//aa
+	SETCALC(FoaPanB_next_aa);//aa
     } else {
-	SETCALC(FOAPanB_next_kk);//ak
+	SETCALC(FoaPanB_next_kk);//ak
     }
     
     float azimuth = unit->m_azimuth = IN0(1);
@@ -354,10 +289,10 @@ void FOAPanB_Ctor(FOAPanB *unit)
     unit->m_Y_amp = sina * cosb;
     unit->m_Z_amp = sinb;
     
-    FOAPanB_next_kk(unit, 1);
+    FoaPanB_next_kk(unit, 1);
 }
 
-void FOAPanB_next_kk(FOAPanB *unit, int inNumSamples)
+void FoaPanB_next_kk(FoaPanB *unit, int inNumSamples)
 {
     float azimuth = IN0(1);
     float elevation = IN0(2);
@@ -410,7 +345,7 @@ void FOAPanB_next_kk(FOAPanB *unit, int inNumSamples)
     }
 }
 
-void FOAPanB_next_aa(FOAPanB *unit, int inNumSamples)
+void FoaPanB_next_aa(FoaPanB *unit, int inNumSamples)
 {
     float *pazimuth = IN(1);
     float *pelevation = IN(2);
@@ -457,371 +392,8 @@ void FOAPanB_next_aa(FOAPanB *unit, int inNumSamples)
 }
 
 
-/* FOAPanB - basic encoder (places sound on the sphere) */
 
-/*
-void FOAPanBWFocus_Ctor(FOAPanBWFocus *unit)
-{
-    if((INRATE(1) == calc_FullRate) && (INRATE(2) == calc_FullRate) && (INRATE(3) == calc_FullRate)){
-	SETCALC(FOAPanBWFocus_next_aa);//aa
-    } else {
-	SETCALC(FOAPanBWFocus_next_kk);//ak
-    }
-    
-    float azimuth = unit->m_azimuth = IN0(1);
-    float elevation = unit->m_elevation = IN0(2);
-    float focus = unit->m_focus = IN0(3);
-    float sina, sinb, cosa, cosb;
-    float sinf;
-    
-    SIN_COS
-    
-    sinf = sin(focus);
-    unit->m_W_amp = rsqrt2;
-    unit->m_X_amp = cosa * cosb * sinf;
-    unit->m_Y_amp = sina * cosb* sinf;
-    unit->m_Z_amp = sinb * sinf;
-    
-    FOAPanBWFocus_next_kk(unit, 1);
-}
-
-void FOAPanBWFocus_next_kk(FOAPanBWFocus *unit, int inNumSamples)
-{
-    float azimuth = IN0(1);
-    float elevation = IN0(2);
-    float focus = IN0(3);
-    float *in = IN(0);
-    float *Wout = OUT(0); 
-    float *Xout = OUT(1); 
-    float *Yout = OUT(2); 
-    float *Zout = OUT(3);
-    float Wamp = unit->m_W_amp;
-    float Xamp = unit->m_X_amp;
-    float Yamp = unit->m_Y_amp;
-    float Zamp = unit->m_Z_amp;
-    float sina, sinb, cosa, cosb, sinf;
-    
-    if((unit->m_azimuth == azimuth) && (unit->m_elevation == elevation) && (unit->m_focus == focus)){
-	for(int i = 0; i < inNumSamples; i++){
-	    Wout[i] = in[i] * Wamp;
-	    Xout[i] = in[i] * Xamp;
-	    Yout[i] = in[i] * Yamp;
-	    Zout[i] = in[i] * Zamp;
-	}
-    } else {
-	
-	SIN_COS
-	
-	sinf = sin(focus);
-	float nextXamp = cosa * cosb * sinf;
-	float nextYamp = sina * cosb * sinf;
-	float nextZamp = sinb * sinf;
-	
-	float xSlope = CALCSLOPE(nextXamp, Xamp);
-	float ySlope = CALCSLOPE(nextYamp, Yamp);
-	float zSlope = CALCSLOPE(nextZamp, Zamp);
-	
-	for(int i = 0; i < inNumSamples; i++){
-	    Wout[i] = in[i] * Wamp;
-	    Xout[i] = in[i] * Xamp;
-	    Yout[i] = in[i] * Yamp;
-	    Zout[i] = in[i] * Zamp;
-	    
-	    Xamp += xSlope;
-	    Yamp += ySlope;  
-	    Zamp += zSlope;
-	}	
-	
-	unit->m_X_amp = Xamp;
-	unit->m_Y_amp = Yamp;
-	unit->m_Z_amp = Zamp;
-	unit->m_azimuth = azimuth;
-	unit->m_elevation = elevation;
-	unit->m_focus = focus;
-    }
-}
-
-void FOAPanBWFocus_next_aa(FOAPanBWFocus *unit, int inNumSamples)
-{
-    float *pazimuth = IN(1);
-    float *pelevation = IN(2);
-    float *pfocus = IN(3);
-    float *in = IN(0);
-    float *Wout = OUT(0); 
-    float *Xout = OUT(1); 
-    float *Yout = OUT(2); 
-    float *Zout = OUT(3);
-    float Wamp = unit->m_W_amp;
-    float Xamp = unit->m_X_amp;
-    float Yamp = unit->m_Y_amp;
-    float Zamp = unit->m_Z_amp;
-    float sina, sinb, cosa, cosb, sinf, azimuth, elevation, focus;
-    
-    for(int i = 0; i < inNumSamples; i++){
-	if((unit->m_azimuth == pazimuth[i]) && (unit->m_elevation == pelevation[i]) && (unit->m_focus == pfocus[i])){
-	    Wout[i] = in[i] * Wamp;
-	    Xout[i] = in[i] * Xamp;
-	    Yout[i] = in[i] * Yamp;
-	    Zout[i] = in[i] * Zamp;
-	} else {
-	    
-	    azimuth = pazimuth[i];
-	    elevation = pelevation[i];
-	    focus = pfocus[i];
-	    
-	    SIN_COS
-	    
-	    sinf = sin(focus);
-	    Xamp = cosa * cosb * sinf;
-	    Yamp = sina * cosb * sinf;
-	    Zamp = sinb * sinf;
-	    
-	    Wout[i] = in[i] * Wamp;
-	    Xout[i] = in[i] * Xamp;
-	    Yout[i] = in[i] * Yamp;
-	    Zout[i] = in[i] * Zamp;
-	    
-	    unit->m_azimuth = azimuth;
-	    unit->m_elevation = elevation;
-	    unit->m_focus = focus;
-	}
-    }
-    unit->m_X_amp = Xamp;
-    unit->m_Y_amp = Yamp;
-    unit->m_Z_amp = Zamp;
-}
-*/
-/* AtkSterToB - basic encoder (places stereo sound on the sphere) */
-/*
-void AtkSterToB_Ctor(AtkSterToB *unit)
-{
-    if((INRATE(2) == calc_FullRate) && (INRATE(3) == calc_FullRate) && (INRATE(4) == calc_FullRate)){
-	SETCALC(AtkSterToB_next_aaa);//aaa
-    } else {
-	SETCALC(AtkSterToB_next_kkk);//kkk
-    }
-    
-    float azimuth = unit->m_azimuth = IN0(2);
-    float width = unit->m_width = IN0(3);
-    float elevation = unit->m_elevation = IN0(4);
-    float width2 = width * 0.5;
-    float azimuthL = unit->m_azimuthL = azimuth + width2;
-    float azimuthR = unit->m_azimuthR = azimuth - width2;
-    
-    float sinaL, sinaR, sinb, cosaL, cosaR, cosb;
-    
-    sinaL = sin(azimuthL); 
-    sinaR = sin(azimuthR); 
-    sinb = sin(elevation); 
-    
-    cosaL = cos(azimuthL); 
-    cosaR = cos(azimuthR);
-    cosb = cos(elevation);     
-    
-    unit->m_W_amp = rsqrt2;
-    unit->m_X_ampL = cosaL * cosb;
-    unit->m_X_ampR = cosaR * cosb;
-    unit->m_Y_ampL = sinaL * cosb;
-    unit->m_Y_ampR = sinaR * cosb;
-    unit->m_Z_amp = sinb;
-    
-    AtkSterToB_next_kkk(unit, 1);
-}
-
-void AtkSterToB_next_kkk(AtkSterToB *unit, int inNumSamples)
-{
-    float azimuth = IN0(2);
-    float width = IN0(3);
-    float elevation = IN0(4);
-    float *inL = IN(0);
-    float *inR = IN(1);
-    float *Wout = OUT(0); 
-    float *Xout = OUT(1); 
-    float *Yout = OUT(2); 
-    float *Zout = OUT(3);
-    float Wamp = unit->m_W_amp;
-    float XampL = unit->m_X_ampL;
-    float XampR = unit->m_X_ampR;
-    float YampL = unit->m_Y_ampL;
-    float YampR = unit->m_Y_ampR;
-    float Zamp = unit->m_Z_amp;
-    float sinaL, sinaR, sinb, cosaL, cosaR, cosb;
-    
-    if((unit->m_azimuth == azimuth) && (unit->m_elevation == elevation) && (unit->m_width == width)){
-	for(int i = 0; i < inNumSamples; i++){
-	    Wout[i] = (inL[i] + inR[i]) * Wamp;
-	    Xout[i] = (inL[i] * XampL) + (inR[i] * XampR);
-	    Yout[i] = (inL[i] * YampL) + (inR[i] * YampR);
-	    Zout[i] = (inL[i] + inR[i]) * Zamp;
-	}
-    } else {
-	
-	float width2 = width * 0.5;
-	float azimuthL = unit->m_azimuthL = azimuth + width2;
-	float azimuthR = unit->m_azimuthR = azimuth - width2;
-	
-	sinaL = sin(azimuthL); 
-	sinaR = sin(azimuthR); 
-	sinb = sin(elevation); 
-	
-	cosaL = cos(azimuthL); 
-	cosaR = cos(azimuthR); 
-	cosb = cos(elevation); 
-	
-	float nextXampL = cosaL * cosb;
-	float nextXampR = cosaR * cosb;
-	float nextYampL = sinaL * cosb;
-	float nextYampR = sinaR * cosb;
-	float nextZamp = sinb;
-	
-	float xSlopeL = CALCSLOPE(nextXampL, XampL);
-	float xSlopeR = CALCSLOPE(nextXampR, XampR);
-	float ySlopeL = CALCSLOPE(nextYampL, YampL);
-	float ySlopeR = CALCSLOPE(nextYampR, YampR);
-	float zSlope = CALCSLOPE(nextZamp, Zamp);
-	
-	for(int i = 0; i < inNumSamples; i++){
-	    Wout[i] = (inL[i] + inR[i]) * Wamp;
-	    Xout[i] = (inL[i] * XampL) + (inR[i] * XampR);
-	    Yout[i] = (inL[i] * YampL) + (inR[i] * YampR);
-	    Zout[i] = (inL[i] + inR[i]) * Zamp;
-	    
-	    XampL += xSlopeL;
-	    XampR += xSlopeR;
-	    YampL += ySlopeL;  
-	    YampR += ySlopeR; 
-	    Zamp += zSlope;
-	}	
-	
-	unit->m_X_ampL = XampL;
-	unit->m_X_ampR = XampR;
-	unit->m_Y_ampL = YampL;
-	unit->m_Y_ampR = YampR;
-	unit->m_Z_amp = Zamp;
-	unit->m_azimuth = azimuth;
-	unit->m_elevation = elevation;
-    }
-}
-
-void AtkSterToB_next_aaa(AtkSterToB *unit, int inNumSamples)
-{
-    float *pazimuth = IN(2);
-    float *pwidth = IN(3);
-    float *pelevation = IN(4);
-    float *inL = IN(0);
-    float *inR = IN(1);
-    float *Wout = OUT(0); 
-    float *Xout = OUT(1); 
-    float *Yout = OUT(2); 
-    float *Zout = OUT(3);
-    float Wamp = unit->m_W_amp;
-    float XampL = unit->m_X_ampL;
-    float XampR = unit->m_X_ampR;
-    float YampL = unit->m_Y_ampL;
-    float YampR = unit->m_Y_ampR;
-    float Zamp = unit->m_Z_amp;
-    float sinaL, sinaR, sinb, cosaL, cosaR, cosb;
-    
-    for(int i = 0; i < inNumSamples; i++){
-	if((unit->m_azimuth == pazimuth[i]) && (unit->m_elevation == pelevation[i]) && (unit->m_width == pwidth[i])){
-	    Wout[i] = (inL[i] + inR[i]) * Wamp;
-	    Xout[i] = (inL[i] * XampL) + (inR[i] * XampR);
-	    Yout[i] = (inL[i] * YampL) + (inR[i] * YampR);
-	    Zout[i] = (inL[i] + inR[i]) * Zamp;
-	} else {
-	    
-	    float azimuth = pazimuth[i];
-	    float width = pwidth[i];
-	    float elevation = pelevation[i];
-	    float width2 = width * 0.5;
-	    float azimuthL = unit->m_azimuthL = azimuth + width2;
-	    float azimuthR = unit->m_azimuthR = azimuth - width2;
-	    
-	    sinaL = sin(azimuthL); 
-	    sinaR = sin(azimuthR); 
-	    sinb = sin(elevation); 
-	    
-	    cosaL = cos(azimuthL); 
-	    cosaR = cos(azimuthR); 
-	    cosb = cos(elevation); 
-	    
-	    XampL = cosaL * cosb;
-	    XampR = cosaR * cosb;
-	    YampL = sinaL * cosb;
-	    YampR = sinaR * cosb;
-	    Zamp = sinb;
-	    
-	    Wout[i] = (inL[i] + inR[i]) * Wamp;
-	    Xout[i] = (inL[i] * XampL) + (inR[i] * XampR);
-	    Yout[i] = (inL[i] * YampL) + (inR[i] * YampR);
-	    Zout[i] = (inL[i] + inR[i]) * Zamp;
-	    
-	    unit->m_X_ampL = XampL;
-	    unit->m_X_ampR = XampR;
-	    unit->m_Y_ampL = YampL;
-	    unit->m_Y_ampR = YampR;
-	    unit->m_Z_amp = Zamp;
-	    unit->m_azimuth = azimuth;
-	    unit->m_elevation = elevation;
-	    unit->m_width = width;
-	}
-    }
-}
-*/
-
-/* AtkPantoF 2D decoder */
-/*
-void AtkPantoF_Ctor(AtkPantoF* unit)
-{
-    // should be 0.0 or 1.0
-    unit->m_orientation = IN0(3);
-    // should be -1.0, 0.0 or 1.0
-    unit->m_directivity = IN0(4);
-    float g1 = powf(2., unit->m_directivity * -0.5);	
-    int numOutputs = unit->mNumOutputs;
-    float iNumOutputsPi = pi / (float)numOutputs;
-    unit->m_Xamps = (float*)RTAlloc(unit->mWorld, numOutputs * sizeof(float));
-    unit->m_Yamps = (float*)RTAlloc(unit->mWorld, numOutputs * sizeof(float));
-    float angle;
-    if(unit->m_orientation > 0){
-	for(int i = 0; i < numOutputs; i++){
-	    angle = (float)(1 + (i * 2)) * iNumOutputsPi;
-	    unit->m_Xamps[i] = g1 * cos(angle);
-	    unit->m_Yamps[i] = g1 * sin(angle);
-	}
-    } else {
-	for(int i = 0; i < numOutputs; i++){
-	    angle = (float)i * (iNumOutputsPi * 2);
-	    unit->m_Xamps[i] = g1 * cos(angle);
-	    unit->m_Yamps[i] = g1 * sin(angle);
-	}	    
-    }
-    AtkPantoF_next(unit, 1);
-    SETCALC(AtkPantoF_next);
-    
-}
-
-void AtkPantoF_Dtor(AtkPantoF *unit){
-    RTFree(unit->mWorld, unit->m_Xamps);
-    RTFree(unit->mWorld, unit->m_Yamps);
-}
-
-void AtkPantoF_next(AtkPantoF *unit, int inNumSamples)
-{
-    float *Win = IN(0);
-    float *Xin = IN(1);
-    float *Yin = IN(2);
-    int numOutputs = unit->mNumOutputs;
-    for(int i = 0; i < numOutputs; i++){
-	float *out = OUT(i);
-	for(int j = 0; j < inNumSamples; j++){
-	    out[j] = Win[j] + (Xin[j] * unit->m_Xamps[i]) + (Yin[j] * unit->m_Yamps[i]);
-	}
-    }
-}
-*/
-
-////////////////////// AtkRotate ///////////////////////
+////////////////////// FoaRotate ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_ROTATE_MATRIX \
@@ -832,21 +404,21 @@ matrix.coefs[1][1] = matrix.coefs[2][2] = cosa; \
 matrix.coefs[1][2] = -sina; \
 matrix.coefs[2][1] = sina;
 
-void AtkRotate_Ctor(AtkRotate* unit)
+void FoaRotate_Ctor(FoaRotate* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_ROTATE_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkRotate_next_a);
+	SETCALC(FoaRotate_next_a);
     else
-	SETCALC(AtkRotate_next_k);
-    AtkRotate_next_k(unit, 1); 
+	SETCALC(FoaRotate_next_k);
+    FoaRotate_next_k(unit, 1); 
 }
 
-void AtkRotate_next_a(AtkRotate *unit, int inNumSamples)
+void FoaRotate_next_a(FoaRotate *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -861,7 +433,7 @@ void AtkRotate_next_a(AtkRotate *unit, int inNumSamples)
     
 }
 
-void AtkRotate_next_k(AtkRotate *unit, int inNumSamples)
+void FoaRotate_next_k(FoaRotate *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -882,7 +454,7 @@ void AtkRotate_next_k(AtkRotate *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkTilt ///////////////////////
+////////////////////// FoaTilt ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_TILT_MATRIX \
@@ -893,21 +465,21 @@ matrix.coefs[2][2] = matrix.coefs[3][3] = cosa; \
 matrix.coefs[2][3] = -sina; \
 matrix.coefs[3][2] = sina;
 
-void AtkTilt_Ctor(AtkTilt* unit)
+void FoaTilt_Ctor(FoaTilt* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_TILT_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkTilt_next_a);
+	SETCALC(FoaTilt_next_a);
     else
-	SETCALC(AtkTilt_next_k);
-    AtkTilt_next_k(unit, 1); 
+	SETCALC(FoaTilt_next_k);
+    FoaTilt_next_k(unit, 1); 
 }
 
-void AtkTilt_next_a(AtkTilt *unit, int inNumSamples)
+void FoaTilt_next_a(FoaTilt *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -922,7 +494,7 @@ void AtkTilt_next_a(AtkTilt *unit, int inNumSamples)
     
 }
 
-void AtkTilt_next_k(AtkTilt *unit, int inNumSamples)
+void FoaTilt_next_k(FoaTilt *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -943,7 +515,7 @@ void AtkTilt_next_k(AtkTilt *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkTumble ///////////////////////
+////////////////////// FoaTumble ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_TUMBLE_MATRIX \
@@ -954,21 +526,21 @@ matrix.coefs[1][1] = matrix.coefs[3][3] = cosa; \
 matrix.coefs[1][3] = -sina; \
 matrix.coefs[3][1] = sina;
 
-void AtkTumble_Ctor(AtkTumble* unit)
+void FoaTumble_Ctor(FoaTumble* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_TUMBLE_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkTumble_next_a);
+	SETCALC(FoaTumble_next_a);
     else
-	SETCALC(AtkTumble_next_k);
-    AtkTumble_next_k(unit, 1); 
+	SETCALC(FoaTumble_next_k);
+    FoaTumble_next_k(unit, 1); 
 }
 
-void AtkTumble_next_a(AtkTumble *unit, int inNumSamples)
+void FoaTumble_next_a(FoaTumble *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -983,7 +555,7 @@ void AtkTumble_next_a(AtkTumble *unit, int inNumSamples)
     
 }
 
-void AtkTumble_next_k(AtkTumble *unit, int inNumSamples)
+void FoaTumble_next_k(FoaTumble *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1004,7 +576,7 @@ void AtkTumble_next_k(AtkTumble *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkFocusX ///////////////////////
+////////////////////// FoaFocusX ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_FOCUSX_MATRIX \
@@ -1017,23 +589,23 @@ matrix.coefs[2][2] = matrix.coefs[3][3] = cosa * roneplussinaa; \
 matrix.coefs[0][1] = rsqrt2 * sina1sina; \
 matrix.coefs[1][0] = sqrt2 * sina1sina; \
 
-void AtkFocusX_Ctor(AtkFocusX* unit)
+void FoaFocusX_Ctor(FoaFocusX* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     
     FILL_FOCUSX_MATRIX
     
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkFocusX_next_a);
+	SETCALC(FoaFocusX_next_a);
     else
-	SETCALC(AtkFocusX_next_k);
-    AtkFocusX_next_k(unit, 1); 
+	SETCALC(FoaFocusX_next_k);
+    FoaFocusX_next_k(unit, 1); 
 }
 
-void AtkFocusX_next_a(AtkFocusX *unit, int inNumSamples)
+void FoaFocusX_next_a(FoaFocusX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1050,7 +622,7 @@ void AtkFocusX_next_a(AtkFocusX *unit, int inNumSamples)
     
 }
 
-void AtkFocusX_next_k(AtkFocusX *unit, int inNumSamples)
+void FoaFocusX_next_k(FoaFocusX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1071,7 +643,7 @@ void AtkFocusX_next_k(AtkFocusX *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkFocusY ///////////////////////
+////////////////////// FoaFocusY ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_FOCUSY_MATRIX \
@@ -1085,23 +657,23 @@ matrix.coefs[0][2] = rsqrt2 * sina1sina; \
 matrix.coefs[2][0] = sqrt2 * sina1sina; \
 
 
-void AtkFocusY_Ctor(AtkFocusY* unit)
+void FoaFocusY_Ctor(FoaFocusY* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     
     FILL_FOCUSY_MATRIX
     
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkFocusY_next_a);
+	SETCALC(FoaFocusY_next_a);
     else
-	SETCALC(AtkFocusY_next_k);
-    AtkFocusY_next_k(unit, 1); 
+	SETCALC(FoaFocusY_next_k);
+    FoaFocusY_next_k(unit, 1); 
 }
 
-void AtkFocusY_next_a(AtkFocusY *unit, int inNumSamples)
+void FoaFocusY_next_a(FoaFocusY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1116,7 +688,7 @@ void AtkFocusY_next_a(AtkFocusY *unit, int inNumSamples)
     
 }
 
-void AtkFocusY_next_k(AtkFocusY *unit, int inNumSamples)
+void FoaFocusY_next_k(FoaFocusY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1137,7 +709,7 @@ void AtkFocusY_next_k(AtkFocusY *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkFocusZ ///////////////////////
+////////////////////// FoaFocusZ ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_FOCUSZ_MATRIX \
@@ -1150,21 +722,21 @@ matrix.coefs[1][1] = matrix.coefs[2][2] = cosa * roneplussinaa; \
 matrix.coefs[0][3] = rsqrt2 * sina1sina; \
 matrix.coefs[3][0] = sqrt2 * sina1sina; \
 
-void AtkFocusZ_Ctor(AtkFocusZ* unit)
+void FoaFocusZ_Ctor(FoaFocusZ* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_FOCUSZ_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkFocusZ_next_a);
+	SETCALC(FoaFocusZ_next_a);
     else
-	SETCALC(AtkFocusZ_next_k);
-    AtkFocusZ_next_k(unit, 1); 
+	SETCALC(FoaFocusZ_next_k);
+    FoaFocusZ_next_k(unit, 1); 
 }
 
-void AtkFocusZ_next_a(AtkFocusZ *unit, int inNumSamples)
+void FoaFocusZ_next_a(FoaFocusZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1179,7 +751,7 @@ void AtkFocusZ_next_a(AtkFocusZ *unit, int inNumSamples)
     
 }
 
-void AtkFocusZ_next_k(AtkFocusZ *unit, int inNumSamples)
+void FoaFocusZ_next_k(FoaFocusZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1200,36 +772,29 @@ void AtkFocusZ_next_k(AtkFocusZ *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkDirectX /////////////////////
+////////////////////// FoaDirectX /////////////////////
 // uses 'angle' var. 
 
-/*
-#define FILL_DIRECTX_MATRIX \
-double sq2cosa2 = sqrt2 * cos(unit->m_angle * 0.5); \
-double sq2sina2 = sqrt2 * sin(unit->m_angle * 0.5); \
-matrix.coefs[0][0] = matrix.coefs[2][2] = matrix.coefs[3][3] =  sq2cosa2; \
-matrix.coefs[1][1] = sq2sina2; 
-*/
 #define FILL_DIRECTX_MATRIX \
 matrix.coefs[0][0]= matrix.coefs[2][2] = matrix.coefs[3][3]  = sqrt(1.0 + sin(unit->m_angle)); \
 matrix.coefs[1][1] = sqrt(1.0 - sin(unit->m_angle)); \
 
 
-void AtkDirectX_Ctor(AtkDirectX* unit)
+void FoaDirectX_Ctor(FoaDirectX* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_DIRECTX_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkDirectX_next_a);
+	SETCALC(FoaDirectX_next_a);
     else
-	SETCALC(AtkDirectX_next_k);
-    AtkDirectX_next_k(unit, 1); 
+	SETCALC(FoaDirectX_next_k);
+    FoaDirectX_next_k(unit, 1); 
 }
 
-void AtkDirectX_next_a(AtkDirectX *unit, int inNumSamples)
+void FoaDirectX_next_a(FoaDirectX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1244,7 +809,7 @@ void AtkDirectX_next_a(AtkDirectX *unit, int inNumSamples)
     
 }
 
-void AtkDirectX_next_k(AtkDirectX *unit, int inNumSamples)
+void FoaDirectX_next_k(FoaDirectX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1265,35 +830,28 @@ void AtkDirectX_next_k(AtkDirectX *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkDirectY /////////////////////
+////////////////////// FoaDirectY /////////////////////
 // uses 'angle' var. 
 
-/*
-#define FILL_DIRECTY_MATRIX \
-double sq2cosa2 = sqrt2 * cos(unit->m_angle * 0.5); \
-double sq2sina2 = sqrt2 * sin(unit->m_angle * 0.5); \
-matrix.coefs[0][0] = matrix.coefs[1][1] = matrix.coefs[3][3] =  sq2cosa2; \
-matrix.coefs[2][2] = sq2sina2; 
-*/
 #define FILL_DIRECTY_MATRIX \
 matrix.coefs[0][0]= matrix.coefs[1][1] = matrix.coefs[3][3]  = sqrt(1.0 + sin(unit->m_angle)); \
 matrix.coefs[2][2] = sqrt(1.0 - sin(unit->m_angle)); \
 
-void AtkDirectY_Ctor(AtkDirectY* unit)
+void FoaDirectY_Ctor(FoaDirectY* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_DIRECTY_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkDirectY_next_a);
+	SETCALC(FoaDirectY_next_a);
     else
-	SETCALC(AtkDirectY_next_k);
-    AtkDirectY_next_k(unit, 1); 
+	SETCALC(FoaDirectY_next_k);
+    FoaDirectY_next_k(unit, 1); 
 }
 
-void AtkDirectY_next_a(AtkDirectY *unit, int inNumSamples)
+void FoaDirectY_next_a(FoaDirectY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1308,7 +866,7 @@ void AtkDirectY_next_a(AtkDirectY *unit, int inNumSamples)
     
 }
 
-void AtkDirectY_next_k(AtkDirectY *unit, int inNumSamples)
+void FoaDirectY_next_k(FoaDirectY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1329,35 +887,28 @@ void AtkDirectY_next_k(AtkDirectY *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkDirectZ /////////////////////
+////////////////////// FoaDirectZ /////////////////////
 // uses 'angle' var. 
 
-/*
-#define FILL_DIRECTZ_MATRIX \
-double sq2cosa2 = sqrt2 * cos(unit->m_angle * 0.5); \
-double sq2sina2 = sqrt2 * sin(unit->m_angle * 0.5); \
-matrix.coefs[0][0] = matrix.coefs[1][1] = matrix.coefs[2][2] =  sq2cosa2; \
-matrix.coefs[3][3] = sq2sina2; 
-*/
 #define FILL_DIRECTZ_MATRIX \
 matrix.coefs[0][0]= matrix.coefs[1][1] = matrix.coefs[2][2]  = sqrt(1.0 + sin(unit->m_angle)); \
 matrix.coefs[3][3] = sqrt(1.0 - sin(unit->m_angle)); \
 
-void AtkDirectZ_Ctor(AtkDirectZ* unit)
+void FoaDirectZ_Ctor(FoaDirectZ* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_DIRECTZ_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkDirectZ_next_a);
+	SETCALC(FoaDirectZ_next_a);
     else
-	SETCALC(AtkDirectZ_next_k);
-    AtkDirectZ_next_k(unit, 1); 
+	SETCALC(FoaDirectZ_next_k);
+    FoaDirectZ_next_k(unit, 1); 
 }
 
-void AtkDirectZ_next_a(AtkDirectZ *unit, int inNumSamples)
+void FoaDirectZ_next_a(FoaDirectZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1372,7 +923,7 @@ void AtkDirectZ_next_a(AtkDirectZ *unit, int inNumSamples)
     
 }
 
-void AtkDirectZ_next_k(AtkDirectZ *unit, int inNumSamples)
+void FoaDirectZ_next_k(FoaDirectZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1393,7 +944,7 @@ void AtkDirectZ_next_k(AtkDirectZ *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkPushX ///////////////////////
+////////////////////// FoaPushX ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_PUSHX_MATRIX \
@@ -1406,21 +957,21 @@ matrix.coefs[0][0] = 1.f; \
 matrix.coefs[1][1] = matrix.coefs[2][2] = matrix.coefs[3][3] = cosa2; \
 matrix.coefs[1][0] = sqrt2asinasina; \
 
-void AtkPushX_Ctor(AtkPushX* unit)
+void FoaPushX_Ctor(FoaPushX* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_PUSHX_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkPushX_next_a);
+	SETCALC(FoaPushX_next_a);
     else
-	SETCALC(AtkPushX_next_k);
-    AtkPushX_next_k(unit, 1); 
+	SETCALC(FoaPushX_next_k);
+    FoaPushX_next_k(unit, 1); 
 }
 
-void AtkPushX_next_a(AtkPushX *unit, int inNumSamples)
+void FoaPushX_next_a(FoaPushX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1435,7 +986,7 @@ void AtkPushX_next_a(AtkPushX *unit, int inNumSamples)
     
 }
 
-void AtkPushX_next_k(AtkPushX *unit, int inNumSamples)
+void FoaPushX_next_k(FoaPushX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1456,7 +1007,7 @@ void AtkPushX_next_k(AtkPushX *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkPushY ///////////////////////
+////////////////////// FoaPushY ///////////////////////
 // uses 'angle' var.
 
 #define FILL_PUSHY_MATRIX \
@@ -1471,21 +1022,21 @@ matrix.coefs[2][0] = sqrt2asinasina; \
 
 
 
-void AtkPushY_Ctor(AtkPushY* unit)
+void FoaPushY_Ctor(FoaPushY* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_PUSHY_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkPushY_next_a);
+	SETCALC(FoaPushY_next_a);
     else
-	SETCALC(AtkPushY_next_k);
-    AtkPushY_next_k(unit, 1); 
+	SETCALC(FoaPushY_next_k);
+    FoaPushY_next_k(unit, 1); 
 }
 
-void AtkPushY_next_a(AtkPushY *unit, int inNumSamples)
+void FoaPushY_next_a(FoaPushY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1500,7 +1051,7 @@ void AtkPushY_next_a(AtkPushY *unit, int inNumSamples)
     
 }
 
-void AtkPushY_next_k(AtkPushY *unit, int inNumSamples)
+void FoaPushY_next_k(FoaPushY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1521,7 +1072,7 @@ void AtkPushY_next_k(AtkPushY *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkPushZ ///////////////////////
+////////////////////// FoaPushZ ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_PUSHZ_MATRIX \
@@ -1534,21 +1085,21 @@ matrix.coefs[0][0] = 1.f; \
 matrix.coefs[1][1] = matrix.coefs[2][2] = matrix.coefs[3][3] = cosa2; \
 matrix.coefs[3][0] = sqrt2asinasina; \
 
-void AtkPushZ_Ctor(AtkPushZ* unit)
+void FoaPushZ_Ctor(FoaPushZ* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_PUSHZ_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkPushZ_next_a);
+	SETCALC(FoaPushZ_next_a);
     else
-	SETCALC(AtkPushZ_next_k);
-    AtkPushZ_next_k(unit, 1); 
+	SETCALC(FoaPushZ_next_k);
+    FoaPushZ_next_k(unit, 1); 
 }
 
-void AtkPushZ_next_a(AtkPushZ *unit, int inNumSamples)
+void FoaPushZ_next_a(FoaPushZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1563,7 +1114,7 @@ void AtkPushZ_next_a(AtkPushZ *unit, int inNumSamples)
     
 }
 
-void AtkPushZ_next_k(AtkPushZ *unit, int inNumSamples)
+void FoaPushZ_next_k(FoaPushZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1584,7 +1135,7 @@ void AtkPushZ_next_k(AtkPushZ *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkPressX ///////////////////////
+////////////////////// FoaPressX ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_PRESSX_MATRIX \
@@ -1599,21 +1150,21 @@ matrix.coefs[1][1] = cosa2; \
 matrix.coefs[2][2] = matrix.coefs[3][3] = cosa; \
 
 
-void AtkPressX_Ctor(AtkPressX* unit)
+void FoaPressX_Ctor(FoaPressX* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_PRESSX_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkPressX_next_a);
+	SETCALC(FoaPressX_next_a);
     else
-	SETCALC(AtkPressX_next_k);
-    AtkPressX_next_k(unit, 1); 
+	SETCALC(FoaPressX_next_k);
+    FoaPressX_next_k(unit, 1); 
 }
 
-void AtkPressX_next_a(AtkPressX *unit, int inNumSamples)
+void FoaPressX_next_a(FoaPressX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1628,7 +1179,7 @@ void AtkPressX_next_a(AtkPressX *unit, int inNumSamples)
     
 }
 
-void AtkPressX_next_k(AtkPressX *unit, int inNumSamples)
+void FoaPressX_next_k(FoaPressX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1649,7 +1200,7 @@ void AtkPressX_next_k(AtkPressX *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkPressY ///////////////////////
+////////////////////// FoaPressY ///////////////////////
 // uses 'angle' var. 
 
 
@@ -1664,21 +1215,21 @@ matrix.coefs[2][0] = sqrt2asinasina; \
 matrix.coefs[2][2] = cosa2; \
 matrix.coefs[1][1] = matrix.coefs[3][3] = cosa; \
 
-void AtkPressY_Ctor(AtkPressY* unit)
+void FoaPressY_Ctor(FoaPressY* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_PRESSY_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkPressY_next_a);
+	SETCALC(FoaPressY_next_a);
     else
-	SETCALC(AtkPressY_next_k);
-    AtkPressY_next_k(unit, 1); 
+	SETCALC(FoaPressY_next_k);
+    FoaPressY_next_k(unit, 1); 
 }
 
-void AtkPressY_next_a(AtkPressY *unit, int inNumSamples)
+void FoaPressY_next_a(FoaPressY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1693,7 +1244,7 @@ void AtkPressY_next_a(AtkPressY *unit, int inNumSamples)
     
 }
 
-void AtkPressY_next_k(AtkPressY *unit, int inNumSamples)
+void FoaPressY_next_k(FoaPressY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1714,7 +1265,7 @@ void AtkPressY_next_k(AtkPressY *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkPressZ ///////////////////////
+////////////////////// FoaPressZ ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_PRESSZ_MATRIX \
@@ -1728,21 +1279,21 @@ matrix.coefs[3][0] = sqrt2asinasina; \
 matrix.coefs[3][3] = cosa2; \
 matrix.coefs[1][1] = matrix.coefs[2][2] = cosa; \
 
-void AtkPressZ_Ctor(AtkPressZ* unit)
+void FoaPressZ_Ctor(FoaPressZ* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_PRESSZ_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkPressZ_next_a);
+	SETCALC(FoaPressZ_next_a);
     else
-	SETCALC(AtkPressZ_next_k);
-    AtkPressZ_next_k(unit, 1); 
+	SETCALC(FoaPressZ_next_k);
+    FoaPressZ_next_k(unit, 1); 
 }
 
-void AtkPressZ_next_a(AtkPressZ *unit, int inNumSamples)
+void FoaPressZ_next_a(FoaPressZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1757,7 +1308,7 @@ void AtkPressZ_next_a(AtkPressZ *unit, int inNumSamples)
     
 }
 
-void AtkPressZ_next_k(AtkPressZ *unit, int inNumSamples)
+void FoaPressZ_next_k(FoaPressZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1778,7 +1329,7 @@ void AtkPressZ_next_k(AtkPressZ *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkZoomX ///////////////////////
+////////////////////// FoaZoomX ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_ZOOMX_MATRIX \
@@ -1789,21 +1340,21 @@ matrix.coefs[2][2] = matrix.coefs[3][3] = cosa; \
 matrix.coefs[0][1] = rsqrt2 * sina; \
 matrix.coefs[1][0] = sqrt2 * sina;
 
-void AtkZoomX_Ctor(AtkZoomX* unit)
+void FoaZoomX_Ctor(FoaZoomX* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_ZOOMX_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkZoomX_next_a);
+	SETCALC(FoaZoomX_next_a);
     else
-	SETCALC(AtkZoomX_next_k);
-    AtkZoomX_next_k(unit, 1); 
+	SETCALC(FoaZoomX_next_k);
+    FoaZoomX_next_k(unit, 1); 
 }
 
-void AtkZoomX_next_a(AtkZoomX *unit, int inNumSamples)
+void FoaZoomX_next_a(FoaZoomX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1818,7 +1369,7 @@ void AtkZoomX_next_a(AtkZoomX *unit, int inNumSamples)
     
 }
 
-void AtkZoomX_next_k(AtkZoomX *unit, int inNumSamples)
+void FoaZoomX_next_k(FoaZoomX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1839,7 +1390,7 @@ void AtkZoomX_next_k(AtkZoomX *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkZoomY ///////////////////////
+////////////////////// FoaZoomY ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_ZOOMY_MATRIX \
@@ -1851,21 +1402,21 @@ matrix.coefs[0][2] = rsqrt2 * sina; \
 matrix.coefs[2][0] = sqrt2 * sina; \
 
 
-void AtkZoomY_Ctor(AtkZoomY* unit)
+void FoaZoomY_Ctor(FoaZoomY* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_ZOOMY_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkZoomY_next_a);
+	SETCALC(FoaZoomY_next_a);
     else
-	SETCALC(AtkZoomY_next_k);
-    AtkZoomY_next_k(unit, 1); 
+	SETCALC(FoaZoomY_next_k);
+    FoaZoomY_next_k(unit, 1); 
 }
 
-void AtkZoomY_next_a(AtkZoomY *unit, int inNumSamples)
+void FoaZoomY_next_a(FoaZoomY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1880,7 +1431,7 @@ void AtkZoomY_next_a(AtkZoomY *unit, int inNumSamples)
     
 }
 
-void AtkZoomY_next_k(AtkZoomY *unit, int inNumSamples)
+void FoaZoomY_next_k(FoaZoomY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1901,7 +1452,7 @@ void AtkZoomY_next_k(AtkZoomY *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkZoomZ ///////////////////////
+////////////////////// FoaZoomZ ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_ZOOMZ_MATRIX \
@@ -1912,21 +1463,21 @@ matrix.coefs[1][1] = matrix.coefs[2][2] = cosa; \
 matrix.coefs[0][3] = rsqrt2 * sina; \
 matrix.coefs[3][0] = sqrt2 * sina; \
 
-void AtkZoomZ_Ctor(AtkZoomZ* unit)
+void FoaZoomZ_Ctor(FoaZoomZ* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_ZOOMZ_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkZoomZ_next_a);
+	SETCALC(FoaZoomZ_next_a);
     else
-	SETCALC(AtkZoomZ_next_k);
-    AtkZoomZ_next_k(unit, 1); 
+	SETCALC(FoaZoomZ_next_k);
+    FoaZoomZ_next_k(unit, 1); 
 }
 
-void AtkZoomZ_next_a(AtkZoomZ *unit, int inNumSamples)
+void FoaZoomZ_next_a(FoaZoomZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -1941,7 +1492,7 @@ void AtkZoomZ_next_a(AtkZoomZ *unit, int inNumSamples)
     
 }
 
-void AtkZoomZ_next_k(AtkZoomZ *unit, int inNumSamples)
+void FoaZoomZ_next_k(FoaZoomZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -1962,7 +1513,7 @@ void AtkZoomZ_next_k(AtkZoomZ *unit, int inNumSamples)
     unit->m_angle = angle;	
 }
 
-////////////////////// AtkDominateX ///////////////////////
+////////////////////// FoaDominateX ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_DOMINATEX_MATRIX \
@@ -1976,21 +1527,21 @@ matrix.coefs[0][1] = rsqrt8 * dommrdom; \
 matrix.coefs[1][0] = rsqrt2 * dommrdom; \
 matrix.coefs[2][2] = matrix.coefs[3][3] = 1.; \
 
-void AtkDominateX_Ctor(AtkDominateX* unit)
+void FoaDominateX_Ctor(FoaDominateX* unit)
 {
     ZERO_MATRIX
     unit->m_gain = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_DOMINATEX_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkDominateX_next_a);
+	SETCALC(FoaDominateX_next_a);
     else
-	SETCALC(AtkDominateX_next_k);
-    AtkDominateX_next_k(unit, 1); 
+	SETCALC(FoaDominateX_next_k);
+    FoaDominateX_next_k(unit, 1); 
 }
 
-void AtkDominateX_next_a(AtkDominateX *unit, int inNumSamples)
+void FoaDominateX_next_a(FoaDominateX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *gain = IN(4);
@@ -2005,7 +1556,7 @@ void AtkDominateX_next_a(AtkDominateX *unit, int inNumSamples)
     
 }
 
-void AtkDominateX_next_k(AtkDominateX *unit, int inNumSamples)
+void FoaDominateX_next_k(FoaDominateX *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float gain = IN0(4);
@@ -2026,7 +1577,7 @@ void AtkDominateX_next_k(AtkDominateX *unit, int inNumSamples)
     unit->m_gain = gain;	
 }
 
-////////////////////// AtkDominateY ///////////////////////
+////////////////////// FoaDominateY ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_DOMINATEY_MATRIX \
@@ -2040,21 +1591,21 @@ matrix.coefs[0][2] = rsqrt8 * dommrdom; \
 matrix.coefs[2][0] = rsqrt2 * dommrdom; \
 matrix.coefs[1][1] = matrix.coefs[3][3] = 1.; \
 
-void AtkDominateY_Ctor(AtkDominateY* unit)
+void FoaDominateY_Ctor(FoaDominateY* unit)
 {
     ZERO_MATRIX
     unit->m_gain = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_DOMINATEY_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkDominateY_next_a);
+	SETCALC(FoaDominateY_next_a);
     else
-	SETCALC(AtkDominateY_next_k);
-    AtkDominateY_next_k(unit, 1); 
+	SETCALC(FoaDominateY_next_k);
+    FoaDominateY_next_k(unit, 1); 
 }
 
-void AtkDominateY_next_a(AtkDominateY *unit, int inNumSamples)
+void FoaDominateY_next_a(FoaDominateY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *gain = IN(4);
@@ -2069,7 +1620,7 @@ void AtkDominateY_next_a(AtkDominateY *unit, int inNumSamples)
     
 }
 
-void AtkDominateY_next_k(AtkDominateY *unit, int inNumSamples)
+void FoaDominateY_next_k(FoaDominateY *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float gain = IN0(4);
@@ -2090,7 +1641,7 @@ void AtkDominateY_next_k(AtkDominateY *unit, int inNumSamples)
     unit->m_gain = gain;	
 }
 
-////////////////////// AtkDominateZ ///////////////////////
+////////////////////// FoaDominateZ ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_DOMINATEZ_MATRIX \
@@ -2104,21 +1655,21 @@ matrix.coefs[0][3] = rsqrt8 * dommrdom; \
 matrix.coefs[3][0] = rsqrt2 * dommrdom; \
 matrix.coefs[1][1] = matrix.coefs[2][2] = 1.; \
 
-void AtkDominateZ_Ctor(AtkDominateZ* unit)
+void FoaDominateZ_Ctor(FoaDominateZ* unit)
 {
     ZERO_MATRIX
     unit->m_gain = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_DOMINATEZ_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkDominateZ_next_a);
+	SETCALC(FoaDominateZ_next_a);
     else
-	SETCALC(AtkDominateZ_next_k);
-    AtkDominateZ_next_k(unit, 1); 
+	SETCALC(FoaDominateZ_next_k);
+    FoaDominateZ_next_k(unit, 1); 
 }
 
-void AtkDominateZ_next_a(AtkDominateZ *unit, int inNumSamples)
+void FoaDominateZ_next_a(FoaDominateZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *gain = IN(4);
@@ -2133,7 +1684,7 @@ void AtkDominateZ_next_a(AtkDominateZ *unit, int inNumSamples)
     
 }
 
-void AtkDominateZ_next_k(AtkDominateZ *unit, int inNumSamples)
+void FoaDominateZ_next_k(FoaDominateZ *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float gain = IN0(4);
@@ -2156,33 +1707,28 @@ void AtkDominateZ_next_k(AtkDominateZ *unit, int inNumSamples)
 
 
 
-////////////////////// AtkDirectO ///////////////////////
+////////////////////// FoaDirectO ///////////////////////
 // uses 'angle' var
 
-/*
-#define FILL_DIRECT_MATRIX \
-matrix.coefs[0][0] = sqrt2 * cos(unit->m_angle * 0.5); \
-matrix.coefs[1][1] = matrix.coefs[2][2] = matrix.coefs[3][3] = sqrt2 * sin(unit->m_angle * 0.5); \
-*/
 #define FILL_DIRECT_MATRIX \
 matrix.coefs[0][0] = sqrt(1.0 + sin(unit->m_angle)); \
 matrix.coefs[1][1] = matrix.coefs[2][2] = matrix.coefs[3][3] = sqrt(1.0 - sin(unit->m_angle)); \
 
-void AtkDirectO_Ctor(AtkDirectO* unit)
+void FoaDirectO_Ctor(FoaDirectO* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_DIRECT_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-	SETCALC(AtkDirectO_next_a);
+	SETCALC(FoaDirectO_next_a);
     else
-	SETCALC(AtkDirectO_next_k);
-    AtkDirectO_next_k(unit, 1); 
+	SETCALC(FoaDirectO_next_k);
+    FoaDirectO_next_k(unit, 1); 
 }
 
-void AtkDirectO_next_a(AtkDirectO *unit, int inNumSamples)
+void FoaDirectO_next_a(FoaDirectO *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -2198,7 +1744,7 @@ void AtkDirectO_next_a(AtkDirectO *unit, int inNumSamples)
 }
 
 
-void AtkDirectO_next_k(AtkDirectO *unit, int inNumSamples)
+void FoaDirectO_next_k(FoaDirectO *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -2223,7 +1769,7 @@ void AtkDirectO_next_k(AtkDirectO *unit, int inNumSamples)
 }
 
 
-////////////////////// AtkAsymmetry ///////////////////////
+////////////////////// FoaAsymmetry ///////////////////////
 // uses 'angle' var. 
 
 #define FILL_ASYMMETRY_MATRIX \
@@ -2238,21 +1784,21 @@ matrix.coefs[1][2] = -sina; \
 matrix.coefs[2][0] = -sqrt2 * cosa * sina; \
 matrix.coefs[2][1] = cosa * sina;
 
-void AtkAsymmetry_Ctor(AtkAsymmetry* unit)
+void FoaAsymmetry_Ctor(FoaAsymmetry* unit)
 {
     ZERO_MATRIX
     unit->m_angle = IN0(4);
-    AtkMatrix matrix = unit->matrix;
+    FoaMatrix matrix = unit->matrix;
     FILL_ASYMMETRY_MATRIX;
     unit->matrix = matrix;
     if(INRATE(4) == calc_FullRate)
-		SETCALC(AtkAsymmetry_next_a);
+		SETCALC(FoaAsymmetry_next_a);
     else
-		SETCALC(AtkAsymmetry_next_k);
-    AtkAsymmetry_next_k(unit, 1); 
+		SETCALC(FoaAsymmetry_next_k);
+    FoaAsymmetry_next_k(unit, 1); 
 }
 
-void AtkAsymmetry_next_a(AtkAsymmetry *unit, int inNumSamples)
+void FoaAsymmetry_next_a(FoaAsymmetry *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float *angle = IN(4);
@@ -2267,7 +1813,7 @@ void AtkAsymmetry_next_a(AtkAsymmetry *unit, int inNumSamples)
     
 }
 
-void AtkAsymmetry_next_k(AtkAsymmetry *unit, int inNumSamples)
+void FoaAsymmetry_next_k(FoaAsymmetry *unit, int inNumSamples)
 {
     SETUP_TRANSFORMS
     float angle = IN0(4);
@@ -2290,22 +1836,22 @@ void AtkAsymmetry_next_k(AtkAsymmetry *unit, int inNumSamples)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// AtkNFC - 
-void AtkNFC_Ctor(AtkNFC* unit)
+// FoaNFC - 
+void FoaNFC_Ctor(FoaNFC* unit)
 {
     unit->m_y1x = 0.0f;
     unit->m_y1y = 0.0f;
     unit->m_y1z = 0.0f;
     unit->m_distanceStart = IN0(4);
     if (INRATE(4) == calc_FullRate) {
-	SETCALC(AtkNFC_next_a);
+	SETCALC(FoaNFC_next_a);
     } else {
-	SETCALC(AtkNFC_next_k);
+	SETCALC(FoaNFC_next_k);
     };
     ClearUnitOutputs(unit, 1);
 }
 
-void AtkNFC_next_k(AtkNFC *unit, int inNumSamples)
+void FoaNFC_next_k(FoaNFC *unit, int inNumSamples)
 {       
     float *Wout = OUT(0);
     float *Xout = OUT(1);
@@ -2358,7 +1904,7 @@ void AtkNFC_next_k(AtkNFC *unit, int inNumSamples)
     
 }
 
-void AtkNFC_next_a(AtkNFC *unit, int inNumSamples)
+void FoaNFC_next_a(FoaNFC *unit, int inNumSamples)
 {       
     float *Wout = OUT(0);
     float *Xout = OUT(1);
@@ -2403,23 +1949,23 @@ void AtkNFC_next_a(AtkNFC *unit, int inNumSamples)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// AtkProximity
+// FoaProximity
 
-void AtkProximity_Ctor(AtkProximity* unit)
+void FoaProximity_Ctor(FoaProximity* unit)
 {
     unit->m_y1x = 0.0f;
     unit->m_y1y = 0.0f;
     unit->m_y1z = 0.0f;
     unit->m_distanceStart = IN0(4);
     if (INRATE(4) == calc_FullRate) {
-	SETCALC(AtkProximity_next_a);
+	SETCALC(FoaProximity_next_a);
     } else {
-	SETCALC(AtkProximity_next_k);
+	SETCALC(FoaProximity_next_k);
     };
     ClearUnitOutputs(unit, 1);
 }
 
-void AtkProximity_next_k(AtkProximity *unit, int inNumSamples)
+void FoaProximity_next_k(FoaProximity *unit, int inNumSamples)
 {       
     float *Wout = OUT(0);
     float *Xout = OUT(1);
@@ -2472,7 +2018,7 @@ void AtkProximity_next_k(AtkProximity *unit, int inNumSamples)
     
 }
 
-void AtkProximity_next_a(AtkProximity *unit, int inNumSamples)
+void FoaProximity_next_a(FoaProximity *unit, int inNumSamples)
 {       
     float *Wout = OUT(0);
     float *Xout = OUT(1);
@@ -2518,9 +2064,9 @@ void AtkProximity_next_a(AtkProximity *unit, int inNumSamples)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// AtkPsychoShelf
+// FoaPsychoShelf
 
-void AtkPsychoShelf_Ctor(AtkPsychoShelf* unit)
+void FoaPsychoShelf_Ctor(FoaPsychoShelf* unit)
 {
     unit->m_y1w = 0.0f;
     unit->m_y2w = 0.0f;
@@ -2534,14 +2080,14 @@ void AtkPsychoShelf_Ctor(AtkPsychoShelf* unit)
     unit->m_k0 = IN0(5);
     unit->m_k1 = IN0(6);
     if (INRATE(4) == calc_FullRate || INRATE(5) == calc_FullRate || INRATE(6) == calc_FullRate) {
-		SETCALC(AtkPsychoShelf_next_a);
+		SETCALC(FoaPsychoShelf_next_a);
     } else {
-		SETCALC(AtkPsychoShelf_next_k);
+		SETCALC(FoaPsychoShelf_next_k);
     };
     ClearUnitOutputs(unit, 1);
 }
 
-void AtkPsychoShelf_next_k(AtkPsychoShelf *unit, int inNumSamples)
+void FoaPsychoShelf_next_k(FoaPsychoShelf *unit, int inNumSamples)
 {       
     float *Wout = OUT(0);
     float *Xout = OUT(1);
@@ -2650,7 +2196,7 @@ void AtkPsychoShelf_next_k(AtkPsychoShelf *unit, int inNumSamples)
     
 }
 
-void AtkPsychoShelf_next_a(AtkPsychoShelf *unit, int inNumSamples)
+void FoaPsychoShelf_next_a(FoaPsychoShelf *unit, int inNumSamples)
 {       
     float *Wout = OUT(0);
     float *Xout = OUT(1);
@@ -2741,335 +2287,7 @@ void AtkPsychoShelf_next_a(AtkPsychoShelf *unit, int inNumSamples)
 }
 
 
-/*
- ///////////////////////////////////////////////////////////////////////////////////////////////////////
- // AtoB - a, b, c, d in, w, x, y, z out
- 
- void AtoB_Ctor(AtoB* unit)
- {
- float orientation = ZIN0(4);
- float mode = ZIN0(5);
- // set-up the proper encoding function
- switch ((int)orientation) {
- case 0 : 
- switch ((int)mode) {
- case 0: SETCALC(AtoB_next_00); break;
- //		    case 1: SETCALC(AtoB_next_01); break;
- //		    case 2: SETCALC(AtoB_next_02); break;
- default : break;
- }
- break;
- case 1 : 
- switch ((int)mode) {
- case 0: SETCALC(AtoB_next_10); break;
- //		    case 1: SETCALC(AtoB_next_11); break;
- //		    case 2: SETCALC(AtoB_next_12); break;
- default : break;
- }
- break;
- case 2 : 
- switch ((int)mode) {
- case 0: SETCALC(AtoB_next_20); break;
- //		    case 1: SETCALC(AtoB_next_21); break;
- //		    case 2: SETCALC(AtoB_next_22); break;
- default : break;
- }
- break;
- case 3 : 
- switch ((int)mode) {
- case 0: SETCALC(AtoB_next_30); break;
- //		    case 1: SETCALC(AtoB_next_31); break;
- //		    case 2: SETCALC(AtoB_next_32); break;
- default : break;
- }
- break;
- case 4 : 
- switch ((int)mode) {
- case 0: SETCALC(AtoB_next_40); break;
- //		    case 1: SETCALC(AtoB_next_41); break;
- //		    case 2: SETCALC(AtoB_next_42); break;
- default : break;
- }
- break;
- case 5 : 
- switch ((int)mode) {
- case 0: SETCALC(AtoB_next_50); break;
- //		    case 1: SETCALC(AtoB_next_51); break;
- //		    case 2: SETCALC(AtoB_next_52); break;
- default : break;
- }
- break;
- case 6 :
- switch ((int)mode) {
- case 0: SETCALC(AtoB_next_60); break;
- //		    case 1: SETCALC(AtoB_next_61); break;
- //		    case 2: SETCALC(AtoB_next_62); break;
- default : break;
- }
- break;
- case 7 : 
- switch ((int)mode) {
- case 0: SETCALC(AtoB_next_70); break;
- //		    case 1: SETCALC(AtoB_next_71); break;
- //		    case 2: SETCALC(AtoB_next_72); break;
- default : break;
- }
- break;
- default : break;
- }
- }
- 
- #define SETUP_AtoB \
- float* a_in = ZIN(0); \
- float* b_in = ZIN(1); \
- float* c_in = ZIN(2); \
- float* d_in = ZIN(3); \
- float* w_out = ZOUT(0); \
- float* x_out = ZOUT(1); \
- float* y_out = ZOUT(2); \
- float* z_out = ZOUT(3); \
- float a, b, c, d;
- 
- #define ASSIGN_ABCD \
- a = ZXP(a_in); \
- b = ZXP(b_in); \
- c = ZXP(c_in); \
- d = ZXP(d_in); 
- 
- //some useful SC constants
- #ifndef __FP__
- const double pi     = acos(-1.);
- #endif
- const double pi2    = pi * .5;
- const double pi32   = pi * 1.5;
- const double twopi  = pi * 2.;
- const double rtwopi = 1. / twopi;
- const double log001 = log(0.001);
- const double log01  = log(0.01);
- const double log1   = log(0.1);
- const double rlog2  = 1./log(2.);
- const double sqrt2  = sqrt(2.);
- const double rsqrt2 = 1. / sqrt2;
- 
- 
- void AtoB_next_00(AtoB *unit, int inNumSamples)
- {
- SETUP_AtoB
- LOOP(inNumSamples,
- ASSIGN_ABCD
- 
- ZXP(w_out) = (a + b + c + d) * 0.5;
- ZXP(x_out) = (a + b - c - d) * 0.5;
- ZXP(y_out) = (a - b - c + d) * 0.5;
- ZXP(z_out) = (a - b + c - d) * 0.5;
- );
- }
- 
- void AtoB_next_10(AtoB *unit, int inNumSamples)
- {
- SETUP_AtoB
- LOOP(inNumSamples,
- ASSIGN_ABCD
- 
- ZXP(w_out) = (a + b + c + d) * 0.5;
- ZXP(x_out) = (a + b - c - d) * 0.5;
- ZXP(y_out) = (a - b - c + d) * 0.5;
- ZXP(z_out) = (-a + b - c + d) * 0.5;
- )
- }
- 
- void AtoB_next_20(AtoB *unit, int inNumSamples)
- { 
- SETUP_AtoB
- LOOP(inNumSamples,
- ASSIGN_ABCD
- 
- ZXP(w_out) = (a + b + c + d) * 0.5;
- ZXP(x_out) = (a + b - c - d) * 0.5;
- ZXP(y_out) = (a - b) * rsqrt2;
- ZXP(z_out) = (c - d) * rsqrt2;
- )
- }
- 
- void AtoB_next_30(AtoB *unit, int inNumSamples)
- {
- SETUP_AtoB
- LOOP(inNumSamples,
- ASSIGN_ABCD
- 
- ZXP(w_out) = (a + b + c + d) * 0.5;
- ZXP(x_out) = (a + b - c - d) * 0.5;
- ZXP(y_out) = (-c + d) * rsqrt2;
- ZXP(z_out) = (a - b) * rsqrt2;
- )
- }
- 
- 
- void AtoB_next_40(AtoB *unit, int inNumSamples)
- {
- SETUP_AtoB
- LOOP(inNumSamples, 
- ASSIGN_ABCD
- 
- ZXP(w_out) = (a + b + c + d) * 0.5;
- ZXP(x_out) = (a * sqrt3div2) + ((-b - c - d) * sqrt3div6);
- ZXP(y_out) = (-b + c) * rsqrt2;
- ZXP(z_out) = ((b + c) * rsqrt6) - (d * sqrt6div3);
- )
- }
- 
- void AtoB_next_50(AtoB *unit, int inNumSamples)
- {
- SETUP_AtoB
- 
- LOOP(inNumSamples,
- ASSIGN_ABCD
- 
- ZXP(w_out) = (a + b + c + d) * 0.5;
- ZXP(x_out) = ((a + b + c) * sqrt3div6) - (d * sqrt3div2);
- ZXP(y_out) = (a - b) * rsqrt2;
- ZXP(z_out) = ((-a - b) * rsqrt6) - (c * sqrt6div3);
- )
- }
- 
- void AtoB_next_60(AtoB *unit, int inNumSamples)
- {
- SETUP_AtoB
- 
- LOOP(inNumSamples,
- ASSIGN_ABCD
- 
- ZXP(w_out) = (a + b + c + d) * 0.5;
- ZXP(x_out) = (a * sqrt3div2) + ((-b - c - d) * sqrt3div6);
- ZXP(y_out) = (-c + d) * rsqrt2;
- ZXP(z_out) = (b * sqrt6div3) + ((-c - d) * rsqrt6);
- )
- }
- 
- void AtoB_next_70(AtoB *unit, int inNumSamples)
- {
- SETUP_AtoB
- 
- LOOP(inNumSamples,
- ASSIGN_ABCD
- 
- ZXP(w_out) = (a + b + c + d) * 0.5;
- ZXP(x_out) = ((a + b + c) * sqrt3div6) - (d * sqrt3div2);
- ZXP(y_out) = (a - b) * rsqrt2;
- ZXP(z_out) = ((a + b) * rsqrt6) + (c * sqrt6div3);
- )
- }
- ///////////////////////////////////////////////////////////////////////////////////////////////////////
- // Dominante - 4 in 4 out
- 
- void Dominate_Ctor(Dominate* unit)
- {
- SETCALC(Dominate_next);
- Dominate_next(unit, 1);
- unit->m_dominance = ZIN0(4) * pi2;
- }
- 
- // four channels in, four channels out... 
- // regardless... call in w, x, y, z and out a, b, c, d
- void Dominate_next(Dominate *unit, int inNumSamples)
- {       
- float *Wout = ZOUT(0);
- float *Xout = ZOUT(1);
- float *Yout = ZOUT(2);
- float *Zout = ZOUT(3);
- 
- float *Win = ZIN(0);
- float *Xin = ZIN(1);
- float *Yin = ZIN(2);
- float *Zin = ZIN(3);
- float dominanceEnd = ZIN0(4); // dom * 0.5pi
- float dominance = unit->m_dominance;
- 
- float cosDom, sinDom;
- float w, x, y, z;
- 
- dominanceEnd = dominanceEnd * (float)pi2;
- 
- float dominance_slope = CALCSLOPE(dominanceEnd, dominance);
- 
- LOOP(inNumSamples,
- 
- cosDom = cos(dominance);
- sinDom = sin(dominance);
- 
- w = ZXP(Win);
- x = ZXP(Xin);
- y = ZXP(Yin);
- z = ZXP(Zin);
- 
- ZXP(Wout) = w + (sqrt2 * sinDom * w);
- ZXP(Xout) = (rsqrt2 * sinDom * x) + x;
- ZXP(Yout) = y * cosDom;
- ZXP(Zout) = z * cosDom;
- 
- dominance += dominance_slope;
- );
- 
- unit->m_dominance = dominanceEnd;
- }
- 
- ///////////////////////////////////////////////////////////////////////////////////////////////////////
- // Push - 4 in 4 out
- 
- void Push_Ctor(Push* unit)
- {
- SETCALC(Push_next);
- Push_next(unit, 1);
- unit->m_push = ZIN0(4) * pi2;
- }
- 
- // four channels in, four channels out... 
- // regardless... call in w, x, y, z and out a, b, c, d
- void Push_next(Push *unit, int inNumSamples)
- {       
- float *Wout = ZOUT(0);
- float *Xout = ZOUT(1);
- float *Yout = ZOUT(2);
- float *Zout = ZOUT(3);
- 
- float *Win = ZIN(0);
- float *Xin = ZIN(1);
- float *Yin = ZIN(2);
- float *Zin = ZIN(3);
- float pushEnd = ZIN0(4); // dom * 0.5pi
- float push = unit->m_push;
- 
- float piover4 = pi * 0.25;
- float cosPushFac, sinPushFac, cosPush;
- float w, x, y, z;
- 
- pushEnd = pushEnd * (float)pi2;
- 
- float push_slope = CALCSLOPE(pushEnd, push);
- 
- LOOP(inNumSamples,
- 
- cosPushFac = cos(piover4 - push);
- sinPushFac = sin(piover4 - push);
- cosPush = cos(push);
- 
- w = ZXP(Win);
- x = ZXP(Xin);
- y = ZXP(Yin);
- z = ZXP(Zin);
- 
- ZXP(Wout) = ((1 + (sqrt2 * cosPushFac)) * w) + ((sqrt2 - (2 * sinPushFac)) * w);
- ZXP(Xout) = ((rsqrt2 - cosPushFac) * x) + ((1 + (sqrt2 * sinPushFac)) * x);
- ZXP(Yout) = y * cosPush;
- ZXP(Zout) = z * cosPush;
- 
- push += push_slope;
- );
- 
- unit->m_push = pushEnd;
- }
- */
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3077,44 +2295,36 @@ void load(InterfaceTable *inTable)
 {
     ft = inTable;
     
-    DefineSimpleCantAliasUnit(FOAPanB);
-/*
-    DefineSimpleCantAliasUnit(FOAPanBWFocus);
-    DefineSimpleCantAliasUnit(AtkSterToB);
-    DefineDtorCantAliasUnit(AtkPantoF);
- */
+    DefineSimpleCantAliasUnit(FoaPanB);
     
-    DefineSimpleCantAliasUnit(AtkDirectO);
-    DefineSimpleCantAliasUnit(AtkDirectX);
-    DefineSimpleCantAliasUnit(AtkDirectY);
-    DefineSimpleCantAliasUnit(AtkDirectZ);
-    DefineSimpleCantAliasUnit(AtkRotate);
-    DefineSimpleCantAliasUnit(AtkTilt);
-    DefineSimpleCantAliasUnit(AtkTumble);
-    DefineSimpleCantAliasUnit(AtkFocusX);	
-    DefineSimpleCantAliasUnit(AtkFocusY);
-    DefineSimpleCantAliasUnit(AtkFocusZ);
-    DefineSimpleCantAliasUnit(AtkPushX);
-    DefineSimpleCantAliasUnit(AtkPushY);
-    DefineSimpleCantAliasUnit(AtkPushZ);
-    DefineSimpleCantAliasUnit(AtkPressX);
-    DefineSimpleCantAliasUnit(AtkPressY);
-    DefineSimpleCantAliasUnit(AtkPressZ);
-    DefineSimpleCantAliasUnit(AtkZoomX);
-    DefineSimpleCantAliasUnit(AtkZoomY);
-    DefineSimpleCantAliasUnit(AtkZoomZ);
-    DefineSimpleCantAliasUnit(AtkDominateX);
-    DefineSimpleCantAliasUnit(AtkDominateY);
-    DefineSimpleCantAliasUnit(AtkDominateZ);
-    DefineSimpleCantAliasUnit(AtkAsymmetry);
+    DefineSimpleCantAliasUnit(FoaDirectO);
+    DefineSimpleCantAliasUnit(FoaDirectX);
+    DefineSimpleCantAliasUnit(FoaDirectY);
+    DefineSimpleCantAliasUnit(FoaDirectZ);
+    DefineSimpleCantAliasUnit(FoaRotate);
+    DefineSimpleCantAliasUnit(FoaTilt);
+    DefineSimpleCantAliasUnit(FoaTumble);
+    DefineSimpleCantAliasUnit(FoaFocusX);	
+    DefineSimpleCantAliasUnit(FoaFocusY);
+    DefineSimpleCantAliasUnit(FoaFocusZ);
+    DefineSimpleCantAliasUnit(FoaPushX);
+    DefineSimpleCantAliasUnit(FoaPushY);
+    DefineSimpleCantAliasUnit(FoaPushZ);
+    DefineSimpleCantAliasUnit(FoaPressX);
+    DefineSimpleCantAliasUnit(FoaPressY);
+    DefineSimpleCantAliasUnit(FoaPressZ);
+    DefineSimpleCantAliasUnit(FoaZoomX);
+    DefineSimpleCantAliasUnit(FoaZoomY);
+    DefineSimpleCantAliasUnit(FoaZoomZ);
+    DefineSimpleCantAliasUnit(FoaDominateX);
+    DefineSimpleCantAliasUnit(FoaDominateY);
+    DefineSimpleCantAliasUnit(FoaDominateZ);
+    DefineSimpleCantAliasUnit(FoaAsymmetry);
     
     
-    DefineSimpleCantAliasUnit(AtkNFC);
-    DefineSimpleCantAliasUnit(AtkProximity);
-    DefineSimpleCantAliasUnit(AtkPsychoShelf);
-    //DefineSimpleUnit(Dominate);
-    //DefineSimpleUnit(Push);
-    //DefineSimpleUnit(AtoB);
+    DefineSimpleCantAliasUnit(FoaNFC);
+    DefineSimpleCantAliasUnit(FoaProximity);
+    DefineSimpleCantAliasUnit(FoaPsychoShelf);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////

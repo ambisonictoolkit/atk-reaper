@@ -1,6 +1,6 @@
 // add comments here....
 
-FOAPanB : Panner {
+FoaPanB : Panner {
 	
 	*ar { arg in, azimuth=0, elevation=0;
 		^this.multiNew('audio', in, azimuth, elevation )
@@ -15,7 +15,7 @@ FOAPanB : Panner {
 }
 
 
-Atk : Panner {
+Foa : Panner {
 		
 	init { arg ... theInputs;
 		inputs = theInputs;		
@@ -29,142 +29,142 @@ Atk : Panner {
  	}
 
 	
-AtkDirectO : Atk {			// check matrix!!, appears to be the old matrix
+FoaDirectO : Foa {
 	*ar { arg w, x, y, z, angle = pi/2, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, angle).madd(mul, add);
 	}
 }
 
 
-AtkDirectX : Atk {
+FoaDirectX : Foa {
 	*ar { arg w, x, y, z, angle = pi/2, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, angle).madd(mul, add);
 	}
 }
 
-AtkDirectY : AtkDirectX { }
-AtkDirectZ : AtkDirectX { }
+FoaDirectY : FoaDirectX { }
+FoaDirectZ : FoaDirectX { }
 
-AtkRotate : Atk { 
+FoaRotate : Foa { 
 	*ar { arg w, x, y, z, angle = 0, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, angle).madd(mul, add);
 	}
 } 
-AtkTilt : AtkRotate { }
-AtkTumble : AtkRotate { }
+FoaTilt : FoaRotate { }
+FoaTumble : FoaRotate { }
 
-AtkFocusX : AtkRotate { }
-AtkFocusY : AtkRotate { }
-AtkFocusZ : AtkRotate { }
+FoaFocusX : FoaRotate { }
+FoaFocusY : FoaRotate { }
+FoaFocusZ : FoaRotate { }
 
-AtkPushX : AtkRotate { }
-AtkPushY : AtkRotate { }
-AtkPushZ : AtkRotate { }
+FoaPushX : FoaRotate { }
+FoaPushY : FoaRotate { }
+FoaPushZ : FoaRotate { }
 
-AtkPressX : AtkRotate { }
-AtkPressY : AtkRotate { }
-AtkPressZ : AtkRotate { }
+FoaPressX : FoaRotate { }
+FoaPressY : FoaRotate { }
+FoaPressZ : FoaRotate { }
 
-AtkZoomX : AtkRotate { }
-AtkZoomY : AtkRotate { }
-AtkZoomZ : AtkRotate { }
+FoaZoomX : FoaRotate { }
+FoaZoomY : FoaRotate { }
+FoaZoomZ : FoaRotate { }
 
 
-AtkDominateX : Atk {	
+FoaDominateX : Foa {	
 	*ar { arg w, x, y, z, gain = 0;
 		^this.multiNew('audio', w, x, y, z, gain);
 	}	
 }
 
-AtkDominateY : AtkDominateX { }
-AtkDominateZ : AtkDominateX { }
+FoaDominateY : FoaDominateX { }
+FoaDominateZ : FoaDominateX { }
 
-AtkAsymmetry : AtkRotate { }
+FoaAsymmetry : FoaRotate { }
 
 
-FOARTT { 
+FoaRTT { 
 	*ar { arg w, x, y, z, rotAngle = 0, tilAngle = 0, tumAngle = 0, mul = 1, add = 0;
 
-		#w, x, y, z = AtkRotate.ar(w, x, y, z, rotAngle);
-		#w, x, y, z = AtkTilt.ar(w, x, y, z, tilAngle);
-		^AtkTumble.ar(w, x, y, z, tumAngle, mul, add);
+		#w, x, y, z = FoaRotate.ar(w, x, y, z, rotAngle);
+		#w, x, y, z = FoaTilt.ar(w, x, y, z, tilAngle);
+		^FoaTumble.ar(w, x, y, z, tumAngle, mul, add);
 	}
 } 
 
-FOAMirror { 
+FoaMirror { 
 	*ar { arg w, x, y, z, theta = 0, phi = 0, mul = 1, add = 0;
 
-		#w, x, y, z = AtkRotate.ar(w, x, y, z, theta.neg);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi.neg);
-		#w, x, y, z = FOAXform.ar([w, x, y, z], FOAXformerMatrix.newMirrorX);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi);
-		^AtkRotate.ar(w, x, y, z, theta, mul, add);
+		#w, x, y, z = FoaRotate.ar(w, x, y, z, theta.neg);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi.neg);
+		#w, x, y, z = FoaXform.ar([w, x, y, z], FoaXformerMatrix.newMirrorX);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi);
+		^FoaRotate.ar(w, x, y, z, theta, mul, add);
 	}
 } 
 
-FOADirect { 
+FoaDirect { 
 	*ar { arg w, x, y, z, angle = 0, theta = 0, phi = 0, mul = 1, add = 0;
 
-		#w, x, y, z = AtkRotate.ar(w, x, y, z, theta.neg);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi.neg);
-		#w, x, y, z = AtkSquishX.ar(w, x, y, z, angle); // rename to DirectX
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi);
-		^AtkRotate.ar(w, x, y, z, theta, mul, add);
+		#w, x, y, z = FoaRotate.ar(w, x, y, z, theta.neg);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi.neg);
+		#w, x, y, z = FoaDirectX.ar(w, x, y, z, angle);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi);
+		^FoaRotate.ar(w, x, y, z, theta, mul, add);
 	}
 } 
 
-FOADominate { 
+FoaDominate { 
 	*ar { arg w, x, y, z, gain = 0, theta = 0, phi = 0, mul = 1, add = 0;
 
-		#w, x, y, z = AtkRotate.ar(w, x, y, z, theta.neg);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi.neg);
-		#w, x, y, z = AtkDominateX.ar(w, x, y, z, gain);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi);
-		^AtkRotate.ar(w, x, y, z, theta, mul, add);
+		#w, x, y, z = FoaRotate.ar(w, x, y, z, theta.neg);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi.neg);
+		#w, x, y, z = FoaDominateX.ar(w, x, y, z, gain);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi);
+		^FoaRotate.ar(w, x, y, z, theta, mul, add);
 	}
 } 
 
-FOAZoom { 
+FoaZoom { 
 	*ar { arg w, x, y, z, angle = 0, theta = 0, phi = 0, mul = 1, add = 0;
 
-		#w, x, y, z = AtkRotate.ar(w, x, y, z, theta.neg);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi.neg);
-		#w, x, y, z = AtkZoomX.ar(w, x, y, z, angle);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi);
-		^AtkRotate.ar(w, x, y, z, theta, mul, add);
+		#w, x, y, z = FoaRotate.ar(w, x, y, z, theta.neg);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi.neg);
+		#w, x, y, z = FoaZoomX.ar(w, x, y, z, angle);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi);
+		^FoaRotate.ar(w, x, y, z, theta, mul, add);
 	}
 } 
 
-FOAFocus { 
+FoaFocus { 
 	*ar { arg w, x, y, z, angle = 0, theta = 0, phi = 0, mul = 1, add = 0;
 
-		#w, x, y, z = AtkRotate.ar(w, x, y, z, theta.neg);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi.neg);
-		#w, x, y, z = AtkFocusX.ar(w, x, y, z, angle);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi);
-		^AtkRotate.ar(w, x, y, z, theta, mul, add);
+		#w, x, y, z = FoaRotate.ar(w, x, y, z, theta.neg);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi.neg);
+		#w, x, y, z = FoaFocusX.ar(w, x, y, z, angle);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi);
+		^FoaRotate.ar(w, x, y, z, theta, mul, add);
 	}
 } 
 
-FOAPush { 
+FoaPush { 
 	*ar { arg w, x, y, z, angle = 0, theta = 0, phi = 0, mul = 1, add = 0;
 
-		#w, x, y, z = AtkRotate.ar(w, x, y, z, theta.neg);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi.neg);
-		#w, x, y, z = AtkPushX.ar(w, x, y, z, angle);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi);
-		^AtkRotate.ar(w, x, y, z, theta, mul, add);
+		#w, x, y, z = FoaRotate.ar(w, x, y, z, theta.neg);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi.neg);
+		#w, x, y, z = FoaPushX.ar(w, x, y, z, angle);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi);
+		^FoaRotate.ar(w, x, y, z, theta, mul, add);
 	}
 } 
 
-FOAPress { 
+FoaPress { 
 	*ar { arg w, x, y, z, angle = 0, theta = 0, phi = 0, mul = 1, add = 0;
 
-		#w, x, y, z = AtkRotate.ar(w, x, y, z, theta.neg);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi.neg);
-		#w, x, y, z = AtkPressX.ar(w, x, y, z, angle);
-		#w, x, y, z = AtkTumble.ar(w, x, y, z, phi);
-		^AtkRotate.ar(w, x, y, z, theta, mul, add);
+		#w, x, y, z = FoaRotate.ar(w, x, y, z, theta.neg);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi.neg);
+		#w, x, y, z = FoaPressX.ar(w, x, y, z, angle);
+		#w, x, y, z = FoaTumble.ar(w, x, y, z, phi);
+		^FoaRotate.ar(w, x, y, z, theta, mul, add);
 	}
 } 
 
@@ -172,21 +172,21 @@ FOAPress {
 //------------------------------------------------------------------------
 // Filters
 
-AtkProximity : Atk { 
+FoaProximity : Foa { 
 	*ar { arg w, x, y, z, distance = 1, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, distance).madd(mul, add);
 	}
 
 }
 
-AtkNFC : Atk { 
+FoaNFC : Foa { 
 	*ar { arg w, x, y, z, distance = 1, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, distance).madd(mul, add);
 	}
 		
 }
 
-AtkPsychoShelf : Atk { 
+FoaPsychoShelf : Foa { 
 	*ar { arg w, x, y, z, freq = 400, k0 = (3/2).sqrt, k1 = 3.sqrt/2, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, freq, k0, k1).madd(mul, add);
 	}
@@ -195,9 +195,9 @@ AtkPsychoShelf : Atk {
 
 
 //------------------------------------------------------------------------
-// ATKMatrixMix & ATKKernelConv
+// AtkMatrixMix & AtkKernelConv
 
-ATKMatrixMix {
+AtkMatrixMix {
 	*ar { arg in, matrix, mul = 1, add = 0;
 		
 		var out;
@@ -215,7 +215,7 @@ ATKMatrixMix {
 	}
 }
 
-ATKKernelConv {
+AtkKernelConv {
 	*ar { arg in, kernel, mul = 1, add = 0;
 		
 		var out;
@@ -241,25 +241,25 @@ ATKKernelConv {
 
 
 //------------------------------------------------------------------------
-// Decoder built using ATKMatrixMix & ATKKernelConv
+// Decoder built using AtkMatrixMix & AtkKernelConv
 
-FOADecode {
+FoaDecode {
 	*ar { arg in, decoder, mul = 1, add = 0;
 
 		switch ( decoder.class, 
 
-			FOADecoderMatrix, {
+			FoaDecoderMatrix, {
 
 				if ( decoder.shelfFreq.isNumber, { // shelf filter?
-					in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
+					in = FoaPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
 						decoder.shelfFreq, decoder.shelfK.at(0), decoder.shelfK.at(1))
 				});
 
-				^ATKMatrixMix.ar(in, decoder.matrix, mul, add)
+				^AtkMatrixMix.ar(in, decoder.matrix, mul, add)
 			},
 			
-			FOADecoderKernel, {
-				^ATKKernelConv.ar(in, decoder.kernel, mul, add)
+			FoaDecoderKernel, {
+				^AtkKernelConv.ar(in, decoder.kernel, mul, add)
 			}
 		)
 	}
@@ -267,21 +267,21 @@ FOADecode {
 
 
 //------------------------------------------------------------------------
-// Encoder built using ATKMatrixMix & ATKKernelConv
+// Encoder built using AtkMatrixMix & AtkKernelConv
 
-FOAEncode {
+FoaEncode {
 	*ar { arg in, encoder, mul = 1, add = 0;
 		
 		var out;
 
 		switch ( encoder.class, 
 
-			FOAEncoderMatrix, {
-				out = ATKMatrixMix.ar(in, encoder.matrix, mul, add)
+			FoaEncoderMatrix, {
+				out = AtkMatrixMix.ar(in, encoder.matrix, mul, add)
 			},
 			
-			FOAEncoderKernel, {
-				out = ATKKernelConv.ar(in, encoder.kernel, mul, add)
+			FoaEncoderKernel, {
+				out = AtkKernelConv.ar(in, encoder.kernel, mul, add)
 			}
 		);
 
@@ -295,28 +295,28 @@ FOAEncode {
 
 
 //------------------------------------------------------------------------
-// Transformer built using ATKMatrixMix & ATKKernelConv
+// Transformer built using AtkMatrixMix & AtkKernelConv
 
-FOAXform {
+FoaXform {
 	*ar { arg in, xformer, mul = 1, add = 0;
 		
 		var out;
 
 //		switch ( xformer.class,
 //
-//			FOAXformerMatrix, {
-//				out = ATKMatrixMix.ar(in, xformer.matrix, mul, add)
+//			FoaXformerMatrix, {
+//				out = AtkMatrixMix.ar(in, xformer.matrix, mul, add)
 //			},
 //			
-//			FOAXformerKernel, {
-//				out = ATKKernelConv.ar(in, xformer.kernel, mul, add)
+//			FoaXformerKernel, {
+//				out = AtkKernelConv.ar(in, xformer.kernel, mul, add)
 //			}
 //		);
 //
 //		^out
 
 		// for now...
-		^ATKMatrixMix.ar(in, xformer.matrix, mul, add)
+		^AtkMatrixMix.ar(in, xformer.matrix, mul, add)
 	}
 }
 
@@ -324,7 +324,7 @@ FOAXform {
 //------------------------------------------------------------------------
 // Transformer: UGen wrapper
 
-FOATransform {
+FoaTransform {
 	*ar { arg in, kind ... args;
 		
 		var argDict, argDefaults;
@@ -365,7 +365,7 @@ FOATransform {
 
 			'rotate', {
 
-				ugen = AtkRotate;
+				ugen = FoaRotate;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -378,7 +378,7 @@ FOATransform {
 			
 			'tilt', {
 
-				ugen = AtkTilt;
+				ugen = FoaTilt;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -391,7 +391,7 @@ FOATransform {
 			
 			'tumble', {
 
-				ugen = AtkTumble;
+				ugen = FoaTumble;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -404,7 +404,7 @@ FOATransform {
 				
 			'directO', {
 
-				ugen = AtkDirectO;
+				ugen = FoaDirectO;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -417,7 +417,7 @@ FOATransform {
 
 			'directX', {
 
-				ugen = AtkDirectX;
+				ugen = FoaDirectX;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -430,7 +430,7 @@ FOATransform {
 
 			'directY', {
 
-				ugen = AtkDirectY;
+				ugen = FoaDirectY;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -443,7 +443,7 @@ FOATransform {
 
 			'directZ', {
 
-				ugen = AtkDirectZ;
+				ugen = FoaDirectZ;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -456,7 +456,7 @@ FOATransform {
 
 			'dominateX', {
 
-				ugen = AtkDominateX;
+				ugen = FoaDominateX;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -469,7 +469,7 @@ FOATransform {
 			
 			'dominateY', {
 
-				ugen = AtkDominateY;
+				ugen = FoaDominateY;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -482,7 +482,7 @@ FOATransform {
 
 			'dominateZ', {
 
-				ugen = AtkDominateZ;
+				ugen = FoaDominateZ;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -495,7 +495,7 @@ FOATransform {
 
 			'zoomX', {
 
-				ugen = AtkZoomX;
+				ugen = FoaZoomX;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -508,7 +508,7 @@ FOATransform {
 			
 			'zoomY', {
 
-				ugen = AtkZoomY;
+				ugen = FoaZoomY;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -521,7 +521,7 @@ FOATransform {
 
 			'zoomZ', {
 
-				ugen = AtkZoomZ;
+				ugen = FoaZoomZ;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -534,7 +534,7 @@ FOATransform {
 			
 			'focusX', {
 
-				ugen = AtkFocusX;
+				ugen = FoaFocusX;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -547,7 +547,7 @@ FOATransform {
 
 			'focusY', {
 
-				ugen = AtkFocusY;
+				ugen = FoaFocusY;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -560,7 +560,7 @@ FOATransform {
 
 			'focusZ', {
 
-				ugen = AtkFocusZ;
+				ugen = FoaFocusZ;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -573,7 +573,7 @@ FOATransform {
 
 			'pushX', {
 
-				ugen = AtkPushX;
+				ugen = FoaPushX;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -586,7 +586,7 @@ FOATransform {
 
 			'pushY', {
 
-				ugen = AtkPushY;
+				ugen = FoaPushY;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -599,7 +599,7 @@ FOATransform {
 
 			'pushZ', {
 
-				ugen = AtkPushZ;
+				ugen = FoaPushZ;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -612,7 +612,7 @@ FOATransform {
 
 			'pressX', {
 
-				ugen = AtkPressX;
+				ugen = FoaPressX;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -625,7 +625,7 @@ FOATransform {
 
 			'pressY', {
 
-				ugen = AtkPressY;
+				ugen = FoaPressY;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -638,7 +638,7 @@ FOATransform {
 
 			'pressZ', {
 
-				ugen = AtkPressZ;
+				ugen = FoaPressZ;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -651,7 +651,7 @@ FOATransform {
 
 			'asymmetry', {
 
-				ugen = AtkAsymmetry;
+				ugen = FoaAsymmetry;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -664,7 +664,7 @@ FOATransform {
 
 			'balance', {
 
-				ugen = AtkZoomY;
+				ugen = FoaZoomY;
 				argDefaults = [0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -677,7 +677,7 @@ FOATransform {
 
 			'rtt', {
 
-				ugen = FOARTT;
+				ugen = FoaRTT;
 				argDefaults = [0, 0, 0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -691,7 +691,7 @@ FOATransform {
 			
 			'mirror', {
 
-				ugen = FOAMirror;
+				ugen = FoaMirror;
 				argDefaults = [0, 0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -705,7 +705,7 @@ FOATransform {
 
 			'direct', {
 
-				ugen = FOADirect;
+				ugen = FoaDirect;
 				argDefaults = [0, 0, 0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -719,7 +719,7 @@ FOATransform {
 
 			'dominate', {
 
-				ugen = FOADominate;
+				ugen = FoaDominate;
 				argDefaults = [0, 0, 0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -733,7 +733,7 @@ FOATransform {
 
 			'zoom', {
 
-				ugen = FOAZoom;
+				ugen = FoaZoom;
 				argDefaults = [0, 0, 0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -747,7 +747,7 @@ FOATransform {
 
 			'focus', {
 
-				ugen = FOAFocus;
+				ugen = FoaFocus;
 				argDefaults = [0, 0, 0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -761,7 +761,7 @@ FOATransform {
 
 			'push', {
 
-				ugen = FOAPush;
+				ugen = FoaPush;
 				argDefaults = [0, 0, 0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -775,7 +775,7 @@ FOATransform {
 
 			'press', {
 
-				ugen = FOAPress;
+				ugen = FoaPress;
 				argDefaults = [0, 0, 0, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -789,7 +789,7 @@ FOATransform {
 			
 			'nfc', {
 
-				ugen = AtkNFC;
+				ugen = FoaNFC;
 				argDefaults = [1, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);
@@ -803,7 +803,7 @@ FOATransform {
 
 			'proximity', {
 
-				ugen = AtkProximity;
+				ugen = FoaProximity;
 				argDefaults = [1, 1, 0];
 				
 				argDict = argDict.value(ugen, args, argDefaults);

@@ -80,79 +80,12 @@
 //------------------------------------------------------------------------
 
 
-////-----------------------------------------------------------------------
-//// superclass for all ATK matricies
-//
-//ATKMatrix {
-//	var <kind;
-//	var <matrix;
-//	var <dirOutputs, <dirInputs;
-//
-//	*new { arg kind;
-//		^super.newCopyArgs(kind)
-//	}
-//
-//	*with { arg array;
-//		^super.newCopyArgs(nil).init(array);
-//	}
-//
-//	*withMatrix { arg matrix;
-//		^super.newCopyArgs(nil, matrix);
-//	}
-//
-//	init { arg array;
-//		matrix = Matrix.with(array);
-//	}
-//
-//	numInputs { ^matrix.cols }
-//
-//	numOutputs { ^matrix.rows }
-//	
-//	// add numChannels?
-//
-//	dim { ^3 }				// all transforms are 3D
-//
-//}
-//
-//
-//FOAMatrix : ATKMatrix {
-//
-//	// multiplication, etc., here
-//	// note: robust error checking isn't completed
-//	* { arg that;
-//		var thisMatFl, thatMatFl;
-//
-//		thisMatFl = this.matrix.flop;
-//		thatMatFl = that.matrix.flop;
-//
-//		case
-//			{ (this.dim == 2) && (that.dim == 3) } 	// from 2D encoder
-//				{ thisMatFl = this.matrix.addRow(Array.fill(this.numInputs, {0})).flop }
-//
-//			{ (this.dim == 3) && (that.dim == 2) } 	// to 2D decoder
-//				{ thisMatFl = this.matrix.removeRow(3).flop }
-//
-//			{ (this.dim == 0) && (that.dim == 3) } 	// from 0D encoder (omni) to 3D
-//				{ thisMatFl = Matrix.newClear(1, 4).put(0, 0, this.matrix.at(0, 0)) }
-//
-//			{ (this.dim == 0) && (that.dim == 2) } 	// from 0D encoder (omni) to 2D
-//				{ thisMatFl = Matrix.newClear(1, 3).put(0, 0, this.matrix.at(0, 0)) };
-//
-//		^FOAMatrix.withMatrix((thisMatFl * thatMatFl).flop)
-//
-//	}
-//	
-//}
-//
-//
-//
-
 //-----------------------------------------------------------------------
 // matrix decoders
 
 //   speaker_matrix                  Heller's DDT (helper function)
-//	rename to FOASpeakerMatrix?
-ATKSpeakerMatrix {
+//	rename to FoaSpeakerMatrix?
+FoaSpeakerMatrix {
 	var <positions, <k, m, n;
 
 	*new { arg directions, k;
@@ -230,7 +163,7 @@ ATKSpeakerMatrix {
 }
 
 
-FOADecoderMatrix {
+FoaDecoderMatrix {
 	var <kind;
 	var <matrix;
 	var <dirOutputs;
@@ -370,7 +303,7 @@ FOADecoderMatrix {
 	    	//       scaled by k, which may not request a velocity
 	    	//       gain. I.e., k = 1 isn't necessarily true, as it
 	    	//       is assigned as an argument to this function.
-	    	speakerMatrix = ATKSpeakerMatrix.newPositions(positions2, k).matrix;
+	    	speakerMatrix = FoaSpeakerMatrix.newPositions(positions2, k).matrix;
 	    
 	    	// n = number of output channels (speakers)
 		n = speakerMatrix.cols;
@@ -457,7 +390,7 @@ FOADecoderMatrix {
 
 
 		// build decoder matrix
-		matrix = FOADecoderMatrix.newDiametric(directions, k).matrix;
+		matrix = FoaDecoderMatrix.newDiametric(directions, k).matrix;
 
 		// reorder the lower polygon
 		upMatrix = matrix[..(numChanPairs-1)];
@@ -691,7 +624,7 @@ FOADecoderMatrix {
 //-----------------------------------------------------------------------
 // martrix encoders
 
-FOAEncoderMatrix {
+FoaEncoderMatrix {
 	var <kind;
 	var <matrix;
 	var <dirInputs;
@@ -860,7 +793,7 @@ FOAEncoderMatrix {
 		var bToAMatrix;
 
 		// retrieve corresponding A-format decoder
-		bToAMatrix = FOADecoderMatrix.newBtoA(orientation, weight);
+		bToAMatrix = FoaDecoderMatrix.newBtoA(orientation, weight);
 
 	    // set input channel directions for instance
 	    dirInputs = bToAMatrix.dirInputs;
@@ -1044,7 +977,7 @@ FOAEncoderMatrix {
 // martrix transforms
 
 
-FOAXformerMatrix {
+FoaXformerMatrix {
 	var <kind;
 	var <matrix;
 
@@ -1616,86 +1549,86 @@ FOAXformerMatrix {
 	initRTT { arg rotAngle, tilAngle, tumAngle;
 	
 		matrix = (
-		    	FOAXformerMatrix.newTumble(tumAngle).matrix *
-		    	FOAXformerMatrix.newTilt(tilAngle).matrix *
-		    	FOAXformerMatrix.newRotate(rotAngle).matrix 
+		    	FoaXformerMatrix.newTumble(tumAngle).matrix *
+		    	FoaXformerMatrix.newTilt(tilAngle).matrix *
+		    	FoaXformerMatrix.newRotate(rotAngle).matrix 
 	    	)
 	}
 
 	initMirror { arg theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta).matrix *
-		    	FOAXformerMatrix.newTumble(phi).matrix *
-		    	FOAXformerMatrix.newMirrorX.matrix *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+		    	FoaXformerMatrix.newRotate(theta).matrix *
+		    	FoaXformerMatrix.newTumble(phi).matrix *
+		    	FoaXformerMatrix.newMirrorX.matrix *
+		    	FoaXformerMatrix.newTumble(phi.neg).matrix *
+		    	FoaXformerMatrix.newRotate(theta.neg).matrix
 	    	)
 	}
 	
 	initDirect { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta).matrix *
-		    	FOAXformerMatrix.newTumble(phi).matrix *
-		    	FOAXformerMatrix.newDirectX(angle).matrix *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+		    	FoaXformerMatrix.newRotate(theta).matrix *
+		    	FoaXformerMatrix.newTumble(phi).matrix *
+		    	FoaXformerMatrix.newDirectX(angle).matrix *
+		    	FoaXformerMatrix.newTumble(phi.neg).matrix *
+		    	FoaXformerMatrix.newRotate(theta.neg).matrix
 	    	)
 	}
 
 	initDominate { arg gain, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta).matrix *
-		    	FOAXformerMatrix.newTumble(phi).matrix *
-		    	FOAXformerMatrix.newDominateX(gain).matrix *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+		    	FoaXformerMatrix.newRotate(theta).matrix *
+		    	FoaXformerMatrix.newTumble(phi).matrix *
+		    	FoaXformerMatrix.newDominateX(gain).matrix *
+		    	FoaXformerMatrix.newTumble(phi.neg).matrix *
+		    	FoaXformerMatrix.newRotate(theta.neg).matrix
 	    	)
 	}
 
 	initZoom { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta).matrix *
-		    	FOAXformerMatrix.newTumble(phi).matrix *
-		    	FOAXformerMatrix.newZoomX(angle).matrix *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+		    	FoaXformerMatrix.newRotate(theta).matrix *
+		    	FoaXformerMatrix.newTumble(phi).matrix *
+		    	FoaXformerMatrix.newZoomX(angle).matrix *
+		    	FoaXformerMatrix.newTumble(phi.neg).matrix *
+		    	FoaXformerMatrix.newRotate(theta.neg).matrix
 	    	)
 	}
 
 	initFocus { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta).matrix *
-		    	FOAXformerMatrix.newTumble(phi).matrix *
-		    	FOAXformerMatrix.newFocusX(angle).matrix *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+		    	FoaXformerMatrix.newRotate(theta).matrix *
+		    	FoaXformerMatrix.newTumble(phi).matrix *
+		    	FoaXformerMatrix.newFocusX(angle).matrix *
+		    	FoaXformerMatrix.newTumble(phi.neg).matrix *
+		    	FoaXformerMatrix.newRotate(theta.neg).matrix
 	    	)
 	}
 
 	initPush { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta).matrix *
-		    	FOAXformerMatrix.newTumble(phi).matrix *
-		    	FOAXformerMatrix.newPushX(angle).matrix *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+		    	FoaXformerMatrix.newRotate(theta).matrix *
+		    	FoaXformerMatrix.newTumble(phi).matrix *
+		    	FoaXformerMatrix.newPushX(angle).matrix *
+		    	FoaXformerMatrix.newTumble(phi.neg).matrix *
+		    	FoaXformerMatrix.newRotate(theta.neg).matrix
 	    	)
 	}
 
 	initPress { arg angle, theta, phi;
 	
 		matrix = (
-		    	FOAXformerMatrix.newRotate(theta).matrix *
-		    	FOAXformerMatrix.newTumble(phi).matrix *
-		    	FOAXformerMatrix.newPressX(angle).matrix *
-		    	FOAXformerMatrix.newTumble(phi.neg).matrix *
-		    	FOAXformerMatrix.newRotate(theta.neg).matrix
+		    	FoaXformerMatrix.newRotate(theta).matrix *
+		    	FoaXformerMatrix.newTumble(phi).matrix *
+		    	FoaXformerMatrix.newPressX(angle).matrix *
+		    	FoaXformerMatrix.newTumble(phi.neg).matrix *
+		    	FoaXformerMatrix.newRotate(theta.neg).matrix
 	    	)
 	}
 
@@ -1723,7 +1656,7 @@ FOAXformerMatrix {
 //------------------------------------------------------------------------
 // kernel decoders
 
-FOADecoderKernel {
+FoaDecoderKernel {
 	var <kind, <subjectID;
 	var <kernel;
 	var <dirChans;
@@ -1756,7 +1689,7 @@ FOADecoderKernel {
 			kernelLibPath = PathName.new("~") +/+ kernelLibPath // no? set for single user
 		});
 
-		decodersPath	= PathName.new("/FOA/decoders");
+		decodersPath	= PathName.new("/Foa/decoders");
 
 		^kernelLibPath +/+ decodersPath +/+ PathName.new(kind.asString)
 	}
@@ -1904,7 +1837,7 @@ FOADecoderKernel {
 //------------------------------------------------------------------------
 // kernel encoders
 
-FOAEncoderKernel {
+FoaEncoderKernel {
 	var <kind, <subjectID;
 	var <kernel;
 	var <dirChans;
@@ -1929,7 +1862,7 @@ FOAEncoderKernel {
 			kernelLibPath = PathName.new("~") +/+ kernelLibPath // no? set for single user
 		});
 
-		encodersPath	= PathName.new("/FOA/encoders");
+		encodersPath	= PathName.new("/Foa/encoders");
 
 		^kernelLibPath +/+ encodersPath +/+ PathName.new(kind.asString)
 	}

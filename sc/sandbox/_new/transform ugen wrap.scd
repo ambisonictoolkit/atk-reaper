@@ -3,12 +3,12 @@
 
 // define encoder / decoder matrices
 
-~encoder = FOAEncoderMatrix.newDirection
-~decoder = FOADecoderMatrix.newQuad(pi/6, 'single')
-~decoder = FOADecoderMatrix.newQuad(pi/6, 'dual')
+~encoder = FoaEncoderMatrix.newDirection
+~decoder = FoaDecoderMatrix.newQuad(pi/6, 'single')
+~decoder = FoaDecoderMatrix.newQuad(pi/6, 'dual')
 
-~xformer = FOAXformerMatrix.newRotate(pi/2)
-~xformer = FOAXformerMatrix.newRotate
+~xformer = FoaXformerMatrix.newRotate(pi/2)
+~xformer = FoaXformerMatrix.newRotate
 
 //	NAME					SPARSE?		UGEN MODE?	NOTES
 // ------------------------------------------------------------
@@ -72,17 +72,19 @@
 // quad (spec'd as narrow quad)
 // mono pink noise, sound synth function
 // mono encoder
-~encoder = FOAEncoderMatrix.newDirection
-~decoder = FOADecoderMatrix.newQuad(pi/6, 'single')
-~decoder = FOADecoderMatrix.newQuad(pi/6, 'dual')
+~encoder = FoaEncoderMatrix.newDirection
+~encoder = FoaEncoderMatrix.newDirection(pi.neg/2)
+~decoder = FoaDecoderMatrix.newQuad(pi/6, 'single')
+~decoder = FoaDecoderMatrix.newQuad(pi/6, 'dual')
 
 (
 {
 	var fl, bl, br, fr;					// for quad output
-	var azim, mouseY, sig;
+	var azim, mouseX, mouseY, sig;
 
 	// kr.... for SC3's internal encoder
 	azim = MouseX.kr(pi, -pi);
+//	mouseX = MouseX.kr(pi/2, -pi/2);
 	mouseY = MouseY.kr(1, -1);			// seems to be inverted from documentation
 //	mouseY = MouseY.kr(pi/2, -pi/2);		// seems to be inverted from documentation
 
@@ -94,80 +96,82 @@
 
 	// ------------------------------------------------------------
 	// encode
-	sig = FOAEncode.ar(sig, ~encoder);
-//	sig = FOAPanB.ar(sig);
+	sig = FoaEncode.ar(sig, ~encoder);
+//	sig = FoaPanB.ar(sig);
 
 
 	// ------------------------------------------------------------
 	// transform
 
-//	sig = AtkDirectO.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
+//	sig = FoaDirectO.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
 //		mouseY);
-//	sig = AtkDirectX.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
+//	sig = FoaDirectX.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
 //		mouseY);
-//	sig = AtkDirectY.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
+//	sig = FoaDirectY.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
 //		mouseY);
-//	sig = AtkDirectZ.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
+//	sig = FoaDirectZ.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
 //		mouseY);
+//	sig = FoaAsymmetry.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3),
+//		mouseX);
 
 
-//	sig = FOAXform.ar(sig, ~xformer);
-	sig = FOATransform.ar(sig, 'rotate', azim);
-//	sig = FOATransform.ar(sig, 'rotate', [azim, mul: 6.dbamp]);
-//	sig = FOATransform.ar(sig, 'rotate', azim, 0.dbamp);
-//	sig = FOATransform.ar(sig, 'tilt', azim);
-//	sig = FOATransform.ar(sig, 'tumble', azim);
+//	sig = FoaXform.ar(sig, ~xformer);
+	sig = FoaTransform.ar(sig, 'rotate', azim);
+//	sig = FoaTransform.ar(sig, 'rotate', [azim, mul: 6.dbamp]);
+//	sig = FoaTransform.ar(sig, 'rotate', azim, 0.dbamp);
+//	sig = FoaTransform.ar(sig, 'tilt', azim);
+//	sig = FoaTransform.ar(sig, 'tumble', azim);
 
-//	sig = FOATransform.ar(sig, 'dominateX', 6.neg);
-//	sig = FOATransform.ar(sig, 'dominateX', mouseY * 6);
-//	sig = FOATransform.ar(sig, 'dominateY', mouseY * 6);
+//	sig = FoaTransform.ar(sig, 'dominateX', 6.neg);
+//	sig = FoaTransform.ar(sig, 'dominateX', mouseY * 6);
+//	sig = FoaTransform.ar(sig, 'dominateY', mouseY * 6);
 
-//	sig = FOATransform.ar(sig, 'directO', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'directX', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'directY', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'directZ', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'directO', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'directX', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'directY', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'directZ', mouseY * pi/2);
 
 
-//	sig = FOATransform.ar(sig, 'zoomX', pi/2);
-//	sig = FOATransform.ar(sig, 'zoomX', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'zoomY', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'zoomZ', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'zoomX', pi/2);
+//	sig = FoaTransform.ar(sig, 'zoomX', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'zoomY', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'zoomZ', mouseY * pi/2);
 
-//	sig = FOATransform.ar(sig, 'focusX', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'focusY', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'focusZ', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'focusX', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'focusY', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'focusZ', mouseY * pi/2);
 
-//	sig = FOATransform.ar(sig, 'pushX', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'pushY', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'pushZ', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'pushX', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'pushY', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'pushZ', mouseY * pi/2);
 
-//	sig = FOATransform.ar(sig, 'pressX', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'pressY', mouseY * pi/2);
-//	sig = FOATransform.ar(sig, 'pressZ', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'pressX', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'pressY', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'pressZ', mouseY * pi/2);
 
-//	sig = FOATransform.ar(sig, 'asymmetry', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'asymmetry', mouseY * pi/2);
 
-//	sig = FOATransform.ar(sig, 'balance', mouseY * pi/2);
+//	sig = FoaTransform.ar(sig, 'balance', mouseY * pi/2);
 
-//	sig = FOATransform.ar(sig, 'rtt', azim, mouseY);
-//	sig = FOATransform.ar(sig, 'rtt', [azim, tumAngle: mouseY]);
+//	sig = FoaTransform.ar(sig, 'rtt', azim, mouseY);
+//	sig = FoaTransform.ar(sig, 'rtt', [azim, tumAngle: mouseY]);
 
-//	sig = FOATransform.ar(sig, 'dominate', mouseY * 6, azim);
-//	sig = FOATransform.ar(sig, 'zoom', mouseY, azim);
-//	sig = FOATransform.ar(sig, 'focus', mouseY, azim);
-//	sig = FOATransform.ar(sig, 'push', mouseY, azim);
-//	sig = FOATransform.ar(sig, 'press', mouseY, azim);
-//	sig = FOATransform.ar(sig, 'direct', mouseY, azim);
-//	sig = FOATransform.ar(sig, 'mirror', mouseY, azim);
+//	sig = FoaTransform.ar(sig, 'dominate', mouseY * 6, azim);
+//	sig = FoaTransform.ar(sig, 'zoom', mouseY, azim);
+//	sig = FoaTransform.ar(sig, 'focus', mouseY, azim);
+//	sig = FoaTransform.ar(sig, 'push', mouseY, azim);
+//	sig = FoaTransform.ar(sig, 'press', mouseY, azim);
+//	sig = FoaTransform.ar(sig, 'direct', mouseY, azim);
+//	sig = FoaTransform.ar(sig, 'mirror', mouseY, azim);
 
 
 	// ------------------------------------------------------------
 	// distance filter
-//	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
-	sig = AtkNFC.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+//	sig = FoaDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
+	sig = FoaNFC.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
 
 	// decode to output
-	#fl, bl, br, fr = FOADecode.ar(sig, ~decoder);
+	#fl, bl, br, fr = FoaDecode.ar(sig, ~decoder);
 	[fl, fr, bl, br]		// reorder output to match speaker arrangement
 
 }.scope;
