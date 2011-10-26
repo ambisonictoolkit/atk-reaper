@@ -102,6 +102,8 @@ struct AtkZoomX : public AtkDirectO { };
 struct AtkZoomY : public AtkDirectO { };
 struct AtkZoomZ : public AtkDirectO { };
 
+struct AtkAsymmetry : public AtkDirectO { };
+
 struct AtkDominateX : public Unit
 {
     float m_gain;
@@ -236,6 +238,10 @@ extern "C"
     void AtkDominateZ_next_a(AtkDominateZ *unit, int inNumSamples);
     void AtkDominateZ_next_k(AtkDominateZ *unit, int inNumSamples);
     void AtkDominateZ_Ctor(AtkDominateZ* unit);
+    
+    void AtkAsymmetry_next_a(AtkAsymmetry *unit, int inNumSamples);
+    void AtkAsymmetry_next_k(AtkAsymmetry *unit, int inNumSamples);
+    void AtkAsymmetry_Ctor(AtkAsymmetry* unit);
     
     void AtkNFC_next_k(AtkNFC *unit, int inNumSamples);
     void AtkNFC_next_a(AtkNFC *unit, int inNumSamples);
@@ -2217,6 +2223,72 @@ void AtkDirectO_next_k(AtkDirectO *unit, int inNumSamples)
 }
 
 
+////////////////////// AtkAsymmetry ///////////////////////
+// uses 'angle' var. 
+
+#define FILL_ASYMMETRY_MATRIX \
+double cosa = cos(unit->m_angle); \
+double sina = sin(unit->m_angle); \
+matrix.coefs[0][0] = 1.; \
+matrix.coefs[1][1] = cosa * cosa; \
+matrix.coefs[2][2] = matrix.coefs[3][3] = cosa; \
+matrix.coefs[0][2] = -rsqrt2 * sina; \
+matrix.coefs[1][0] = sqrt2 * sina * sina; \
+matrix.coefs[1][2] = -sina; \
+matrix.coefs[2][0] = -sqrt2 * cosa * sina; \
+matrix.coefs[2][1] = cosa * sina;
+
+void AtkAsymmetry_Ctor(AtkAsymmetry* unit)
+{
+    ZERO_MATRIX
+    unit->m_angle = IN0(4);
+    AtkMatrix matrix = unit->matrix;
+    FILL_ASYMMETRY_MATRIX;
+    unit->matrix = matrix;
+    if(INRATE(4) == calc_FullRate)
+		SETCALC(AtkAsymmetry_next_a);
+    else
+		SETCALC(AtkAsymmetry_next_k);
+    AtkAsymmetry_next_k(unit, 1); 
+}
+
+void AtkAsymmetry_next_a(AtkAsymmetry *unit, int inNumSamples)
+{
+    SETUP_TRANSFORMS
+    float *angle = IN(4);
+    for(int i = 0; i < inNumSamples; i++){
+		if(angle[i] != unit->m_angle){
+			unit->m_angle = angle[i];
+			FILL_ASYMMETRY_MATRIX
+		}
+		CALC_MATRIX
+    }
+    unit->matrix = matrix;
+    
+}
+
+void AtkAsymmetry_next_k(AtkAsymmetry *unit, int inNumSamples)
+{
+    SETUP_TRANSFORMS
+    float angle = IN0(4);
+    float angleslope;
+    if(angle != unit->m_angle){
+		angleslope = CALCSLOPE(angle, unit->m_angle);
+		for(int i = 0; i < inNumSamples; i++){
+			CALC_MATRIX
+			unit->m_angle += angleslope;
+			FILL_ASYMMETRY_MATRIX
+		}	
+    } else {
+		for(int i = 0; i < inNumSamples; i++){
+			CALC_MATRIX
+		}
+    }
+    unit->matrix = matrix;
+    unit->m_angle = angle;	
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // AtkNFC - 
 void AtkNFC_Ctor(AtkNFC* unit)
@@ -2254,22 +2326,29 @@ void AtkNFC_next_k(AtkNFC *unit, int inNumSamples)
     float y1z = unit->m_y1z;
     
     for(int i = 0; i < inNumSamples; i++){
-	float freq = 53.0 / distanceStart;
-	float wc = (twopi * freq) * SAMPLEDUR;
-	//	a0 = (1 + (wc.cos.neg * 2 + 2).sqrt).reciprocal;
-	float a0 = 1 / (sqrt((cos(wc) * -2) + 2) + 1);
-	float y0x = Xin[i] + a0 * y1x;
-	Xout[i] = a0 * y0x + -a0 * y1x;
-	y1x = y0x;
-	float y0y = Yin[i] + a0 * y1y;
-	Yout[i] = a0 * y0y + -a0 * y1y;
-	y1y = y0y;
-	float y0z = Zin[i] + a0 * y1z;
-	Zout[i] = a0 * y0z + -a0 * y1z;
-	y1z = y0z;
-	// W is passed straight out
-	Wout[i] = Win[i];
-	distanceStart += distanceInc;
+		float freq = 53.0 / distanceStart;
+		float wc = (twopi * freq) * SAMPLEDUR;
+
+		//	a0 = (1 + (wc.cos.neg * 2 + 2).sqrt).reciprocal;
+		float a0 = 1 / (sqrt((cos(wc) * -2) + 2) + 1);
+
+		// W is passed straight out
+		Wout[i] = Win[i];
+		
+		// filter 1st order
+		float y0x = Xin[i] + a0 * y1x;
+		Xout[i] = a0 * y0x + -a0 * y1x;
+		y1x = y0x;
+
+		float y0y = Yin[i] + a0 * y1y;
+		Yout[i] = a0 * y0y + -a0 * y1y;
+		y1y = y0y;
+
+		float y0z = Zin[i] + a0 * y1z;
+		Zout[i] = a0 * y0z + -a0 * y1z;
+		y1z = y0z;
+
+		distanceStart += distanceInc;
     }
     
     unit->m_y1x = zapgremlins(y1x);
@@ -2297,20 +2376,25 @@ void AtkNFC_next_a(AtkNFC *unit, int inNumSamples)
     float y1z = unit->m_y1z;
     
     for(int i = 0; i < inNumSamples; i++){
-	float freq = 53.0 / distance[i];
-	float wc = (twopi * freq) * SAMPLEDUR;
-	float a0 = 1 / (sqrt((cos(wc) * -2) + 2) + 1);
-	float y0x = Xin[i] + a0 * y1x;
-	Xout[i] = a0 * y0x + -a0 * y1x;
-	y1x = y0x;
-	float y0y = Yin[i] + a0 * y1y;
-	Yout[i] = a0 * y0y + -a0 * y1y;
-	y1y = y0y;
-	float y0z = Zin[i] + a0 * y1z;
-	Zout[i] = a0 * y0z + -a0 * y1z;
-	y1z = y0z;
-	// W is passed straight out
-	Wout[i] = Win[i];
+		float freq = 53.0 / distance[i];
+		float wc = (twopi * freq) * SAMPLEDUR;
+		float a0 = 1 / (sqrt((cos(wc) * -2) + 2) + 1);
+
+		// W is passed straight out
+		Wout[i] = Win[i];
+
+		// filter 1st order
+		float y0x = Xin[i] + a0 * y1x;
+		Xout[i] = a0 * y0x + -a0 * y1x;
+		y1x = y0x;
+
+		float y0y = Yin[i] + a0 * y1y;
+		Yout[i] = a0 * y0y + -a0 * y1y;
+		y1y = y0y;
+
+		float y0z = Zin[i] + a0 * y1z;
+		Zout[i] = a0 * y0z + -a0 * y1z;
+		y1z = y0z;
     }
     
     unit->m_y1x = zapgremlins(y1x);
@@ -2356,22 +2440,29 @@ void AtkProximity_next_k(AtkProximity *unit, int inNumSamples)
     float y1z = unit->m_y1z;
     
     for(int i=0; i<inNumSamples;i++){
-	float freq = 53.0 / distanceStart;
-	float wc = (twopi * freq) * SAMPLEDUR;
-	//	a0 = 1 + (wc.cos.neg * 2 + 2).sqrt;
-	float a0 = 1 + sqrt((cos(wc) * -2) + 2);
-	float y0x = Xin[i] + y1x;
-	Xout[i] = a0 * y0x - y1x;
-	y1x = y0x;
-	float y0y = Yin[i] + y1y;
-	Yout[i] = a0 * y0y - y1y;
-	y1y = y0y;
-	float y0z = Zin[i] + y1z;
-	Zout[i] = a0 * y0z - y1z;
-	y1z = y0z;
-	// W is passed straight out
-	Wout[i] = Win[i];
-	distanceStart += distanceInc;
+		float freq = 53.0 / distanceStart;
+		float wc = (twopi * freq) * SAMPLEDUR;
+
+		//	a0 = 1 + (wc.cos.neg * 2 + 2).sqrt;
+		float a0 = 1 + sqrt((cos(wc) * -2) + 2);
+
+		// W is passed straight out
+		Wout[i] = Win[i];
+
+		// filter 1st order
+		float y0x = Xin[i] + y1x;
+		Xout[i] = a0 * y0x - y1x;
+		y1x = y0x;
+
+		float y0y = Yin[i] + y1y;
+		Yout[i] = a0 * y0y - y1y;
+		y1y = y0y;
+
+		float y0z = Zin[i] + y1z;
+		Zout[i] = a0 * y0z - y1z;
+		y1z = y0z;
+
+		distanceStart += distanceInc;
     }
     
     unit->m_y1x = zapgremlins(y1x);
@@ -2399,20 +2490,25 @@ void AtkProximity_next_a(AtkProximity *unit, int inNumSamples)
     float y1z = unit->m_y1z;
     
     for(int i = 0; i<inNumSamples; i++){
-	float freq = 53.0 / distance[i];
-	float wc = (twopi * freq) * SAMPLEDUR;
-	float a0 = 1 + sqrt((cos(wc) * -2) + 2);
-	float y0x = Xin[i] + y1x;
-	Xout[i] = a0 * y0x - y1x;
-	y1x = y0x;
-	float y0y = Yin[i] + y1y;
-	Yout[i] = a0 * y0y - y1y;
-	y1y = y0y;
-	float y0z = Zin[i] + y1z;
-	Zout[i] = a0 * y0z - y1z;
-	y1z = y0z;
-	// W is passed straight out
-	Wout[i] = Win[i];
+		float freq = 53.0 / distance[i];
+		float wc = (twopi * freq) * SAMPLEDUR;
+		float a0 = 1 + sqrt((cos(wc) * -2) + 2);
+
+		// W is passed straight out
+		Wout[i] = Win[i];
+
+		// filter 1st order
+		float y0x = Xin[i] + y1x;
+		Xout[i] = a0 * y0x - y1x;
+		y1x = y0x;
+		
+		float y0y = Yin[i] + y1y;
+		Yout[i] = a0 * y0y - y1y;
+		y1y = y0y;
+		
+		float y0z = Zin[i] + y1z;
+		Zout[i] = a0 * y0z - y1z;
+		y1z = y0z;
     }
     
     unit->m_y1x = zapgremlins(y1x);
@@ -3010,6 +3106,7 @@ void load(InterfaceTable *inTable)
     DefineSimpleCantAliasUnit(AtkDominateX);
     DefineSimpleCantAliasUnit(AtkDominateY);
     DefineSimpleCantAliasUnit(AtkDominateZ);
+    DefineSimpleCantAliasUnit(AtkAsymmetry);
     
     
     DefineSimpleCantAliasUnit(AtkNFC);

@@ -1,74 +1,5 @@
-/* FOA wrappers */
-// NOTE: we may wish to rename all ATK as FOA
-// 		for clarity, and to assist with further development
-//		of HOA implementations
+// add comments here....
 
-
-// it may be useful to subclass much of this as UGens--in order to use UGen methods
-
-
-// FOA is now redundant
-//FOA {
-//	var <w, <x, <y, <z;
-//	
-//	*new {arg w, x, y, z;
-//		^super.newCopyArgs(w, x, y, z);
-//	}
-//	
-//	*ar {arg w, x, y, z;
-//		^this.new(w, x, y, z);
-//	}
-//	
-//	madd {arg mul = 1, add = 0;
-//		^MulAdd.ar([w, x, y, z], mul, add);	
-//	}
-//	
-//	sig {arg mul = 1, add = 0;
-//		^[w, x, y, z] * mul + add;
-//	}
-//	
-//	asUGenInput {
-//		^[w, x, y, z];
-//	}
-//	
-//	asAudioRateInput {
-//		^[w, x, y, z];
-//	}
-//}
-
-//ATKMonoToFOA {
-//	*ar {arg in, azimuth = 0, elevation = 0;	
-//		var w, x, y, z;
-//		#w, x, y, z = AtkMonoToB.ar(in, azimuth, elevation);
-//		^FOA.ar(w, x, y, z);
-//	}	
-//}
-//
-//ATKRotate {
-//	*ar {arg in, angle = 0, mul = 1, add = 0;
-//		var w, x, y, z;
-//		(in.isKindOf(FOA)).if({
-//			#w, x, y, z = AtkRotate.ar(in.w, in.x, in.y, in.z, angle, mul, add);
-//			^FOA.ar(w, x, y, z);
-//		})
-//	}
-//}
-
-// ATKPantoF is now redundant, and replaced by matrix style decoder
-// See FOADecode built using Mix and ATKMatrix below
-/*
-ATKPantoF {
-	*ar {arg numChannels, in, orientation = 1, directivity = 1, mul = 1, add = 1;
-		(in.isKindOf(FOA)).if({
-			^AtkPantoF.ar(numChannels, in.w, in.x, in.y, orientation, directivity);
-		})
-	}
-}
-*/
-
-
-// rename to FOAPanB	
-//AtkMonoToB : Panner {
 FOAPanB : Panner {
 	
 	*ar { arg in, azimuth=0, elevation=0;
@@ -82,20 +13,6 @@ FOAPanB : Panner {
 		^channels
 	}
 }
-
-//AtkSterToB : Panner {
-//
-//	*ar { arg l, r, azimuth=0, width = 0.5pi, elevation=0;
-//		^this.multiNew('audio', l, r, azimuth, width, elevation)
-//	}
-//	
-//	init { arg ... theInputs;
-//		inputs = theInputs;		
-//		channels = [ OutputProxy(\audio,this,0), OutputProxy(\audio,this,1),
-//					OutputProxy(\audio,this,2), OutputProxy(\audio,this,3) ];
-//		^channels
-//	}
-//}
 
 
 Atk : Panner {
@@ -111,40 +28,6 @@ Atk : Panner {
  	
  	}
 
-// See FOADecode built using Mix and ATKMatrix below
-/*
-AtkDecode : UGen {
-	*ar {arg w, x, y, z, azimuth, elevation, mul = 1, add = 0;
-		^this.multiNew('audio', w, x, y, z, azimuth, elevation).madd(mul, add);
-		}
- 	
- 	checkInputs {
- 		inputs[0..3].do({arg input, i; 	
- 			if (rate !== input.rate) { 
- 				^("input " + i + "is not" + rate + "rate: " + input + input.rate);
- 			};
- 			})
- 		^this.checkValidInputs 
- 		}
-	}
-*/
-// ATKPantoF is now redundant, and replaced by matrix style decoder
-// See FOADecode built using Mix and ATKMatrix below
-/*
-AtkPantoF : Panner {
-	*ar {arg numChans, w, x, y, orientation = 1, directivity = 1, mul = 1, add = 0;
-		^this.multiNew('audio', numChans, w, x, y, orientation, directivity).madd(mul, add)
-		}
-	
-	init { arg numChans ... theInputs;
-		inputs = theInputs;
-		channels = Array.fill(numChans, { arg i; OutputProxy(rate,this, i) });
-		^channels
-	}
- 	checkInputs { ^this.checkNInputs(3) }
- 	
-	}
-*/
 	
 AtkDirectO : Atk {			// check matrix!!, appears to be the old matrix
 	*ar { arg w, x, y, z, angle = pi/2, mul = 1, add = 0;
@@ -196,9 +79,7 @@ AtkDominateX : Atk {
 AtkDominateY : AtkDominateX { }
 AtkDominateZ : AtkDominateX { }
 
-// add:
-// 
-//	asymmetry(angle)					write as UGen
+AtkAsymmetry : AtkRotate { }
 
 
 FOARTT { 
@@ -305,39 +186,6 @@ AtkNFC : Atk {
 		
 }
 
-//// realised directly, rather than using RMShelf
-//// default k --> 2D
-//// better to code this up as a UGen, to get access to SR
-//// the below code polls SR from the default server--which won't work in all cases!!
-//AtkPsychoShelf { 
-//	*ar { arg w, x, y, z, frequency = 400, k = [(3/2).sqrt, 3.sqrt/2], mul = 1, add = 0;
-//		
-//		var k2;
-//		var wc, c;
-//		var a0, a1, a2, b1, b2;
-//
-//		// expand k from degree (order) gains to channel gains
-//		k2 = k.collect({ arg item, i;
-//			Array.fill(2 * i + 1, {item})}).flat;
-//
-//		// calculate coefficients
-////		wc = (pi * frequency / SampleRate.ir(0)).tan;
-////		wc = (pi * frequency / 44100).tan;
-//		wc = (pi * frequency / Server.default.sampleRate).tan; // I'm sure there's a better way!!
-//		c = (wc - 1) / (wc + 1);
-//
-//		a0 = (((1 - k2)/4) * (1 + (c**2))) + (((1 + k2)/2) * c);
-//		a1 = ((1 - k2) * c) + (((1 + k2)/2) * (1 + (c**2)));
-//		a2 = a0;
-//
-//		b1 = Array.fill( k2.size, { (2*c).neg } );
-//		b2 = Array.fill( k2.size, { (c**2).neg } );
-//
-//		^SOS.ar([w, x, y, z], a0, a1, a2, b1, b2, mul, add);
-//	}
-//		
-//}
-
 AtkPsychoShelf : Atk { 
 	*ar { arg w, x, y, z, freq = 400, k0 = (3/2).sqrt, k1 = 3.sqrt/2, mul = 1, add = 0;
 		^this.multiNew('audio', w, x, y, z, freq, k0, k1).madd(mul, add);
@@ -403,10 +251,6 @@ FOADecode {
 			FOADecoderMatrix, {
 
 				if ( decoder.shelfFreq.isNumber, { // shelf filter?
-					// This will probably be updated when PsychoShelf is wrapped
-					// rename to FOAPsychoShelf
-//					in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
-//						decoder.shelfFreq, decoder.shelfK)
 					in = AtkPsychoShelf.ar(in.at(0), in.at(1), in.at(2), in.at(3),
 						decoder.shelfFreq, decoder.shelfK.at(0), decoder.shelfK.at(1))
 				});
@@ -807,17 +651,15 @@ FOATransform {
 
 			'asymmetry', {
 
-				Error("Asymmetry is not yet implemented!").throw
-
-//				ugen = AtkAsymmetry;
-//				argDefaults = [0, 1, 0];
-//				
-//				argDict = argDict.value(ugen, args, argDefaults);
-//				
-//				^ugen.ar(
-//					in.at(0), in.at(1), in.at(2), in.at(3),
-//					argDict.at(\angle), argDict.at(\mul), argDict.at(\add)
-//				)
+				ugen = AtkAsymmetry;
+				argDefaults = [0, 1, 0];
+				
+				argDict = argDict.value(ugen, args, argDefaults);
+				
+				^ugen.ar(
+					in.at(0), in.at(1), in.at(2), in.at(3),
+					argDict.at(\angle), argDict.at(\mul), argDict.at(\add)
+				)
 			},
 
 			'balance', {
@@ -975,32 +817,3 @@ FOATransform {
 		)
 	}
 }
-
-
-//// wrapper for ugens that take an input
-//UGenWrapper {
-//	*ar { arg in, ugenName... args;
-//		
-//		var out;
-//
-//		out = ugenName.ar(in, *args);		// not catching keywords
-//
-//		^out;
-//	}
-//}
-
-
-//AtkMonoToB.ar.numChannels
-//AtkMonoToB.ar.source.numOutputs
-//
-//AtkMonoToB.ar.source.dumpArgs
-//AtkMonoToB.class.findRespondingMethodFor(\ar).argNames 
-//AtkMonoToB.ar.source.inputs
-//AtkMonoToB.ar.source.numInputs
-//AtkMonoToB.ar.source.argNameForInputAt(0)
-//AtkMonoToB.ar.source.argNameForInputAt(1)
-//AtkMonoToB.ar.source.argNameForInputAt(2)
-
-
-//AtkMonoToB.ar.source.def
-//AtkMonoToB.ar.source.asFunction
