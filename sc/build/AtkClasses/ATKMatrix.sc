@@ -1851,6 +1851,18 @@ FoaEncoderKernel {
 		^super.newCopyArgs('super', 0).initKernel(kernelSize, server);
 	}
 
+//	*newGreatHall { arg subjectID = "x06y02", server = Server.default;
+//		^super.newCopyArgs('greathall', subjectID).initKernel("None", server);
+//	}
+//
+//	*newOctagon { arg subjectID = "x06y02", server = Server.default;
+//		^super.newCopyArgs('octagon', subjectID).initKernel("None", server);
+//	}
+//
+//	*newClassroom { arg subjectID = "x30y10", server = Server.default;
+//		^super.newCopyArgs('classroom', subjectID).initKernel("None", server);
+//	}
+
 	initPath {
 		
 		var kernelLibPath;
@@ -1874,19 +1886,35 @@ FoaEncoderKernel {
 		var sampleRate;
 		var errorMsg;
 		
-		// constants
-		chans = 3;			// horizontal only kernel (at the moment), [w, x, y]
-		
+
 		// init dirChans (output channel (speaker) directions) and kernel sr
 		switch ( kind,
 			'super', {
 				dirChans = [ pi/4, pi.neg/4 ];	 // approx, doesn't include phasiness
-				sampleRate = "None"
+				sampleRate = "None";
+				chans = 3;					// [w, x, y]
 			},
 			'uhj', {
 				dirChans = [ inf, inf ];
 				sampleRate = server.sampleRate.asString;
+				chans = 3;					// [w, x, y]
 			}
+//			},
+//			'greathall', {
+//				dirChans = [ inf ];
+//				sampleRate = server.sampleRate.asString;
+//				chans = 4;					// [w, x, y, z]
+//			},
+//			'octagon', {
+//				dirChans = [ inf ];
+//				sampleRate = server.sampleRate.asString;
+//				chans = 4;					// [w, x, y, z]
+//			},
+//			'classroom', {
+//				dirChans = [ inf ];
+//				sampleRate = server.sampleRate.asString;
+//				chans = 4;					// [w, x, y, z]
+//			}
 		);
 
 
