@@ -623,10 +623,6 @@ FoaEncoderMatrix {
 	var <matrix;
 	var <dirInputs;
 
-	*newB {
-		^super.newCopyArgs('b').initB;
-	}
-
 	*newAtoB { arg orientation = 'flu', weight = 'dec';
 		^super.newCopyArgs('AtoB').initAtoB(orientation, weight);
 	}
@@ -772,15 +768,6 @@ FoaEncoderMatrix {
 		matrix = matrix.pseudoInverse;
 
 		matrix = matrix.putRow(0, matrix.getRow(0) * g0); // scale W
-	}
-
-	initB {
-
-	    // set input channel directions for instance
-	    dirInputs = [ inf ];
-
-		// build encoder matrix, and set for instance
-	    matrix = Matrix.newIdentity(4)
 	}
 
 	initAtoB { arg orientation, weight;
