@@ -3,11 +3,12 @@
 
 // define encoder / decoder matrices
 
-~encoder = FOAEncoderMatrix.newStereo(pi/4)
-~encoder = FOAEncoderKernel.newSuper				// remember to free!!
+~encoder = FoaEncoderMatrix.newStereo(pi/4)
+~encoder = FoaEncoderKernel.newSuper				// remember to free!!
+~encoder = FoaEncoderKernel.newGreatHall				// remember to free!!
 
-~decoder = FOADecoderMatrix.newQuad(pi/6, 'dual')
-~decoder = FOADecoderKernel.newUHJ				// remember to free!!
+~decoder = FoaDecoderMatrix.newQuad(pi/6, 'dual')
+~decoder = FoaDecoderKernel.newUHJ				// remember to free!!
 
 // inspect
 ~encoder.kind
@@ -16,24 +17,6 @@
 
 ~encoder.free				// free the kerne when finishedl!
 ~decoder.free				// free the kerne when finishedl!
-
-
-//// ------------------------------------------------------------
-//// encode
-//sig = FOAEncode.ar(Pan2.ar(sig, azim.neg/pi), ~encodeMatrix);
-//
-//
-//// ------------------------------------------------------------
-//// transform
-//sig = FOATransform.ar('tras', sig, arg0, arg1, arg2, arg3, arg4);
-//	
-//
-//
-//// decode to output
-//outSig = FOADecode.ar(sig, ~decoderMatrix);
-
-
-
 
 
 // ------------------------------------------------------------
@@ -56,7 +39,8 @@
 
 	// ------------------------------------------------------------
 	// encode
-	foaSig = FOAEncode.ar(Pan2.ar(sig, azim.neg/pi), ~encoder);
+//	foaSig = FoaEncode.ar(Pan2.ar(sig, azim.neg/pi), ~encoder);
+	foaSig = FoaEncode.ar(sig, ~encoder);
 	
 	
 	// test... out as array?
@@ -67,13 +51,13 @@
 	// distance filter
 //	sig = AtkDistance.ar(sig.at(0), sig.at(1), sig.at(2), sig.at(3), 1);
 
-//	// decode to output (quad)
-//	#fl, bl, br, fr = FOADecode.ar(foaSig, ~decoder);
+	// decode to output (quad)
+//	#fl, bl, br, fr = FoaDecode.ar(foaSig, ~decoder);
 //
 //	[fl, fr, bl, br]		// reorder output to match speaker arrangement
 
 	// decode to output (UHJ)
-	FOADecode.ar(foaSig, ~decoder);
+//	FoaDecode.ar(foaSig, ~decoder);
 
 
 }.scope;

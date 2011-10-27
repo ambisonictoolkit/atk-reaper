@@ -3,8 +3,29 @@
  *  xSC3plugins
  *
  *  Created by Josh Parmenter on 2/4/05.
- *  Copyright 2005 __MyCompanyName__. All rights reserved.
+ *  Copyright 2005 Josh Parmenter. All rights reserved.
+ *  Copyright the ATK Community, Josh Parmenter, and Joseph Anderson, 2011
+ *  
+ *  	J Anderson	j.anderson[at]ambisonictoolkit.net 
+ *  	J Parmenter	j.parmenter[at]ambisonictoolkit.net 
  *
+ */
+/*
+ This file is part of SuperCollider3 version of the Ambisonic Toolkit (ATK).
+ 
+ The SuperCollider3 version of the Ambisonic Toolkit (ATK) is free software:
+ you can redistribute it and/or modify it under the terms of the GNU General
+ Public License as published by the Free Software Foundation, either version 3
+ of the License, or (at your option) any later version.
+ 
+ The SuperCollider3 version of the Ambisonic Toolkit (ATK) is distributed in
+ the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with the
+ SuperCollider3 version of the Ambisonic Toolkit (ATK). If not, see
+ <http://www.gnu.org/licenses/>.
  */
 /*
  SuperCollider real time audio synthesis system
@@ -24,7 +45,33 @@
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
+*/
+
+/*
+ //---------------------------------------------------------------------
+ //	The Ambisonic Toolkit (ATK) is a soundfield kernel support library.
+ //
+ //
+ //	The Ambisonic Toolkit (ATK) is intended to bring together a number of tools and
+ //	methods for working with Ambisonic surround sound. The intention is for the toolset
+ //	to be both ergonomic and comprehensive, providing both classic and novel algorithms
+ //	to creatively manipulate and synthesise complex Ambisonic soundfields.
+ //	
+ //	The tools are framed for the user to think in terms of the soundfield kernel. By
+ //	this, it is meant the ATK addresses the holistic problem of creatively controlling a
+ //	complete soundfield, allowing and encouraging the composer to think beyond the placement
+ //	of sounds in a sound-space and instead attend to the impression and image of a soundfield.
+ //	This approach takes advantage of the model the Ambisonic technology presents, and is
+ //	viewed to be the idiomatic mode for working with the Ambisonic technique.
+ //	
+ //	
+ //	We hope you enjoy the ATK!
+ //	
+ //	For more information visit http://ambisonictoolkit.net/ or
+ //	email info[at]ambisonictoolkit.net
+ //
+ //--------------------------------------------------------------------- 
+*/
 
 
 #include "SC_PlugIn.h"

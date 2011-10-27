@@ -1,90 +1,84 @@
-// -------------------------------------------------------
-// ATK Matrix
-//
-// Coded by Joseph Anderson 2011
-//
-// -------------------------------------------------------
+/*
+	Copyright the ATK Community and Joseph Anderson, 2011
+		J Anderson	j.anderson[at]ambisonictoolkit.net 
+	
+	
+	This file is part of SuperCollider3 version of the Ambisonic Toolkit (ATK).
+	
+	The SuperCollider3 version of the Ambisonic Toolkit (ATK) is free software:
+	you can redistribute it and/or modify it under the terms of the GNU General
+	Public License as published by the Free Software Foundation, either version 3
+	of the License, or (at your option) any later version.
+	
+	The SuperCollider3 version of the Ambisonic Toolkit (ATK) is distributed in
+	the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+	implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+	the GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License along with the
+	SuperCollider3 version of the Ambisonic Toolkit (ATK). If not, see
+	<http://www.gnu.org/licenses/>.
+*/
 
-// NOTE: Really need to clean up these comments!!!
+
+//---------------------------------------------------------------------
+//	The Ambisonic Toolkit (ATK) is a soundfield kernel support library.
+//
+// 	Class: FoaSpeakerMatrix
+// 	Class: FoaDecoderMatrix
+// 	Class: FoaEncoderMatrix
+// 	Class: FoaDecoderKernel
+// 	Class: FoaEncoderKernel
+//
+//	The Ambisonic Toolkit (ATK) is intended to bring together a number of tools and
+//	methods for working with Ambisonic surround sound. The intention is for the toolset
+//	to be both ergonomic and comprehensive, providing both classic and novel algorithms
+//	to creatively manipulate and synthesise complex Ambisonic soundfields.
+//	
+//	The tools are framed for the user to think in terms of the soundfield kernel. By
+//	this, it is meant the ATK addresses the holistic problem of creatively controlling a
+//	complete soundfield, allowing and encouraging the composer to think beyond the placement
+//	of sounds in a sound-space and instead attend to the impression and image of a soundfield.
+//	This approach takes advantage of the model the Ambisonic technology presents, and is
+//	viewed to be the idiomatic mode for working with the Ambisonic technique.
+//	
+//	
+//	We hope you enjoy the ATK!
+//	
+//	For more information visit http://ambisonictoolkit.net/ or
+//	email info[at]ambisonictoolkit.net
+//
+//---------------------------------------------------------------------
+
 
 //------------------------------------------------------------------------
-// (Gerzon's) Diametric Decoder Theorem (DDT)
+// Third Party Notices
 //------------------------------------------------------------------------
 //
-// Much of the code below is a transcoding of Aaron Heller's Octave
-// code available at: http://www.ai.sri.com/ajh/ambisonics/
+//-----------------------------------------------------------------------
+// Support for Gerzon's Diametric Decoder Theorem (DDT) decoding algorithm is derived
+// from Aaron Heller's Octave code available at: http://www.ai.sri.com/ajh/ambisonics/
 //
 // Benjamin, et al., "Localization in Horizontal-Only Ambisonic Systems"
 // Preprint from AES-121, 10/2006, San Francisco
 //
-// Heller's original functions are noted through comments in each
-// functions help field.
+// Implementation in the SuperCollider3 version of the ATK is by
+// Joseph Anderson <j.anderson[at]ambisonictoolkit.net>
+//-----------------------------------------------------------------------
 //
-// Transcoding to Python/Numpy for use in muse/ATK/SC3 by
-// Joseph Anderson <josephlloydanderson@mac.com>
+//-----------------------------------------------------------------------
+// Irregular array decoding coefficients (5.0, 7.0) are kindly provided by
+// Bruce Wiggins: http://www.brucewiggins.co.uk/
 //
-// aes_paper.m (expanded version of speaker_matrix.m) contains the
-// following functions:
-//
-//   velocity_gain_matrix()**            : compute alpha, beta, and gamma
-//   speaker_matrix()                    : compute alpha, beta, and gamma
-//   decoder_gain_matrix()               : compute decoder matrix
-//
-// ----------------------------------------
-// the following functions are not included in SC3
-// as are included in muse/ATK and not immediately
-// useful in SC3 implementations
-//
-//   rV()                                : compute the Makita direction and rV
-//   rE()                                : compute rE (and direction?)
-//
-//   _virtual_mic()                      : virtual mic angle and directivity
-//   decoder_matrix_to_virtual_mic()     : computes loudspeaker 'virtual mics' 
-//
-// ----------------------------------------
-// the following functions are not included
-// as they duplicate muse/ATK functionality
-//
-//   az2dir()                            : convert azimuth to directon cosines
-//   degrees()                           : convert radians to degrees
-//   radians()                           : convert degrees to radians
-//   gain_to_db()
-//
-//   rectangular_speaker_arrays()        : example decodes
-//   hexagonal_speaker_arrays()          : example decodes
-//
-//
-//
-// NOTE: speaker_matrix() and velocity_gain_matrix() are the same code.
-//       It appears these two separate names are used (in error) in Heller's
-//       code. The expanded version, aes_paper.m defines velocity_gain_matrix(),
-//       but calls speaker_matrix().
-//
-//------------------------------------------------------------------------
-//
-//
-//------------------------------------------------------------------------
-// DDT and related decoder matrix gains
-//
-//   NOTE:   These are the functions that compute gains to generate
-//           loudspeaker feeds, and are not the functions which return
-//           decoded B-format. See decoders, below.
-//
-//
-//   speaker_matrix                  Heller's DDT (helper function)
-//   decoder_gain_matrix             Heller's DDT (returns decoder gains)
-//   panto_reg_decoder_gain_matrix   pantophonic
-//   peri_reg_decoder_gain_matrix    periphonic
-//   quad_decoder_gain_matrix        quad
-//
-//------------------------------------------------------------------------
+// B. Wiggins, "An Investigation into the Real-time Manipulation and Control of
+// Three-dimensional Sound Fields," PhD Thesis, University of Derby, Derby, 2004.
+//-----------------------------------------------------------------------
 
 
 //-----------------------------------------------------------------------
 // matrix decoders
 
-//   speaker_matrix                  Heller's DDT (helper function)
-//	rename to FoaSpeakerMatrix?
+//   Heller's DDT (helper function)
 FoaSpeakerMatrix {
 	var <positions, <k, m, n;
 
@@ -1851,6 +1845,11 @@ FoaEncoderKernel {
 		^super.newCopyArgs('super', 0).initKernel(kernelSize, server);
 	}
 
+	// Encoding via Isophonics Room Impulse Response Data Set, not yet implemented.
+	// (http://isophonics.net/content/room-impulse-response-data-set)
+	// 
+	// NOTE: Convolution2 doesn't support large, arbitrary sized kernels.
+
 //	*newGreatHall { arg subjectID = "x06y02", server = Server.default;
 //		^super.newCopyArgs('greathall', subjectID).initKernel("None", server);
 //	}
@@ -1899,6 +1898,12 @@ FoaEncoderKernel {
 				sampleRate = server.sampleRate.asString;
 				chans = 3;					// [w, x, y]
 			}
+
+	// Encoding via Isophonics Room Impulse Response Data Set, not yet implemented.
+	// (http://isophonics.net/content/room-impulse-response-data-set)
+	// 
+	// NOTE: Convolution2 doesn't support large, arbitrary sized kernels.
+
 //			},
 //			'greathall', {
 //				dirChans = [ inf ];
@@ -2036,23 +2041,3 @@ FoaEncoderKernel {
 	}
 }
 
-
-//------------------------------------------------------------------------
-// Extension to PathName... here for the time being
-+ PathName {
-
-	parentLevelPath { arg index;
-		
-		var ci = this.colonIndices;
-
-		^if( index == 0, {
-			fullPath
-		}, {		
-			if((fullPath.last.isPathSeparator) && (ci.size > 1), {
-				fullPath.copyRange(0, ci[ci.size - (1 + index)])
-			}, {
-				fullPath.copyRange(0, ci[ci.size - index])
-			})
-		})
-	}
-}
