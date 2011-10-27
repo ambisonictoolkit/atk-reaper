@@ -1653,7 +1653,7 @@ FoaXformerMatrix {
 FoaDecoderKernel {
 	var <kind, <subjectID;
 	var <kernel;
-	var <dirChans;
+	var <dirChannels;
 	
 
 	*newSpherical { arg subjectID = 0004, kernelSize = 512, server = Server.default;
@@ -1698,12 +1698,12 @@ FoaDecoderKernel {
 		// constants
 		chans = 2;			// stereo kernel
 		
-		// init dirChans (output channel (speaker) directions) and kernel sr
+		// init dirChannels (output channel (speaker) directions) and kernel sr
 		if ( kind == 'uhj', {
-		    dirChans = [ pi/6, pi.neg/6 ];
+		    dirChannels = [ pi/6, pi.neg/6 ];
 			sampleRate = "None";
 		}, {
-			dirChans = [ 5/9 * pi, 5/9 * pi.neg ];
+			dirChannels = [ 5/9 * pi, 5/9 * pi.neg ];
 			sampleRate = server.sampleRate.asString;
 		});
 		
@@ -1817,13 +1817,13 @@ FoaDecoderKernel {
 
 	dim { ^kernel.shape.at(0) - 1}
 
-	numChans { ^kernel.shape.at(1) }
+	numChannels { ^kernel.shape.at(1) }
 
 	kernelSize { ^kernel.at(0).at(0).numFrames }
 
 	printOn { arg stream;
 		stream << this.class.name << "(" <<*
-			[kind, this.dim, this.numChans, subjectID, this.kernelSize] <<")";
+			[kind, this.dim, this.numChannels, subjectID, this.kernelSize] <<")";
 	}
 }
 
@@ -1834,7 +1834,7 @@ FoaDecoderKernel {
 FoaEncoderKernel {
 	var <kind, <subjectID;
 	var <kernel;
-	var <dirChans;
+	var <dirChannels;
 	
 
 	*newUHJ { arg kernelSize = 512, server = Server.default;
@@ -1886,15 +1886,15 @@ FoaEncoderKernel {
 		var errorMsg;
 		
 
-		// init dirChans (output channel (speaker) directions) and kernel sr
+		// init dirChannels (output channel (speaker) directions) and kernel sr
 		switch ( kind,
 			'super', {
-				dirChans = [ pi/4, pi.neg/4 ];	 // approx, doesn't include phasiness
+				dirChannels = [ pi/4, pi.neg/4 ];	 // approx, doesn't include phasiness
 				sampleRate = "None";
 				chans = 3;					// [w, x, y]
 			},
 			'uhj', {
-				dirChans = [ inf, inf ];
+				dirChannels = [ inf, inf ];
 				sampleRate = server.sampleRate.asString;
 				chans = 3;					// [w, x, y]
 			}
@@ -1906,17 +1906,17 @@ FoaEncoderKernel {
 
 //			},
 //			'greathall', {
-//				dirChans = [ inf ];
+//				dirChannels = [ inf ];
 //				sampleRate = server.sampleRate.asString;
 //				chans = 4;					// [w, x, y, z]
 //			},
 //			'octagon', {
-//				dirChans = [ inf ];
+//				dirChannels = [ inf ];
 //				sampleRate = server.sampleRate.asString;
 //				chans = 4;					// [w, x, y, z]
 //			},
 //			'classroom', {
-//				dirChans = [ inf ];
+//				dirChannels = [ inf ];
 //				sampleRate = server.sampleRate.asString;
 //				chans = 4;					// [w, x, y, z]
 //			}
@@ -2031,13 +2031,13 @@ FoaEncoderKernel {
 
 	dim { ^kernel.shape.at(1) - 1}
 
-	numChans { ^kernel.shape.at(0) }
+	numChannels { ^kernel.shape.at(0) }
 
 	kernelSize { ^kernel.at(0).at(0).numFrames }
 
 	printOn { arg stream;
 		stream << this.class.name << "(" <<*
-			[kind, this.dim, this.numChans, subjectID, this.kernelSize] <<")";
+			[kind, this.dim, this.numChannels, subjectID, this.kernelSize] <<")";
 	}
 }
 
