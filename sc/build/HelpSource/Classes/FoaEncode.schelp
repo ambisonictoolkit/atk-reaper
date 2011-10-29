@@ -1,0 +1,242 @@
+CLASS:: FoaEncode
+summary:: First Order Ambisonic (FOA) encoder from the Ambisonic Toolkit (ATK)
+categories:: UGens>Multichannel>Ambisonics, Ambisonic Toolkit
+related:: Classes/FoaEncoderMatrix, Classes/FoaEncoderKernel, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+Encodes signals in a variety of configurations to a first order ambisonic signal (B-format). link::Classes/PanB:: is a SuperCollider inbuilt equivalent.
+
+NOTE::
+Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
+
+subsection:: Credits
+Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
+Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+::
+
+
+
+CLASSMETHODS::
+
+METHOD:: ar
+
+argument:: in
+The input signal, an array: [in0, in1, ... inN]
+
+argument:: encoder
+link::Classes/FoaEncoderMatrix:: or link::Classes/FoaEncoderKernel:: instance.
+
+argument:: mul
+Output will be multiplied by this value.
+
+argument:: add
+This value will be added to the output.
+
+returns::
+
+A B-format signal as an array of channels: [w, x, y, z]
+
+
+
+EXAMPLES::
+
+code::
+// ------------------------------------------------------------
+// omni encoder
+// mono pink noise source
+//
+// quad decoder
+
+
+// define encoder / decoder matrices
+~encoder = FoaEncoderMatrix.newOmni
+~decoder = FoaDecoderMatrix.newQuad
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+// You'll only hear the first two channels on a stereo setup.
+// Choose a stereo or binaural decoder if this is the case.
+(
+{
+    var sig;				// audio signal
+    var angle, azim;			// angle and azimuth control
+    var fl, bl, br, fr;			// quad output channels
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---> top 		= push to plane wave
+    //		  bottom	= omni-directional
+    angle = MouseY.kr(pi/2, 0);
+
+    // azimuth -> hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = MouseX.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = PinkNoise.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = FoaEncode.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = FoaTransform.ar(sig, 'push', angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // decode (to quad)
+    #fl, bl, br, fr = FoaDecode.ar(sig, ~decoder);
+    [fl, fr, bl, br]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+// ------------------------------------------------------------
+::
+code::
+// ------------------------------------------------------------
+// A to B encoder
+// decorrelated pink noise source
+//
+// quad decoder
+
+
+// define encoder / decoder matrices
+~encoder = FoaEncoderMatrix.newAtoB
+~decoder = FoaDecoderMatrix.newQuad
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+// You'll only hear the first two channels on a stereo setup.
+// Choose a stereo or binaural decoder if this is the case.
+(
+{
+    var sig;				// audio signal
+    var angle, azim;			// angle and azimuth control
+    var fl, bl, br, fr;			// quad output channels
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---> top 		= push to plane wave
+    //		  bottom	= omni-directional
+    angle = MouseY.kr(pi/2, 0);
+
+    // azimuth -> hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = MouseX.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = PinkNoise.ar([1, 1, 1, 1]); // 4 channels decorrelated pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = FoaEncode.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = FoaTransform.ar(sig, 'push', angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // decode (to quad)
+    #fl, bl, br, fr = FoaDecode.ar(sig, ~decoder);
+    [fl, fr, bl, br]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+// ------------------------------------------------------------
+::
+code::
+// ------------------------------------------------------------
+// SuperStereo encoder
+// stereo panned mono pink noise source
+//
+// quad decoder
+
+
+// define encoder / decoder matrices
+~encoder = FoaEncoderKernel.newSuper		// kernel encoders should be freed after use!!
+						// free below...
+~decoder = FoaDecoderMatrix.newQuad
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+// You'll only hear the first two channels on a stereo setup.
+// Choose a stereo or binaural decoder if this is the case.
+(
+{
+    var sig;				// audio signal
+    var azim;				// angle and azimuth control
+    var fl, bl, br, fr;			// quad output channels
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // azimuth -> hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = MouseX.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = PinkNoise.ar;					// mono pink noise
+
+    // ------------------------------------------------------------
+    // pan (encode) to stereo
+	sig = Pan2.ar(sig, azim.neg/pi);
+
+    // ------------------------------------------------------------
+    // encode
+    sig = FoaEncode.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (to quad)
+    #fl, bl, br, fr = FoaDecode.ar(sig, ~decoder);
+    [fl, fr, bl, br]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+
+// free kernel
+~encoder.free
+
+// ------------------------------------------------------------
+::
