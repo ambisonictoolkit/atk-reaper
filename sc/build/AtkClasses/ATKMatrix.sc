@@ -2039,6 +2039,14 @@ FoaEncoderKernel {
 
 	kernelSize { ^kernel.at(0).at(0).numFrames }
 
+	numOutputs { ^kernel.shape.at(1) }
+	
+	dirInputs { ^dirChannels }
+
+	numInputs { ^kernel.shape.at(0) }
+	
+	dirOutputs { ^this.numOutputs.collect({ inf }) }
+
 	printOn { arg stream;
 		stream << this.class.name << "(" <<*
 			[kind, this.dim, this.numChannels, subjectID, this.kernelSize] <<")";

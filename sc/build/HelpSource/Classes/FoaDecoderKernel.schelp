@@ -1,5 +1,5 @@
 CLASS:: FoaDecoderKernel
-summary:: First Order Ambisonic (FOA) decoder matrices from the Ambisonic Toolkit (ATK)
+summary:: First Order Ambisonic (FOA) decoder kernels from the Ambisonic Toolkit (ATK)
 categories:: Ambisonic Toolkit
 related:: Classes/FoaDecoderMatrix, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
 
@@ -306,7 +306,7 @@ Free the kernel.
 
 discussion:: Release the kernel buffer's memory on the server and return the bufferID back to the server's buffer number allocator for future reuse.
 
-warning:: Only free the kernel when the link::Class/FoaDecode*ar:: is no longer in use!::
+warning:: Only free the kernel when the link::Classes/FoaDecode#*ar:: is no longer in use!::
 
 
 
