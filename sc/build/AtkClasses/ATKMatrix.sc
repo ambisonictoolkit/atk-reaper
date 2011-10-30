@@ -731,8 +731,12 @@ FoaEncoderMatrix {
 
 		// invert to encoder matrix
 		matrix = matrix.pseudoInverse;
+		
+		// normalise matrix
+		matrix = matrix * matrix.getRow(0).sum.reciprocal;
 
-		matrix = matrix.putRow(0, matrix.getRow(0) * g0); // scale W
+		// scale W
+		matrix = matrix.putRow(0, matrix.getRow(0) * g0);
 	}
 
 	initInv3D { arg pattern;
@@ -767,7 +771,11 @@ FoaEncoderMatrix {
 		// invert to encoder matrix
 		matrix = matrix.pseudoInverse;
 
-		matrix = matrix.putRow(0, matrix.getRow(0) * g0); // scale W
+		// normalise matrix
+		matrix = matrix * matrix.getRow(0).sum.reciprocal;
+
+		// scale W
+		matrix = matrix.putRow(0, matrix.getRow(0) * g0);
 	}
 
 	initAtoB { arg orientation, weight;
