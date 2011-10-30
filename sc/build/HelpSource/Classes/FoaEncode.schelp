@@ -1,6 +1,6 @@
 CLASS:: FoaEncode
 summary:: First Order Ambisonic (FOA) encoder from the Ambisonic Toolkit (ATK)
-categories:: UGens>Multichannel>Ambisonics, Ambisonic Toolkit
+categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics
 related:: Classes/FoaEncoderMatrix, Classes/FoaEncoderKernel, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
 
 DESCRIPTION::

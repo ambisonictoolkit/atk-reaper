@@ -28,7 +28,7 @@ argument:: phi
 Elevation angle, in radians: pi/2 to pi.neg/2.
 
 argument:: pattern
-Variable virtual microphone pattern, 0 to 1:
+Virtual microphone pattern, 0 to 1:
 
 table::
 ## strong::pattern:: || strong::virtual microphone::
@@ -48,7 +48,7 @@ argument:: angle
 The half angle of the stereo pair, in radians: 0 to pi., Default: pi/2
 
 argument:: pattern
-Variable virtual microphone pattern, 0 to 1:
+Virtual microphone pattern, 0 to 1:
 
 table::
 ## strong::pattern:: || strong::virtual microphone::
@@ -110,7 +110,7 @@ discussion:: The outputs are in anti-clockwise order. The position of the first 
 
 Varying strong::angle:: allows a number of flexible quadraphonic decoders to be generated. E.g, strong::angle:: = pi/6 returns a decoder with loudspeakers at [ 30, 150, -150, 30 ] degrees.
 
-Please see link::#Decoder_k:: for further discussion on strong::k::.
+Please see link::#decoder_k:: for further discussion on strong::k::.
 
 
 
@@ -158,7 +158,7 @@ discussion:: The outputs are in anti-clockwise order. The position of the first 
 
 Used in conjunction with link::Classes/FoaDecode#*ar:: the resulting decoder is equivalent to link::Classes/DecodeB2#*ar:: (SuperCollider's inbuilt decoder), albeit with the addition of variable strong::k:: and dual-band optimised psychoacoustic decoding. link::Classes/DecodeB2#*ar:: is a "controlled opposites" decoder ( strong::k:: = code::'controlled':: ) with a gain of 6dB greater than link::#*newPanto::.
 
-Please see link::#Decoder_k:: for further discussion on strong::k::.
+Please see link::#decoder_k:: for further discussion on strong::k::.
 
 
 METHOD:: newPeri
@@ -186,7 +186,7 @@ list::
 
 discussion::  The outputs are in anti-clockwise order, beginning with the top ring. The position of the first speaker is either centre or left of centre. link::#-dirChannels:: may be used to query resulting loudspeaker directions.
 
-Please see link::#Decoder_k:: for further discussion on strong::k::.
+Please see link::#decoder_k:: for further discussion on strong::k::.
 
 
 METHOD:: newDiametric
@@ -243,7 +243,7 @@ code::
 ~decoder.dirChannels * 180/pi
 ::
 
-Please see link::#Decoder_k:: for further discussion on strong::k::.
+Please see link::#decoder_k:: for further discussion on strong::k::.
 
 
 METHOD:: newBtoA
@@ -275,7 +275,8 @@ table::
 ## code::'car':: || Cardioid || sqrt(3)
 ::
 
-discussion:: 
+discussion::
+anchor::btoadiscuss::
 The B-format to A-format decoder is primarily intended to be used in conjuction with the A-format to B-format encoder, link::Classes/FoaEncoderMatrix#*newAtoB::. Though the use of BtoA/AtoB decoder/encoder pairs, signal processing networks can be constructed which preserve the spatial encoding found in the original input B-format signal.
 
 code::
@@ -349,7 +350,7 @@ code::
 
 
 SUBSECTION:: Decoder k
-The default strong::k:: ( code::'single':: ), for decoders accepting strong::k:: as an argument, returns an code::'energy':: optimised decoder. code::'dual':: returns a dual-band psychoacoustically optimised decoder. footnote::See: E. Benjamin, R. Lee, and A. Heller, "Is My Decoder Ambisonic?," in Proceedings of the 125th Audio Engineering Society Convention, San Francisco, 2008.:: The code::'dual':: decoder is the optimum choice for small scale studio or domestic settings. code::'single':: is suitable for larger, mid-scale environments. code::'velocity':: returns "strict soundfield" decoding, and is not preferred for first order Ambisonics in most circumstances. code::'controlled':: returns "controlled opposites" decoding, which is often preferred in large-scale, concert environments. footnote::See: D. G. Malham, "Experience with Large Area 3-D Ambisonic Sound Systems," Proceedings of the Institute of Acoustics, vol. 14, no. 5, pp. 209–215, Nov. 1992.:: (SuperCollider's inbuilt decoder, link::Classes/DecodeB2#*ar::, is a "controlled opposites" decoder.)
+The default strong::k:: ( code::'single':: ), for decoders accepting strong::k:: as an argument, returns an code::'energy':: optimised (aka "max rE") decoder. code::'dual':: returns a dual-band psychoacoustically optimised decoder. footnote::See: E. Benjamin, R. Lee, and A. Heller, "Is My Decoder Ambisonic?," in Proceedings of the 125th Audio Engineering Society Convention, San Francisco, 2008.:: The code::'dual':: decoder is the optimum choice for small scale studio or domestic settings. code::'single':: is suitable for larger, mid-scale environments. code::'velocity':: returns "strict soundfield" (aka "basic") decoding, and is not preferred for first order Ambisonics in most circumstances. code::'controlled':: returns "controlled opposites" decoding (aka "in phase"), which is often preferred in large-scale, concert environments. footnote::See: D. G. Malham, "Experience with Large Area 3-D Ambisonic Sound Systems," Proceedings of the Institute of Acoustics, vol. 14, no. 5, pp. 209–215, Nov. 1992.:: (SuperCollider's inbuilt decoder, link::Classes/DecodeB2#*ar::, is a "controlled opposites" decoder. See link::Classes/FoaDecode#supercollider's_inbuilt_decoder#this::.)
 
 The strong::k:: keywords translate to numerical values as follows:
 
