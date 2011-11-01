@@ -150,6 +150,7 @@ code::
 
 code::
 // Periphonic (2D) encoder, 3 cardioid microphones
+// See: http://www.michaelgerzonphotos.org.uk/microphones-calrecs.html
 // [60, -180, -60]
 
 ~directions = pi/180 * [60, -180, -60];

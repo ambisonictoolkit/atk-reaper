@@ -1,0 +1,34 @@
+CLASS:: FoaTransform
+summary:: First Order Ambisonic (FOA) transformer from the Ambisonic Toolkit (ATK)
+categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics
+related:: Classes/FoaXformerMatrix, Classes/FoaEecode, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+(put long description here)
+
+
+CLASSMETHODS::
+
+METHOD:: ar
+(describe method here)
+
+argument:: in
+(describe argument here)
+
+argument:: kind
+(describe argument here)
+
+argument::  ... args
+(describe argument here)
+
+returns:: (returnvalue)
+
+
+INSTANCEMETHODS::
+
+
+EXAMPLES::
+
+code::
+(some example code)
+::

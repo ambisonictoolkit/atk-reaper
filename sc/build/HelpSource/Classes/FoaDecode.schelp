@@ -1,7 +1,7 @@
 CLASS:: FoaDecode
 summary:: First Order Ambisonic (FOA) decoder from the Ambisonic Toolkit (ATK)
 categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics
-related:: Classes/FoaDecoderMatrix, Classes/FoaDecoderKernel, Classes/FoaEncode, Reference/SomeRelatedStuff, etc.
+related:: Classes/FoaDecoderMatrix, Classes/FoaDecoderKernel, Classes/FoaEncode, Classes/FoaXform, Reference/SomeRelatedStuff, etc.
 
 DESCRIPTION::
 Renders (decodes) a first order ambisonic signal (B-format) to speaker feeds in a variety of configurations. link::Classes/DecodeB2:: is the SuperCollider inbuilt equivalent.
@@ -45,6 +45,325 @@ As the Ambisonic technique is a hierarchal system, numerous options for playback
 Encoded as an omnidirectional soundfield, link::Classes/PinkNoise:: is used as the example sound source. In a well aligned, dampend studio environment, this usually sounds "in the head". link::Classes/FoaPush:: is used to "push" the omnidirectional soundfield so that it becomes a planewave (infinite distance, in an anechoic environment) arriving from some direction.
 
 The soundfield is controlled by link::Classes/MouseX:: and link::Classes/MouseY::, where link::Classes/MouseX:: specifies the incident azimuth angle (pi to -pi; left to right of display) and link::Classes/MouseY:: the link::Classes/FoaPush:: angle (0 to pi/2; bottom to top of display). With the mouse at the bottom of the display, the soundfield remains omnidirectional. Placed at the top of the display, the soundfield becomes directional, and varying left/right position will vary the incident azimuth of the resulting planewave.
+
+
+subsection:: Virtual microphone stereo decoder
+
+The soundfield may be decoded to stereo using a pair of virtual microphones.
+
+note:: A matrix type decoder, see link::Classes/FoaDecoderMatrix#*newStereo:: for further details.::
+
+code::
+// ------------------------------------------------------------
+// virtual microphone stereo decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = FoaEncoderMatrix.newOmni
+~decoder = FoaDecoderMatrix.newStereo
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;// audio signal
+    var angle, azim;			// angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---> top 		= push to plane wave
+    //            bottom        = omni-directional
+    angle = MouseY.kr(pi/2, 0);
+
+    // azimuth -> hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = MouseX.kr(pi, -pi);
+
+	
+    // ------------------------------------------------------------
+    // test sig
+    sig = PinkNoise.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = FoaEncode.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = FoaTransform.ar(sig, 'push', angle, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (to stereo)
+    FoaDecode.ar(sig, ~decoder);
+
+}.scope;
+)
+
+// free kernel
+~decoder.free
+
+// ------------------------------------------------------------
+::
+
+
+subsection:: Ambisonic UHJ stereo decoder
+
+Ambisonic UHJ stereo footnote::See: link::http://en.wikipedia.org/wiki/Ambisonic_UHJ_format:::: is the 'native' stereo format for Ambisonics. A B-format signal (2D, with some losses) can be recovered from a UHJ decoded signal through the use of link::Classes/FoaEncoderKernel#*newUHJ::.
+
+
+
+note:: A kernel type decoder, see link::Classes/FoaDecoderKernel#*newUHJ:: for further details.::
+
+warning:: Kernel decoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of link::Classes/FoaDecoderKernel#-free:: after use.::
+
+
+
+code::
+// ------------------------------------------------------------
+// UHJ (stereo) decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = FoaEncoderMatrix.newOmni
+~decoder = FoaDecoderKernel.newUHJ       // kernel decoders should be freed after use!!
+                                         // free below...
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;// audio signal
+    var angle, azim;			// angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---> top 		= push to plane wave
+    //            bottom        = omni-directional
+    angle = MouseY.kr(pi/2, 0);
+
+    // azimuth -> hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = MouseX.kr(pi, -pi);
+
+	
+    // ------------------------------------------------------------
+    // test sig
+    sig = PinkNoise.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = FoaEncode.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = FoaTransform.ar(sig, 'push', angle, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (to stereo)
+    FoaDecode.ar(sig, ~decoder);
+
+}.scope;
+)
+
+// free kernel
+~decoder.free
+
+// ------------------------------------------------------------
+::
+
+subsection:: Synthetic binaural decoder
+
+
+The Ambisonic Tookit provides a synthetic spherical head model HRTF decoder. footnote::See: R. O. Duda, "Modeling head related transfer functions," in Proceedings of the Twenty-Seventh Annual Asilomar Conference on Signals, Systems and Computers, Asilomar, CA, 1993.:: Ten subjects with varying head sizes are available. Audition to find one that works best for you.
+
+Additionally, HRTF decoders computed from measured HRIRs are also available: link::Classes/FoaDecoderKernel#*newListen:: & link::Classes/FoaDecoderKernel#*newCIPIC::. 
+
+
+note:: A kernel type decoder, see link::Classes/FoaDecoderKernel#*newSpherical:: for further details.::
+
+warning:: Kernel decoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of link::Classes/FoaDecoderKernel#-free:: after use.::
+
+
+code::
+// ------------------------------------------------------------
+// Binaural (synthetic) decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = FoaEncoderMatrix.newOmni
+~decoder = FoaDecoderKernel.newSpherical // kernel decoders should be freed after use!!
+                                         // free below...
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;// audio signal
+    var angle, azim;			// angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---> top 		= push to plane wave
+    //            bottom        = omni-directional
+    angle = MouseY.kr(pi/2, 0);
+
+    // azimuth -> hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = MouseX.kr(pi, -pi);
+
+	
+    // ------------------------------------------------------------
+    // test sig
+    sig = PinkNoise.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = FoaEncode.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = FoaTransform.ar(sig, 'push', angle, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (to binaural)
+    FoaDecode.ar(sig, ~decoder);
+
+}.scope;
+)
+
+// free kernel
+~decoder.free
+
+// ------------------------------------------------------------
+::
+
+
+subsection:: CIPIC binaural decoder
+
+Measured HRTF decoder, with measurements from the University of California Davis' link::http://interface.cipic.ucdavis.edu/sound/hrtf.html##CIPIC HRTF database::. footnote::See: link::http://interface.cipic.ucdavis.edu/sound/hrtf.html:::: Forty-five subjects with varying head sizes are available. Audition to find one that works best for you.
+
+
+note:: A kernel type decoder, see link::Classes/FoaDecoderKernel#*newCIPIC:: for further details.::
+
+warning:: Kernel decoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of link::Classes/FoaDecoderKernel#-free:: after use.::
+
+code::
+// ------------------------------------------------------------
+// Binaural (CIPIC) decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = FoaEncoderMatrix.newOmni
+~decoder = FoaDecoderKernel.newCIPIC     // kernel decoders should be freed after use!!
+                                         // free below...
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;// audio signal
+    var angle, azim;			// angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---> top 		= push to plane wave
+    //            bottom        = omni-directional
+    angle = MouseY.kr(pi/2, 0);
+
+    // azimuth -> hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = MouseX.kr(pi, -pi);
+
+	
+    // ------------------------------------------------------------
+    // test sig
+    sig = PinkNoise.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = FoaEncode.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = FoaTransform.ar(sig, 'push', angle, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (to binaural)
+    FoaDecode.ar(sig, ~decoder);
+
+}.scope;
+)
+
+// free kernel
+~decoder.free
+
+// ------------------------------------------------------------
+::
 
 
 subsection:: Quadraphonic decoder
@@ -379,323 +698,6 @@ code::
 // ------------------------------------------------------------
 ::
 
-subsection:: Virtual microphone stereo decoder
-
-The soundfield may be decoded to stereo using a pair of virtual microphones.
-
-note:: A matrix type decoder, see link::Classes/FoaDecoderMatrix#*newStereo:: for further details.::
-
-code::
-// ------------------------------------------------------------
-// virtual microphone stereo decoder
-//
-// mono pink noise source
-// omni encoder
-
-
-// define encoder / decoder matrices
-~encoder = FoaEncoderMatrix.newOmni
-~decoder = FoaDecoderMatrix.newStereo
-
-
-// inspect
-~encoder.kind
-~encoder.numChannels
-~encoder.dirChannels
-
-~decoder.kind
-~decoder.numChannels
-~decoder.dirChannels * 180/pi
-
-(
-{
-    var sig;// audio signal
-    var angle, azim;			// angle and azimuth control
-
-
-    // display encoder and decoder
-    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
-    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
-
-    // angle ---> top 		= push to plane wave
-    //            bottom        = omni-directional
-    angle = MouseY.kr(pi/2, 0);
-
-    // azimuth -> hard left 	= back
-    //		  centre 	= centre
-    //		  hard right 	= back
-    azim = MouseX.kr(pi, -pi);
-
-	
-    // ------------------------------------------------------------
-    // test sig
-    sig = PinkNoise.ar; 			// mono pink noise
-
-
-    // ------------------------------------------------------------
-    // encode
-    sig = FoaEncode.ar(sig, ~encoder);
-
-    // ------------------------------------------------------------
-    // transform
-    sig = FoaTransform.ar(sig, 'push', angle, azim);
-
-
-    // ------------------------------------------------------------
-    // decode (to stereo)
-    FoaDecode.ar(sig, ~decoder);
-
-}.scope;
-)
-
-// free kernel
-~decoder.free
-
-// ------------------------------------------------------------
-::
-
-
-subsection:: Ambisonic UHJ stereo decoder
-
-Ambisonic UHJ stereo footnote::See: link::http://en.wikipedia.org/wiki/Ambisonic_UHJ_format:::: is the 'native' stereo format for Ambisonics. A B-format signal (2D, with some losses) can be recovered from a UHJ decoded signal through the use of link::Classes/FoaEncoderKernel#*newUHJ::.
-
-
-
-note:: A kernel type decoder, see link::Classes/FoaDecoderKernel#*newUHJ:: for further details.::
-
-warning:: Kernel decoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of link::Classes/FoaDecoderKernel#-free:: after use.::
-
-
-
-code::
-// ------------------------------------------------------------
-// UHJ (stereo) decoder
-//
-// mono pink noise source
-// omni encoder
-
-
-// define encoder / decoder matrices
-~encoder = FoaEncoderMatrix.newOmni
-~decoder = FoaDecoderKernel.newUHJ       // kernel decoders should be freed after use!!
-                                         // free below...
-
-// inspect
-~encoder.kind
-~encoder.numChannels
-~encoder.dirChannels
-
-~decoder.kind
-~decoder.numChannels
-~decoder.dirChannels * 180/pi
-
-(
-{
-    var sig;// audio signal
-    var angle, azim;			// angle and azimuth control
-
-
-    // display encoder and decoder
-    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
-    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
-
-    // angle ---> top 		= push to plane wave
-    //            bottom        = omni-directional
-    angle = MouseY.kr(pi/2, 0);
-
-    // azimuth -> hard left 	= back
-    //		  centre 	= centre
-    //		  hard right 	= back
-    azim = MouseX.kr(pi, -pi);
-
-	
-    // ------------------------------------------------------------
-    // test sig
-    sig = PinkNoise.ar; 			// mono pink noise
-
-
-    // ------------------------------------------------------------
-    // encode
-    sig = FoaEncode.ar(sig, ~encoder);
-
-    // ------------------------------------------------------------
-    // transform
-    sig = FoaTransform.ar(sig, 'push', angle, azim);
-
-
-    // ------------------------------------------------------------
-    // decode (to stereo)
-    FoaDecode.ar(sig, ~decoder);
-
-}.scope;
-)
-
-// free kernel
-~decoder.free
-
-// ------------------------------------------------------------
-::
-
-subsection:: Synthetic binaural decoder
-
-
-The Ambisonic Tookit provides a synthetic spherical head model HRTF decoder. footnote::See: R. O. Duda, "Modeling head related transfer functions," in Proceedings of the Twenty-Seventh Annual Asilomar Conference on Signals, Systems and Computers, Asilomar, CA, 1993.:: Ten subjects with varying head sizes are available. Audition to find one that works best for you.
-
-Additionally, HRTF decoders computed from measured HRIRs are also available: link::Classes/FoaDecoderKernel#*newListen:: & link::Classes/FoaDecoderKernel#*newCIPIC::. 
-
-
-note:: A kernel type decoder, see link::Classes/FoaDecoderKernel#*newSpherical:: for further details.::
-
-warning:: Kernel decoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of link::Classes/FoaDecoderKernel#-free:: after use.::
-
-
-code::
-// ------------------------------------------------------------
-// Binaural (synthetic) decoder
-//
-// mono pink noise source
-// omni encoder
-
-
-// define encoder / decoder matrices
-~encoder = FoaEncoderMatrix.newOmni
-~decoder = FoaDecoderKernel.newSpherical // kernel decoders should be freed after use!!
-                                         // free below...
-
-// inspect
-~encoder.kind
-~encoder.numChannels
-~encoder.dirChannels
-
-~decoder.kind
-~decoder.numChannels
-~decoder.dirChannels * 180/pi
-
-(
-{
-    var sig;// audio signal
-    var angle, azim;			// angle and azimuth control
-
-
-    // display encoder and decoder
-    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
-    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
-
-    // angle ---> top 		= push to plane wave
-    //            bottom        = omni-directional
-    angle = MouseY.kr(pi/2, 0);
-
-    // azimuth -> hard left 	= back
-    //		  centre 	= centre
-    //		  hard right 	= back
-    azim = MouseX.kr(pi, -pi);
-
-	
-    // ------------------------------------------------------------
-    // test sig
-    sig = PinkNoise.ar; 			// mono pink noise
-
-
-    // ------------------------------------------------------------
-    // encode
-    sig = FoaEncode.ar(sig, ~encoder);
-
-    // ------------------------------------------------------------
-    // transform
-    sig = FoaTransform.ar(sig, 'push', angle, azim);
-
-
-    // ------------------------------------------------------------
-    // decode (to binaural)
-    FoaDecode.ar(sig, ~decoder);
-
-}.scope;
-)
-
-// free kernel
-~decoder.free
-
-// ------------------------------------------------------------
-::
-
-
-subsection:: CIPIC binaural decoder
-
-Measured HRTF decoder, with measurements from the University of California Davis' link::http://interface.cipic.ucdavis.edu/sound/hrtf.html##CIPIC HRTF database::. footnote::See: link::http://interface.cipic.ucdavis.edu/sound/hrtf.html:::: Forty-five subjects with varying head sizes are available. Audition to find one that works best for you.
-
-
-note:: A kernel type decoder, see link::Classes/FoaDecoderKernel#*newCIPIC:: for further details.::
-
-warning:: Kernel decoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of link::Classes/FoaDecoderKernel#-free:: after use.::
-
-code::
-// ------------------------------------------------------------
-// Binaural (CIPIC) decoder
-//
-// mono pink noise source
-// omni encoder
-
-
-// define encoder / decoder matrices
-~encoder = FoaEncoderMatrix.newOmni
-~decoder = FoaDecoderKernel.newCIPIC     // kernel decoders should be freed after use!!
-                                         // free below...
-
-// inspect
-~encoder.kind
-~encoder.numChannels
-~encoder.dirChannels
-
-~decoder.kind
-~decoder.numChannels
-~decoder.dirChannels * 180/pi
-
-(
-{
-    var sig;// audio signal
-    var angle, azim;			// angle and azimuth control
-
-
-    // display encoder and decoder
-    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
-    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
-
-    // angle ---> top 		= push to plane wave
-    //            bottom        = omni-directional
-    angle = MouseY.kr(pi/2, 0);
-
-    // azimuth -> hard left 	= back
-    //		  centre 	= centre
-    //		  hard right 	= back
-    azim = MouseX.kr(pi, -pi);
-
-	
-    // ------------------------------------------------------------
-    // test sig
-    sig = PinkNoise.ar; 			// mono pink noise
-
-
-    // ------------------------------------------------------------
-    // encode
-    sig = FoaEncode.ar(sig, ~encoder);
-
-    // ------------------------------------------------------------
-    // transform
-    sig = FoaTransform.ar(sig, 'push', angle, azim);
-
-
-    // ------------------------------------------------------------
-    // decode (to binaural)
-    FoaDecode.ar(sig, ~decoder);
-
-}.scope;
-)
-
-// free kernel
-~decoder.free
-
-// ------------------------------------------------------------
-::
 
 subsection:: Periphonic (cube) decoder
 
@@ -764,7 +766,7 @@ code::
 
 
     // ------------------------------------------------------------
-    // decode (to quad)
+    // decode (to cube)
     #flu, blu, bru, fru, fld, bld, brd, frd = FoaDecode.ar(sig, ~decoder);
     [flu, fru, blu, bru, fld, frd, bld, brd]	// reorder output to match speaker arrangement
 
