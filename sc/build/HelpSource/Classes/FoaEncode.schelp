@@ -707,7 +707,7 @@ As a relatively inexpensive piece of equipment, the imaging of the link::http://
 
 If you haven't already choose a code:: ~decoder:: and defined code:: ~renderDecode ::, do so link::#choose_a_decoder#now::.
 
-note:: A matrix type encoder, see link::Classes/FoaEncoderMatrix#*newZoom:: and link::Classes/FoaXformerMatrix#*newDominateX:: for further details.::
+note:: A matrix type encoder, see link::Classes/FoaEncoderMatrix#*newZoomH2:: and link::Classes/FoaXformerMatrix#*newDominateX:: for further details.::
 
 
 code::
@@ -780,6 +780,82 @@ list::
 ::
 
 ::
+
+
+
+subsection:: ZoomH2 encoder, reversed (soundfile)
+
+As described link::Classes/FoaEncoderMatrix#*newZoomH2#here::, the link::http://www.zoom.co.jp/english/products/h2/##ZoomH2:: encoder reverses the labels for front and back of the link::http://www.zoom.co.jp/english/products/h2/##ZoomH2::. This is done to favour the use of the decoder as a roving, hand-held device, with the display facing the operator.
+
+If one wishes to respect the labelled orientation of the device as does link::http://www.radio.uqam.ca/ambisonic/comparative_recording.html##Courville:: in the example below, we'll need to either adjust the strong::angles:: argument or apply link::Classes/FoaXform#*newMirrorX::. For this example, we'll set strong::angles:: = code:: [3/4*pi, pi/3] ::, which are those specified in the link::http://www.zoom.co.jp/downloads/h2/manual/##ZoomH2 documentation::.
+
+As a relatively inexpensive piece of equipment, the imaging of the link::http://www.zoom.co.jp/english/products/h2/##ZoomH2:: isn't always as consistent as we'd prefer. To remedy, the Y gain is tweaked to widen the image.
+
+If you haven't already choose a code:: ~decoder:: and defined code:: ~renderDecode ::, do so link::#choose_a_decoder#now::.
+
+note:: A matrix type encoder, see link::Classes/FoaEncoderMatrix#*newZoomH2:: for further details.::
+
+
+code::
+// ------------------------------------------------------------
+// zoomH2 encoder
+// zoomH2 soundfile read from disk
+
+
+// define encoder matrix
+~encoder = FoaEncoderMatrix.newZoomH2([3/4*pi, pi/3], 1.7378)
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = Buffer.read(s, "sounds/ATK/zoomh2/Courville-Dialogue.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = PlayBuf.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = FoaEncode.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+::
+
+note:: strong::Soundfile Credits::
+
+list::
+## D. Courville, "Comparative Surround Recording," Ambisonic Studio | Comparative Surround Recording, 2007. [Online]. Available: http://www.radio.uqam.ca/ambisonic/comparative_recording.html. [Accessed: 26-Jul-2011].
+::
+
+::
+
+
 
 subsection:: Pantophonic encoder (soundfile)
 
