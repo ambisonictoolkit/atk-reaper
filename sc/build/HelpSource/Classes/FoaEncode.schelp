@@ -50,7 +50,7 @@ subsection:: Choose a decoder
 
 A number of decoders are defined below. Please choose one suitable for your system. Also, don't forget to define code:: ~renderDecode :: !
 
-note:: If you choose a kernel decoder, link::Classes/FoaEncoderKernel::, be sure to free the kernel after use. ::
+note:: If you choose a kernel decoder, link::Classes/FoaDecoderKernel::, be sure to free the kernel after use. ::
 
 code::
 // ------------------------------------------------------------
@@ -850,7 +850,7 @@ code::
 note:: strong::Soundfile Credits::
 
 list::
-## D. Courville, "Comparative Surround Recording," Ambisonic Studio | Comparative Surround Recording, 2007. [Online]. Available: http://www.radio.uqam.ca/ambisonic/comparative_recording.html. [Accessed: 26-Jul-2011].
+## D. Courville, "Comparative Surround Recording," Ambisonic Studio | Comparative Surround Recording, 2007. [Online]. Available: http://www.radio.uqam.ca/ambisonic/comparative_recording.html [Accessed: 26-Jul-2011].
 ::
 
 ::
