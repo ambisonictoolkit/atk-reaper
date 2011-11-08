@@ -166,8 +166,8 @@ FoaZoomZ : FoaRotate { }
 
 
 FoaDominateX : Foa {	
-	*ar { arg w, x, y, z, gain = 0;
-		^this.multiNew('audio', w, x, y, z, gain);
+	*ar { arg w, x, y, z, gain = 0, mul = 1, add = 0;
+		^this.multiNew('audio', w, x, y, z, gain).madd(mul, add);
 	}	
 }
 
