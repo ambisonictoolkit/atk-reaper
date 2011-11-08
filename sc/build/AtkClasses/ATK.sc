@@ -97,8 +97,8 @@
 
 FoaPanB : Panner {
 	
-	*ar { arg in, azimuth=0, elevation=0;
-		^this.multiNew('audio', in, azimuth, elevation )
+	*ar { arg in, azimuth=0, elevation=0, mul = 1, add = 0;
+		^this.multiNew('audio', in, azimuth, elevation ).madd(mul, add);
 	}
 	
 	init { arg ... theInputs;
@@ -163,6 +163,12 @@ FoaPressZ : FoaRotate { }
 FoaZoomX : FoaRotate { }
 FoaZoomY : FoaRotate { }
 FoaZoomZ : FoaRotate { }
+
+FoaBalance { 
+	*ar { arg w, x, y, z, angle = 0, mul = 1, add = 0;
+		^FoaZoomY.ar(w, x, y, z, angle, mul, add);
+	}
+} 
 
 
 FoaDominateX : Foa {	

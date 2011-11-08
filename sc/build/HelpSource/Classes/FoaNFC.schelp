@@ -1,0 +1,61 @@
+CLASS:: FoaNFC
+summary:: First Order Ambisonic (FOA) nearfield compensation transformer from the Ambisonic Toolkit (ATK)
+categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
+related:: Classes/FoaProximity, Classes/FoaTransform, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+Apply nearfield compensation filtering to a first order ambisonic signal (B-format). link::Classes/FoaNFC:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
+
+
+NOTE::
+Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
+
+subsection:: Credits
+Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
+Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+::
+
+
+CLASSMETHODS::
+
+METHOD:: ar
+
+argument:: w
+Input signal W.
+
+argument:: x
+Input signal X.
+
+argument:: y
+Input signal Y.
+
+argument:: z
+Input signal Z.
+
+argument:: distance
+The distance, in meters.
+
+warning:: strong::Distance:: = 0 is an invalid value! ::
+
+argument:: mul
+Output will be multiplied by this value.
+
+argument:: add
+This value will be added to the output.
+
+
+discussion::
+
+link::Classes/FoaNFC:: facilitates the reduction or removal of the link::http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity effect:: from encoded signals. The link::http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity effect:: can be an important contributor to perceptions of nearness.
+
+Nearfield compensation footnote::Usually called distance compensation in the classic Ambisonics literature.:: is usually used in conjunction with link::Classes/FoaDecode:: to compensate for the distance of loudspeakers on playback. Additionally, link::Classes/FoaNFC:: can also be used to reduce the link::http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity effect:: found in nearfield recordings.
+
+
+The Ambisonic Toolkit's proximity filter, link::Classes/FoaProximity::, undoes link::Classes/FoaNFC:: given the same strong::distance:: argument.
+
+
+
+
+EXAMPLES::
+
+Please see link::Classes/FoaDecode#psychoacoustically_optimised_quadraphonic_decoder#this:: and link::Classes/FoaTransform#nfc_(soundfile)#this::.

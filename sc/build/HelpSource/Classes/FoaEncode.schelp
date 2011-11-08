@@ -873,7 +873,8 @@ code::
 
 
 // define encoder matrix
-~encoder = FoaEncoderMatrix.newPanto(8, 'point')
+~encoder = FoaEncoderMatrix.newPanto(8, 'flat')   // choose for Mackay
+~encoder = FoaEncoderMatrix.newPanto(8, 'point')  // choose for Young
 
 
 // inspect
@@ -885,6 +886,7 @@ code::
 // read a whole sound into memory
 // remember to free the buffer later!
 // (boot the server, if you haven't!)
+~sndbuf = Buffer.read(s, "sounds/ATK/multichannel/Mackay-Augustines_Message.wav")
 ~sndbuf = Buffer.read(s, "sounds/ATK/multichannel/Young-Allting_Runt.wav")
 
 
@@ -921,5 +923,6 @@ code::
 note:: strong::Soundfile Credits::
 
 list::
+## Robert Mackay, "Augustine's Message," [unpublished recording]
 ## John Young, "Allting Runt Omkring," [unpublished recording]
 ::

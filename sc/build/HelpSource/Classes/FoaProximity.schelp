@@ -1,0 +1,59 @@
+CLASS:: FoaProximity
+summary:: First Order Ambisonic (FOA) proximity effect transformer from the Ambisonic Toolkit (ATK)
+categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
+related:: Classes/FoaNFC, Classes/FoaTransform, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+Apply proximity filtering to a first order ambisonic signal (B-format). link::Classes/FoaProximity:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
+
+NOTE::
+Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
+
+subsection:: Credits
+Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
+Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+::
+
+
+CLASSMETHODS::
+
+METHOD:: ar
+
+argument:: w
+Input signal W.
+
+argument:: x
+Input signal X.
+
+argument:: y
+Input signal Y.
+
+argument:: z
+Input signal Z.
+
+argument:: distance
+The distance, in meters.
+
+warning:: strong::Distance:: = 0 is an invalid value! ::
+
+argument:: mul
+Output will be multiplied by this value.
+
+argument:: add
+This value will be added to the output.
+
+
+discussion::
+
+link::Classes/FoaProximity:: facilitates the introduction of the link::http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity effect:: to encoded signals. At extremes, the proximity effect introduces a strong bass boost, as well as phase differences. The link::http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity effect:: can be an important contributor to perceptions of nearness.
+
+The Ambisonic Toolkit's nearfield compensation filter, link::Classes/FoaNFC::, undoes link::Classes/FoaProximity:: given the same strong::distance:: argument.
+
+
+warning:: As link::Classes/FoaProximity:: includes a 1st-order integration, signals must be highpass filtered before application. link::Classes/HPF:: is usually a suitable choice to control low frequency boost.::
+
+
+
+EXAMPLES::
+
+Please see link::Classes/FoaTransform#proximity#this::.

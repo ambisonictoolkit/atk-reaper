@@ -1,0 +1,55 @@
+CLASS:: FoaDirectO
+summary:: First Order Ambisonic (FOA) directivity transformer from the Ambisonic Toolkit (ATK)
+categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
+related:: Classes/FoaDirectX, Classes/FoaDirectY, Classes/FoaDirectZ, Classes/FoaDirect, Classes/FoaTransform, Classes/FoaXform, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+Adjust the soundfield directivity of a first order ambisonic signal (B-format) across the origin. link::Classes/FoaDirectO:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
+
+
+NOTE::
+Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
+
+subsection:: Credits
+Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
+Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+::
+
+
+CLASSMETHODS::
+
+METHOD:: ar
+
+argument:: w
+Input signal W.
+
+argument:: x
+Input signal X.
+
+argument:: y
+Input signal Y.
+
+argument:: z
+Input signal Z.
+
+argument:: angle
+The distortion angle, in radians. 0 to pi/2
+
+argument:: mul
+Output will be multiplied by this value.
+
+argument:: add
+This value will be added to the output.
+
+discussion::
+
+strong::Angle:: = 0 retains the current directivity of the soundfield. Increasing strong::angle:: towards pi/2 decreases the directivity, reducing the gains on the directional compenents to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes omnidirectional or directionless.
+
+note:: Corresponding matrix transformer: link::Classes/FoaXformerMatrix#*newDirectO:: ::
+
+
+
+
+EXAMPLES::
+
+Please see various examples link::Classes/FoaTransform#examples#here::.

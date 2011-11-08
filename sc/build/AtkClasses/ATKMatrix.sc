@@ -154,6 +154,10 @@ FoaSpeakerMatrix {
 		// return resulting matrix
 	 	^sqrt(1/2) * n * k * ( s.inverse * directions);
 	}
+
+	printOn { arg stream;
+		stream << this.class.name << "(" <<* [this.dim, this.numChannels] <<")";
+	}
 }
 
 

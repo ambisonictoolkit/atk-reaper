@@ -1,0 +1,61 @@
+CLASS:: FoaPsychoShelf
+summary:: First Order Ambisonic (FOA) psychoacoustic shelf filter from the Ambisonic Toolkit (ATK)
+categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
+related:: Classes/FoaNFC, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+Apply psychoacoustic shelf filtering to a first order ambisonic signal (B-format). link::Classes/FoaPsychoShelf:: is usually called internally by link::Classes/FoaDecode::.
+
+
+NOTE::
+Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
+
+subsection:: Credits
+Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
+Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+::
+
+
+CLASSMETHODS::
+
+METHOD:: ar
+
+argument:: w
+Input signal W.
+
+argument:: x
+Input signal X.
+
+argument:: y
+Input signal Y.
+
+argument:: z
+Input signal Z.
+
+argument:: freq
+Shelf filter corner frequency, in Hz.
+
+argument:: k0
+High frequency scale for 0-order harmonic: W.
+
+argument:: k1
+High frequency scale for 1st-order harmonics: X, Y, Z.
+
+argument:: mul
+Output will be multiplied by this value.
+
+argument:: add
+This value will be added to the output.
+
+
+discussion::
+
+link::Classes/FoaPsychoShelf:: is invoked by link::Classes/FoaDecode:: when a dual-band psychoacoustically optimised decoder footnote::See: E. Benjamin, R. Lee, and A. Heller, "Is My Decoder Ambisonic?," in Proceedings of the 125th Audio Engineering Society Convention, San Francisco, 2008.:: is called by setting strong::k:: to code:: 'dual' ::. This kind of decoder is the optimum choice for small scale studio or domestic settings.
+
+note:: In normal circumstances, the user will not call link::Classes/FoaPsychoShelf:: directly.::
+
+
+EXAMPLES::
+
+Please see link::Classes/FoaDecode#psychoacoustically_optimised_quadraphonic_decoder#this::.
+

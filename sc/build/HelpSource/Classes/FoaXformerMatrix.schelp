@@ -284,7 +284,7 @@ note:: Corresponding UGen: link::Classes/FoaZoomZ:: ::
 
 
 METHOD:: newZoom
-Apply dominance along an arbitrary axis.
+Apply zoom along an arbitrary axis.
 
 argument:: angle
 The distortion angle, in radians. -pi/2 to pi/2
@@ -311,7 +311,7 @@ Apply focus along the x-axis.
 argument:: angle
 The distortion angle, in radians. -pi/2 to pi/2
 
-discussion:: Focus is a normailised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: increase gain at code:: [0, 0] ::, while reducing at code:: [pi, 0] ::. Negative values do the inverse. The default, 0, results in no change.
+discussion:: Focus is a normalised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: maintain gain at code:: [0, 0] ::, while reducing at code:: [pi, 0] ::. Negative values do the inverse. The default, 0, results in no change.
 
 In contrast with zoom, gain is maintained at 0dB in the direction of distortion.
 
@@ -326,7 +326,7 @@ Apply focus along the y-axis.
 argument:: angle
 The distortion angle, in radians. -pi/2 to pi/2
 
-discussion:: Focus is a normailised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: increase gain at code:: [pi/2, 0] ::, while reducing at code:: [-pi/2, 0] ::. Negative values do the inverse. The default, 0, results in no change.
+discussion:: Focus is a normalised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: maintain gain at code:: [pi/2, 0] ::, while reducing at code:: [-pi/2, 0] ::. Negative values do the inverse. The default, 0, results in no change.
 
 In contrast with zoom, gain is maintained at 0dB in the direction of distortion.
 
@@ -340,7 +340,7 @@ Apply focus along the x-axis.
 argument:: angle
 The distortion angle, in radians. -pi/2 to pi/2
 
-discussion:: Focus is a normailised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: increase gain at code:: [0, pi/2] ::, while reducing at code:: [0, -pi/2] ::. Negative values do the inverse. The default, 0, results in no change.
+discussion:: Focus is a normalised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: maintain gain at code:: [0, pi/2] ::, while reducing at code:: [0, -pi/2] ::. Negative values do the inverse. The default, 0, results in no change.
 
 In contrast with zoom, gain is maintained at 0dB in the direction of distortion.
 
@@ -483,7 +483,7 @@ Apply soundfield asymmetry
 argument:: angle
 The distortion angle, in radians. -pi/2 to pi/2
 
-discussion:: Positive values of strong::angle:: rotate -Y towards the front centre of the image, and at pi/2 collapse the soundfield to a planewave. Negative values rotate +Y toowards the front centre. The default, 0, results in no change.
+discussion:: Positive values of strong::angle:: rotate code:: [0, -pi/2] :: towards code:: [0, 0] ::, and at pi/2 collapse the soundfield to a planewave. Negative values rotate code:: [0, pi/2] :: toowards code:: [0, 0] ::. The default, 0, results in no change.
 
 Imaging is illustrated link::Classes/FoaAsymmetry##here::.
 

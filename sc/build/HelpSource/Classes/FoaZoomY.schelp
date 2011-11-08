@@ -1,0 +1,55 @@
+CLASS:: FoaZoomY
+summary:: First Order Ambisonic (FOA) zoom transformer from the Ambisonic Toolkit (ATK)
+categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
+related:: Classes/FoaZoomX, Classes/FoaZoomZ, Classes/FoaZoom, Classes/FoaTransform, Classes/FoaXform, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+Apply zoom to a first order ambisonic signal (B-format) along the y-axis. link::Classes/FoaZoomY:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
+
+
+NOTE::
+Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
+
+subsection:: Credits
+Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
+Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+::
+
+
+
+CLASSMETHODS::
+
+METHOD:: ar
+
+argument:: w
+Input signal W.
+
+argument:: x
+Input signal X.
+
+argument:: y
+Input signal Y.
+
+argument:: z
+Input signal Z.
+
+argument:: angle
+The distortion angle, in radians. -pi/2 to pi/2
+
+argument:: mul
+Output will be multiplied by this value.
+
+argument:: add
+This value will be added to the output.
+
+
+
+discussion:: Zoom is a normailised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: increase gain at code:: [0, pi/2] ::, while reducing at code:: [0, -pi/2] ::. Negative values do the inverse. The default, 0, results in no change.
+
+
+note:: Corresponding matrix transformer: link::Classes/FoaXformerMatrix#*newZoomY:: ::
+
+
+EXAMPLES::
+
+Please see various examples link::Classes/FoaTransform#examples#here::.
