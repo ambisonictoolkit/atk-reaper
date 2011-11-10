@@ -1,18 +1,14 @@
 CLASS:: FoaPushY
-summary:: First Order Ambisonic (FOA) push transformer from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
-related:: Classes/FoaPushX, Classes/FoaPushZ, Classes/FoaPush, Classes/FoaTransform, Classes/FoaXform, Reference/SomeRelatedStuff, etc.
+summary:: First Order Ambisonic (FOA) push transformer
+categories:: Libraries>Ambisonic Toolkit>FOA>Transforming>UGens, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
+related:: Classes/FoaPushX, Classes/FoaPushZ, Classes/FoaPush, Classes/FoaTransform, Classes/FoaXform
 
 DESCRIPTION::
-Apply push to a first order ambisonic signal (B-format) along the y-axis. link::Classes/FoaPushY:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
+Apply push to a first order ambisonic signal (B-format) along the y-axis.
 
 
 NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+link::Classes/FoaPushY:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
 ::
 
 

@@ -1,18 +1,13 @@
 CLASS:: FoaPsychoShelf
-summary:: First Order Ambisonic (FOA) psychoacoustic shelf filter from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
-related:: Classes/FoaNFC, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
+summary:: First Order Ambisonic (FOA) psychoacoustic shelf filter
+categories:: Libraries>Ambisonic Toolkit>FOA>Decoding>UGens, UGens>Multichannel>Ambisonics
+related:: Classes/FoaNFC, Classes/FoaDecode
 
 DESCRIPTION::
-Apply psychoacoustic shelf filtering to a first order ambisonic signal (B-format). link::Classes/FoaPsychoShelf:: is usually called internally by link::Classes/FoaDecode::.
+Apply psychoacoustic shelf filtering to a first order ambisonic signal (B-format).
 
-
-NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+note::
+link::Classes/FoaPsychoShelf:: is usually called internally by link::Classes/FoaDecode::.
 ::
 
 

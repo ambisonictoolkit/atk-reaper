@@ -1,17 +1,13 @@
 CLASS:: FoaProximity
-summary:: First Order Ambisonic (FOA) proximity effect transformer from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
-related:: Classes/FoaNFC, Classes/FoaTransform, Reference/SomeRelatedStuff, etc.
+summary:: First Order Ambisonic (FOA) proximity effect filter
+categories:: Libraries>Ambisonic Toolkit>FOA>Transforming>UGens, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
+related:: Classes/FoaNFC, Classes/FoaTransform
 
 DESCRIPTION::
-Apply proximity filtering to a first order ambisonic signal (B-format). link::Classes/FoaProximity:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
+Apply proximity filtering to a first order ambisonic signal (B-format).
 
 NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+link::Classes/FoaProximity:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
 ::
 
 

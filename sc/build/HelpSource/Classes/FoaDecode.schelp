@@ -1,18 +1,11 @@
 CLASS:: FoaDecode
-summary:: First Order Ambisonic (FOA) decoder from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics
-related:: Classes/FoaDecoderMatrix, Classes/FoaDecoderKernel, Classes/FoaEncode, Classes/FoaXform, Reference/SomeRelatedStuff, etc.
+summary:: First Order Ambisonic (FOA) decoder
+categories:: Libraries>Ambisonic Toolkit>FOA>Decoding, UGens>Multichannel>Ambisonics
+related:: Classes/FoaDecoderMatrix, Classes/FoaDecoderKernel
 
 DESCRIPTION::
 Renders (decodes) a first order ambisonic signal (B-format) to speaker feeds in a variety of configurations. link::Classes/DecodeB2:: is the SuperCollider inbuilt equivalent.
 
-NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
-::
 
 CLASSMETHODS::
 

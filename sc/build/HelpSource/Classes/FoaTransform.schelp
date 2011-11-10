@@ -1,21 +1,15 @@
 CLASS:: FoaTransform
-summary:: First Order Ambisonic (FOA) transformer from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics
-related:: Classes/FoaXformerMatrix, Classes/FoaEncode, Classes/FoaXform, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
+summary:: First Order Ambisonic (FOA) transformer
+categories:: Libraries>Ambisonic Toolkit>FOA>Transforming, UGens>Multichannel>Ambisonics
+related:: Classes/FoaXform
 
 DESCRIPTION::
 Transforms (spatial domain filter) a first order ambisonic signal (B-format). link::Classes/FoaTransform:: applies dynamic transforms, for static transforms see link::Classes/FoaXform::.
 
-link::Classes/FoaTransform:: is a convenience wrapper around the various transformer UGens.
-
 
 
 NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+link::Classes/FoaTransform:: is a convenience wrapper around the various transformer UGens.
 ::
 
 

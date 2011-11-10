@@ -1,10 +1,10 @@
 CLASS:: FoaTilt
-summary:: First Order Ambisonic (FOA) rotation transformer from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
-related:: Classes/FoaRotate, Classes/FoaTumble, Classes/FoaRTT, Classes/FoaTransform, Classes/FoaXform, Classes/Rotate2, Reference/SomeRelatedStuff, etc.
+summary:: First Order Ambisonic (FOA) rotation transformer
+categories:: Libraries>Ambisonic Toolkit>FOA>Transforming>UGens, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
+related:: Classes/FoaRotate, Classes/FoaTumble, Classes/FoaRTT, Classes/FoaTransform, Classes/FoaXform, Classes/Rotate2
 
 DESCRIPTION::
-Rotate a first order ambisonic signal (B-format) around the x-axis. link::Classes/FoaTilt:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
+Rotate a first order ambisonic signal (B-format) around the x-axis.
 
 
 The inbuilt equivalent is link::Classes/Rotate2::.
@@ -12,11 +12,7 @@ The inbuilt equivalent is link::Classes/Rotate2::.
 
 
 NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+link::Classes/FoaTilt:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
 ::
 
 

@@ -1,18 +1,14 @@
 CLASS:: FoaDominateZ
-summary:: First Order Ambisonic (FOA) dominance transformer from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
-related:: Classes/FoaDominateX, Classes/FoaDominateY, Classes/FoaDominate, Classes/FoaTransform, Classes/FoaXform, Reference/SomeRelatedStuff, etc.
+summary:: First Order Ambisonic (FOA) dominance transformer
+categories:: Libraries>Ambisonic Toolkit>FOA>Transforming>UGens, UGens>Multichannel>Ambisonics, UGens>Multichannel>Panners
+related:: Classes/FoaDominateX, Classes/FoaDominateY, Classes/FoaDominate, Classes/FoaTransform, Classes/FoaXform
 
 DESCRIPTION::
-Apply dominance to a first order ambisonic signal (B-format) along the z-axis. link::Classes/FoaDominateZ:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
+Apply dominance to a first order ambisonic signal (B-format) along the z-axis.
 
 
 NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+link::Classes/FoaDominateZ:: is usually called via the convenience wrapper link::Classes/FoaTransform::.
 ::
 
 

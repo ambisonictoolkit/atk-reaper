@@ -1,21 +1,16 @@
 CLASS:: AtkMatrixMix
 summary:: Matrix mixer from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics
-related:: Classes/Mix, Classes/AtkKernelConv, Classes/FoaEncode, Classes/FoaXform, Classes/FoaTransform, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
+categories:: Libraries>Ambisonic Toolkit>Internals, UGens>Multichannel>Ambisonics
+related:: Classes/Mix, Classes/AtkKernelConv
+
 
 DESCRIPTION::
 Mix an link::Classes/Array:: of channels to an link::Classes/Array:: of channels.
 
+note::
 link::Classes/AtkMatrixMix:: is usually called internally by the Ambisonic Toolkit's encoders, transformers and decoders.
-
-
-NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
 ::
+
 
 
 CLASSMETHODS::

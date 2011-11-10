@@ -1,18 +1,11 @@
 CLASS:: FoaXform
-summary:: First Order Ambisonic (FOA) matrix transformer from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit, UGens>Multichannel>Ambisonics
-related:: Classes/FoaXformerMatrix, Classes/FoaEncode, Classes/FoaTransform, Classes/FoaDecode, Reference/SomeRelatedStuff, etc.
+summary:: First Order Ambisonic (FOA) matrix transformer
+categories:: Libraries>Ambisonic Toolkit>FOA>Transforming, UGens>Multichannel>Ambisonics
+related:: Classes/FoaXformerMatrix, Classes/FoaTransform
 
 DESCRIPTION::
 Transforms (spatial domain filter) a first order ambisonic signal (B-format). link::Classes/FoaXform:: applies static transforms, for dynamic transforms see link::Classes/FoaTransform::.
 
-NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
-::
 
 
 CLASSMETHODS::
@@ -181,7 +174,7 @@ Rotation is one of the most used soundfield transforms. In this case we'll it to
 
 If you haven't already choose a code:: ~decoder:: and defined code:: ~renderDecode ::, do so link::#choose_a_decoder#now::.
 
-note:: A matrix type transformer, see link::Classes/FoaXformererMatrix#*newRotate:: for further details.::
+note:: A matrix type transformer, see link::Classes/FoaXformerMatrix#*newRotate:: for further details.::
 
 code::
 // ------------------------------------------------------------
@@ -252,7 +245,7 @@ In mirroring through the origin and delaying the soundfield, we can generate a n
 
 If you haven't already choose a code:: ~decoder:: and defined code:: ~renderDecode ::, do so link::#choose_a_decoder#now::.
 
-note:: A matrix type transformer, see link::Classes/FoaXformererMatrix#*newMirrorO:: for further details.::
+note:: A matrix type transformer, see link::Classes/FoaXformerMatrix#*newMirrorO:: for further details.::
 
 
 code::
@@ -340,7 +333,7 @@ Dominance adjusts the gain of a soundfield in a particular direction. Here we'll
 
 If you haven't already choose a code:: ~decoder:: and defined code:: ~renderDecode ::, do so link::#choose_a_decoder#now::.
 
-note:: A matrix type transformer, see link::Classes/FoaXformererMatrix#*newDominateX:: for further details.::
+note:: A matrix type transformer, see link::Classes/FoaXformerMatrix#*newDominateX:: for further details.::
 
 
 code::

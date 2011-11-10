@@ -1,19 +1,14 @@
 CLASS:: FoaSpeakerMatrix
-summary:: First Order Ambisonic (FOA) diametric decoder speaker matrices from the Ambisonic Toolkit (ATK)
-categories:: Ambisonic Toolkit
-related:: Classes/FoaDecoderMatrix, Reference/SomeRelatedStuff, etc.
+summary:: First Order Ambisonic (FOA) diametric decoder speaker matrices
+categories:: Libraries>Ambisonic Toolkit>Internals
+related:: Classes/FoaDecoderMatrix
 
 DESCRIPTION::
 Generates speaker matrices required by the Ambisonic Toolkit's first order diametric decoder, link::Classes/FoaDecoderMatrix#*newDiametric::. footnote:: link::Classes/FoaSpeakerMatrix:: is Heller's speaker matrix helper used to generate matricies for diamatric decoding. See: See: E. Benjamin, R. Lee, and A. Heller, "Is My Decoder Ambisonic?," in Proceedings of the 125th Audio Engineering Society Convention, San Francisco, 2008. ::
 
-In normal circumstances, the user will not call link::Classes/FoaSpeakerMatrix:: directly.
 
 NOTE::
-Part of the Ambisonic Toolkit, a soundfield kernel synthesis, processing and rendering library.
-
-subsection:: Credits
-Joseph Anderson [j.anderson[at]ambisonictoolkit.net],
-Josh Parmenter [j.parmenter[at]ambisonictoolkit.net], 2011
+In normal circumstances, the user will not call link::Classes/FoaSpeakerMatrix:: directly.
 ::
 
 
