@@ -48,6 +48,10 @@ This value will be added to the output.
 
 discussion:: Zoom is a normailised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: increase gain at code:: [0, pi/2] ::, while reducing at code:: [0, -pi/2] ::. Negative values do the inverse. The default, 0, results in no change.
 
+anchor::figure::
+
+image::balance_fig.png#Balance imaging::
+
 
 note:: Corresponding matrix transformer: link::Classes/FoaXformerMatrix#*newZoomY:: ::
 

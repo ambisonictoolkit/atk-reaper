@@ -45,6 +45,11 @@ This value will be added to the output.
 discussion:: Positive values of strong::gain:: increase the gain at code:: [0, 0] :: to strong::+gain:: dB, while decreasing the gain at code:: [pi, 0] :: to strong::-gain::. This simultaneously results in a distortion of the image towards code:: [0, 0] ::. Negative values of gain invert this distortion, distorting towards code:: [pi, 0] :: . The default, 0, results in no change.
 
 
+anchor::figure::
+
+image::dominance_fig.png#Dominance imaging::
+
+
 note:: Corresponding matrix transformer: link::Classes/FoaXformerMatrix#*newDominateX:: ::
 
 

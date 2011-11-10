@@ -124,6 +124,9 @@ discussion::
 
 strong::Angle:: = 0 retains the current directivity of the soundfield. Increasing strong::angle:: towards pi/2 decreases the directivity, reducing the gains on the directional compenents to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes omnidirectional or directionless.
 
+
+Imaging is illustrated link::Classes/FoaDirectO#figure#here::.
+
 note:: Corresponding UGen: link::Classes/FoaDirectO:: ::
 
 
@@ -137,6 +140,8 @@ discussion::
 
 strong::Angle:: = 0 retains the current directivity of the soundfield. Increasing strong::angle:: towards pi/2 decreases the directivity along the x-axis, reducing the gain on this axis to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes directionless on the x-axis.
 
+Imaging is illustrated link::Classes/FoaDirectX#figure#here::.
+
 note:: Corresponding UGen: link::Classes/FoaDirectX:: ::
 
 
@@ -149,6 +154,8 @@ The distortion angle, in radians. 0 to pi/2
 discussion::
 
 strong::Angle:: = 0 retains the current directivity of the soundfield. Increasing strong::angle:: towards pi/2 decreases the directivity along the y-axis, reducing the gain on this axis to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes directionless on the y-axis.
+
+Imaging is illustrated link::Classes/FoaDirectY#figure#here::.
 
 note:: Corresponding UGen: link::Classes/FoaDirectY:: ::
 
@@ -196,7 +203,7 @@ Dominance gain, in dB.
 
 discussion:: Positive values of strong::gain:: increase the gain at code:: [0, 0] :: to strong::+gain:: dB, while decreasing the gain at code:: [pi, 0] :: to strong::-gain::. This simultaneously results in a distortion of the image towards code:: [0, 0] ::. Negative values of gain invert this distortion, distorting towards code:: [pi, 0] :: . The default, 0, results in no change.
 
-Imaging is illustrated link::Classes/FoaDominateX##here::.
+Imaging is illustrated link::Classes/FoaDominateX#figure#here::.
 
 
 note:: Corresponding UGen: link::Classes/FoaDominateX:: ::
@@ -254,7 +261,7 @@ The distortion angle, in radians. -pi/2 to pi/2
 
 discussion:: Zoom is a normailised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: increase gain at code:: [0, 0] ::, while reducing at code:: [pi, 0] ::. Negative values do the inverse. The default, 0, results in no change.
 
-Imaging is illustrated link::Classes/FoaZoomX##here::.
+Imaging is illustrated link::Classes/FoaZoomX#figure#here::.
 
 note:: Corresponding UGen: link::Classes/FoaZoomX:: ::
 
@@ -267,6 +274,8 @@ argument:: angle
 The distortion angle, in radians. -pi/2 to pi/2
 
 discussion:: Zoom is a normailised dominance variant, specified in terms of a distortion angle. Positive values of strong::angle:: increase gain at code:: [pi/2, 0] ::, while reducing at code:: [-pi/2, 0] ::. Negative values do the inverse. The default, 0, results in no change.
+
+Imaging is illustrated link::Classes/FoaZoomY#figure#here::.
 
 note:: Corresponding UGen: link::Classes/FoaZoomY:: ::
 
@@ -315,7 +324,7 @@ discussion:: Focus is a normalised dominance variant, specified in terms of a di
 
 In contrast with zoom, gain is maintained at 0dB in the direction of distortion.
 
-Imaging is illustrated link::Classes/FoaFocusX##here::.
+Imaging is illustrated link::Classes/FoaFocusX#figure#here::.
 
 note:: Corresponding UGen: link::Classes/FoaFocusX:: ::
 
@@ -374,7 +383,7 @@ The distortion angle, in radians. -pi/2 to pi/2
 
 discussion:: Push is a dominance related transform, specified in terms of a distortion angle. Positive values of strong::angle:: push the image towards code:: [0, 0] ::. Negative values push towards code:: [pi, 0] ::. The default, 0, results in no change.
 
-Imaging is illustrated link::Classes/FoaPushX##here::.
+Imaging is illustrated link::Classes/FoaPushX#figure#here::.
 
 note:: Corresponding UGen: link::Classes/FoaPushX:: ::
 
@@ -431,7 +440,7 @@ The distortion angle, in radians. -pi/2 to pi/2
 
 discussion:: Press is a dominance related transform, specified in terms of a distortion angle. Positive values of strong::angle:: press the image towards code:: [0, 0] ::. Negative values press towards code:: [pi, 0] ::. The default, 0, results in no change.
 
-Imaging is illustrated link::Classes/FoaPressX##here::.
+Imaging is illustrated link::Classes/FoaPressX#figure#here::.
 
 note:: Corresponding UGen: link::Classes/FoaPressX:: ::
 
@@ -485,7 +494,7 @@ The distortion angle, in radians. -pi/2 to pi/2
 
 discussion:: Positive values of strong::angle:: rotate code:: [0, -pi/2] :: towards code:: [0, 0] ::, and at pi/2 collapse the soundfield to a planewave. Negative values rotate code:: [0, pi/2] :: toowards code:: [0, 0] ::. The default, 0, results in no change.
 
-Imaging is illustrated link::Classes/FoaAsymmetry##here::.
+Imaging is illustrated link::Classes/FoaAsymmetry#figure#here::.
 
 note:: Corresponding UGen: link::Classes/FoaAsymmetry:: ::
 
@@ -499,6 +508,9 @@ The distortion angle, in radians. -pi/2 to pi/2
 
 discussion:: See link::#*newZoomY#ZoomY::.
 
+Imaging is illustrated link::Classes/FoaBalance#figure#here::.
+
+note:: Corresponding UGen: link::Classes/FoaBalance:: ::
 
 
 

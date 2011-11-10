@@ -45,6 +45,11 @@ discussion::
 
 strong::Angle:: = 0 retains the current directivity of the soundfield. Increasing strong::angle:: towards pi/2 decreases the directivity, reducing the gains on the directional compenents to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes omnidirectional or directionless.
 
+anchor::figure::
+
+image::direct_fig.png#DirectO imaging::
+
+
 note:: Corresponding matrix transformer: link::Classes/FoaXformerMatrix#*newDirectO:: ::
 
 

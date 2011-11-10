@@ -42,7 +42,13 @@ Output will be multiplied by this value.
 argument:: add
 This value will be added to the output.
 
-discussion:: Positive values of strong::angle:: rotate code:: [0, -pi/2] :: towards code:: [0, 0] ::, and at pi/2 collapse the soundfield to a planewave. Negative values rotate code:: [0, pi/2] :: toowards code:: [0, 0] ::. The default, 0, results in no change.
+discussion:: Positive values of strong::angle:: rotate code:: [0, -pi/2] :: towards code:: [0, 0] ::, and at pi/2 collapse the soundfield to a planewave. Negative values rotate code:: [0, pi/2] :: towards code:: [0, 0] ::. The default, 0, results in no change.
+
+
+
+anchor::figure::
+
+image::asymmetry_fig.png#Asymmetry imaging::
 
 
 note:: Corresponding matrix transformer: link::Classes/FoaXformerMatrix#*newAsymmetry:: ::

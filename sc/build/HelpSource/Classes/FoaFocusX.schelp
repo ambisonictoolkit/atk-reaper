@@ -46,6 +46,10 @@ discussion:: Focus is a normalised dominance variant, specified in terms of a di
 
 In contrast with zoom, gain is maintained at 0dB in the direction of distortion.
 
+anchor::figure::
+
+image::focus_fig.png#Focus imaging::
+
 
 note:: Corresponding matrix transformer: link::Classes/FoaXformerMatrix#*newFocusX:: ::
 

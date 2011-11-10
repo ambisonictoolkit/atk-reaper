@@ -45,6 +45,11 @@ This value will be added to the output.
 discussion:: Press is a dominance related transform, specified in terms of a distortion angle. Positive values of strong::angle:: press the image towards code:: [0, 0] ::. Negative values press towards code:: [pi, 0] ::. The default, 0, results in no change.
 
 
+anchor::figure::
+
+image::press_fig.png#Press imaging::
+
+
 note:: Corresponding matrix transformer: link::Classes/FoaXformerMatrix#*newPressX:: ::
 
 
