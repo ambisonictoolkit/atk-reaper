@@ -1,0 +1,32 @@
+\documentclass[10pt]{article}
+\usepackage[usenames]{color} %used for font color
+\usepackage{amssymb} %maths
+\usepackage{amsmath} %maths
+\usepackage[utf8]{inputenc} %useful to type directly diacritic characters
+% import pst-node: node package
+\usepackage{pst-node}
+
+%draw matrix
+\psset{framearc=0.2,shadow=true,fillstyle=solid,shadowcolor=black!25}
+\begin{psmatrix}[rowsep=0.2cm]
+  & \textcolor{cyan}{\textbf{Author}} & \psline[linestyle=dashed,shadow=false,linecolor=cyan](-1.5,0.5)(-1.5,-4.5) \textcolor{cyan}{\textbf{Image}} \psline[linestyle=dashed,shadow=false,linecolor=cyan](1.5,0.5)(1.5,-4.5) & \textcolor{cyan}{\textbf{Monitor}}  & \\ 
+  \text{microphone} & & & & {\tabular{c}3D speaker\\ array \endtabular} \\
+  {\tabular{c}microphone\\ array \endtabular} & \psframebox{encoder} & \psframebox{transformer} & \psframebox{decoder} & {\tabular{c}2D speaker\\ array \endtabular} \\
+  \text{synthesiser(s)} & & & & {\tabular{c}stereo\\ array \endtabular} \\
+  {\tabular{c}virtual speaker\\ array \endtabular} & & & & \text{headphones}
+\end{psmatrix}
+%draw arrows
+\psset{nodesep=2pt,arrows=>}
+%to encoding
+\ncline[arrowscale=2]{3,2}{2,1}
+\ncline[arrowscale=2]{3,2}{3,1}
+\ncline[arrowscale=2]{3,2}{4,1}
+\ncline[arrowscale=2]{3,2}{5,1}
+%network
+\ncline[arrowscale=2]{3,3}{3,2}
+\ncline[arrowscale=2]{3,4}{3,3}
+%to decoding
+\ncline[arrowscale=2]{2,5}{3,4}
+\ncline[arrowscale=2]{3,5}{3,4}
+\ncline[arrowscale=2]{4,5}{3,4}
+\ncline[arrowscale=2]{5,5}{3,4}
