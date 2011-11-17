@@ -1,0 +1,66 @@
+<html><head><title>AtkKernelConv</title><link rel='stylesheet' href='./../scdoc.css' type='text/css' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><script src='./../scdoc.js' type='text/javascript'></script><script src='./../docmap.js' type='text/javascript'></script><script src='./../prettify.js' type='text/javascript'></script><script src='./../lang-sc.js' type='text/javascript'></script><script type='text/javascript'>var helpRoot='./..';</script></head><ul id='menubar'></ul><body onload='fixTOC();prettyPrint()'><div class='contents'><div class='header'><div id='label'>SuperCollider CLASSES</div><div id='categories'><a href='./../Browse.html#Libraries>Ambisonic Toolkit>Internals'>Libraries>Ambisonic Toolkit>Internals</a>, <a href='./../Browse.html#UGens>Multichannel>Ambisonics'>UGens>Multichannel>Ambisonics</a></div><h1>AtkKernelConv</h1><div id='summary'>Kernel convolution from the Ambisonic Toolkit (ATK)</div></div><div class='subheader'>
+<div id='filename'>Source: /Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/<a href='file:///Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/ATK.sc'>ATK.sc</a></div><div class='inheritance'>Inherits from: <a href="../Classes/Object.html">Object</a></div><div id='related'>See also: <a href="./../Classes/Convolution2.html">Convolution2</a>, <a href="./../Classes/AtkMatrixMix.html">AtkMatrixMix</a></div>[ <a href='nil'>old help</a> ]</div><div id='toc'>
+<ul class='toc'><li class='toc1'><a href='#description'>Description</a></li>
+<ul class='toc'></ul><li class='toc1'><a href='#classmethods'>Class methods</a></li>
+<ul class='toc'><li class='toc3'><a href='#*ar'>ar</a> </li>
+<li class='toc2'><a href='#inherited_class_methods'>Inherited class methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#instancemethods'>Instance methods</a></li>
+<ul class='toc'><li class='toc2'><a href='#inherited_instance_methods'>Inherited instance methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#examples'>Examples</a></li>
+<ul class='toc'><li class='toc2'><a href='#monophonic_to_decorrelated_foa'>Monophonic to decorrelated FOA</a></li>
+<ul class='toc'></ul></ul></ul></div><h2><a class='anchor' name='description'>Description</a></h2>
+<p>Convolve an <a href="./../Classes/Array.html">Array</a> of channels to an <a href="./../Classes/Array.html">Array</a> of channels.
+<div class='note'><span class='notelabel'>NOTE:</span> <a href="./../Classes/AtkKernelConv.html">AtkKernelConv</a> is usually called internally by the Ambisonic Toolkit's encoders, transformers and decoders.
+</div><h2><a class='anchor' name='classmethods'>Class Methods</a></h2>
+<h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*ar'>*</a></span><a href='./../Overviews/Methods.html#ar'>ar</a> (<span class='argstr'>in</span>, <span class='argstr'>kernel</span>, <span class='argstr'>mul = 1</span>, <span class='argstr'>add = 0</span>)</h3>
+<div class='method'><h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> in <td class='argumentdesc'><p>The input signal, an array.
+<tr><td class='argumentname'> kernel <td class='argumentdesc'><p>The convolution kernel.
+<tr><td class='argumentname'> mul <td class='argumentdesc'><p>Output will be multiplied by this value.
+<tr><td class='argumentname'> add <td class='argumentdesc'><p>This value will be added to the output.
+</table><h4>Returns:</h4>
+<div class='returnvalue'><p>An array of channels.
+</div><h4>Discussion:</h4>
+<div class='note'><span class='notelabel'>NOTE:</span> In normal circumstances, the user will not call <a href="./../Classes/AtkKernelConv.html">AtkKernelConv</a> directly.</div></div><h3><a class='anchor' name='inherited_class_methods'>Inherited class methods</a></h3>
+<div id='inheritedclassmets'></div><h2><a class='anchor' name='instancemethods'>Instance Methods</a></h2>
+<h3><a class='anchor' name='inherited_instance_methods'>Inherited instance methods</a></h3>
+<div id='inheritedinstmets'></div><h2><a class='anchor' name='examples'>Examples</a></h2>
+<h3><a class='anchor' name='monophonic_to_decorrelated_foa'>Monophonic to decorrelated FOA</a></h3>
+<pre class='code prettyprint lang-sc'>
+// hand code a mono signal to a decorrelated soundfield in B-format
+// NOTE: the demonstrated kernel is not ideal for this task
+
+// define encoding kernel
+(
+var kernelSize;
+var scale;
+
+kernelSize = 256;
+scale = 24.neg.dbamp;
+
+~kernel = [[
+	<a class='clslnk' href='./../Classes/Buffer.html'>Buffer</a>.loadCollection(s, <a class='clslnk' href='./../Classes/FloatArray.html'>FloatArray</a>.fill(kernelSize, {(3/2).sqrt * scale.rand2})),
+	<a class='clslnk' href='./../Classes/Buffer.html'>Buffer</a>.loadCollection(s, <a class='clslnk' href='./../Classes/FloatArray.html'>FloatArray</a>.fill(kernelSize, {scale.rand2})),
+	<a class='clslnk' href='./../Classes/Buffer.html'>Buffer</a>.loadCollection(s, <a class='clslnk' href='./../Classes/FloatArray.html'>FloatArray</a>.fill(kernelSize, {scale.rand2})),
+	<a class='clslnk' href='./../Classes/Buffer.html'>Buffer</a>.loadCollection(s, <a class='clslnk' href='./../Classes/FloatArray.html'>FloatArray</a>.fill(kernelSize, {scale.rand2}))
+]]
+)
+
+// convolve
+(
+{ 
+    var sig;
+
+    // pink noise
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar;
+
+    // encode
+    <a class='clslnk' href='./../Classes/AtkKernelConv.html'>AtkKernelConv</a>.ar(sig, ~kernel);
+}.scope
+)
+
+// free kernel when finished
+~kernel.at(0).do({arg kern; kern.free})
+</pre>
+<div class='doclink'>source: <a href='file:///Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/AtkKernelConv.schelp'>/Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/AtkKernelConv.schelp</a></div></div></body></html>

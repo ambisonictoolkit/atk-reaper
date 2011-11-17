@@ -1,0 +1,36 @@
+<html><head><title>FoaDominateY</title><link rel='stylesheet' href='./../scdoc.css' type='text/css' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><script src='./../scdoc.js' type='text/javascript'></script><script src='./../docmap.js' type='text/javascript'></script><script src='./../prettify.js' type='text/javascript'></script><script src='./../lang-sc.js' type='text/javascript'></script><script type='text/javascript'>var helpRoot='./..';</script></head><ul id='menubar'></ul><body onload='fixTOC();prettyPrint()'><div class='contents'><div class='header'><div id='label'>SuperCollider CLASSES</div><div id='categories'><a href='./../Browse.html#Libraries>Ambisonic Toolkit>FOA>Transforming>UGens'>Libraries>Ambisonic Toolkit>FOA>Transforming>UGens</a>, <a href='./../Browse.html#UGens>Multichannel>Ambisonics'>UGens>Multichannel>Ambisonics</a>, <a href='./../Browse.html#UGens>Multichannel>Panners'>UGens>Multichannel>Panners</a></div><h1>FoaDominateY</h1><div id='summary'>First Order Ambisonic (FOA) dominance transformer</div></div><div class='subheader'>
+<div id='filename'>Source: /Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/<a href='file:///Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/ATK.sc'>ATK.sc</a></div><div class='inheritance'>Inherits from: <a href="../Classes/FoaDominateX.html">FoaDominateX</a> : <a href="../Classes/Foa.html">Foa</a> : <a href="../Classes/Panner.html">Panner</a> : <a href="../Classes/MultiOutUGen.html">MultiOutUGen</a> : <a href="../Classes/UGen.html">UGen</a> : <a href="../Classes/AbstractFunction.html">AbstractFunction</a> : <a href="../Classes/Object.html">Object</a></div><div id='related'>See also: <a href="./../Classes/FoaDominateX.html">FoaDominateX</a>, <a href="./../Classes/FoaDominateZ.html">FoaDominateZ</a>, <a href="./../Classes/FoaDominate.html">FoaDominate</a>, <a href="./../Classes/FoaTransform.html">FoaTransform</a>, <a href="./../Classes/FoaXform.html">FoaXform</a></div>[ <a href='nil'>old help</a> ]</div><div id='toc'>
+<ul class='toc'><li class='toc1'><a href='#description'>Description</a></li>
+<ul class='toc'></ul><li class='toc1'><a href='#classmethods'>Class methods</a></li>
+<ul class='toc'><li class='toc3'><a href='#*ar'>ar</a> </li>
+<li class='toc2'><a href='#inherited_class_methods'>Inherited class methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#instancemethods'>Instance methods</a></li>
+<ul class='toc'><li class='toc2'><a href='#inherited_instance_methods'>Inherited instance methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#examples'>Examples</a></li>
+<ul class='toc'></ul></ul></div><h2><a class='anchor' name='description'>Description</a></h2>
+<p>Apply dominance to a first order ambisonic signal (B-format) along the y-axis.
+<div class='note'><span class='notelabel'>NOTE:</span> <a href="./../Classes/FoaDominateY.html">FoaDominateY</a> is usually called via the convenience wrapper <a href="./../Classes/FoaTransform.html">FoaTransform</a>.
+</div><h2><a class='anchor' name='classmethods'>Class Methods</a></h2>
+<h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*ar'>*</a></span><a href='./../Overviews/Methods.html#ar'>ar</a> (<span class='argstr'>w</span>, <span class='argstr'>x</span>, <span class='argstr'>y</span>, <span class='argstr'>z</span>, <span class='argstr'>gain = 0</span>, <span class='argstr'>mul = 1</span>, <span class='argstr'>add = 0</span>)</h3>
+<div class='supmethod'>From superclass: <a href='./../Classes/FoaDominateX.html'>FoaDominateX</a></div>
+<div class='method'><h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> w <td class='argumentdesc'><p>Input signal W.
+<tr><td class='argumentname'> x <td class='argumentdesc'><p>Input signal X.
+<tr><td class='argumentname'> y <td class='argumentdesc'><p>Input signal Y.
+<tr><td class='argumentname'> z <td class='argumentdesc'><p>Input signal Z.
+<tr><td class='argumentname'> gain <td class='argumentdesc'><p>Dominance gain, in dB.
+<tr><td class='argumentname'> mul <td class='argumentdesc'><p>Output will be multiplied by this value.
+<tr><td class='argumentname'> add <td class='argumentdesc'><p>This value will be added to the output.
+</table><h4>Discussion:</h4>
+<p>Positive values of <strong>gain</strong> increase the gain at <code class='code prettyprint lang-sc'> [pi/2, 0] </code>
+ to <strong>+gain</strong> dB, while decreasing the gain at <code class='code prettyprint lang-sc'> [-pi/2, 0] </code>
+ to <strong>-gain</strong>. This simultaneously results in a distortion of the image towards <code class='code prettyprint lang-sc'> [pi/2, 0] </code>
+. Negative values of gain invert this distortion, distorting towards <code class='code prettyprint lang-sc'> [-pi/2, 0] </code>
+ . The default, 0, results in no change.
+<div class='note'><span class='notelabel'>NOTE:</span> Corresponding matrix transformer: <a href="./../Classes/FoaXformerMatrix.html#*newDominateY">FoaXformerMatrix: *newDominateY</a> </div></div><h3><a class='anchor' name='inherited_class_methods'>Inherited class methods</a></h3>
+<div id='inheritedclassmets'></div><h2><a class='anchor' name='instancemethods'>Instance Methods</a></h2>
+<h3><a class='anchor' name='inherited_instance_methods'>Inherited instance methods</a></h3>
+<div id='inheritedinstmets'></div><h2><a class='anchor' name='examples'>Examples</a></h2>
+<p>Please see various examples <a href="./../Classes/FoaTransform.html#examples">here</a>.
+<div class='doclink'>source: <a href='file:///Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaDominateY.schelp'>/Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaDominateY.schelp</a></div></div></body></html>

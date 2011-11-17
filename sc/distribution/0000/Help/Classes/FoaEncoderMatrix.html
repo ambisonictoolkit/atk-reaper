@@ -1,0 +1,315 @@
+<html><head><title>FoaEncoderMatrix</title><link rel='stylesheet' href='./../scdoc.css' type='text/css' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><script src='./../scdoc.js' type='text/javascript'></script><script src='./../docmap.js' type='text/javascript'></script><script src='./../prettify.js' type='text/javascript'></script><script src='./../lang-sc.js' type='text/javascript'></script><script type='text/javascript'>var helpRoot='./..';</script></head><ul id='menubar'></ul><body onload='fixTOC();prettyPrint()'><div class='contents'><div class='header'><div id='label'>SuperCollider CLASSES</div><div id='categories'><a href='./../Browse.html#Libraries>Ambisonic Toolkit>FOA>Encoding'>Libraries>Ambisonic Toolkit>FOA>Encoding</a></div><h1>FoaEncoderMatrix</h1><div id='summary'>First Order Ambisonic (FOA) encoder matrices</div></div><div class='subheader'>
+<div id='filename'>Source: /Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/<a href='file:///Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/ATKMatrix.sc'>ATKMatrix.sc</a></div><div class='inheritance'>Inherits from: <a href="../Classes/Object.html">Object</a></div><div id='related'>See also: <a href="./../Classes/FoaEncoderKernel.html">FoaEncoderKernel</a>, <a href="./../Classes/FoaEncode.html">FoaEncode</a></div>[ <a href='nil'>old help</a> ]</div><div id='toc'>
+<ul class='toc'><li class='toc1'><a href='#description'>Description</a></li>
+<ul class='toc'></ul><li class='toc1'><a href='#classmethods'>Class methods</a></li>
+<ul class='toc'><li class='toc3'><a href='#*newOmni'>newOmni</a> </li>
+<li class='toc3'><a href='#*newDirection'>newDirection</a> </li>
+<li class='toc3'><a href='#*newStereo'>newStereo</a> </li>
+<li class='toc3'><a href='#*newQuad'>newQuad</a> </li>
+<li class='toc3'><a href='#*new5_0'>new5_0</a> </li>
+<li class='toc3'><a href='#*new7_0'>new7_0</a> </li>
+<li class='toc3'><a href='#*newPanto'>newPanto</a> </li>
+<li class='toc3'><a href='#*newPeri'>newPeri</a> </li>
+<li class='toc3'><a href='#*newDirections'>newDirections</a> </li>
+<li class='toc3'><a href='#*newZoomH2'>newZoomH2</a> </li>
+<li class='toc3'><a href='#*newAtoB'>newAtoB</a> </li>
+<li class='toc2'><a href='#inherited_class_methods'>Inherited class methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#instancemethods'>Instance methods</a></li>
+<ul class='toc'><li class='toc3'><a href='#-kind'>kind</a> </li>
+<li class='toc3'><a href='#-dim'>dim</a> </li>
+<li class='toc3'><a href='#-numChannels'>numChannels</a> </li>
+<li class='toc3'><a href='#-dirChannels'>dirChannels</a> </li>
+<li class='toc3'><a href='#-matrix'>matrix</a> </li>
+<li class='toc3'><a href='#-numOutputs'>numOutputs</a> </li>
+<li class='toc3'><a href='#-dirOutputs'>dirOutputs</a> </li>
+<li class='toc3'><a href='#-numInputs'>numInputs</a> </li>
+<li class='toc3'><a href='#-dirInputs'>dirInputs</a> </li>
+<li class='toc2'><a href='#inherited_instance_methods'>Inherited instance methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#examples'>Examples</a></li>
+<ul class='toc'></ul></ul></div><h2><a class='anchor' name='description'>Description</a></h2>
+<p>Generates encoding matrices required by the Ambisonic Toolkit's first order encoder, <a href="./../Classes/FoaEncode.html">FoaEncode</a>.
+<h2><a class='anchor' name='classmethods'>Class Methods</a></h2>
+<h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newOmni'>*</a></span><a href='./../Overviews/Methods.html#newOmni'>newOmni</a> </h3>
+<div class='method'><p>Omnidirectional encoder (monophonic).
+<h4>Discussion:</h4>
+<p>An omnidirectional soundfield can be regarded in two ways: a soundfield with an infinite number of planewaves arriving in all directions, or a soundfield with no directions. In a well aligned, dampend studio environment, this usually sounds "in the head", while in concert hall listening usually appears as omnipresent.
+<p>To control the soundfield, <a href="./../Classes/FoaPush.html">FoaPush</a> and <a href="./../Classes/FoaFocus.html">FoaFocus</a> can be applied to either "push" or "focus" an omnidirectional soundfield into a planewave, giving the soundfield an angle of arrival.<a class='footnote anchor' name='footnote_org_1' href='#footnote_1'><sup>1</sup></a> </div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newDirection'>*</a></span><a href='./../Overviews/Methods.html#newDirection'>newDirection</a> (<span class='argstr'>theta = 0</span>, <span class='argstr'>phi = 0</span>)</h3>
+<div class='method'><p>Planewave encoder (monophonic).
+<h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> theta <td class='argumentdesc'><p>Azimuth angle, in radians: pi to -pi
+<tr><td class='argumentname'> phi <td class='argumentdesc'><p>Elevation anglein radians: pi/2 to -pi/2
+</table><h4>Discussion:</h4>
+<p>This is the classic Ambisonic encoding (panning) function. SuperCollider's inbuilt <a href="./../Classes/PanB.html">PanB</a> and the Ambisonic Toolkit's <a href="./../Classes/FoaPanB.html">FoaPanB</a> implement this encoder as a UGen, and allow dynamically changing <strong>theta</strong> and <strong>phi</strong>.
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newStereo'>*</a></span><a href='./../Overviews/Methods.html#newStereo'>newStereo</a> (<span class='argstr'>angle = 0</span>)</h3>
+<div class='method'><p>Stereophonic encoder.
+<h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> angle <td class='argumentdesc'><p>Soundfield distortion angle, in radians: pi/2 to -pi/2
+</table><h4>Discussion:</h4>
+<p>The stereophonic signal is encoded as two planewaves. When <strong>angle</strong> = 0, the left and right channels of the input signal arrive at <code class='code prettyprint lang-sc'> [90, -90] </code>
+ degrees. <strong>angle</strong> = pi/4 distorts the arrivals to <code class='code prettyprint lang-sc'> [45, -45] </code>
+ degrees. <strong>angle</strong> = pi/2, places both the left and right inputs at front centre, <code class='code prettyprint lang-sc'> [0, 0] </code>
+ degrees. This behaviour matches that of the Ambisonic Toolkit's first order image warping UGens: <a href="./../Classes/FoaFocus.html">FoaFocus</a>, <a href="./../Classes/FoaZoom.html">FoaZoom</a>, <a href="./../Classes/FoaPush.html">FoaPush</a>, and <a href="./../Classes/FoaPress.html">FoaPress</a>.
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newQuad'>*</a></span><a href='./../Overviews/Methods.html#newQuad'>newQuad</a> </h3>
+<div class='method'><p>Quadraphonic encoder.
+<h4>Discussion:</h4>
+<p>The quadraphonic signal is encoded as four planewaves arriving at <code class='code prettyprint lang-sc'> [ 45, 135, -135, -45 ] </code>
+ degrees. This encoding is equivalent to placing infinitely distant loudspeakers around a soundfield microphone in an anechoic chamber.
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*new5_0'>*</a></span><a href='./../Overviews/Methods.html#new5_0'>new5_0</a> </h3>
+<div class='method'><p>5.0 encoder.
+<h4>Discussion:</h4>
+<p>The 5.0 signal is encoded as five planewaves arriving at <code class='code prettyprint lang-sc'> [ 0, 30, 110, -110, -30 ] </code>
+ degrees. This encoding is equivalent to placing infinitely distant loudspeakers around a soundfield microphone in an anechoic chamber.
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*new7_0'>*</a></span><a href='./../Overviews/Methods.html#new7_0'>new7_0</a> </h3>
+<div class='method'><p>7.0 encoder.
+<h4>Discussion:</h4>
+<p>The 7.0 signal is encoded as seven planewaves arriving at <code class='code prettyprint lang-sc'> [ 0, 30, 90, 135, -135, -90, -30 ] </code>
+ degrees. This encoding is equivalent to placing infinitely distant loudspeakers around a soundfield microphone in an anechoic chamber.
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newPanto'>*</a></span><a href='./../Overviews/Methods.html#newPanto'>newPanto</a> (<span class='argstr'>numChans = 4</span>, <span class='argstr'>orientation = 'flat'</span>)</h3>
+<div class='method'><p>Pantophonic (2D) regular polygon encoder.
+<h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> numChans <td class='argumentdesc'><p>number of input channel feeds
+<tr><td class='argumentname'> orientation <td class='argumentdesc'><code class='code prettyprint lang-sc'>'flat'</code>
+ or <code class='code prettyprint lang-sc'>'point'</code>
+</table><h4>Discussion:</h4>
+<p> Inputs are in anti-clockwise order. The position of the first input channel is either centre or left of centre. <a href="#-dirChannels">-dirChannels</a> may be used to query resulting input channel directions. This encoding is equivalent to placing infinitely distant loudspeakers around a soundfield microphone in an anechoic chamber.
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newPeri'>*</a></span><a href='./../Overviews/Methods.html#newPeri'>newPeri</a> (<span class='argstr'>numChanPairs = 4</span>, <span class='argstr'>elevation = 0.61547970867039</span>, <span class='argstr'>orientation = 'flat'</span>)</h3>
+<div class='method'><p>Periphonic (3D) dual ring, regular cylindrical encoder.
+<h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> numChanPairs <td class='argumentdesc'><p>Number of channel pairs. (Half the total number of input channel feeds.)
+<tr><td class='argumentname'> elevation <td class='argumentdesc'><p>Elevation of the upper ring, measured from the origin. In radians.
+<tr><td class='argumentname'> orientation <td class='argumentdesc'><code class='code prettyprint lang-sc'>'flat'</code>
+ or <code class='code prettyprint lang-sc'>'point'</code>
+</table><h4>Discussion:</h4>
+<p> Inputs are in anti-clockwise order, beginning with the top ring. The position of the first speaker is either centre or left of centre. <a href="#-dirChannels">-dirChannels</a> may be used to query resulting loudspeaker directions. This encoding is equivalent to placing infinitely distant loudspeakers around a soundfield microphone in an anechoic chamber.
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newDirections'>*</a></span><a href='./../Overviews/Methods.html#newDirections'>newDirections</a> (<span class='argstr'>directions</span>, <span class='argstr'>pattern</span>)</h3>
+<div class='method'><p>Virtual loudspeaker or microphone encoder, suitable for varied periphonic and pantophonic arrays.
+<h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> directions <td class='argumentdesc'><p>An array of directions of the virtual loudspeakers or microphones. Specify in radians.
+<p>Rank 1 arrays return pantophonic, while rank 2 arrays return periphonic. E.g.,
+<pre class='code prettyprint lang-sc'>
+// 2D:
+~directions = [ theta0, theta1, ... thetaN ];
+</pre>
+<pre class='code prettyprint lang-sc'>
+// 3D:
+~directions = [ [ theta0, phi0 ], [ theta1, phi1 ], ... [ thetaN, phiN ] ];
+</pre>
+<tr><td class='argumentname'> pattern <td class='argumentdesc'><p>Virtual microphone pattern, <code class='code prettyprint lang-sc'>nil</code>
+, or 0 to 1.
+<dl>
+<dt><code class='code prettyprint lang-sc'>nil</code>
+ <dd><strong>directions</strong> specifies virtual loudspeaker positions
+<dt>0 to 1 <dd><strong>directions</strong> specifies a microphone array with patterns:
+    <table>
+<tr><td><strong>pattern</strong> <td><strong>microphone</strong>    <tr><td>0.0 <td>Omni
+    <tr><td>0.5 <td>Cardioid
+    <tr><td>1.0 <td>Bi-directional
+    </table>
+<p>If <strong>pattern</strong> is an <a href="./../Classes/Array.html">Array</a>, individual microphone patterns are specified.
+</dl>
+</table><h4>Discussion:</h4>
+<a href="#-newDirections">-newDirections</a> is the Ambisonic Toolkit's most versatile first order encoder. Arbitrary input loudspeaker and/or microphone arrays may be specified. 
+<pre class='code prettyprint lang-sc'>
+// Periphonic (3D) encoder, a 1/2 dome of 13 loudspeakers
+// [[0, 0], [45, 0], [90, 0], [135, 0], [-180, 0], [-135, 0], [-90, 0], [-45, 0],
+//  [45, 35.3], [135, 35.3], [-135, 35.3], [-45, 35.3], [0, 90]]
+
+~directions = pi/180 * [[0, 0], [45, 0], [90, 0], [135, 0], [-180, 0], [-135, 0], [-90, 0],
+    [-45, 0], [45, 35.3], [135, 35.3], [-135, 35.3], [-45, 35.3], [0, 90]];
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newDirections(~directions);
+
+// inspect
+~encoder.dirChannels * 180/pi;
+</pre>
+<pre class='code prettyprint lang-sc'>
+// Periphonic (2D) encoder, 3 cardioid microphones
+// See: http://www.michaelgerzonphotos.org.uk/microphones-calrecs.html
+// [60, -180, -60]
+
+~directions = pi/180 * [60, -180, -60];
+~pattern = 0.5;
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newDirections(~directions, ~pattern);
+
+// inspect
+~encoder.dirChannels * 180/pi;
+</pre>
+<pre class='code prettyprint lang-sc'>
+// Periphonic (2D) encoder, 1 omni and 2 cardioid microphones
+// [0, 45, -45]
+
+~directions = pi/180 * [0, 45, -45];
+~pattern = [0, 0.5, 0.5];
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newDirections(~directions, ~pattern);
+
+// inspect
+~encoder.dirChannels * 180/pi;
+</pre>
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newZoomH2'>*</a></span><a href='./../Overviews/Methods.html#newZoomH2'>newZoomH2</a> (<span class='argstr'>angles</span>, <span class='argstr'>pattern = 0.5857</span>, <span class='argstr'>k = 1</span>)</h3>
+<div class='method'><a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a> (pantophonic) encoder.
+<h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> angles <td class='argumentdesc'><p>Angles for front left and back left microphones, in radians. (The corresponding right microphones are mirrored across the y-axis.) Defaults to <code class='code prettyprint lang-sc'> [pi/3, 3/4*pi] </code>
+ .
+<div class='note'><span class='notelabel'>NOTE:</span> <a class='anchor' name='newzoomh2note'>&nbsp;</a> The encoder reverses the labels for front and back of the <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a>. This is done so that directions are are preserved from the point of view of a field recording operator. With the <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a>'s display facing the operator (for ease of monitoring), sounds arriving in front of the operator will be encoded in the front of the soundfield. See also <a href="#newzoomdiscussion">Discussion</a> below.</div><tr><td class='argumentname'> pattern <td class='argumentdesc'><p>Microphone pattern<a class='footnote anchor' name='footnote_org_2' href='#footnote_2'><sup>2</sup></a> , 0 to 1:
+<table>
+<tr><td><strong>pattern</strong> <td><strong>virtual microphone</strong><tr><td> 0.0 <td>Omni
+<tr><td>0.5 <td>Cardioid
+<tr><td>1.0 <td>Bi-directional
+</table>
+<tr><td class='argumentname'> k <td class='argumentdesc'><p>Post-encoding Y scalar.
+<div class='note'><span class='notelabel'>NOTE:</span> Please see further discussion of <strong>k</strong> <a href="#newzoomh2k">here</a></div></table><h4>Discussion:</h4>
+<a class='anchor' name='newzoomdiscussion'>&nbsp;</a>A four channel recording made by the <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a> will be returned as two stereo .wav files named:
+<ul>
+<li>SRxxxF.wav
+<li>SRxxxR.wav
+</ul>
+<p>Presuming the <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a> is oriented as described <a href="#newzoomh2note">here</a>, the following illustrates correct input for the encoder:
+<pre class='code prettyprint lang-sc'>
+// ZoomH2 records two stereo .wav files:
+//       SRxxxF.wav
+//       SRxxxR.wav
+// correct input for <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newZoomH2 is:
+
+~in = [ SRxxxR.at(0), SRxxxR.at(1), SRxxxF.at(0), SRxxxF.at(1) ]
+</pre>
+<a class='anchor' name='newzoomh2k'>&nbsp;</a>The encoder includes a Y scalar, <strong>k</strong>, and an auditioned adjustment is usually necessary to improve the resulting image. As the <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a>'s polar patterns are not consistent across frequency, and the capsules are not coincident, imaging is not always consistent. Touching <strong>k</strong> can go some way towards remedy-ing this.
+<div class='note'><span class='notelabel'>NOTE:</span> <strong>k</strong> = 1.7378 is a value that has been found suitable for matching <a href="http://www.radio.uqam.ca/ambisonic/comparative_recording.html##Courville">Courville</a>'s <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a><a class='footnote anchor' name='footnote_org_3' href='#footnote_3'><sup>3</sup></a> and Soundfield recordings.<a class='footnote anchor' name='footnote_org_4' href='#footnote_4'><sup>4</sup></a> </div></div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newAtoB'>*</a></span><a href='./../Overviews/Methods.html#newAtoB'>newAtoB</a> (<span class='argstr'>orientation = 'flu'</span>, <span class='argstr'>weight = 'dec'</span>)</h3>
+<div class='method'><p>A-format to B-format encoder. Encodes to a variety of tetrahedral orientations and W channel weights.
+<h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> orientation <td class='argumentdesc'><p>Orientation of the A-format tetrahedron.
+<table>
+<tr><td><strong>orientation</strong> <td><strong>angles</strong> ([theta, phi] in degrees)
+<tr><td><code class='code prettyprint lang-sc'>'flu'</code>
+ <td><code class='code prettyprint lang-sc'> [[45.0,  35.3], [-45.0, -35.3], [135.0, -35.3], [-135.0,  35.3]] </code>
+<tr><td> <code class='code prettyprint lang-sc'>'fld'</code>
+ <td><code class='code prettyprint lang-sc'> [[45.0, -35.3], [-45.0 , 35.3], [135.0,  35.3], [-135.0, -35.3]] </code>
+<tr><td> <code class='code prettyprint lang-sc'>'flr'</code>
+ <td><code class='code prettyprint lang-sc'> [[54.7,   0.0], [-54.7,   0.0], [180.0,  54.7], [ 180.0, -54.7]] </code>
+<tr><td> <code class='code prettyprint lang-sc'>'fud'</code>
+ <td><code class='code prettyprint lang-sc'> [[ 0.0,  54.7], [  0.0, -54.7], [125.7,   0.0], [-125.7,   0.0]] </code>
+<tr><td> <code class='code prettyprint lang-sc'>'fbd'</code>
+ <td><code class='code prettyprint lang-sc'> [[ 0.0,   0.0], [180.0, -70.5], [112.2,  28.1], [-112.2,  28.1]] </code>
+<tr><td> <code class='code prettyprint lang-sc'>'fbu'</code>
+ <td><code class='code prettyprint lang-sc'> [[ 0.0,   0.0], [180.0,  70.5], [112.2, -28.1], [-112.2, -28.1]] </code>
+<tr><td> <code class='code prettyprint lang-sc'>'flru'</code>
+ <td><code class='code prettyprint lang-sc'> [[67.8,  28.1], [-67.8,  28.1], [  0.0, -70.5], [ 180.0,   0.0]] </code>
+<tr><td> <code class='code prettyprint lang-sc'>'flrd'</code>
+ <td><code class='code prettyprint lang-sc'> [[67.8, -28.1], [-67.8, -28.1], [  0.0,  70.5], [ 180.0,   0.0]] </code>
+</table>
+<tr><td class='argumentname'> weight <td class='argumentdesc'><p>The W weight factor.
+<table>
+<tr><td><strong>weight</strong> <td><strong>kind</strong> <td><strong>W scale</strong><tr><td> <code class='code prettyprint lang-sc'>'dec'</code>
+ <td>Decorrelated (on the sphere) <td>1/sqrt(3)
+<tr><td><code class='code prettyprint lang-sc'>'can'</code>
+ <td>Canonical (B-format) <td>1/sqrt(2)
+<tr><td><code class='code prettyprint lang-sc'>'uns'</code>
+ <td>Unscaled <td>1
+<tr><td><code class='code prettyprint lang-sc'>'car'</code>
+ <td>Cardioid <td>sqrt(3)
+</table>
+</table><h4>Discussion:</h4>
+<p>The A-format encoder is often used in conjunction with the <a href="./../Classes/FoaDecoderMatrix.html#*newBtoA">FoaDecoderMatrix: *newBtoA</a> B-format decoder to form signal processing networks which preserve the spatial encoding as is described <a href="./../Classes/FoaDecoderMatrix.html#btoadiscuss">here</a>.
+<p>On its own, <a href="#*newAtoB">*newAtoB</a> is often used to author immersive, periphonic (3D) decorrelated soundfields.
+</div><h3><a class='anchor' name='inherited_class_methods'>Inherited class methods</a></h3>
+<div id='inheritedclassmets'></div><h2><a class='anchor' name='instancemethods'>Instance Methods</a></h2>
+<h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-kind'>-</a></span><a href='./../Overviews/Methods.html#kind'>kind</a> </h3>
+<div class='method'><p>Answers the kind of encoder
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// encoder
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newQuad
+
+// inspect
+~encoder.kind
+</pre>
+<pre class='code prettyprint lang-sc'>
+// encoder
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newPeri
+
+// inspect
+~encoder.kind
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-dim'>-</a></span><a href='./../Overviews/Methods.html#dim'>dim</a> </h3>
+<div class='method'><p>Answers the number of encoder dimensions: 2D or 3D.
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// encoder
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newQuad
+
+// inspect
+~encoder.dim
+</pre>
+<pre class='code prettyprint lang-sc'>
+// encoder
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newPeri
+
+// inspect
+~encoder.dim
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-numChannels'>-</a></span><a href='./../Overviews/Methods.html#numChannels'>numChannels</a> </h3>
+<div class='method'><p>Answers the number of input channels (virtual loudspeakers or microphones).
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// encoder
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newQuad
+
+// inspect
+~encoder.numChannels
+</pre>
+<pre class='code prettyprint lang-sc'>
+// encoder (two rings of 6)
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newPeri(6)
+
+// inspect
+~encoder.numChannels
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-dirChannels'>-</a></span><a href='./../Overviews/Methods.html#dirChannels'>dirChannels</a> </h3>
+<div class='method'><p>Answers the direction of virtual loudspeaker or microphone feeds, with angles in radians.
+<h4>Returns:</h4>
+<div class='returnvalue'><p>A rank 1 array for pantophonic, and rank 2 array for periphonic. E.g.,
+<pre class='code prettyprint lang-sc'>
+// 2D:
+[ theta0, theta1, ... thetaN ]
+</pre>
+<pre class='code prettyprint lang-sc'>
+// 3D
+[ [ theta0, phi0 ], [ theta1, phi1 ], ... [ thetaN, phiN ] ]
+</pre>
+<pre class='code prettyprint lang-sc'>
+// encoder
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newQuad
+
+// inspect
+~encoder.dirChannels * 180/pi
+</pre>
+<pre class='code prettyprint lang-sc'>
+// encoder (two rings of 6)
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newPeri(6)
+
+// inspect
+~encoder.dirChannels * 180/pi
+</pre>
+</div></div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-matrix'>-</a></span><a href='./../Overviews/Methods.html#matrix'>matrix</a> </h3>
+<div class='method'><p>Answers the encoding matrix
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-numOutputs'>-</a></span><a href='./../Overviews/Methods.html#numOutputs'>numOutputs</a> </h3>
+<div class='method'><p>Answers the number of outputs for the encoder. 3 for 2D and 4 for 3D.
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-dirOutputs'>-</a></span><a href='./../Overviews/Methods.html#dirOutputs'>dirOutputs</a> </h3>
+<div class='method'><p>A convenience method providing polymorphism with <a href="./../Classes/FoaEncoderMatrix.html#-dirOutputs">FoaEncoderMatrix: -dirOutputs</a>.
+<h4>Returns:</h4>
+<div class='returnvalue'><ul>
+<li>for 2D: <code class='code prettyprint lang-sc'> [ inf, inf, inf ] </code>
+<li> for 3D: <code class='code prettyprint lang-sc'> [ inf, inf, inf , inf ] </code>
+</ul>
+</div></div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-numInputs'>-</a></span><a href='./../Overviews/Methods.html#numInputs'>numInputs</a> </h3>
+<div class='method'><p>A synonym for <a href="#-numChannels">-numChannels</a></div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-dirInputs'>-</a></span><a href='./../Overviews/Methods.html#dirInputs'>dirInputs</a> </h3>
+<div class='method'><p>A synonym for <a href="#-dirChannels">-dirChannels</a></div><h3><a class='anchor' name='inherited_instance_methods'>Inherited instance methods</a></h3>
+<div id='inheritedinstmets'></div><h2><a class='anchor' name='examples'>Examples</a></h2>
+<p>Please see <a href="./../Classes/FoaEncode.html#Examples">FoaEncode: Examples</a>.
+<div class='footnotes'>
+<a class='anchor' name='footnote_1'/><div class='footnote'>[<a href='#footnote_org_1'>1</a>] - In combination with distance scaling, <a href="./../-newOmni.html">-newOmni</a> and <a href="./../Classes/FoaPush.html">FoaPush</a> can be used to implement Menzies' "W-panning" technique. See: D. Menzies, "W-panning and O-format, tools for object spatialization," in Proceedings of the Audio Engineering Society 22nd International Conference on Virtual, Synthetic and Entertainment Audio, Espoo, Finland, 2002.</div><a class='anchor' name='footnote_2'/><div class='footnote'>[<a href='#footnote_org_2'>2</a>] - The default value, 0.5857, is derived from measurements made by Farina, and is a hyper-cardioid response with a zero at 135 degrees. See: <a href="http://pcfarina.eng.unipr.it/Public/Brahma/Zoom-H2/Polar-ZoomH2.xls">http://pcfarina.eng.unipr.it/Public/Brahma/Zoom-H2/Polar-ZoomH2.xls</a> </div><a class='anchor' name='footnote_3'/><div class='footnote'>[<a href='#footnote_org_3'>3</a>] - Courville orients his ZoomH2 so that the labelled front of the device faces the front of the sound scene. This is front/back reversed as regards -newZoomH2. If you choose to encode Courville's example files, you'll need to follow with FoaMirrorX.</div><a class='anchor' name='footnote_4'/><div class='footnote'>[<a href='#footnote_org_4'>4</a>] - See: <a href="http://www.radio.uqam.ca/ambisonic/comparative_recording.html ">http://www.radio.uqam.ca/ambisonic/comparative_recording.html </a></div></div><div class='doclink'>source: <a href='file:///Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaEncoderMatrix.schelp'>/Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaEncoderMatrix.schelp</a></div></div></body></html>

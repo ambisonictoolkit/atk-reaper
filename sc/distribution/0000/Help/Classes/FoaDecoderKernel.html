@@ -1,0 +1,243 @@
+<html><head><title>FoaDecoderKernel</title><link rel='stylesheet' href='./../scdoc.css' type='text/css' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><script src='./../scdoc.js' type='text/javascript'></script><script src='./../docmap.js' type='text/javascript'></script><script src='./../prettify.js' type='text/javascript'></script><script src='./../lang-sc.js' type='text/javascript'></script><script type='text/javascript'>var helpRoot='./..';</script></head><ul id='menubar'></ul><body onload='fixTOC();prettyPrint()'><div class='contents'><div class='header'><div id='label'>SuperCollider CLASSES</div><div id='categories'><a href='./../Browse.html#Libraries>Ambisonic Toolkit>FOA>Decoding'>Libraries>Ambisonic Toolkit>FOA>Decoding</a></div><h1>FoaDecoderKernel</h1><div id='summary'>First Order Ambisonic (FOA) decoder kernels</div></div><div class='subheader'>
+<div id='filename'>Source: /Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/<a href='file:///Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/ATKMatrix.sc'>ATKMatrix.sc</a></div><div class='inheritance'>Inherits from: <a href="../Classes/Object.html">Object</a></div><div id='related'>See also: <a href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>, <a href="./../Classes/FoaDecode.html">FoaDecode</a></div>[ <a href='nil'>old help</a> ]</div><div id='toc'>
+<ul class='toc'><li class='toc1'><a href='#description'>Description</a></li>
+<ul class='toc'></ul><li class='toc1'><a href='#classmethods'>Class methods</a></li>
+<ul class='toc'><li class='toc3'><a href='#*newUHJ'>newUHJ</a> </li>
+<li class='toc3'><a href='#*newSpherical'>newSpherical</a> </li>
+<li class='toc3'><a href='#*newListen'>newListen</a> </li>
+<li class='toc3'><a href='#*newCIPIC'>newCIPIC</a> </li>
+<li class='toc2'><a href='#inherited_class_methods'>Inherited class methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#instancemethods'>Instance methods</a></li>
+<ul class='toc'><li class='toc3'><a href='#-kind'>kind</a> </li>
+<li class='toc3'><a href='#-subjectID'>subjectID</a> </li>
+<li class='toc3'><a href='#-dim'>dim</a> </li>
+<li class='toc3'><a href='#-numChannels'>numChannels</a> </li>
+<li class='toc3'><a href='#-dirChannels'>dirChannels</a> </li>
+<li class='toc3'><a href='#-kernel'>kernel</a> </li>
+<li class='toc3'><a href='#-kernelSize'>kernelSize</a> </li>
+<li class='toc3'><a href='#-free'>free</a> </li>
+<li class='toc3'><a href='#-numOutputs'>numOutputs</a> </li>
+<li class='toc3'><a href='#-dirOutputs'>dirOutputs</a> </li>
+<li class='toc3'><a href='#-numInputs'>numInputs</a> </li>
+<li class='toc3'><a href='#-dirInputs'>dirInputs</a> </li>
+<li class='toc2'><a href='#inherited_instance_methods'>Inherited instance methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#examples'>Examples</a></li>
+<ul class='toc'></ul></ul></div><h2><a class='anchor' name='description'>Description</a></h2>
+<p>Generates decoding kernels required by the Ambisonic Toolkit's first order decoder, <a href="./../Classes/FoaDecode.html">FoaDecode</a>.
+<h2><a class='anchor' name='classmethods'>Class Methods</a></h2>
+<h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newUHJ'>*</a></span><a href='./../Overviews/Methods.html#newUHJ'>newUHJ</a> (<span class='argstr'>kernelSize = 512</span>, <span class='argstr'>server</span>)</h3>
+<div class='method'><p>Ambisonic UHJ stereo decoder.<a class='footnote anchor' name='footnote_org_1' href='#footnote_1'><sup>1</sup></a> <h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> kernelSize <td class='argumentdesc'><p>256, 512, 1024, 2048, 4096, 8192
+<tr><td class='argumentname'> server <td class='argumentdesc'><a href="./../Classes/Server.html">Server</a> on which to load kernel.
+</table><h4>Discussion:</h4>
+<p>For production work targeting stereo output, the authors advise using UHJ, as Ambisonic UHJ stereo is the native Ambisonic stereo format. 
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newSpherical'>*</a></span><a href='./../Overviews/Methods.html#newSpherical'>newSpherical</a> (<span class='argstr'>subjectID = 4</span>, <span class='argstr'>kernelSize = 512</span>, <span class='argstr'>server</span>)</h3>
+<div class='method'><p>Synthetic spherical head model HRTF decoder.<a class='footnote anchor' name='footnote_org_2' href='#footnote_2'><sup>2</sup></a> <h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> subjectID <td class='argumentdesc'><p>0 to 9
+<tr><td class='argumentname'> kernelSize <td class='argumentdesc'><p>256, 512, 1024, 2048, 4096, 8192
+<tr><td class='argumentname'> server <td class='argumentdesc'><a href="./../Classes/Server.html">Server</a> on which to load kernel.
+</table><h4>Discussion:</h4>
+<a href="#-newSpherical">-newSpherical</a> models a sphere only, and is equivalent to placing a pair of spaced, sphere baffled microphones in the soundfield. With no pinnae and no body, elevation cues are not present.
+<p>The <strong>subjectID</strong> argument varies to suit listener head width, with 0 the smallest and 9 the largest head. The user is advised to audition to find a suitable choice.
+</div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newListen'>*</a></span><a href='./../Overviews/Methods.html#newListen'>newListen</a> (<span class='argstr'>subjectID = 1002</span>, <span class='argstr'>server</span>)</h3>
+<div class='method'><p>Measured HRTF decoder, with measurements from IRCAM's <a href="http://recherche.ircam.fr/equipes/salles/listen/##Listen HRTF database">Listen HRTF database</a>.<a class='footnote anchor' name='footnote_org_3' href='#footnote_3'><sup>3</sup></a> <h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> subjectID <td class='argumentdesc'><p>1002 to 1059 (51 in total) <div class='warning'><span class='warninglabel'>WARNING:</span> <strong>subjectID</strong>s are not entirely contiguous.</div><tr><td class='argumentname'> server <td class='argumentdesc'><a href="./../Classes/Server.html">Server</a> on which to load kernel.
+</table><h4>Discussion:</h4>
+<p>The user is advised to audition <strong>subjectID</strong>s to find a suitable choice. If an invalid <strong>subjectID</strong> is chosen, valid choices are returned.
+<pre class='code prettyprint lang-sc'>
+// Boot desired server first...
+// ... choose an invalid subject
+~encoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newListen(0)
+
+// make sure you scroll up to see the resulting valid subjects!
+</pre>
+<div class='warning'><span class='warninglabel'>WARNING:</span>  The <a href="http://recherche.ircam.fr/equipes/salles/listen/##Listen HRTF database">Listen HRTF database</a> is measured at <a href="./../Classes/SampleRate.html">SampleRate</a> = 44.1kHz. Make sure your <a href="./../Classes/Server.html">Server</a> is set to this rate.</div></div><h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*newCIPIC'>*</a></span><a href='./../Overviews/Methods.html#newCIPIC'>newCIPIC</a> (<span class='argstr'>subjectID = 21</span>, <span class='argstr'>server</span>)</h3>
+<div class='method'><p>Measured HRTF decoder, with measurements from the University of California Davis' <a href="http://interface.cipic.ucdavis.edu/sound/hrtf.html##CIPIC HRTF database">CIPIC HRTF database</a>.<a class='footnote anchor' name='footnote_org_4' href='#footnote_4'><sup>4</sup></a> <h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> subjectID <td class='argumentdesc'><p>3 to 165 (45 in total) <div class='warning'><span class='warninglabel'>WARNING:</span> <strong>subjectID</strong>s are not entirely contiguous.</div><tr><td class='argumentname'> server <td class='argumentdesc'><a href="./../Classes/Server.html">Server</a> on which to load kernel.
+</table><h4>Discussion:</h4>
+<p>The <a href="http://interface.cipic.ucdavis.edu/sound/hrtf.html##CIPIC HRTF database">CIPIC HRTF database</a> provides two <a href="http://www.gras.dk/00012/00330/##KEMAR dummy">KEMAR dummy</a> measurements. <strong>subjectID</strong> = 21 is the large pinnae dummy and <strong>subjectID</strong> = 165 is the small pinnae dummy.
+<p>The user is advised to audition <strong>subjectID</strong>s to find a suitable choice. If an invalid <strong>subjectID</strong> is chosen, valid choices are returned.
+<pre class='code prettyprint lang-sc'>
+// Boot desired server first...
+// ... choose an invalid subject
+~encoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newCIPIC(0)
+
+// make sure you scroll up to see the resulting valid subjects!
+</pre>
+<div class='note'><span class='notelabel'>NOTE:</span>  The HRIRs from the <a href="http://interface.cipic.ucdavis.edu/sound/hrtf.html##CIPIC HRTF database">CIPIC HRTF database</a> have been equalised (by inspection) to match the frequency response of <a href="#*newSpherical">*newSpherical</a> and <a href="#*newListen">*newListen</a> . </div><div class='warning'><span class='warninglabel'>WARNING:</span> The <a href="http://recherche.ircam.fr/equipes/salles/listen/##Listen HRTF database">Listen HRTF database</a> is measured at <a href="./../Classes/SampleRate.html">SampleRate</a> = 44.1kHz. Make sure your <a href="./../Classes/Server.html">Server</a> is set to this rate.</div></div><h3><a class='anchor' name='inherited_class_methods'>Inherited class methods</a></h3>
+<div id='inheritedclassmets'></div><h2><a class='anchor' name='instancemethods'>Instance Methods</a></h2>
+<h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-kind'>-</a></span><a href='./../Overviews/Methods.html#kind'>kind</a> </h3>
+<div class='method'><p>Answers the kind of decoder
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newUHJ
+
+// inspect
+~decoder.kind
+
+// don't forget to free!!
+~decoder.free
+</pre>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newCIPIC
+
+// inspect
+~decoder.kind
+
+// don't forget to free!!
+~decoder.free
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-subjectID'>-</a></span><a href='./../Overviews/Methods.html#subjectID'>subjectID</a> </h3>
+<div class='method'><p>Answers the <strong>subjectID</strong> of the decoder
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newUHJ
+
+// inspect
+~decoder.subjectID
+
+// don't forget to free!!
+~decoder.free
+</pre>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newCIPIC
+
+// inspect
+~decoder.subjectID
+
+// don't forget to free!!
+~decoder.free
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-dim'>-</a></span><a href='./../Overviews/Methods.html#dim'>dim</a> </h3>
+<div class='method'><p>Answers the number of decoder dimensions: 2D or 3D.
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newSpherical
+
+// inspect
+~decoder.dim
+
+// don't forget to free!!
+~decoder.free
+</pre>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newCIPIC
+
+// inspect
+~decoder.dim
+
+// don't forget to free!!
+~decoder.free
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-numChannels'>-</a></span><a href='./../Overviews/Methods.html#numChannels'>numChannels</a> </h3>
+<div class='method'><p>Answers the number of loudspeaker (or headphone) feeds (output channels).
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newUHJ
+
+// inspect
+~decoder.numChannels
+
+// don't forget to free!!
+~decoder.free
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-dirChannels'>-</a></span><a href='./../Overviews/Methods.html#dirChannels'>dirChannels</a> </h3>
+<div class='method'><p>Answers the direction of loudspeaker (or headphone) feeds, with angles in radians.
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newUHJ
+
+// inspect
+~decoder.dirChannels * 180/pi
+
+// don't forget to free!!
+~decoder.free
+</pre>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newCIPIC
+
+// inspect
+~decoder.dirChannels * 180/pi
+
+// don't forget to free!!
+~decoder.free
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-kernel'>-</a></span><a href='./../Overviews/Methods.html#kernel'>kernel</a> </h3>
+<div class='method'><p>Answers the decoder kernel.
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newUHJ
+
+// inspect
+~decoder.kernel
+
+// don't forget to free!!
+~decoder.free
+</pre>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newCIPIC
+
+// inspect
+~decoder.kernel
+
+// don't forget to free!!
+~decoder.free
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-kernelSize'>-</a></span><a href='./../Overviews/Methods.html#kernelSize'>kernelSize</a> </h3>
+<div class='method'><p>Answers the <strong>kernelSize</strong>.
+<h4>Discussion:</h4>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newUHJ
+
+// inspect
+~decoder.kernelSize
+
+// don't forget to free!!
+~decoder.free
+</pre>
+<pre class='code prettyprint lang-sc'>
+// decoder - make sure you boot the server first!!
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newCIPIC
+
+// inspect
+~decoder.kernelSize
+
+// don't forget to free!!
+~decoder.free
+</pre>
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-free'>-</a></span><a href='./../Overviews/Methods.html#free'>free</a> </h3>
+<div class='method'><p>Free the kernel.
+<h4>Discussion:</h4>
+<p>Release the kernel buffer's memory on the server and return the bufferID back to the server's buffer number allocator for future reuse.
+<div class='warning'><span class='warninglabel'>WARNING:</span> Only free the kernel when the <a href="./../Classes/FoaDecode.html#*ar">FoaDecode: *ar</a> is no longer in use!</div></div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-numOutputs'>-</a></span><a href='./../Overviews/Methods.html#numOutputs'>numOutputs</a> </h3>
+<div class='method'><p>A synonym for <a href="#-numChannels">-numChannels</a></div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-dirOutputs'>-</a></span><a href='./../Overviews/Methods.html#dirOutputs'>dirOutputs</a> </h3>
+<div class='method'><p>A synonym for <a href="#-dirChannels">-dirChannels</a></div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-numInputs'>-</a></span><a href='./../Overviews/Methods.html#numInputs'>numInputs</a> </h3>
+<div class='method'><p>Answers the number of inputs for the decoder. 3 for 2D and 4 for 3D.
+</div><h3 class='imethodname'><span class='methprefix'><a class='anchor' name='-dirInputs'>-</a></span><a href='./../Overviews/Methods.html#dirInputs'>dirInputs</a> </h3>
+<div class='method'><p>A convenience method providing polymorphism with <a href="./../Classes/FoaEncoderKernel.html#-dirInputs">FoaEncoderKernel: -dirInputs</a>.
+<h4>Returns:</h4>
+<div class='returnvalue'><ul>
+<li>for 2D: <code class='code prettyprint lang-sc'> [ inf, inf, inf ] </code>
+<li> for 3D: <code class='code prettyprint lang-sc'> [ inf, inf, inf , inf ] </code>
+</ul>
+</div></div><h3><a class='anchor' name='inherited_instance_methods'>Inherited instance methods</a></h3>
+<div id='inheritedinstmets'></div><h2><a class='anchor' name='examples'>Examples</a></h2>
+<p>Please see <a href="./../Classes/FoaDecode.html#Examples">FoaDecode: Examples</a>.
+<div class='footnotes'>
+<a class='anchor' name='footnote_1'/><div class='footnote'>[<a href='#footnote_org_1'>1</a>] - See: <a href="http://en.wikipedia.org/wiki/Ambisonic_UHJ_format">http://en.wikipedia.org/wiki/Ambisonic_UHJ_format</a></div><a class='anchor' name='footnote_2'/><div class='footnote'>[<a href='#footnote_org_2'>2</a>] - See: R. O. Duda, "Modeling head related transfer functions," in Proceedings of the Twenty-Seventh Annual Asilomar Conference on Signals, Systems and Computers, Asilomar, CA, 1993.</div><a class='anchor' name='footnote_3'/><div class='footnote'>[<a href='#footnote_org_3'>3</a>] - See: <a href="http://recherche.ircam.fr/equipes/salles/listen/">http://recherche.ircam.fr/equipes/salles/listen/</a></div><a class='anchor' name='footnote_4'/><div class='footnote'>[<a href='#footnote_org_4'>4</a>] - See: <a href="http://interface.cipic.ucdavis.edu/sound/hrtf.html">http://interface.cipic.ucdavis.edu/sound/hrtf.html</a></div></div><div class='doclink'>source: <a href='file:///Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaDecoderKernel.schelp'>/Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaDecoderKernel.schelp</a></div></div></body></html>

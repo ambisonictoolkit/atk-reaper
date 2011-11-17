@@ -1,0 +1,779 @@
+<html><head><title>FoaDecode</title><link rel='stylesheet' href='./../scdoc.css' type='text/css' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><script src='./../scdoc.js' type='text/javascript'></script><script src='./../docmap.js' type='text/javascript'></script><script src='./../prettify.js' type='text/javascript'></script><script src='./../lang-sc.js' type='text/javascript'></script><script type='text/javascript'>var helpRoot='./..';</script></head><ul id='menubar'></ul><body onload='fixTOC();prettyPrint()'><div class='contents'><div class='header'><div id='label'>SuperCollider CLASSES</div><div id='categories'><a href='./../Browse.html#Libraries>Ambisonic Toolkit>FOA>Decoding'>Libraries>Ambisonic Toolkit>FOA>Decoding</a>, <a href='./../Browse.html#UGens>Multichannel>Ambisonics'>UGens>Multichannel>Ambisonics</a></div><h1>FoaDecode</h1><div id='summary'>First Order Ambisonic (FOA) decoder</div></div><div class='subheader'>
+<div id='filename'>Source: /Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/<a href='file:///Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/ATK.sc'>ATK.sc</a></div><div class='inheritance'>Inherits from: <a href="../Classes/Object.html">Object</a></div><div id='related'>See also: <a href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>, <a href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a></div>[ <a href='nil'>old help</a> ]</div><div id='toc'>
+<ul class='toc'><li class='toc1'><a href='#description'>Description</a></li>
+<ul class='toc'></ul><li class='toc1'><a href='#classmethods'>Class methods</a></li>
+<ul class='toc'><li class='toc3'><a href='#*ar'>ar</a> </li>
+<li class='toc2'><a href='#inherited_class_methods'>Inherited class methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#instancemethods'>Instance methods</a></li>
+<ul class='toc'><li class='toc2'><a href='#inherited_instance_methods'>Inherited instance methods</a></li>
+<ul class='toc'></ul></ul><li class='toc1'><a href='#examples'>Examples</a></li>
+<ul class='toc'><li class='toc2'><a href='#virtual_microphone_stereo_decoder'>Virtual microphone stereo decoder</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#ambisonic_uhj_stereo_decoder'>Ambisonic UHJ stereo decoder</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#synthetic_binaural_decoder'>Synthetic binaural decoder</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#cipic_binaural_decoder'>CIPIC binaural decoder</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#quadraphonic_decoder'>Quadraphonic decoder</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#supercollider's_inbuilt_decoder'>SuperCollider's inbuilt decoder</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#psychoacoustically_optimised_quadraphonic_decoder'>Psychoacoustically optimised quadraphonic decoder</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#itu_5.0_decoder'>ITU 5.0 decoder</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#periphonic_(cube)_decoder'>Periphonic (cube) decoder</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#psychoacoustically_optimised_diametric_(bi-rectangle)_decoder'>Psychoacoustically optimised diametric (bi-rectangle) decoder</a></li>
+<ul class='toc'></ul></ul></ul></div><h2><a class='anchor' name='description'>Description</a></h2>
+<p>Renders (decodes) a first order ambisonic signal (B-format) to speaker feeds in a variety of configurations. <a href="./../Classes/DecodeB2.html">DecodeB2</a> is the SuperCollider inbuilt equivalent.
+<h2><a class='anchor' name='classmethods'>Class Methods</a></h2>
+<h3 class='cmethodname'><span class='methprefix'><a class='anchor' name='*ar'>*</a></span><a href='./../Overviews/Methods.html#ar'>ar</a> (<span class='argstr'>in</span>, <span class='argstr'>decoder</span>, <span class='argstr'>mul = 1</span>, <span class='argstr'>add = 0</span>)</h3>
+<div class='method'><h4>Arguments:</h4>
+<table class='arguments'>
+<tr><td class='argumentname'> in <td class='argumentdesc'><p>The B-format signal, an array: [w, x, y, z]
+<tr><td class='argumentname'> decoder <td class='argumentdesc'><a href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a> or <a href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a> instance.
+<tr><td class='argumentname'> mul <td class='argumentdesc'><p>Output will be multiplied by this value.
+<tr><td class='argumentname'> add <td class='argumentdesc'><p>This value will be added to the output.
+</table><h4>Returns:</h4>
+<div class='returnvalue'><p>An array of channels, one for each speaker.
+</div></div><h3><a class='anchor' name='inherited_class_methods'>Inherited class methods</a></h3>
+<div id='inheritedclassmets'></div><h2><a class='anchor' name='instancemethods'>Instance Methods</a></h2>
+<h3><a class='anchor' name='inherited_instance_methods'>Inherited instance methods</a></h3>
+<div id='inheritedinstmets'></div><h2><a class='anchor' name='examples'>Examples</a></h2>
+<p>The examples below are intended to briefly illustrate some of the first order decoding options made available in the Ambisonic Toolkit. The user is encouraged to carefully review the features of <a href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a> and <a href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a> to gain a deeper understanding of the flexibility of these tools.
+<p>As the Ambisonic technique is a hierarchal system, numerous options for playback are possible. These include two channel stereo, two channel binaural, 2D horizontal only surround (pantophonic) and full 3D with height surround (periphonic). A brief introduction is explored below.
+<p>Encoded as an omnidirectional soundfield, <a href="./../Classes/PinkNoise.html">PinkNoise</a> is used as the example sound source. In a well aligned, dampend studio environment, this usually sounds "in the head". <a href="./../Classes/FoaPush.html">FoaPush</a> is used to "push" the omnidirectional soundfield so that it becomes a planewave (infinite distance, in an anechoic environment) arriving from some direction.
+<p>The soundfield is controlled by <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a>, where <a href="./../Classes/MouseX.html">MouseX</a> specifies the incident azimuth angle (pi to -pi; left to right of display) and <a href="./../Classes/MouseY.html">MouseY</a> the <a href="./../Classes/FoaPush.html">FoaPush</a> angle (0 to pi/2; bottom to top of display). With the mouse at the bottom of the display, the soundfield remains omnidirectional. Placed at the top of the display, the soundfield becomes directional, and varying left/right position will vary the incident azimuth of the resulting planewave.
+<h3><a class='anchor' name='virtual_microphone_stereo_decoder'>Virtual microphone stereo decoder</a></h3>
+<p>The soundfield may be decoded to stereo using a pair of virtual microphones.
+<div class='note'><span class='notelabel'>NOTE:</span> A matrix type decoder, see <a href="./../Classes/FoaDecoderMatrix.html#*newStereo">FoaDecoderMatrix: *newStereo</a> for further details.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// virtual microphone stereo decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderMatrix.html'>FoaDecoderMatrix</a>.newStereo
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;// audio signal
+    var angle, azim;			// angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top 		= push to plane wave
+    //            bottom        = omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+	
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (to stereo)
+    <a class='clslnk' href='./../Classes/FoaDecode.html'>FoaDecode</a>.ar(sig, ~decoder);
+
+}.scope;
+)
+
+// free kernel
+~decoder.free
+
+// ------------------------------------------------------------
+</pre>
+<h3><a class='anchor' name='ambisonic_uhj_stereo_decoder'>Ambisonic UHJ stereo decoder</a></h3>
+<p>Ambisonic UHJ stereo<a class='footnote anchor' name='footnote_org_1' href='#footnote_1'><sup>1</sup></a>  is the 'native' stereo format for Ambisonics. A B-format signal (2D, with some losses) can be recovered from a UHJ decoded signal through the use of <a href="./../Classes/FoaEncoderKernel.html#*newUHJ">FoaEncoderKernel: *newUHJ</a>.
+<div class='note'><span class='notelabel'>NOTE:</span> A kernel type decoder, see <a href="./../Classes/FoaDecoderKernel.html#*newUHJ">FoaDecoderKernel: *newUHJ</a> for further details.</div><div class='warning'><span class='warninglabel'>WARNING:</span> Kernel decoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of <a href="./../Classes/FoaDecoderKernel.html#-free">FoaDecoderKernel: -free</a> after use.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// UHJ (stereo) decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newUHJ       // kernel decoders should be freed after use!!
+                                         // free below...
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;// audio signal
+    var angle, azim;			// angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top 		= push to plane wave
+    //            bottom        = omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+	
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (to stereo)
+    <a class='clslnk' href='./../Classes/FoaDecode.html'>FoaDecode</a>.ar(sig, ~decoder);
+
+}.scope;
+)
+
+// free kernel
+~decoder.free
+
+// ------------------------------------------------------------
+</pre>
+<h3><a class='anchor' name='synthetic_binaural_decoder'>Synthetic binaural decoder</a></h3>
+<p>The Ambisonic Tookit provides a synthetic spherical head model HRTF decoder.<a class='footnote anchor' name='footnote_org_2' href='#footnote_2'><sup>2</sup></a> Ten subjects with varying head sizes are available. Audition to find one that works best for you.
+<p>Additionally, HRTF decoders computed from measured HRIRs are also available: <a href="./../Classes/FoaDecoderKernel.html#*newListen">FoaDecoderKernel: *newListen</a> &amp; <a href="./../Classes/FoaDecoderKernel.html#*newCIPIC">FoaDecoderKernel: *newCIPIC</a>. 
+<div class='note'><span class='notelabel'>NOTE:</span> A kernel type decoder, see <a href="./../Classes/FoaDecoderKernel.html#*newSpherical">FoaDecoderKernel: *newSpherical</a> for further details.</div><div class='warning'><span class='warninglabel'>WARNING:</span> Kernel decoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of <a href="./../Classes/FoaDecoderKernel.html#-free">FoaDecoderKernel: -free</a> after use.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// Binaural (synthetic) decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newSpherical // kernel decoders should be freed after use!!
+                                         // free below...
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;// audio signal
+    var angle, azim;			// angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top 		= push to plane wave
+    //            bottom        = omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+	
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (to binaural)
+    <a class='clslnk' href='./../Classes/FoaDecode.html'>FoaDecode</a>.ar(sig, ~decoder);
+
+}.scope;
+)
+
+// free kernel
+~decoder.free
+
+// ------------------------------------------------------------
+</pre>
+<h3><a class='anchor' name='cipic_binaural_decoder'>CIPIC binaural decoder</a></h3>
+<p>Measured HRTF decoder, with measurements from the University of California Davis' <a href="http://interface.cipic.ucdavis.edu/sound/hrtf.html##CIPIC HRTF database">CIPIC HRTF database</a>.<a class='footnote anchor' name='footnote_org_3' href='#footnote_3'><sup>3</sup></a>  Forty-five subjects with varying head sizes are available. Audition to find one that works best for you.
+<div class='note'><span class='notelabel'>NOTE:</span> A kernel type decoder, see <a href="./../Classes/FoaDecoderKernel.html#*newCIPIC">FoaDecoderKernel: *newCIPIC</a> for further details.</div><div class='warning'><span class='warninglabel'>WARNING:</span> Kernel decoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of <a href="./../Classes/FoaDecoderKernel.html#-free">FoaDecoderKernel: -free</a> after use.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// Binaural (CIPIC) decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderKernel.html'>FoaDecoderKernel</a>.newCIPIC     // kernel decoders should be freed after use!!
+                                         // free below...
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;// audio signal
+    var angle, azim;			// angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top 		= push to plane wave
+    //            bottom        = omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+	
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (to binaural)
+    <a class='clslnk' href='./../Classes/FoaDecode.html'>FoaDecode</a>.ar(sig, ~decoder);
+
+}.scope;
+)
+
+// free kernel
+~decoder.free
+
+// ------------------------------------------------------------
+</pre>
+<h3><a class='anchor' name='quadraphonic_decoder'>Quadraphonic decoder</a></h3>
+<p>The Ambisonic Toolkit provides an optimised quadraphonic decoder with variable loudspeaker angle. The below example uses the default settings, which results in a square layout, <code class='code prettyprint lang-sc'>'single'</code>
+ band type ( <code class='code prettyprint lang-sc'>'energy'</code>
+ ) decoder. This sort of decoder is suitable for mid-scale playback, though, for best results for an audience, the use of a larger array (5+ loudspeakers) is advised. <a href="./../Classes/FoaDecoderMatrix.html#*newPanto">FoaDecoderMatrix: *newPanto</a> or <a href="./../Classes/FoaDecoderMatrix.html#*newDiametric">FoaDecoderMatrix: *newDiametric</a> would be appropriate.
+<p>A psychoacoustically optimised (dual-band) near-field compensated decoder, suitable for studio monitoring, is demonstrated <a href="#psychoacoustically_optimised_quadraphonic_decoder">below</a>.
+<div class='note'><span class='notelabel'>NOTE:</span> A matrix type decoder, see <a href="./../Classes/FoaDecoderMatrix.html#*newQuad">FoaDecoderMatrix: *newQuad</a> for further details.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// quad decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderMatrix.html'>FoaDecoderMatrix</a>.newQuad
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;				// audio signal
+    var angle, azim;			// angle and azimuth control
+    var fl, bl, br, fr;			// quad output channels
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top 		= push to plane wave
+    //		  bottom	= omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // decode (to quad)
+    #fl, bl, br, fr = <a class='clslnk' href='./../Classes/FoaDecode.html'>FoaDecode</a>.ar(sig, ~decoder);
+    [fl, fr, bl, br]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class='anchor' name='supercollider's_inbuilt_decoder'>SuperCollider's inbuilt decoder</a></h3>
+<p>By default, SuperCollider includes a pantophonic (2D) decoder, <a href="./../Classes/DecodeB2.html">DecodeB2</a>. This inbuilt decoder provides functionality similar to the Ambisonic Toolkit's <a href="./../Classes/FoaDecoderMatrix.html#*newPanto">FoaDecoderMatrix: *newPanto</a>, with the exceptions of a variable <strong>k</strong> argument and the documentation features of <a href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>, e.g. <a href="./../Classes/FoaDecoderMatrix.html#-dirChannels">FoaDecoderMatrix: -dirChannels</a>.
+<p>The inbuilt decoder is a <code class='code prettyprint lang-sc'>'controlled'</code>
+ <strong>k</strong> decoder. (See <a href="./../Classes/FoaDecoderMatrix.html#decoder_k">this discussion</a> on <strong>k</strong>.) The below code includes a function, <code class='code prettyprint lang-sc'>funK</code>
+, to add variable <strong>k</strong> functionality to <a href="./../Classes/DecodeB2.html">DecodeB2</a>. So, this example is realised as a <code class='code prettyprint lang-sc'>'single'</code>
+ band type ( <code class='code prettyprint lang-sc'>'energy'</code>
+ ) decoder, matching the <a href="./../Classes/FoaDecoderMatrix.html#*newQuad">FoaDecoderMatrix: *newQuad</a> example <a href="#quadraphonic_decoder">above</a>.
+<div class='note'><span class='notelabel'>NOTE:</span> See <a href="./../Classes/DecodeB2.html#*ar">DecodeB2: *ar</a> for further details.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// compare to SuperCollider's inbuilt <a class='clslnk' href='./../Classes/DecodeB2.html'>DecodeB2</a> (as quad decoder)
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder matrix and decoder channels
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~numChans = 4
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~numChans
+
+// function to adjust k of <a class='clslnk' href='./../Classes/DecodeB2.html'>DecodeB2</a>.ar
+(
+var funK;
+
+funK = { arg k;
+    if ( k.isNumber, {
+            k
+        }, {
+	    switch ( k,
+		'velocity', 	{ [1, 2, 2, 2] },
+		'energy', 	{ [1, 2.sqrt, 2.sqrt, 2.sqrt] },
+		'controlled',   { [1, 1, 1, 1] },
+		'single', 	{ [1, 2.sqrt, 2.sqrt, 2.sqrt] }
+	    )
+	}
+    )
+};
+
+~kScale = funK.value('single');         // specify ATK's default,
+)                                       // a single band ('energy') decoder
+
+(
+{
+    var sig;                            // audio signal
+    var angle, azim;                    // angle and azimuth control
+    var fl, bl, br, fr;                 // quad output channels
+    var w, x, y, z;                 	// b-format channels (split)
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format("inbuilt").postln;
+
+    // angle ---&gt; top           = push to plane wave
+    //            bottom        = omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left     = back
+    //            centre        = centre
+    //            hard right    = back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar;                         // mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+    // ------------------------------------------------------------
+    // split to w, x, y, z, and scale k
+    #w, x, y, z = sig * ~kScale;
+
+    // ------------------------------------------------------------
+    // decode (to quad), and match gain to ATK decoders
+    #fl, fr, br, bl = <a class='clslnk' href='./../Classes/DecodeB2.html'>DecodeB2</a>.ar(~numChans, w, x, y) * 6.neg.dbamp;
+    [fl, fr, bl, br]    // reorder output to match speaker arrangement
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class='anchor' name='psychoacoustically_optimised_quadraphonic_decoder'>Psychoacoustically optimised quadraphonic decoder</a></h3>
+<p>The decoder presented here is an example of a dual-band ( <code class='code prettyprint lang-sc'>'dual'</code>
+ ) psychoacoustically optmisied, near-field compensated decoder described by Gerzon.<a class='footnote anchor' name='footnote_org_4' href='#footnote_4'><sup>4</sup></a> This sort of decoder is considered the ideal for first order Ambisonics, meeting all the criteria outlined by Gerzon to qualify as Ambisonic,<a class='footnote anchor' name='footnote_org_5' href='#footnote_5'><sup>5</sup></a> and is the choice for critical studio listening.
+<p>Additionally, this decode is rendered as a 'narrow quadraphonic' layout, with loudspeaker angles at <code class='code prettyprint lang-sc'> [ 30.0, 150.0, -150.0, -30.0 ] </code>
+. For studio based work, this can be convenient, as the front pair is at the correct angle for two channel stereo monitoring. The narrow layout gives increased localisation and stabilised images at front and back, at the expense of reduced stability at the sides. 
+<p>Near-field compensation, filtering for the near-field effects of loudspeaker placement, is made through the use of <a href="./../Classes/FoaNFC.html">FoaNFC</a>.
+<div class='note'><span class='notelabel'>NOTE:</span> A matrix type decoder, see <a href="./../Classes/FoaDecoderMatrix.html#*newQuad">FoaDecoderMatrix: *newQuad</a> and <a href="./../Classes/FoaNFC.html">FoaNFC</a> for further details.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// narrow quad decoder, psychocacousticly optimised, &amp; with NFC
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderMatrix.html'>FoaDecoderMatrix</a>.newQuad(pi/6, 'dual')
+~distance = 1.2                 // louspeaker distance, for NFC, in meters
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+~distance
+
+(
+{
+    var sig;                            // audio signal
+    var angle, azim;                    // angle and azimuth control
+    var fl, bl, br, fr;                 // quad output channels
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+
+    // angle ---&gt; top           = push to plane wave
+    //            bottom        = omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left     = back
+    //            centre        = centre
+    //            hard right    = back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar;                         // mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // nfc &amp; decode (to quad)
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'nfc', ~distance);
+    #fl, bl, br, fr = <a class='clslnk' href='./../Classes/FoaDecode.html'>FoaDecode</a>.ar(sig, ~decoder);
+    [fl, fr, bl, br]    // reorder output to match speaker arrangement
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class='anchor' name='itu_5.0_decoder'>ITU 5.0 decoder</a></h3>
+<p>The Ambisonic Toolkit includes <a href="http://www.brucewiggins.co.uk/?page_id=78##Bruce Wiggins'">Bruce Wiggins'</a> optimised ITU 5.0 decoders.<a class='footnote anchor' name='footnote_org_6' href='#footnote_6'><sup>6</sup></a> <div class='note'><span class='notelabel'>NOTE:</span> A matrix type decoder, see <a href="./../Classes/FoaDecoderMatrix.html#*new5_0">FoaDecoderMatrix: *new5_0</a> for further details.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// 5.0 decoder
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderMatrix.html'>FoaDecoderMatrix</a>.new5_0
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;// audio signal
+    var angle, azim;			// angle and azimuth control
+    var fc, fl, bl, br, fr;		// 5.0 output channels
+    var lo;	 			// low freq channel place holder
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top 		= push to plane wave
+    //            bottom        = omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+	
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (to 5.0)
+    #fc, fl, bl, br, fr = <a class='clslnk' href='./../Classes/FoaDecode.html'>FoaDecode</a>.ar(sig, ~decoder);
+    lo = <a class='clslnk' href='./../Classes/Silent.html'>Silent</a>.ar;
+
+    [fl, fr, fc, lo, bl, br]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class='anchor' name='periphonic_(cube)_decoder'>Periphonic (cube) decoder</a></h3>
+<p>A full 3D decoder, with eight loudspeakers arranged in upper and lower rings of four. This small eight channel array is not optimal for large scale playback. For public performance, a 10 or 12 channel arrangement (two rings of 5 or 6) is more suitable.
+<p>The loudspeaker layout specified by this decoder is more suited to a small-scale situation. See <a href="#Diametric_(bi-rectangle)_decoder">below</a> for a minimal arrangement appropriate for full 3D studio monitoring.
+<div class='note'><span class='notelabel'>NOTE:</span> A matrix type decoder, see <a href="./../Classes/FoaDecoderMatrix.html#*newPeri">FoaDecoderMatrix: *newPeri</a> for further details.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// periphonic (3D) decoder (8-channels arranged as a cube)
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderMatrix.html'>FoaDecoderMatrix</a>.newPeri
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+
+(
+{
+    var sig;				// audio signal
+    var angle, azim;			// angle and azimuth control
+    var flu, blu, bru, fru;		// cube output channels
+    var fld, bld, brd, frd;
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top 		= push to plane wave
+    //		  bottom	= omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // decode (to cube)
+    #flu, blu, bru, fru, fld, bld, brd, frd = <a class='clslnk' href='./../Classes/FoaDecode.html'>FoaDecode</a>.ar(sig, ~decoder);
+    [flu, fru, blu, bru, fld, frd, bld, brd]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class='anchor' name='psychoacoustically_optimised_diametric_(bi-rectangle)_decoder'>Psychoacoustically optimised diametric (bi-rectangle) decoder</a></h3>
+<p>This bi-rectangular decoder has been described by Gerzon as optimal for small-scale, full 3D listening. The decoder presented is an example of a dual-band ( <code class='code prettyprint lang-sc'>'dual'</code>
+ ) psychoacoustically optmisied, near-field compensated decoder. Meeting all the criteria outlined by Gerzon to qualify as Ambisonic, this decoder is a good choice for full 3D critical studio listening.
+<p>The frontal loudspeaker pair is arranged at <code class='code prettyprint lang-sc'> [ 30.0, -30.0 ] </code>
+ degrees. For studio based work, this can be convenient, as the front pair is at the correct angle for two channel stereo monitoring.
+<p>Near-field compensation, filtering for the near-field effects of loudspeaker placement, is made through the use of <a href="./../Classes/FoaNFC.html">FoaNFC</a>.
+<div class='note'><span class='notelabel'>NOTE:</span> A matrix type decoder, see <a href="./../Classes/FoaDecoderMatrix.html#*newDiametric">FoaDecoderMatrix: *newDiametric</a> and <a href="./../Classes/FoaNFC.html">FoaNFC</a> for further details.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// diametric 3d decoder (8-channels in a bi-rectangle)
+//             psychocacousticly optimised, &amp; with NFC
+//
+// mono pink noise source
+// omni encoder
+
+
+// define encoder / decoder matrices
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newOmni
+~decoder = <a class='clslnk' href='./../Classes/FoaDecoderMatrix.html'>FoaDecoderMatrix</a>.newDiametric(
+    pi/180 * [[30, 0], [-30, 0], [90, 35.3], [-90, 35.3]],
+    'dual'
+)
+~distance = 1.2                 // louspeaker distance, for NFC, in meters
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+~decoder.kind
+~decoder.numChannels
+~decoder.dirChannels * 180/pi
+~distance
+
+(
+{
+    var sig;				// audio signal
+    var angle, azim;			// angle and azimuth control
+    var fl, fr, bl, br;			// bi-rectangle output channels
+    var slu, sru, sld, srd;
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top 		= push to plane wave
+    //		  bottom	= omni-directional
+    angle = <a class='clslnk' href='./../Classes/MouseY.html'>MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class='clslnk' href='./../Classes/MouseX.html'>MouseX</a>.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PinkNoise.html'>PinkNoise</a>.ar; 			// mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // nfc &amp; decode (to bi-rectangle)
+    sig = <a class='clslnk' href='./../Classes/FoaTransform.html'>FoaTransform</a>.ar(sig, 'nfc', ~distance);
+    #fl, fr, slu, sru, br, bl, srd, sld = <a class='clslnk' href='./../Classes/FoaDecode.html'>FoaDecode</a>.ar(sig, ~decoder);
+    [fl, fr, bl, br, slu, sru, sld, srd]	// reorder output to match speaker arrangement
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<div class='footnotes'>
+<a class='anchor' name='footnote_1'/><div class='footnote'>[<a href='#footnote_org_1'>1</a>] - See: <a href="http://en.wikipedia.org/wiki/Ambisonic_UHJ_format">http://en.wikipedia.org/wiki/Ambisonic_UHJ_format</a></div><a class='anchor' name='footnote_2'/><div class='footnote'>[<a href='#footnote_org_2'>2</a>] - See: R. O. Duda, "Modeling head related transfer functions," in Proceedings of the Twenty-Seventh Annual Asilomar Conference on Signals, Systems and Computers, Asilomar, CA, 1993.</div><a class='anchor' name='footnote_3'/><div class='footnote'>[<a href='#footnote_org_3'>3</a>] - See: <a href="http://interface.cipic.ucdavis.edu/sound/hrtf.html">http://interface.cipic.ucdavis.edu/sound/hrtf.html</a></div><a class='anchor' name='footnote_4'/><div class='footnote'>[<a href='#footnote_org_4'>4</a>] - M. A. Gerzon, "Multi-system ambisonic decoder," Wireless World, pp. 43-47, 69-73, July/Aug. 1977.</div><a class='anchor' name='footnote_5'/><div class='footnote'>[<a href='#footnote_org_5'>5</a>] - E. Benjamin, R. Lee, and A. Heller, "Is My Decoder Ambisonic?," in Proceedings of the 125th Audio Engineering Society Convention, San Francisco, 2008.</div><a class='anchor' name='footnote_6'/><div class='footnote'>[<a href='#footnote_org_6'>6</a>] - Irregular decoders in the Ambisonic Toolkit are kindly provided by Bruce Wiggins: <a href="http://www.brucewiggins.co.uk/">http://www.brucewiggins.co.uk/</a>. See also: B. Wiggins, I. Paterson-Stephens, V. Lowndes, and S. Berry, "The design and optimisation of surround sound decoders using heuristic methods," in Proceedings of UKSIM 2003: Conference on Computer Simulation, Cambridge, England, 2003.</div></div><div class='doclink'>source: <a href='file:///Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaDecode.schelp'>/Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaDecode.schelp</a></div></div></body></html>
