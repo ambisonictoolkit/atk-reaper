@@ -309,7 +309,8 @@ code::
 // A-format soundfile read from disk
 
 // define encoder matrix
-~encoder = FoaEncoderMatrix.newAtoB('flr')
+~encoder = FoaEncoderMatrix.newAtoB('flrd')   // for Thomas
+~encoder = FoaEncoderMatrix.newAtoB('flr')    // for Cross
 
 
 // inspect
@@ -321,6 +322,7 @@ code::
 // read a whole sound into memory
 // remember to free the buffer later!
 // (boot the server, if you haven't!)
+~sndbuf = Buffer.read(s, "sounds/ATK/a-format/Thomas_Mackay.wav")
 ~sndbuf = Buffer.read(s, "sounds/ATK/a-format/Cross_Tenor_Sax.wav")
 
 
@@ -357,6 +359,7 @@ code::
 note:: strong::Soundfile Credits::
 
 list::
+## Niall Thomas, "Rob Mackay: flute improvisations," [unpublished recording]
 ## David Cross, "Tenor saxophone improvisations," [unpublished recording]
 ::
 
