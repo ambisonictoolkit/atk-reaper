@@ -908,3 +908,72 @@ list::
 ## Robert Mackay, "Augustine's Message," [unpublished recording]
 ## John Young, "Allting Runt Omkring," [unpublished recording]
 ::
+
+
+
+subsection:: Directions encoder (soundfile)
+
+The directions encoder may be used to transcode from one format to another. This example transcodes a periphonic 12-channel recording to the decoder you've chosen.
+
+If you haven't already choosen a code:: ~decoder:: and defined code:: ~renderDecode ::, do so link::#choose_a_decoder#now::.
+
+note:: A matrix type encoder, see link::Classes/FoaEncoderMatrix#*newPanto:: for further details.::
+
+
+code::
+// ------------------------------------------------------------
+// periphonic (12-channel) encoder
+
+
+// define encoder matrix
+~directions = pi / 180 * [ [ 22.5, 0 ], [ -22.5, 0 ], [ 67.5, 0 ], [ -67.5, 0 ], [ 112.5, 0 ], [ -112.5, 0 ], [ 157.5, 0 ], [ -157.5, 0 ], [ 45, 45 ], [ -45, 45 ], [ -135, 45 ], [ 135, 45 ] ]
+~encoder = FoaEncoderMatrix.newDirections(~directions)
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = Buffer.read(s, "sounds/ATK/multichannel/Wilson-Bose.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = PlayBuf.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = FoaEncode.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+::
+
+note:: strong::Soundfile Credits::
+
+list::
+## Scott Wilson, "Böse," [unpublished recording]
+::
