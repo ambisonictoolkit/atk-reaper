@@ -1,0 +1,418 @@
+TAtkUGens (Upgraded)
+v7
+r0
+t341329339.449889
+cCheck dependencies
+cCompileC "build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o" /Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+cCompileC "build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o" /Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp normal i386 c++ com.apple.compilers.gcc.4_2
+cMasterObjectLink "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o"
+cLd "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx" normal x86_64
+cMasterObjectLink "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o"
+cLd "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx" normal i386
+cCreateUniversalBinary /Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/AtkUGensUB.scx normal "x86_64 i386"
+cPhaseScriptExecution "Run Script" "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh"
+
+N/Developer/SDKs/MacOSX10.5.sdk
+c000000004B7E366000000000000000EE
+t1266562656
+s238
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/assert.h
+c0000000047BA99300000000000000DCB
+t1203411248
+s3531
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/machine/endian.h
+c0000000047E883B700000000000006C3
+t1206420407
+s1731
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/math.h
+c0000000047BA987000000000000004B7
+t1203411056
+s1207
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/netinet/in.h
+c0000000047E883C30000000000005346
+t1206420419
+s21318
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/pthread.h
+c0000000047BA9932000000000000380F
+t1203411250
+s14351
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/stdio.h
+c0000000047BA99310000000000003D1D
+t1203411249
+s15645
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/stdlib.h
+c0000000047BA99310000000000002A79
+t1203411249
+s10873
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/string.h
+c0000000047BA99320000000000001731
+t1203411250
+s5937
+
+N/Developer/SDKs/MacOSX10.5.sdk/usr/include/sys/types.h
+c0000000047E883D2000000000000290F
+t1206420434
+s10511
+
+N/System/Library/Frameworks/vecLib.framework/vecLib
+c000000004C23D694000000000005DBF0
+t1277417108
+s383984
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/AtkUGensUB.scx
+t1319636539
+s298400
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o
+t1319636539
+s161760
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o
+t1319636539
+s155624
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o
+t1319636539
+s391136
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.LinkFileList
+c000000004EA69CC4000000000000009F
+t1319541956
+s159
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx
+t1319636539
+s142752
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o
+t1319636539
+s470024
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.LinkFileList
+c000000004EA69CC400000000000000A1
+t1319541956
+s161
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx
+t1319636539
+s148520
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh
+c000000004EA69CC40000000000000041
+t1319541956
+s65
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/common/SC_Altivec.h
+c000000004D930D090000000000000F86
+t1301482761
+s3974
+i<altivec.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/common/SC_Endian.h
+c000000004D930D09000000000000070B
+t1301482761
+s1803
+i<machine/endian.h>
+i<machine/endian.h>
+i<netinet/in.h>
+i<winsock2.h>
+i<endian.h>
+i<netinet/in.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/Hash.h
+c000000004D930D090000000000000FB9
+t1301482761
+s4025
+i"SC_Types.h"
+i"SC_Endian.h"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_BoundsMacros.h
+c000000004D930D090000000000000514
+t1301482761
+s1300
+i<cstdlib>
+i<cmath>
+i<algorithm>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_BufGen.h
+c000000004D930D0900000000000004AB
+t1301482761
+s1195
+i"SC_Types.h"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_Constants.h
+c000000004D930D09000000000000070C
+t1301482761
+s1804
+i<cmath>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_DemandUnit.h
+c000000004D930D090000000000000A7D
+t1301482761
+s2685
+i"SC_Unit.h"
+i"SC_Wire.h"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_FifoMsg.h
+c000000004D930D090000000000000638
+t1301482761
+s1592
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_Graph.h
+c000000004D930D090000000000000606
+t1301482761
+s1542
+i"SC_Node.h"
+i"SC_Rate.h"
+i"SC_SndBuf.h"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_InlineBinaryOp.h
+c000000004D930D0900000000000029FD
+t1301482761
+s10749
+i"SC_BoundsMacros.h"
+i<cmath>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_InlineUnaryOp.h
+c000000004D930D090000000000002CC0
+t1301482761
+s11456
+i"SC_Types.h"
+i"SC_Constants.h"
+i<cmath>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_InterfaceTable.h
+c000000004D930D09000000000000190B
+t1301482761
+s6411
+i"SC_Types.h"
+i"SC_SndBuf.h"
+i"SC_Unit.h"
+i"SC_BufGen.h"
+i"SC_FifoMsg.h"
+i<sndfile-win.h>
+i<sndfile.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_Node.h
+c000000004D930D0900000000000004FF
+t1301482761
+s1279
+i"SC_Types.h"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_PlugIn.h
+c000000004D930D090000000000000851
+t1301482761
+s2129
+i"SC_World.h"
+i"SC_Graph.h"
+i"SC_Unit.h"
+i"SC_Wire.h"
+i"SC_InterfaceTable.h"
+i"Unroll.h"
+i"SC_InlineUnaryOp.h"
+i"SC_InlineBinaryOp.h"
+i"SC_BoundsMacros.h"
+i"SC_RGen.h"
+i"SC_DemandUnit.h"
+i"clz.h"
+i"sc_msg_iter.h"
+i"SC_Altivec.h"
+i"SC_VFP11.h"
+i<stdlib.h>
+i<xmath.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_RGen.h
+c000000004D930D090000000000001EF3
+t1301482761
+s7923
+i"SC_Endian.h"
+i"SC_Types.h"
+i"SC_BoundsMacros.h"
+i"Hash.h"
+i<math.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_Rate.h
+c000000004D930D09000000000000059A
+t1301482761
+s1434
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_SndBuf.h
+c000000004D930D090000000000000D01
+t1301482761
+s3329
+i<sys/types.h>
+i<sndfile-win.h>
+i<sndfile.h>
+i"SC_sndfile_stub.h"
+i"nova-tt/rw_spinlock.hpp"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_Types.h
+c000000004D930D090000000000000669
+t1301482761
+s1641
+i<sys/types.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_Unit.h
+c000000004D930D0900000000000024AB
+t1301482761
+s9387
+i"SC_Types.h"
+i"SC_SndBuf.h"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_Wire.h
+c000000004D930D090000000000000429
+t1301482761
+s1065
+i"SC_Types.h"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_World.h
+c000000004D930D090000000000000C91
+t1301482761
+s3217
+i"SC_Types.h"
+i"SC_Rate.h"
+i"SC_SndBuf.h"
+i"SC_RGen.h"
+i"SC_Lock.h"
+i"nova-tt/rw_spinlock.hpp"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/SC_sndfile_stub.h
+c000000004D930D090000000000000766
+t1301482761
+s1894
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/Unroll.h
+c000000004D930D0900000000000016E6
+t1301482761
+s5862
+i<string.h>
+i<cassert>
+i"SC_BoundsMacros.h"
+i<assert.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/clz.h
+c000000004D930D09000000000000110B
+t1301482761
+s4363
+i"SC_Types.h"
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/plugin_interface/sc_msg_iter.h
+c000000004D930D09000000000000193A
+t1301482761
+s6458
+i"SC_Endian.h"
+i"SC_Types.h"
+i<string.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/server/SC_Lock.h
+c000000004D930D0900000000000004A6
+t1301482761
+s1190
+i<pthread.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/headers/sndfile.h
+c000000004D930D090000000000004E69
+t1301482761
+s20073
+i<stdio.h>
+i<sys/types.h>
+
+N/Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp
+c000000004EA93933000000000000EBAD
+t1319713075
+s60333
+i"SC_PlugIn.h"
+
+CCheck dependencies
+r0
+lSLF07#2@18"Check dependencies341329337#341329337#0(0"0(0#1#0"8616040640#0"0#
+
+CCompileC "build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o" /Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp normal i386 c++ com.apple.compilers.gcc.4_2
+s341329337.056004
+e341329339.423098
+r1
+xCompileC
+xbuild/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o
+x/Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp
+xnormal
+xi386
+xc++
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@75"Compile /Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp341329337#341329339#0(0"0(0#0#67"/Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp8601606400#1151"    cd /Users/josephla/Documents/Developer/ATK-Muse/sc    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x c++ -arch i386 -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -O3 -DSC_DARWIN -isysroot /Developer/SDKs/MacOSX10.5.sdk -fvisibility-inlines-hidden -mmacosx-version-min=10.5 -gdwarf-2 "-I/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/AtkUGensUB.hmap" -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -F/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment -I/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/include "-I/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/DerivedSources/i386" "-I/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/DerivedSources" -c /Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp -o "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o"0#
+
+CCompileC "build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o" /Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+s341329337.055452
+e341329339.245400
+r1
+xCompileC
+xbuild/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o
+x/Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp
+xnormal
+xx86_64
+xc++
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@75"Compile /Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp341329337#341329339#0(0"0(0#0#67"/Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp8602946336#1157"    cd /Users/josephla/Documents/Developer/ATK-Muse/sc    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x c++ -arch x86_64 -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -O3 -DSC_DARWIN -isysroot /Developer/SDKs/MacOSX10.5.sdk -fvisibility-inlines-hidden -mmacosx-version-min=10.5 -gdwarf-2 "-I/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/AtkUGensUB.hmap" -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -F/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment -I/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/include "-I/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/DerivedSources/x86_64" "-I/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/DerivedSources" -c /Users/josephla/Documents/Developer/ATK-Muse/sc/source/AtkUGens.cpp -o "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o"0#
+
+CCreateUniversalBinary /Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/AtkUGensUB.scx normal "x86_64 i386"
+s341329339.439996
+e341329339.441948
+r1
+xCreateUniversalBinary
+x/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/AtkUGensUB.scx
+xnormal
+xx86_64 i386
+lSLF07#2@74"CreateUniversalBinary build/Deployment/AtkUGensUB.scx normal "x86_64 i386"341329339#341329339#0(0"0(0#0#59"/Users/josephla/Documents/Developer/ATK-Muse/sc/x86_64 i3868603313408#475"    cd /Users/josephla/Documents/Developer/ATK-Muse/sc    /usr/bin/lipo -create "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx" "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx" -output /Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/AtkUGensUB.scx0#
+
+CLd "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx" normal i386
+s341329339.427862
+e341329339.439939
+r1
+xLd
+x/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx
+xnormal
+xi386
+lSLF07#2@154"Link /Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx341329339#341329339#0(0"0(0#0#0"8608401792#691"    cd /Users/josephla/Documents/Developer/ATK-Muse/sc    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Developer/usr/bin/g++-4.2 -arch i386 -bundle -isysroot /Developer/SDKs/MacOSX10.5.sdk -L/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment -F/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment -filelist "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.LinkFileList" -mmacosx-version-min=10.5 -framework vecLib -o "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.scx"0#
+
+CLd "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx" normal x86_64
+s341329339.250426
+e341329339.263460
+r1
+xLd
+x/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx
+xnormal
+xx86_64
+lSLF07#2@156"Link /Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx341329339#341329339#0(0"0(0#0#0"8606642144#697"    cd /Users/josephla/Documents/Developer/ATK-Muse/sc    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Developer/usr/bin/g++-4.2 -arch x86_64 -bundle -isysroot /Developer/SDKs/MacOSX10.5.sdk -L/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment -F/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment -filelist "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.LinkFileList" -mmacosx-version-min=10.5 -framework vecLib -o "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.scx"0#
+
+CMasterObjectLink "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o"
+s341329339.423165
+e341329339.427811
+r1
+xMasterObjectLink
+x/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o
+lSLF07#2@163"Link /Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o341329339#341329339#0(0"0(0#0#158"/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o8615816800#407"    cd /Users/josephla/Documents/Developer/ATK-Muse/sc    /Developer/usr/bin/ld -r -arch i386 "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGens.o" -o "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-i386-master.o"0#
+
+CMasterObjectLink "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o"
+s341329339.245518
+e341329339.250349
+r1
+xMasterObjectLink
+x/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o
+lSLF07#2@165"Link /Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o341329339#341329339#0(0"0(0#0#160"/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o8603365664#413"    cd /Users/josephla/Documents/Developer/ATK-Muse/sc    /Developer/usr/bin/ld -r -arch x86_64 "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGens.o" -o "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/AtkUGensUB.scx-x86_64-master.o"0#
+
+CPhaseScriptExecution "Run Script" "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh"
+s341329339.441998
+e341329339.449871
+r1
+xPhaseScriptExecution
+xRun Script
+x/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh
+lSLF07#2@36"Run custom shell script 'Run Script'341329339#341329339#0(0"0(0#0#0"8599886816#16202"    cd /Users/josephla/Documents/Developer/ATK-Muse/sc    setenv ACTION build    setenv ALTERNATE_GROUP staff    setenv ALTERNATE_MODE u+w,go-w,a+rX    setenv ALTERNATE_OWNER josephla    setenv ALWAYS_SEARCH_USER_PATHS YES    setenv APPLE_INTERNAL_DEVELOPER_DIR /AppleInternal/Developer    setenv APPLE_INTERNAL_DIR /AppleInternal    setenv APPLE_INTERNAL_DOCUMENTATION_DIR /AppleInternal/Documentation    setenv APPLE_INTERNAL_LIBRARY_DIR /AppleInternal/Library    setenv APPLE_INTERNAL_TOOLS /AppleInternal/Developer/Tools    setenv APPLY_RULES_IN_COPY_FILES NO    setenv ARCHS "x86_64 i386"    setenv ARCHS_STANDARD_32_64_BIT "x86_64 i386"    setenv ARCHS_STANDARD_32_BIT i386    setenv ARCHS_STANDARD_64_BIT x86_64    setenv BUILD_COMPONENTS "headers build"    setenv BUILD_DIR /Users/josephla/Documents/Developer/ATK-Muse/sc/build    setenv BUILD_ROOT /Users/josephla/Documents/Developer/ATK-Muse/sc/build    setenv BUILD_STYLE Deployment    setenv BUILD_VARIANTS normal    setenv BUILT_PRODUCTS_DIR /Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment    setenv CACHE_ROOT /var/folders/77/77gU0CgaE+qrM+oedhZjO++++TI/-Caches-/com.apple.Xcode.501    setenv CCHROOT /var/folders/77/77gU0CgaE+qrM+oedhZjO++++TI/-Caches-/com.apple.Xcode.501    setenv CHMOD /bin/chmod    setenv CHOWN /usr/sbin/chown    setenv CLASS_FILE_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/JavaClasses"    setenv CLEAN_PRECOMPS YES    setenv CLONE_HEADERS NO    setenv CODESIGNING_FOLDER_PATH /Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/AtkUGensUB.scx    setenv CODE_SIGNING_ALLOWED YES    setenv COMMAND_MODE legacy    setenv COMPOSITE_SDK_DIRS /var/folders/77/77gU0CgaE+qrM+oedhZjO++++TI/-Caches-/com.apple.Xcode.501/CompositeSDKs    setenv CONFIGURATION Deployment    setenv CONFIGURATION_BUILD_DIR /Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment    setenv CONFIGURATION_TEMP_DIR /Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment    setenv COPYING_PRESERVES_HFS_DATA NO    setenv COPY_PHASE_STRIP YES    setenv COPY_RESOURCES_FROM_STATIC_FRAMEWORKS YES    setenv CP /bin/cp    setenv CURRENT_ARCH i386    setenv CURRENT_VARIANT normal    setenv DEAD_CODE_STRIPPING NO    setenv DEBUGGING_SYMBOLS YES    setenv DEBUG_INFORMATION_FORMAT dwarf    setenv DEPLOYMENT_LOCATION NO    setenv DEPLOYMENT_POSTPROCESSING NO    setenv DERIVED_FILES_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/DerivedSources"    setenv DERIVED_FILE_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/DerivedSources"    setenv DERIVED_SOURCES_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/DerivedSources"    setenv DEVELOPER_APPLICATIONS_DIR /Developer/Applications    setenv DEVELOPER_BIN_DIR /Developer/usr/bin    setenv DEVELOPER_DIR /Developer    setenv DEVELOPER_FRAMEWORKS_DIR /Developer/Library/Frameworks    setenv DEVELOPER_FRAMEWORKS_DIR_QUOTED "\"/Developer/Library/Frameworks\""    setenv DEVELOPER_LIBRARY_DIR /Developer/Library    setenv DEVELOPER_SDK_DIR /Developer/SDKs    setenv DEVELOPER_TOOLS_DIR /Developer/Tools    setenv DEVELOPER_USR_DIR /Developer/usr    setenv DEVELOPMENT_LANGUAGE English    setenv DO_HEADER_SCANNING_IN_JAM NO    setenv DSTROOT /tmp/xSC3Atk-Universal.dst    setenv DWARF_DSYM_FILE_NAME AtkUGensUB.scx.dSYM    setenv DWARF_DSYM_FOLDER_PATH /Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment    setenv DYLIB_INSTALL_NAME_BASE /usr/local/lib    setenv ENABLE_HEADER_DEPENDENCIES YES    setenv ENABLE_OPENMP_SUPPORT NO    setenv EXCLUDED_INSTALLSRC_SUBDIRECTORY_PATTERNS ".svn .git CVS"    setenv EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES "*.nib *.lproj *.framework *.gch (*) CVS .svn .git *.xcodeproj *.xcode *.pbproj *.pbxproj"    setenv EXECUTABLE_EXTENSION scx    setenv EXECUTABLE_NAME AtkUGensUB.scx    setenv EXECUTABLE_PATH AtkUGensUB.scx    setenv EXECUTABLE_SUFFIX .scx    setenv FILE_LIST "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects/LinkFileList"    setenv FIXED_FILES_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/FixedFiles"    setenv FRAMEWORK_FLAG_PREFIX -framework    setenv FRAMEWORK_SEARCH_PATHS "\"/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment\" "    setenv FRAMEWORK_VERSION A    setenv FULL_PRODUCT_NAME AtkUGensUB.scx    setenv GCC3_VERSION 3.3    setenv GCC_ENABLE_FIX_AND_CONTINUE NO    setenv GCC_INLINES_ARE_PRIVATE_EXTERN YES    setenv GCC_OPTIMIZATION_LEVEL 3    setenv GCC_PFE_FILE_C_DIALECTS "c objective-c c++ objective-c++"    setenv GCC_PREPROCESSOR_DEFINITIONS SC_DARWIN    setenv GCC_TREAT_WARNINGS_AS_ERRORS NO    setenv GCC_VERSION 4.2    setenv GCC_VERSION_IDENTIFIER __2    setenv GENERATE_MASTER_OBJECT_FILE YES    setenv GENERATE_PKGINFO_FILE NO    setenv GENERATE_PROFILING_CODE NO    setenv GID 20    setenv GROUP staff    setenv HEADERMAP_INCLUDES_FLAT_ENTRIES_FOR_TARGET_BEING_BUILT YES    setenv HEADERMAP_INCLUDES_FRAMEWORK_ENTRIES_FOR_ALL_PRODUCT_TYPES YES    setenv HEADERMAP_INCLUDES_NONPUBLIC_NONPRIVATE_HEADERS YES    setenv HEADERMAP_INCLUDES_PROJECT_HEADERS YES    setenv HEADER_SEARCH_PATHS "\"/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/include\" "    setenv ICONV /usr/bin/iconv    setenv INFOPLIST_EXPAND_BUILD_SETTINGS YES    setenv INFOPLIST_OUTPUT_FORMAT same-as-input    setenv INFOPLIST_PREPROCESS NO    setenv INSTALL_DIR /tmp/xSC3Atk-Universal.dst/usr/local/lib    setenv INSTALL_GROUP staff    setenv INSTALL_MODE_FLAG u+w,go-w,a+rX    setenv INSTALL_OWNER josephla    setenv INSTALL_PATH /usr/local/lib    setenv INSTALL_ROOT /tmp/xSC3Atk-Universal.dst    setenv JAVAC_DEFAULT_FLAGS "-J-Xms64m -J-XX:NewSize=4M -J-Dfile.encoding=UTF8"    setenv JAVA_APP_STUB /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub    setenv JAVA_ARCHIVE_CLASSES YES    setenv JAVA_ARCHIVE_TYPE JAR    setenv JAVA_COMPILER /usr/bin/javac    setenv JAVA_FRAMEWORK_RESOURCES_DIRS Resources    setenv JAVA_JAR_FLAGS cv    setenv JAVA_SOURCE_SUBDIR .    setenv JAVA_USE_DEPENDENCIES YES    setenv JAVA_ZIP_FLAGS -urg    setenv JIKES_DEFAULT_FLAGS "+E +OLDCSO"    setenv KEEP_PRIVATE_EXTERNS NO    setenv LD_DYLIB_INSTALL_NAME /usr/local/lib/AtkUGensUB.scx    setenv LD_GENERATE_MAP_FILE NO    setenv LD_MAP_FILE_PATH "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/AtkUGensUB-LinkMap-normal-i386.txt"    setenv LD_OPENMP_FLAGS -fopenmp    setenv LEX /Developer/usr/bin/lex    setenv LIBRARY_FLAG_NOSPACE YES    setenv LIBRARY_FLAG_PREFIX -l    setenv LIBRARY_SEARCH_PATHS "\"/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment\" "    setenv LIBRARY_STYLE BUNDLE    setenv LINKER_DISPLAYS_MANGLED_NAMES NO    setenv LINK_FILE_LIST_normal_i386 "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/i386/AtkUGensUB.LinkFileList"    setenv LINK_FILE_LIST_normal_x86_64 "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal/x86_64/AtkUGensUB.LinkFileList"    setenv LINK_WITH_STANDARD_LIBRARIES YES    setenv LOCAL_ADMIN_APPS_DIR /Applications/Utilities    setenv LOCAL_APPS_DIR /Applications    setenv LOCAL_DEVELOPER_DIR /Library/Developer    setenv LOCAL_LIBRARY_DIR /Library    setenv MACH_O_TYPE mh_bundle    setenv MACOSX_DEPLOYMENT_TARGET 10.5    setenv MAC_OS_X_PRODUCT_BUILD_VERSION 10K549    setenv MAC_OS_X_VERSION_ACTUAL 1068    setenv MAC_OS_X_VERSION_MAJOR 1060    setenv MAC_OS_X_VERSION_MINOR 0608    setenv NATIVE_ARCH i386    setenv NATIVE_ARCH_32_BIT i386    setenv NATIVE_ARCH_64_BIT x86_64    setenv NATIVE_ARCH_ACTUAL x86_64    setenv NO_COMMON YES    setenv OBJECT_FILE_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects"    setenv OBJECT_FILE_DIR_normal "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Objects-normal"    setenv OBJROOT /Users/josephla/Documents/Developer/ATK-Muse/sc/build    setenv ONLY_ACTIVE_ARCH NO    setenv OPTIMIZATION_LEVEL 0    setenv OS MACOS    setenv OSAC /usr/bin/osacompile    setenv PACKAGE_TYPE com.apple.package-type.mach-o-dylib    setenv PASCAL_STRINGS YES    setenv PATH_PREFIXES_EXCLUDED_FROM_HEADER_DEPENDENCIES "/usr/include /usr/local/include /System/Library/Frameworks /System/Library/PrivateFrameworks /Developer/Headers /Developer/SDKs /Developer/Platforms"    setenv PFE_FILE_C_DIALECTS c++    setenv PKGINFO_FILE_PATH "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/PkgInfo"    setenv PLATFORM_DEVELOPER_APPLICATIONS_DIR /Developer/Applications    setenv PLATFORM_DEVELOPER_BIN_DIR /Developer/usr/bin    setenv PLATFORM_DEVELOPER_LIBRARY_DIR /Developer/Library    setenv PLATFORM_DEVELOPER_SDK_DIR /Developer/SDKs    setenv PLATFORM_DEVELOPER_TOOLS_DIR /Developer/Tools    setenv PLATFORM_DEVELOPER_USR_DIR /Developer/usr    setenv PLATFORM_NAME macosx    setenv PLATFORM_PRODUCT_BUILD_VERSION 10M2518    setenv PLIST_FILE_OUTPUT_FORMAT same-as-input    setenv PREBINDING NO    setenv PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR YES    setenv PRECOMP_DESTINATION_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/PrefixHeaders"    setenv PRESERVE_DEAD_CODE_INITS_AND_TERMS NO    setenv PRIVATE_HEADERS_FOLDER_PATH /usr/local/include    setenv PRODUCT_NAME AtkUGensUB    setenv PRODUCT_SETTINGS_PATH     setenv PRODUCT_TYPE com.apple.product-type.library.dynamic    setenv PROFILING_CODE NO    setenv PROJECT xSC3Atk-Universal    setenv PROJECT_DERIVED_FILE_DIR /Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/DerivedSources    setenv PROJECT_DIR /Users/josephla/Documents/Developer/ATK-Muse/sc    setenv PROJECT_FILE_PATH /Users/josephla/Documents/Developer/ATK-Muse/sc/xSC3Atk-Universal.xcodeproj    setenv PROJECT_NAME xSC3Atk-Universal    setenv PROJECT_TEMP_DIR /Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build    setenv PUBLIC_HEADERS_FOLDER_PATH /usr/local/include    setenv RECURSIVE_SEARCH_PATHS_FOLLOW_SYMLINKS YES    setenv REMOVE_CVS_FROM_RESOURCES YES    setenv REMOVE_GIT_FROM_RESOURCES YES    setenv REMOVE_SVN_FROM_RESOURCES YES    setenv REZ_COLLECTOR_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/ResourceManagerResources"    setenv REZ_EXECUTABLE YES    setenv REZ_OBJECTS_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/ResourceManagerResources/Objects"    setenv REZ_SEARCH_PATHS "\"/Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment\" "    setenv RUN_CLANG_STATIC_ANALYZER NO    setenv SCAN_ALL_SOURCE_FILES_FOR_INCLUDES NO    setenv SCRIPT_INPUT_FILE_COUNT 0    setenv SCRIPT_OUTPUT_FILE_COUNT 0    setenv SDKROOT /Developer/SDKs/MacOSX10.5.sdk    setenv SDK_DIR /Developer/SDKs/MacOSX10.5.sdk    setenv SDK_NAME macosx10.5    setenv SDK_PRODUCT_BUILD_VERSION 9L31a    setenv SED /usr/bin/sed    setenv SEPARATE_STRIP NO    setenv SEPARATE_SYMBOL_EDIT NO    setenv SET_DIR_MODE_OWNER_GROUP YES    setenv SET_FILE_MODE_OWNER_GROUP NO    setenv SHARED_DERIVED_FILE_DIR /Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment/DerivedSources    setenv SHARED_PRECOMPS_DIR /var/folders/77/77gU0CgaE+qrM+oedhZjO++++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders    setenv SKIP_INSTALL YES    setenv SOURCE_ROOT /Users/josephla/Documents/Developer/ATK-Muse/sc    setenv SRCROOT /Users/josephla/Documents/Developer/ATK-Muse/sc    setenv STANDARD_C_PLUS_PLUS_LIBRARY_TYPE dynamic    setenv STRINGS_FILE_OUTPUT_ENCODING UTF-16    setenv STRIP_INSTALLED_PRODUCT YES    setenv STRIP_STYLE debugging    setenv SYMBOL_REPOSITORY_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/SymbolRepositories"    setenv SYMROOT /Users/josephla/Documents/Developer/ATK-Muse/sc/build    setenv SYSTEM_ADMIN_APPS_DIR /Applications/Utilities    setenv SYSTEM_APPS_DIR /Applications    setenv SYSTEM_CORE_SERVICES_DIR /System/Library/CoreServices    setenv SYSTEM_DEMOS_DIR /Applications/Extras    setenv SYSTEM_DEVELOPER_APPS_DIR /Developer/Applications    setenv SYSTEM_DEVELOPER_BIN_DIR /Developer/usr/bin    setenv SYSTEM_DEVELOPER_DEMOS_DIR "/Developer/Applications/Utilities/Built Examples"    setenv SYSTEM_DEVELOPER_DIR /Developer    setenv SYSTEM_DEVELOPER_DOC_DIR "/Developer/ADC Reference Library"    setenv SYSTEM_DEVELOPER_GRAPHICS_TOOLS_DIR "/Developer/Applications/Graphics Tools"    setenv SYSTEM_DEVELOPER_JAVA_TOOLS_DIR "/Developer/Applications/Java Tools"    setenv SYSTEM_DEVELOPER_PERFORMANCE_TOOLS_DIR "/Developer/Applications/Performance Tools"    setenv SYSTEM_DEVELOPER_RELEASENOTES_DIR "/Developer/ADC Reference Library/releasenotes"    setenv SYSTEM_DEVELOPER_TOOLS /Developer/Tools    setenv SYSTEM_DEVELOPER_TOOLS_DOC_DIR "/Developer/ADC Reference Library/documentation/DeveloperTools"    setenv SYSTEM_DEVELOPER_TOOLS_RELEASENOTES_DIR "/Developer/ADC Reference Library/releasenotes/DeveloperTools"    setenv SYSTEM_DEVELOPER_USR_DIR /Developer/usr    setenv SYSTEM_DEVELOPER_UTILITIES_DIR /Developer/Applications/Utilities    setenv SYSTEM_DOCUMENTATION_DIR /Library/Documentation    setenv SYSTEM_LIBRARY_DIR /System/Library    setenv TARGETNAME "AtkUGens (Upgraded)"    setenv TARGET_BUILD_DIR /Users/josephla/Documents/Developer/ATK-Muse/sc/build/Deployment    setenv TARGET_NAME "AtkUGens (Upgraded)"    setenv TARGET_TEMP_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build"    setenv TEMP_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build"    setenv TEMP_FILES_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build"    setenv TEMP_FILE_DIR "/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build"    setenv TEMP_ROOT /Users/josephla/Documents/Developer/ATK-Muse/sc/build    setenv UID 501    setenv UNSTRIPPED_PRODUCT NO    setenv USER josephla    setenv USER_APPS_DIR /Users/josephla/Applications    setenv USER_LIBRARY_DIR /Users/josephla/Library    setenv USE_DYNAMIC_NO_PIC YES    setenv USE_HEADERMAP YES    setenv USE_HEADER_SYMLINKS NO    setenv VALIDATE_PRODUCT NO    setenv VALID_ARCHS "i386 ppc ppc64 ppc7400 ppc970 x86_64"    setenv VERBOSE_PBXCP NO    setenv VERSION_INFO_BUILDER josephla    setenv VERSION_INFO_FILE AtkUGensUB_vers.c    setenv VERSION_INFO_STRING "\"@(#)PROGRAM:AtkUGensUB  PROJECT:xSC3Atk-Universal-\""    setenv WARNING_CFLAGS "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas"    setenv XCODE_APP_SUPPORT_DIR /Developer/Library/Xcode    setenv XCODE_PRODUCT_BUILD_VERSION 10M2518    setenv XCODE_VERSION_ACTUAL 0400    setenv XCODE_VERSION_MAJOR 0400    setenv XCODE_VERSION_MINOR 0400    setenv YACC /Developer/usr/bin/yacc    setenv ZERO_LINK NO    setenv _REAL_SDKROOT macosx10.5    /bin/sh -c "\"/Users/josephla/Documents/Developer/ATK-Muse/sc/build/xSC3Atk-Universal.build/Deployment/AtkUGens (Upgraded).build/Script-F3FE075B0B0D767000A29459.sh\""0#
+
