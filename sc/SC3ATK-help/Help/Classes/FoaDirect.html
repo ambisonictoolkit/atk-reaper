@@ -1,0 +1,115 @@
+<html>
+<head>
+<title>FoaDirect</title>
+<link rel="stylesheet" href="./../scdoc.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="./../scdoc.js" type="text/javascript"></script><script src="./../docmap.js" type="text/javascript"></script><script src="./../prettify.js" type="text/javascript"></script><script src="./../lang-sc.js" type="text/javascript"></script><script type="text/javascript">var helpRoot='./..';</script>
+</head>
+<body>
+<ul id="menubar"></ul>
+<div class="contents">
+<div class="header">
+<div id="label">SuperCollider CLASSES</div>
+<div id="categories">
+<a href="./../Browse.html#Libraries&gt;Ambisonic%20Toolkit&gt;FOA&gt;Transforming&gt;UGens">Libraries&gt;Ambisonic Toolkit&gt;FOA&gt;Transforming&gt;UGens</a>, <a href="./../Browse.html#UGens&gt;Multichannel&gt;Ambisonics">UGens&gt;Multichannel&gt;Ambisonics</a>, <a href="./../Browse.html#UGens&gt;Multichannel&gt;Panners">UGens&gt;Multichannel&gt;Panners</a>
+</div>
+<h1>FoaDirect</h1>
+<div id="summary">First Order Ambisonic (FOA) directivity transformer</div>
+</div>
+<div class="subheader">
+<div id="related">See also: <a href="./../Classes/FoaDirectO.html">FoaDirectO</a>, <a href="./../Classes/FoaDirectX.html">FoaDirectX</a>, <a href="./../Classes/FoaDirectY.html">FoaDirectY</a>, <a href="./../Classes/FoaDirectZ.html">FoaDirectZ</a>, <a href="./../Classes/FoaTransform.html">FoaTransform</a>, <a href="./../Classes/FoaXform.html">FoaXform</a>
+</div>[ </div>
+<div id="toc">
+<ul class="toc">
+<li class="toc1"><a href="#description">Description</a></li>
+<ul class="toc"></ul>
+<li class="toc1"><a href="#classmethods">Class methods</a></li>
+<ul class="toc">
+<li class="toc3">
+<a href="#*ar">ar</a> </li>
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#instancemethods">Instance methods</a></li>
+<ul class="toc">
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#examples">Examples</a></li>
+<ul class="toc"></ul>
+</ul>
+</div>
+<h2><a class="anchor" name="description">Description</a></h2>
+<p>Adjust the soundfield directivity of a first order ambisonic signal (B-format) across an arbitrary plane.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> <a href="./../Classes/FoaDirect.html">FoaDirect</a> is usually called via the convenience wrapper <a href="./../Classes/FoaTransform.html">FoaTransform</a>.
+</div>
+<h2><a class="anchor" name="classmethods">Class Methods</a></h2>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*ar">*</a></span><a href="./../Overviews/Methods.html#ar">ar</a> (<span class="argstr">w</span>, <span class="argstr">x</span>, <span class="argstr">y</span>, <span class="argstr">z</span>, <span class="argstr">angle = 0</span>, <span class="argstr">theta = 0</span>, <span class="argstr">phi = 0</span>, <span class="argstr">mul = 1</span>, <span class="argstr">add = 0</span>)</h3>
+<div class="method">
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> w </td>
+<td class="argumentdesc"><p>Input signal W.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> x </td>
+<td class="argumentdesc"><p>Input signal X.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> y </td>
+<td class="argumentdesc"><p>Input signal Y.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> z </td>
+<td class="argumentdesc"><p>Input signal Z.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. 0 to pi/2
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> theta </td>
+<td class="argumentdesc"><p>Azimuth for the normal to the plane, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> phi </td>
+<td class="argumentdesc"><p>Elevation for the normal to the plane, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> mul </td>
+<td class="argumentdesc"><p>Output will be multiplied by this value.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> add </td>
+<td class="argumentdesc"><p>This value will be added to the output.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<strong>Angle</strong> = 0 retains the current directivity of the soundfield. Increasing <strong>angle</strong> towards pi/2 decreases the directivity along the normal defined by <strong>theta</strong> and <strong>phi</strong>, reducing the gain on this normal to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes directionless on the normal.
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding matrix transformer: <a href="./../Classes/FoaXformerMatrix.html#*newDirect">FoaXformerMatrix: *newDirect</a> </div>
+</div>
+<h3></h3>
+<div id="inheritedclassmets"></div>
+<h2><a class="anchor" name="instancemethods">Instance Methods</a></h2>
+<h3></h3>
+<div id="inheritedinstmets"></div>
+<h2><a class="anchor" name="examples">Examples</a></h2>
+<p>Please see various examples <a href="./../Classes/FoaTransform.html#examples">here</a>.
+</p>
+</div>
+</body>
+</html>

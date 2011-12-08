@@ -1,0 +1,962 @@
+<html>
+<head>
+<title>FoaEncode</title>
+<link rel="stylesheet" href="./../scdoc.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="./../scdoc.js" type="text/javascript"></script><script src="./../docmap.js" type="text/javascript"></script><script src="./../prettify.js" type="text/javascript"></script><script src="./../lang-sc.js" type="text/javascript"></script><script type="text/javascript">var helpRoot='./..';</script>
+</head>
+<body>
+<ul id="menubar"></ul>
+<div class="contents">
+<div class="header">
+<div id="label">SuperCollider CLASSES</div>
+<div id="categories">
+<a href="./../Browse.html#Libraries&gt;Ambisonic%20Toolkit&gt;FOA&gt;Encoding">Libraries&gt;Ambisonic Toolkit&gt;FOA&gt;Encoding</a>, <a href="./../Browse.html#UGens&gt;Multichannel&gt;Ambisonics">UGens&gt;Multichannel&gt;Ambisonics</a>
+</div>
+<h1>FoaEncode</h1>
+<div id="summary">First Order Ambisonic (FOA) encoder</div>
+</div>
+<div class="subheader">
+<div id="related">See also: <a href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>, <a href="./../Classes/FoaEncoderKernel.html">FoaEncoderKernel</a>
+</div>[ </div>
+<div id="toc">
+<ul class="toc">
+<li class="toc1"><a href="#description">Description</a></li>
+<ul class="toc"></ul>
+<li class="toc1"><a href="#classmethods">Class methods</a></li>
+<ul class="toc">
+<li class="toc3">
+<a href="#*ar">ar</a> </li>
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#instancemethods">Instance methods</a></li>
+<ul class="toc">
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#examples">Examples</a></li>
+<ul class="toc">
+<li class="toc2"><a href="#choose_a_decoder">Choose a decoder</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#omnidirectional_encoder">Omnidirectional encoder</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#a_to_b_encoder">A to B encoder</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#a_to_b_encoder_(soundfile)">A to B encoder (soundfile)</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#stereophonic_encoder">Stereophonic encoder</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#stereophonic_encoder_(soundfile)">Stereophonic encoder (soundfile)</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#super_stereo_encoder_(soundfile)">Super Stereo encoder (soundfile)</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#ambisonic_uhj_stereo_encoder_(soundfile)">Ambisonic UHJ stereo encoder (soundfile)</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#zoomh2_encoder_(soundfile)">ZoomH2 encoder (soundfile)</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#zoomh2_encoder,_reversed_(soundfile)">ZoomH2 encoder, reversed (soundfile)</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#pantophonic_encoder_(soundfile)">Pantophonic encoder (soundfile)</a></li>
+<ul class="toc"></ul>
+</ul>
+</ul>
+</div>
+<h2><a class="anchor" name="description">Description</a></h2>
+<p>Encodes signals in a variety of configurations to a first order ambisonic signal (B-format). <a href="./../Classes/PanB.html">PanB</a> is a SuperCollider inbuilt equivalent.
+</p>
+<h2><a class="anchor" name="classmethods">Class Methods</a></h2>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*ar">*</a></span><a href="./../Overviews/Methods.html#ar">ar</a> (<span class="argstr">in</span>, <span class="argstr">encoder</span>, <span class="argstr">mul = 1</span>, <span class="argstr">add = 0</span>)</h3>
+<div class="method">
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> in </td>
+<td class="argumentdesc"><p>The input signal, an array: [in0, in1, ... inN]
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> encoder </td>
+<td class="argumentdesc">
+<a href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a> or <a href="./../Classes/FoaEncoderKernel.html">FoaEncoderKernel</a> instance.
+</td>
+</tr>
+<tr>
+<td class="argumentname"> mul </td>
+<td class="argumentdesc"><p>Output will be multiplied by this value.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> add </td>
+<td class="argumentdesc"><p>This value will be added to the output.
+</p></td>
+</tr>
+</table>
+<h4>Returns:</h4>
+<div class="returnvalue"><p>A B-format signal as an array of channels: [w, x, y, z]
+</p></div>
+</div>
+<h3></h3>
+<div id="inheritedclassmets"></div>
+<h2><a class="anchor" name="instancemethods">Instance Methods</a></h2>
+<h3></h3>
+<div id="inheritedinstmets"></div>
+<h2><a class="anchor" name="examples">Examples</a></h2>
+<p>The examples below are intended to briefly illustrate some of the first order encoding options made available in the Ambisonic Toolkit. The user is encouraged to carefully review the features of <a href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a> and <a href="./../Classes/FoaEncoderKernel.html">FoaEncoderKernel</a> to gain a deeper understanding of the flexibility of these tools.
+</p>
+<p>Available encoders include monophonic (as an omnidirectional soundfield or planewave), stereophonic and varieties of pantophonic (2D surround) and periphonic (3D surround). Additionally, microphone array encoding is also supported.
+</p>
+<p>As the Ambisonic technique is a hierarchal system, numerous options for playback are possible. These include two channel stereo, two channel binaural, pantophonic and full 3D periphonic. With the examples below, we'll take advantage of this by first choosing a suitable decoder with with to audition.
+</p>
+<h3><a class="anchor" name="choose_a_decoder">Choose a decoder</a></h3>
+<p>A number of decoders are defined below. Please choose one suitable for your system. Also, don't forget to define <code class="code prettyprint lang-sc"> ~renderDecode </code>
+ !
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> If you choose a kernel decoder, <a href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>, be sure to free the kernel after use. </div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// switch to internal server, and boot
+(
+        s = <a class="clslnk" href="./../Classes/Server.html">Server</a>.internal;
+        <a class="clslnk" href="./../Classes/Server.html">Server</a>.default = s;
+        s.boot;
+)
+
+
+// ------------------------------------------------------------
+// choose a decoder
+
+// stereophonic / binaural
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newStereo(131/2 * pi/180, 0.5) // Cardioids at 131 deg
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>.newUHJ                         // UHJ (kernel)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>.newSpherical                   // synthetic binaural (kernel)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>.newCIPIC                       // KEMAR binaural (kernel)
+
+
+// pantophonic (2D)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newQuad(k: 'dual')             // psycho optimised quad
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newQuad(pi/6, 'dual')          // psycho optimised narrow quad
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.new5_0                         // 5.0
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newPanto(6, k: 'dual')         // psycho optimised hex
+
+
+// periphonic (3D)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newPeri(k: 'dual')             // psycho optimised cube
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newDiametric(                  // psycho optimised bi-rectangle
+    pi/180 * [[30, 0], [-30, 0], [90, 35.3], [-90, 35.3]],
+    'dual'
+)
+
+
+// inspect
+~decoder.kind
+
+
+// ------------------------------------------------------------
+// define ~renderDecode
+(
+~renderDecode = { arg in, decoder;
+    var kind;
+    var fl, bl, br, fr;
+    var fc, lo;
+    var sl, sr;
+    var flu, blu, bru, fru;
+    var fld, bld, brd, frd;
+    var slu, sru, sld, srd;
+        
+
+    kind = decoder.kind;
+    
+    case
+        { decoder.numChannels == 2 }
+            {
+                // decode to stereo (or binaural)
+                <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder)
+            }
+        { kind == 'quad' }
+            {
+                // decode (to quad)
+                #fl, bl, br, fr = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+
+                // reorder output to match speaker arrangement
+                [fl, fr, bl, br]
+            }
+        { kind == '5.0' }
+            {
+                // decode (to 5.0)
+                #fc, fl, bl, br, fr = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                lo = <a class="clslnk" href="./../Classes/Silent.html">Silent</a>.ar;
+                                
+                // reorder output to match speaker arrangement
+                [fl, fr, fc, lo, bl, br]
+            }
+        { kind == 'panto' }
+            {
+                // decode (to hex)
+                #fl, sl, bl, br, sr, fr = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                                
+                // reorder output to match speaker arrangement
+                [fl, fr, sl, sr, bl, br]
+            }
+        { kind == 'peri' }
+            {
+                // decode (to cube)
+                #flu, blu, bru, fru, fld, bld, brd, frd = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                                
+                // reorder output to match speaker arrangement
+                [flu, fru, blu, bru, fld, frd, bld, brd]
+            }
+        { kind == 'diametric' }
+            {
+                // decode (to bi-rectangle)
+                #fl, fr, slu, sru, br, bl, srd, sld = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                
+                // reorder output to match speaker arrangement
+                [fl, fr, bl, br, slu, sru, sld, srd]
+            };
+}
+)
+
+// ------------------------------------------------------------
+// now we're ready to try the examples below!
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="omnidirectional_encoder">Omnidirectional encoder</a></h3>
+<p>Encoded as an omnidirectional soundfield, <a href="./../Classes/PinkNoise.html">PinkNoise</a> is used as the example sound source. In a well aligned, dampend studio environment, this usually sounds "in the head". <a href="./../Classes/FoaPush.html">FoaPush</a> is used to "push" the omnidirectional soundfield so that it becomes a planewave (infinite distance, in an anechoic environment) arriving from some direction.
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a>, where <a href="./../Classes/MouseX.html">MouseX</a> specifies the incident azimuth angle (pi to -pi; left to right of display) and <a href="./../Classes/MouseY.html">MouseY</a> the <a href="./../Classes/FoaPush.html">FoaPush</a> angle (0 to pi/2; bottom to top of display). With the mouse at the bottom of the display, the soundfield remains omnidirectional. Placed at the top of the display, the soundfield becomes directional, and varying left/right position will vary the incident azimuth of the resulting planewave.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newOmni">FoaEncoderMatrix: *newOmni</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// omni encoder
+// mono pink noise source
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newOmni
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+(
+{
+    var sig;                            // audio signal
+    var angle, azim;                    // angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top           = push to plane wave
+    //            bottom        = omni-directional
+    angle = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left     = back
+    //            centre        = centre
+    //            hard right    = back
+    azim = <a class="clslnk" href="./../Classes/MouseX.html">MouseX</a>.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PinkNoise.html">PinkNoise</a>.ar;                         // mono pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="a_to_b_encoder">A to B encoder</a></h3>
+<p>Here we encode four channels of decorrelated <a href="./../Classes/PinkNoise.html">PinkNoise</a> as a decorrelated soundfield, resulting in a maximally diffuse soundfield. <a href="./../Classes/FoaPush.html">FoaPush</a> is used to "push" the soundfield so that it becomes a planewave (infinite distance, in an anechoic environment) arriving from some direction. This technique gives the opportunity to continuously modulate between a directional and a diffuse soundfield.
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a>, where <a href="./../Classes/MouseX.html">MouseX</a> specifies the incident azimuth angle (pi to -pi; left to right of display) and <a href="./../Classes/MouseY.html">MouseY</a> the <a href="./../Classes/FoaPush.html">FoaPush</a> angle (0 to pi/2; bottom to top of display). With the mouse at the bottom of the display, the soundfield remains omnidirectional. Placed at the top of the display, the soundfield becomes directional, and varying left/right position will vary the incident azimuth of the resulting planewave.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newAtoB">FoaEncoderMatrix: *newAtoB</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// A to B encoder
+// decorrelated pink noise source
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newAtoB
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels
+
+(
+{
+    var sig;				// audio signal
+    var angle, azim;			// angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top 		= push to plane wave
+    //		  bottom	= omni-directional
+    angle = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class="clslnk" href="./../Classes/MouseX.html">MouseX</a>.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PinkNoise.html">PinkNoise</a>.ar([1, 1, 1, 1]); // 4 channels decorrelated pink noise
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, 'push', angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="a_to_b_encoder_(soundfile)">A to B encoder (soundfile)</a></h3>
+<p>This example is somewhat unconvential as regards the literature. Four microphones (omnis) are place around the performer in a tetrahedron. This is then matrixed into B-format.
+</p>
+<p>As the performer rotates and moves about, the image shifts through the sound-scene. In a compositional context, <a href="./../Classes/FoaPush.html">FoaPush</a> could be used to control the soundfield.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newAtoB">FoaEncoderMatrix: *newAtoB</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// A to B encoder
+// A-format soundfile read from disk
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newAtoB('flr')
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/a-format/Cross_Tenor_Sax.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/a-format/Thomas_Mackay.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> David Cross, "Tenor saxophone improvisations," [unpublished recording]
+</li>
+<li>Niall Thomas, "Rob Mackay: flute improvisations," [unpublished recording]
+</li>
+</ul>
+</div>
+<h3><a class="anchor" name="stereophonic_encoder">Stereophonic encoder</a></h3>
+<p>In this example we first encode a single channel of <a href="./../Classes/PinkNoise.html">PinkNoise</a> into a stereophonic signal with <a href="./../Classes/Pan2.html">Pan2</a>. <a href="./../Classes/FoaZooom.html">FoaZooom</a> is then used to balance the soundfield across the x-axis (front/back).
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a>, where <a href="./../Classes/MouseX.html">MouseX</a> specifies the left to right position of the stereo panned source and <a href="./../Classes/MouseY.html">MouseY</a> the <a href="./../Classes/FoaZoom.html">FoaZoom</a> front to back position (distortion angle). Moving the mouse in a circular motion results in a circular motion of the sound.<a class="footnote anchor" name="footnote_org_1" href="#footnote_1"><sup>1</sup></a> </p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newStereo">FoaEncoderMatrix: *newStereo</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// stereo encoder
+// stereo panned mono pink noise source
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newStereo
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+(
+{
+    var sig;                            // audio signal
+    var angle, azim;                    // angle and azimuth control
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // angle ---&gt; top           = zoom to plane wave at front
+    //            bottom        = zoom to plane wave at back
+    angle = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(pi/2, pi.neg/2);
+
+    // azimuth -&gt; hard left     = back
+    //            centre        = centre
+    //            hard right    = back
+    azim = <a class="clslnk" href="./../Classes/MouseX.html">MouseX</a>.kr(pi, -pi);
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PinkNoise.html">PinkNoise</a>.ar;                                 // mono pink noise
+
+    // ------------------------------------------------------------
+    // pan (encode) to stereo
+    sig = <a class="clslnk" href="./../Classes/Pan2.html">Pan2</a>.ar(sig, azim.neg/pi);
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, 'zoom', angle);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free kernel
+~encoder.free
+
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="stereophonic_encoder_(soundfile)">Stereophonic encoder (soundfile)</a></h3>
+<p>For this example we'll look at encoding stereo soundfiles.
+</p>
+<p>The stereo encoder places the left channel at +pi/4 and the right at -pi/4. Compare to the <a href="./../Classes/FoaEncoderKernel.html#*newSuper">Super Stereo</a> encoder <a href="#super_stereo_encoder_(soundfile)">below</a>.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newStereo">FoaEncoderMatrix: *newStereo</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// stereo encoder
+// stereo soundfile read from disk
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newStereo(pi/4)
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/stereo/The_City_Waites-The_Downfall.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/stereo/The_City_Waites-An_Old.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/stereo/Aurora_Surgit-Lux_Aeterna.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/stereo/Aurora_Surgit-Dies_Irae.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> The City Waites, "The Downfall of Dancing," Penny Merriments, NAXOS 8.557672
+</li>
+<li>The City Waites, "An Old Song on the Spanish Armada," Penny Merriments, NAXOS 8.557672
+</li>
+<li>Aurora Surgit, "Lux aeterna," Ego sum Resurrectio, NAXOS 8.557672
+</li>
+<li>Aurora Surgit, "Dies irae," Ego sum Resurrectio, NAXOS 8.557672
+</li>
+</ul>
+</div>
+<h3><a class="anchor" name="super_stereo_encoder_(soundfile)">Super Stereo encoder (soundfile)</a></h3>
+<p>Super Stereo<a class="footnote anchor" name="footnote_org_2" href="#footnote_2"><sup>2</sup></a> is the classic Ambisonic method to encode stereophonic files, and is considered to be optimal for frontal stereo encoding.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A kernel type encoder, see <a href="./../Classes/FoaEncoderKernel.html#*newSuper">FoaEncoderKernel: *newSuper</a> for further details.</div>
+<div class="warning">
+<span class="warninglabel">WARNING:</span> Kernel encoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of <a href="./../Classes/FoaEncoderKernel.html#-free">FoaEncoderKernel: -free</a> after use.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// super stereo encoder
+// stereo soundfile read from disk
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderKernel.html">FoaEncoderKernel</a>.newSuper
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/stereo/The_City_Waites-The_Downfall.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/stereo/The_City_Waites-An_Old.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/stereo/Aurora_Surgit-Lux_Aeterna.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/stereo/Aurora_Surgit-Dies_Irae.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free kernel &amp; buffer
+~encoder.free
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> The City Waites, "The Downfall of Dancing," Penny Merriments, NAXOS 8.557672
+</li>
+<li>The City Waites, "An Old Song on the Spanish Armada," Penny Merriments, NAXOS 8.557672
+</li>
+<li>Aurora Surgit, "Lux aeterna," Ego sum Resurrectio, NAXOS 8.557672
+</li>
+<li>Aurora Surgit, "Dies irae," Ego sum Resurrectio, NAXOS 8.557672
+</li>
+</ul>
+</div>
+<h3><a class="anchor" name="ambisonic_uhj_stereo_encoder_(soundfile)">Ambisonic UHJ stereo encoder (soundfile)</a></h3>
+<a href="http://en.wikipedia.org/wiki/Ambisonic_UHJ_format##Ambisonic%20UHJ">Ambisonic UHJ</a> is the stereo format for Ambisonics.
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A kernel type encoder, see <a href="./../Classes/FoaEncoderKernel.html#*newUHJ">FoaEncoderKernel: *newUHJ</a> for further details.</div>
+<div class="warning">
+<span class="warninglabel">WARNING:</span> Kernel encoders require special care. Allow the kernel time to load before attempting to use. Additionally, the kernel buffer should be freed through the use of <a href="./../Classes/FoaEncoderKernel.html#-free">FoaEncoderKernel: -free</a> after use.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// ambisonic uhj stereo encoder
+// stereo soundfile read from disk
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderKernel.html">FoaEncoderKernel</a>.newUHJ
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/uhj/Palestrina-O_Bone.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/uhj/Gabrieli-Canzon_Duodecimi.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/uhj/Cante_Flamenco-Alegrias.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/uhj/Waldteufel-The_Skaters.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free kernel &amp; buffer
+~encoder.free
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> Christ Church Cathedral Choir, "Palestrina: O Bone Jesu, exaudi me," Ambisonic Sampler, NI 1417
+</li>
+<li>The Wallace Collection, "Gabrieli: Canzon Duodecimi Toni a 10 (No 2)," Ambisonic Sampler, NI 1417
+</li>
+<li>C. Lobato, J. del Gastor, &amp; P. del Gastor, "Alegrias," Ambisonic Sampler, NI 1417
+</li>
+<li>The Gulbenkian Orchestra, "Waldteufel: The Skaters' Waltz," Ambisonic Sampler, NI 1417
+</li>
+</ul>
+</div>
+<h3><a class="anchor" name="zoomh2_encoder_(soundfile)">ZoomH2 encoder (soundfile)</a></h3>
+<p>The <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a> is a convenient, portable handheld recorder. The device only records horizontal surround (pantophonic), so we don't get height.
+</p>
+<p>As a relatively inexpensive piece of equipment, the imaging of the <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a> isn't always as consistent as we'd prefer. To remedy, the Y gain is tweaked to widen the image, and <a href="./../Classes/FoaXformerMatrix.html#*newDominateX">dominance</a> is applied to stabilise the front.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newZoomH2">FoaEncoderMatrix: *newZoomH2</a> and <a href="./../Classes/FoaXformerMatrix.html#*newDominateX">FoaXformerMatrix: *newDominateX</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// zoomH2 encoder
+// zoomH2 soundfile read from disk
+
+
+// define encoder and xform matricies
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newZoomH2(k: 1.7378)
+~xformer = <a class="clslnk" href="./../Classes/FoaXformerMatrix.html">FoaXformerMatrix</a>.newDominateX(3.0)
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/zoomh2/Anderson-Waltz.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/zoomh2/Anderson-Steam.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/zoomh2/Anderson-Stape_Silver.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/zoomh2/Anderson-St_Peter_&amp;_St_Paul.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // xform
+    sig = <a class="clslnk" href="./../Classes/FoaXform.html">FoaXform</a>.ar(sig, ~xformer);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> Joseph Anderson, "Pickering Steam Fair: Waltz," [unpublished recording]
+</li>
+<li>Joseph Anderson, "Pickering Steam Fair: Engine," [unpublished recording]
+</li>
+<li>Joseph Anderson, "Stape Silver Band: March," [unpublished recording]
+</li>
+<li>Joseph Anderson, "St Peter &amp; St Paul," [unpublished recording]
+</li>
+</ul>
+</div>
+<h3><a class="anchor" name="zoomh2_encoder,_reversed_(soundfile)">ZoomH2 encoder, reversed (soundfile)</a></h3>
+<p>As described <a href="./../Classes/FoaEncoderMatrix.html#*newZoomH2">here</a>, the <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a> encoder reverses the labels for front and back of the <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a>. This is done to favour the use of the decoder as a roving, hand-held device, with the display facing the operator.
+</p>
+<p>If one wishes to respect the labelled orientation of the device as does <a href="http://www.radio.uqam.ca/ambisonic/comparative_recording.html##Courville">Courville</a> in the example below, we'll need to either adjust the <strong>angles</strong> argument or apply <a href="./../Classes/FoaXform.html#*newMirrorX">FoaXform: *newMirrorX</a>. For this example, we'll set <strong>angles</strong> = <code class="code prettyprint lang-sc"> [3/4*pi, pi/3] </code>
+, which are those specified in the <a href="http://www.zoom.co.jp/downloads/h2/manual/##ZoomH2%20documentation">ZoomH2 documentation</a>.
+</p>
+<p>As a relatively inexpensive piece of equipment, the imaging of the <a href="http://www.zoom.co.jp/english/products/h2/##ZoomH2">ZoomH2</a> isn't always as consistent as we'd prefer. To remedy, the Y gain is tweaked to widen the image.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newZoomH2">FoaEncoderMatrix: *newZoomH2</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// zoomH2 encoder
+// zoomH2 soundfile read from disk
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newZoomH2([3/4*pi, pi/3], 1.7378)
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/zoomh2/Courville-Dialogue.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul><li> D. Courville, "Comparative Surround Recording," Ambisonic Studio | Comparative Surround Recording, 2007. [Online]. Available: <a href="http://www.radio.uqam.ca/ambisonic/comparative_recording.html%20">http://www.radio.uqam.ca/ambisonic/comparative_recording.html </a>[Accessed: 26-Jul-2011].
+</li></ul>
+</div>
+<h3><a class="anchor" name="pantophonic_encoder_(soundfile)">Pantophonic encoder (soundfile)</a></h3>
+<p>The pantophonic encoder may be used to transcode from one format to another. This example transcodes an octophonic recording to the decoder you've chosen.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newPanto">FoaEncoderMatrix: *newPanto</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// pantophonic (8-channel) encoder
+// pantophonic (8-channel) soundfile read from disk
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newPanto(8, 'flat')   // choose for Mackay
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newPanto(8, 'point')  // choose for Young
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/multichannel/Mackay-Augustines_Message.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/multichannel/Young-Allting_Runt.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> Robert Mackay, "Augustine's Message," [unpublished recording]
+</li>
+<li>John Young, "Allting Runt Omkring," [unpublished recording]
+</li>
+</ul>
+</div>
+<div class="footnotes">
+<a class="anchor" name="footnote_1"></a><div class="footnote">[<a href="#footnote_org_1">1</a>] - We don't advise using this approach for encoding monophonic sources. The technique illustrated <a href="#omnidirectional_encoder">here</a> is the idiomatic method. If one desires a similar use of the mouse, <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a> can be mapped appropriately to <a href="./../Classes/FoaPush.html">FoaPush</a>'s <strong>angle</strong>, <strong>theta</strong>, and <strong>phi</strong> parameters. </div>
+<a class="anchor" name="footnote_2"></a><div class="footnote">[<a href="#footnote_org_2">2</a>] - See: <a href="http://en.wikipedia.org/wiki/Ambisonics#Super_stereo%20">http://en.wikipedia.org/wiki/Ambisonics#Super_stereo </a>
+</div>
+</div>
+</div>
+</body>
+</html>

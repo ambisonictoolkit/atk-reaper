@@ -1,0 +1,975 @@
+<html>
+<head>
+<title>FoaTransform</title>
+<link rel="stylesheet" href="./../scdoc.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="./../scdoc.js" type="text/javascript"></script><script src="./../docmap.js" type="text/javascript"></script><script src="./../prettify.js" type="text/javascript"></script><script src="./../lang-sc.js" type="text/javascript"></script><script type="text/javascript">var helpRoot='./..';</script>
+</head>
+<body>
+<ul id="menubar"></ul>
+<div class="contents">
+<div class="header">
+<div id="label">SuperCollider CLASSES</div>
+<div id="categories">
+<a href="./../Browse.html#Libraries&gt;Ambisonic%20Toolkit&gt;FOA&gt;Transforming">Libraries&gt;Ambisonic Toolkit&gt;FOA&gt;Transforming</a>, <a href="./../Browse.html#UGens&gt;Multichannel&gt;Ambisonics">UGens&gt;Multichannel&gt;Ambisonics</a>
+</div>
+<h1>FoaTransform</h1>
+<div id="summary">First Order Ambisonic (FOA) transformer</div>
+</div>
+<div class="subheader">
+<div id="related">See also: <a href="./../Classes/FoaXform.html">FoaXform</a>
+</div>[ </div>
+<div id="toc">
+<ul class="toc">
+<li class="toc1"><a href="#description">Description</a></li>
+<ul class="toc"></ul>
+<li class="toc1"><a href="#classmethods">Class methods</a></li>
+<ul class="toc">
+<li class="toc3">
+<a href="#*ar">ar</a> </li>
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#instancemethods">Instance methods</a></li>
+<ul class="toc">
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#examples">Examples</a></li>
+<ul class="toc">
+<li class="toc2"><a href="#choose_a_decoder">Choose a decoder</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#rotate_(soundfile)">Rotate (soundfile)</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#dominatex_(soundfile)">DominateX (soundfile)</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#focus">Focus</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#push_and_rtt">Push and RTT</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#x-axis:_focusx,_zoomx_&amp;_pushx">X-axis: FocusX, ZoomX &amp; PushX</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#y-axis:_balance_and_asymmetry">Y-axis: Balance and Asymmetry</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#proximity">Proximity</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#nfc_(soundfile)">NFC (soundfile)</a></li>
+<ul class="toc"></ul>
+</ul>
+</ul>
+</div>
+<h2><a class="anchor" name="description">Description</a></h2>
+<p>Transforms (spatial domain filter) a first order ambisonic signal (B-format). <a href="./../Classes/FoaTransform.html">FoaTransform</a> applies dynamic transforms, for static transforms see <a href="./../Classes/FoaXform.html">FoaXform</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> <a href="./../Classes/FoaTransform.html">FoaTransform</a> is a convenience wrapper around the various transformer UGens.
+</div>
+<h2><a class="anchor" name="classmethods">Class Methods</a></h2>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*ar">*</a></span><a href="./../Overviews/Methods.html#ar">ar</a> (<span class="argstr">in</span>, <span class="argstr">kind</span> <span class="argstr">... args</span>)</h3>
+<div class="method">
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> in </td>
+<td class="argumentdesc"><p>The input signal, an array: [in0, in1, ... inN]
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> kind </td>
+<td class="argumentdesc">
+<p>The kind of transform to apply.
+<a class="anchor" name="transforms">&#160;</a></p>
+<dl>
+<dt> <code class="code prettyprint lang-sc"> 'rtt' </code>
+ </dt>
+<dd><a href="./../Classes/FoaRTT.html">FoaRTT</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'mirror' </code>
+ </dt>
+<dd><a href="./../Classes/FoaMirror.html">FoaMirror</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'directO' </code>
+ </dt>
+<dd><a href="./../Classes/FoaDirectO.html">FoaDirectO</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'direct' </code>
+ </dt>
+<dd><a href="./../Classes/FoaDirect.html">FoaDirect</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'dominate' </code>
+ </dt>
+<dd><a href="./../Classes/FoaDominate.html">FoaDominate</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'zoom' </code>
+ </dt>
+<dd><a href="./../Classes/FoaZoom.html">FoaZoom</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'focus' </code>
+ </dt>
+<dd><a href="./../Classes/FoaFocus.html">FoaFocus</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'push' </code>
+ </dt>
+<dd><a href="./../Classes/FoaPush.html">FoaPush</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'press' </code>
+ </dt>
+<dd><a href="./../Classes/FoaPress.html">FoaPress</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'asymmetry' </code>
+ </dt>
+<dd><a href="./../Classes/FoaAsymmetry.html">FoaAsymmetry</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'balance' </code>
+ </dt>
+<dd><a href="./../Classes/FoaZoomY.html">FoaBalance</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'nfc' </code>
+ </dt>
+<dd><a href="./../Classes/FoaNFC.html">FoaNFC</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'proximity' </code>
+ </dt>
+<dd><a href="./../Classes/FoaProximity.html">FoaProximity</a></dd>
+</dl>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong> Axial transforms </strong><dl>
+<dt> <code class="code prettyprint lang-sc"> 'rotate' </code>
+ </dt>
+<dd><a href="./../Classes/FoaRotate.html">FoaRotate</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'tilt' </code>
+ </dt>
+<dd><a href="./../Classes/FoaTilt.html">FoaTilt</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'tumble' </code>
+ </dt>
+<dd><a href="./../Classes/FoaTumble.html">FoaTumble</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'directX' </code>
+ </dt>
+<dd><a href="./../Classes/FoaDirectX.html">FoaDirectX</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'directY' </code>
+ </dt>
+<dd><a href="./../Classes/FoaDirectY.html">FoaDirectY</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'directZ' </code>
+ </dt>
+<dd><a href="./../Classes/FoaDirectZ.html">FoaDirectZ</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'dominateX' </code>
+ </dt>
+<dd><a href="./../Classes/FoaDominateX.html">FoaDominateX</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'dominateY' </code>
+ </dt>
+<dd><a href="./../Classes/FoaDominateY.html">FoaDominateY</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'dominateZ' </code>
+ </dt>
+<dd><a href="./../Classes/FoaDominateZ.html">FoaDominateZ</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'zoomX' </code>
+ </dt>
+<dd><a href="./../Classes/FoaZoomX.html">FoaZoomX</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'zoomY' </code>
+ </dt>
+<dd><a href="./../Classes/FoaZoomY.html">FoaZoomY</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'zoomZ' </code>
+ </dt>
+<dd><a href="./../Classes/FoaZoomZ.html">FoaZoomZ</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'focusX' </code>
+ </dt>
+<dd><a href="./../Classes/FoaFocusX.html">FoaFocusX</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'focusY' </code>
+ </dt>
+<dd><a href="./../Classes/FoaFocusY.html">FoaFocusY</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'focusZ' </code>
+ </dt>
+<dd><a href="./../Classes/FoaFocusZ.html">FoaFocusZ</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'pushX' </code>
+ </dt>
+<dd><a href="./../Classes/FoaPushX.html">FoaPushX</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'pushY' </code>
+ </dt>
+<dd><a href="./../Classes/FoaPushY.html">FoaPushY</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'pushZ' </code>
+ </dt>
+<dd><a href="./../Classes/FoaPushZ.html">FoaPushZ</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'pressX' </code>
+ </dt>
+<dd><a href="./../Classes/FoaPressX.html">FoaPressX</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'pressY' </code>
+ </dt>
+<dd><a href="./../Classes/FoaPressY.html">FoaPressY</a></dd>
+<dt> <code class="code prettyprint lang-sc"> 'pressZ' </code>
+ </dt>
+<dd><a href="./../Classes/FoaPressZ.html">FoaPressZ</a></dd>
+</dl>
+</div>
+</td>
+</tr>
+<tr>
+<td class="argumentname"> ... args </td>
+<td class="argumentdesc"><p>Arguments for the wrapped transformer UGens.
+</p></td>
+</tr>
+</table>
+</div>
+<h3></h3>
+<div id="inheritedclassmets"></div>
+<h2><a class="anchor" name="instancemethods">Instance Methods</a></h2>
+<h3></h3>
+<div id="inheritedinstmets"></div>
+<h2><a class="anchor" name="examples">Examples</a></h2>
+<p>The examples below are intended to briefly illustrate some of the first order tranform options made available in the Ambisonic Toolkit. The user is encouraged to carefully review the features of the individual <a href="#transforms">transforms</a> to gain a deeper understanding of the flexibility of these tools.
+</p>
+<p>Available transformers include rotations, mirroring, directivity (spatial low pass fitering), dominance (image warping), and a variety of dominance related transforms.
+</p>
+<p>As the Ambisonic technique is a hierarchal system, numerous options for playback are possible. These include two channel stereo, two channel binaural, pantophonic and full 3D periphonic. With the examples below, we'll take advantage of this by first choosing a suitable decoder with with to audition.
+</p>
+<h3><a class="anchor" name="choose_a_decoder">Choose a decoder</a></h3>
+<p>A number of decoders are defined below. Please choose one suitable for your system. Also, don't forget to define <code class="code prettyprint lang-sc"> ~renderDecode </code>
+ !
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> If you choose a kernel decoder, <a href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>, be sure to free the kernel after use. </div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// switch to internal server, and boot
+(
+        s = <a class="clslnk" href="./../Classes/Server.html">Server</a>.internal;
+        <a class="clslnk" href="./../Classes/Server.html">Server</a>.default = s;
+        s.boot;
+)
+
+
+// ------------------------------------------------------------
+// choose a decoder
+
+// stereophonic / binaural
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newStereo(131/2 * pi/180, 0.5) // Cardioids at 131 deg
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>.newUHJ                         // UHJ (kernel)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>.newSpherical                   // synthetic binaural (kernel)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>.newCIPIC                       // KEMAR binaural (kernel)
+
+
+// pantophonic (2D)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newQuad(k: 'dual')             // psycho optimised quad
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newQuad(pi/6, 'dual')          // psycho optimised narrow quad
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.new5_0                         // 5.0
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newPanto(6, k: 'dual')         // psycho optimised hex
+
+
+// periphonic (3D)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newPeri(k: 'dual')             // psycho optimised cube
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newDiametric(                  // psycho optimised bi-rectangle
+    pi/180 * [[30, 0], [-30, 0], [90, 35.3], [-90, 35.3]],
+    'dual'
+)
+
+
+// inspect
+~decoder.kind
+
+
+// ------------------------------------------------------------
+// define ~renderDecode
+(
+~renderDecode = { arg in, decoder;
+    var kind;
+    var fl, bl, br, fr;
+    var fc, lo;
+    var sl, sr;
+    var flu, blu, bru, fru;
+    var fld, bld, brd, frd;
+    var slu, sru, sld, srd;
+        
+
+    kind = decoder.kind;
+    
+    case
+        { decoder.numChannels == 2 }
+            {
+                // decode to stereo (or binaural)
+                <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder)
+            }
+        { kind == 'quad' }
+            {
+                // decode (to quad)
+                #fl, bl, br, fr = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+
+                // reorder output to match speaker arrangement
+                [fl, fr, bl, br]
+            }
+        { kind == '5.0' }
+            {
+                // decode (to 5.0)
+                #fc, fl, bl, br, fr = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                lo = <a class="clslnk" href="./../Classes/Silent.html">Silent</a>.ar;
+                                
+                // reorder output to match speaker arrangement
+                [fl, fr, fc, lo, bl, br]
+            }
+        { kind == 'panto' }
+            {
+                // decode (to hex)
+                #fl, sl, bl, br, sr, fr = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                                
+                // reorder output to match speaker arrangement
+                [fl, fr, sl, sr, bl, br]
+            }
+        { kind == 'peri' }
+            {
+                // decode (to cube)
+                #flu, blu, bru, fru, fld, bld, brd, frd = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                                
+                // reorder output to match speaker arrangement
+                [flu, fru, blu, bru, fld, frd, bld, brd]
+            }
+        { kind == 'diametric' }
+            {
+                // decode (to bi-rectangle)
+                #fl, fr, slu, sru, br, bl, srd, sld = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                
+                // reorder output to match speaker arrangement
+                [fl, fr, bl, br, slu, sru, sld, srd]
+            };
+}
+)
+
+// ------------------------------------------------------------
+// now we're ready to try the examples below!
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="rotate_(soundfile)">Rotate (soundfile)</a></h3>
+<p>Rotation is one of the most used soundfield transforms. In this case we'll it to centre the subject of a field recording.
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseX.html">MouseX</a>, which specifies the rotation angle (pi to -pi; left to right of display).
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A UGen type transformer, see <a href="./../Classes/FoaRotate.html">FoaRotate</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// rotate transformer
+// b-format soundfile read from disk
+
+// choose transformer
+~transformer = 'rotate'
+
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Courville-Dialogue.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Hodges-Purcell.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Leonard-Orfeo_Trio.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+    var azim;                           // azimuth control
+
+
+    // display transformer &amp; decoder
+    "Ambisonic transforming via % transformer".format(~transformer).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // azimuth -&gt; hard left     = back
+    //            centre        = centre
+    //            hard right    = back
+    azim = <a class="clslnk" href="./../Classes/MouseX.html">MouseX</a>.kr(pi, -pi);
+
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, ~transformer, azim);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> D. Courville, "Comparative Surround Recording," Ambisonic Studio | Comparative Surround Recording, 2007. [Online]. Available: <a href="http://www.radio.uqam.ca/ambisonic/comparative_recording.html%20">http://www.radio.uqam.ca/ambisonic/comparative_recording.html </a>[Accessed: 26-Jul-2011].
+</li>
+<li>P. Hodges, "Purcell - Passacaglia (King Arthur)," Sound of Space: ambisonic surround sound. [Online]. Available: <a href="http://soundofspace.com/ambisonic_files/52%20">http://soundofspace.com/ambisonic_files/52 </a>[Accessed: 03-Nov-2011].
+</li>
+<li>J. Leonard, "The Orfeo Trio &amp; TetraMic," Sound of Space: ambisonic surround sound. [Online]. Available: <a href="http://soundofspace.com/ambisonic_files/41%20">http://soundofspace.com/ambisonic_files/41 </a>[Accessed: 03-Nov-2011].
+</li>
+</ul>
+</div>
+<h3><a class="anchor" name="dominatex_(soundfile)">DominateX (soundfile)</a></h3>
+<p>Dominance specified in gain is a classic Ambisonic production technique. Here we apply gain across the X axis. With these example recordings, we adjust both the stage width and the subject to reverb balance.
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseY.html">MouseY</a>, which specifies the dominance gain (4.5 dB to -4.5 dB; top to bottom of display).
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A UGen type transformer, see <a href="./../Classes/FoaDominateX.html">FoaDominateX</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// dominateX transformer
+// b-format soundfile read from disk
+
+// choose transformer
+~transformer = 'dominateX'
+
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Courville-Dialogue.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Hodges-Purcell.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Leonard-Orfeo_Trio.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+    var gain;                           // gain control
+
+
+    // display transformer &amp; decoder
+    "Ambisonic transforming via % transformer".format(~transformer).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // gain ---&gt; top            = +4.5db for front
+    //            bottom        = -4.5db for front
+    gain = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(4.5, 4.5.neg);
+
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, ~transformer, gain);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> D. Courville, "Comparative Surround Recording," Ambisonic Studio | Comparative Surround Recording, 2007. [Online]. Available: <a href="http://www.radio.uqam.ca/ambisonic/comparative_recording.html%20">http://www.radio.uqam.ca/ambisonic/comparative_recording.html </a>[Accessed: 26-Jul-2011].
+</li>
+<li>P. Hodges, "Purcell - Passacaglia (King Arthur)," Sound of Space: ambisonic surround sound. [Online]. Available: <a href="http://soundofspace.com/ambisonic_files/52%20">http://soundofspace.com/ambisonic_files/52 </a>[Accessed: 03-Nov-2011].
+</li>
+<li>J. Leonard, "The Orfeo Trio &amp; TetraMic," Sound of Space: ambisonic surround sound. [Online]. Available: <a href="http://soundofspace.com/ambisonic_files/41%20">http://soundofspace.com/ambisonic_files/41 </a>[Accessed: 03-Nov-2011].
+</li>
+</ul>
+</div>
+<h3><a class="anchor" name="focus">Focus</a></h3>
+<p>Here we encode four channels of decorrelated and comb filtered <a href="./../Classes/PinkNoise.html">PinkNoise</a> as a decorrelated soundfield, resulting in a maximally diffuse soundfield. <a href="./../Classes/FoaFocus.html">FoaFocus</a> is used to "focus" on various parts of the soundfield. At extremes, it becomes a planewave (infinite distance, in an anechoic environment) arriving from some direction. This technique gives the opportunity to continuously modulate between a directional and a diffuse soundfield.
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a>, where <a href="./../Classes/MouseX.html">MouseX</a> specifies the incident azimuth angle (pi to -pi; left to right of display) and <a href="./../Classes/MouseY.html">MouseY</a> the <a href="./../Classes/FoaFocus.html">FoaFocus</a> angle (0 to pi/2; bottom to top of display). With the mouse at the bottom of the display, the soundfield remains decorrelated. Placed at the top of the display, the soundfield becomes directional, and varying left/right position will vary the incident azimuth of the resulting planewave.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A UGen type transformer, see <a href="./../Classes/FoaFocus.html">FoaFocus</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// focus transformer
+// decorrelated, comb filtered pink noise source
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newAtoB
+
+// choose transformer
+~transformer = 'focus'
+
+(
+{
+    var sig;				// audio signal
+    var angle, azim;			// angle and azimuth control
+    var freq;
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic transforming via % transformer".format(~transformer).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // frequencies
+    freq = 220;
+
+    // angle ---&gt; top 		= push to plane wave
+    //		  bottom	= omni-directional
+    angle = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class="clslnk" href="./../Classes/MouseX.html">MouseX</a>.kr(pi, -pi);
+
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PinkNoise.html">PinkNoise</a>.ar([1, 1, 1, 1]); // 4 channels decorrelated pink noise
+
+    // ------------------------------------------------------------
+    // comb filter
+    sig = <a class="clslnk" href="./../Classes/HPF.html">HPF</a>.ar(sig, freq);
+    sig = <a class="clslnk" href="./../Classes/CombL.html">CombL</a>.ar(sig, freq.reciprocal, freq.reciprocal, mul: 9.neg.dbamp);
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, ~transformer, angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="push_and_rtt">Push and RTT</a></h3>
+<p>Here we encode four channels of <a href="./../Classes/Klank.html">Klank</a> resonated <a href="./../Classes/Dust.html">Dust</a> from A-format. <a href="./../Classes/FoaPush.html">FoaPush</a> is used to "push" the soundfield so that it becomes a planewave (infinite distance, in an anechoic environment) arriving from some direction. This technique gives the opportunity to continuously modulate between a directional and a spatially active soundfield. Additionally, <a href="./../Classes/FoaRTT.html">FoaRTT</a> is used to continuously reorient the granular stream so that individual A-format directions don't predominate, and the complete soundfield is filled with activity.
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a>, where <a href="./../Classes/MouseX.html">MouseX</a> specifies the incident azimuth angle (pi to -pi; left to right of display) and <a href="./../Classes/MouseY.html">MouseY</a> the <a href="./../Classes/FoaPush.html">FoaPush</a> angle (0 to pi/2; bottom to top of display). With the mouse at the bottom of the display, the soundfield remains decorrelated. Placed at the top of the display, the soundfield becomes directional, and varying left/right position will vary the incident azimuth of the resulting planewave.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> UGen type transformers, see <a href="./../Classes/FoaPush.html">FoaPush</a> and <a href="./../Classes/FoaRTT.html">FoaRTT</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// push and rtt transformer
+// granular klank stream source
+
+
+// define encoder matrix
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newAtoB
+
+// choose transformer
+~transformer1 = 'rtt'
+~transformer2 = 'push'
+
+(
+{
+    var sig;				     // audio signal
+    var angle, azim;			// angle and azimuth control
+    var freq;
+
+    // ir...
+    var gain = -18;
+
+    var freqs = [50.0, 7000.0], gains = [-24, 0], rtimes = [0.1, 2.0];
+    var frequencies, amplitudes, ringTimes;
+    var numModes = 20;
+	
+    var density = 20;                  // grain/klank density
+
+    var rttFreq = 10 * density;
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic transforming via % transformer".format(~transformer1).postln;
+    "Ambisonic transforming via % transformer".format(~transformer2).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+
+    // calculate klank args
+    frequencies = <a class="clslnk" href="./../Classes/Array.html">Array</a>.rand(numModes, freqs.at(0), freqs.at(1)).sort;
+    amplitudes = <a class="clslnk" href="./../Classes/Array.html">Array</a>.rand(numModes, gains.at(0), gains.at(1)).sort.reverse.dbamp;
+    ringTimes = <a class="clslnk" href="./../Classes/Array.html">Array</a>.rand(numModes, rtimes.at(0), rtimes.at(1)).sort.reverse;
+
+
+    // angle ---&gt; top 		= push to plane wave
+    //		  bottom	= omni-directional
+    angle = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(pi/2, 0);
+
+    // azimuth -&gt; hard left 	= back
+    //		  centre 	= centre
+    //		  hard right 	= back
+    azim = <a class="clslnk" href="./../Classes/MouseX.html">MouseX</a>.kr(pi, -pi);
+
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/Dust.html">Dust</a>.ar(<a class="clslnk" href="./../Classes/Array.html">Array</a>.fill(4, density / 4));
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+    // ------------------------------------------------------------
+    // transform 1 (rtt)
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(
+        sig,
+        ~transformer1,
+        <a class="clslnk" href="./../Classes/LFSaw.html">LFSaw</a>.ar(rttFreq, pi, add: pi),
+        <a class="clslnk" href="./../Classes/LFSaw.html">LFSaw</a>.ar(rttFreq**(1/3), pi, add: pi),
+        <a class="clslnk" href="./../Classes/LFSaw.html">LFSaw</a>.ar(rttFreq**(2/3), pi, add: pi)
+    );
+
+
+    // ------------------------------------------------------------
+    // <a class="clslnk" href="./../Classes/Klank.html">Klank</a>
+    sig = gain.dbamp * <a class="clslnk" href="./../Classes/Klank.html">Klank</a>.ar(
+        `[ frequencies, amplitudes, ringTimes ],
+        sig
+    );
+
+
+    // ------------------------------------------------------------
+    // transform 2 (push)
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, ~transformer2, angle, azim);
+
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="x-axis:_focusx,_zoomx_&amp;_pushx">X-axis: FocusX, ZoomX &amp; PushX</a></h3>
+<p>With this example we encode four channels of comb filtered <a href="./../Classes/Dust.html">Dust</a> as planewaves arriving from the cardinal directions. <a href="./../Classes/FoaFocusX.html">FoaFocusX</a>, <a href="./../Classes/FoaZoomX.html">FoaZoomX</a> and <a href="./../Classes/FoaPushX.html">FoaPushX</a> are used to distort the soundfield. At extremes, encoded planewaves are distorted to arrive from the same direction. This example allows one to get compare these transforms on the x-axis.
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseY.html">MouseY</a>, with <strong>angle</strong> varying between -pi/2 and pi/2. With the mouse in the centre of the display, the soundfield remains unchanged. Placed at the top or bottom of the display, the soundfield is distorted.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> UGen type transformers, see <a href="./../Classes/FoaFocusX.html">FoaFocusX</a>, <a href="./../Classes/FoaZoomX.html">FoaZoomX</a> &amp; <a href="./../Classes/FoaPushX.html">FoaPushX</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// x-axis transformers
+// comb filtered dust noise source, at cardinal points
+
+
+// define encoder matricies, for each cardinal point
+(
+~encoder = [ 
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection,
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi/2),
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi),
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi.neg/2)
+]
+)
+
+// choose transformer
+~transformer = 'focusX'
+~transformer = 'zoomX'
+~transformer = 'pushX'
+
+(
+{
+    var sig;                            // audio signal
+    var angle;                          // angle control
+    var freq;
+    var density = 10;                   // grain density
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.at(0).kind).postln;
+    "Ambisonic transforming via % transformer".format(~transformer).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // frequencies
+    freq = 220 * [ 4, 5, 7, 6 ] / 4;
+
+    // angle ---&gt; top           = pi/2
+    //            bottom        = -pi/2
+    angle = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(pi/2, pi.neg/2);
+
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/Dust.html">Dust</a>.ar(<a class="clslnk" href="./../Classes/Array.html">Array</a>.fill(4, density / 4));
+
+
+    // ------------------------------------------------------------
+    // comb filter
+    sig = <a class="clslnk" href="./../Classes/BPF.html">BPF</a>.ar(sig, freq, mul: 18.dbamp);
+    sig = <a class="clslnk" href="./../Classes/CombL.html">CombL</a>.ar(sig, freq.reciprocal, freq.reciprocal, mul: 9.neg.dbamp);
+
+
+    // ------------------------------------------------------------
+    // encode
+	sig = <a class="clslnk" href="./../Classes/Mix.html">Mix</a>.fill(sig.numChannels, { arg i;  <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig.at(i), ~encoder.at(i)) });
+    
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, ~transformer, angle);
+
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="y-axis:_balance_and_asymmetry">Y-axis: Balance and Asymmetry</a></h3>
+<p>With with the <a href="#x-axis:_focusx,_zoomx_&amp;_pushx">above example</a> we encode four channels of comb filtered <a href="./../Classes/Dust.html">Dust</a> as planewaves arriving from the cardinal directions. <a href="./../Classes/FoaZoomY.html">FoaZoomY</a> and <a href="./../Classes/FoaAsymmetry.html">FoaAsymmetry</a> are used to distort the soundfield. At extremes, encoded planewaves are distorted to arrive from the same direction. This example allows one to get compare these transforms on the x-axis.
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseX.html">MouseX</a>, with <strong>angle</strong> varying between -pi/2 and pi/2. With the mouse in the centre of the display, the soundfield remains unchanged. Placed at the left or right of the display, the soundfield is distorted.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> UGen type transformers, see <a href="./../Classes/FoaZoomY.html">FoaZoomY</a> and <a href="./../Classes/FoaAsymmetry.html">FoaAsymmetry</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// y-axis transformers
+// comb filtered dust noise source, at cardinal points
+
+
+// define encoder matricies, for each cardinal point
+(
+~encoder = [ 
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection,
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi/2),
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi),
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi.neg/2)
+]
+)
+
+// choose transformer
+~transformer = 'balance'
+~transformer = 'asymmetry'
+
+(
+{
+    var sig;                            // audio signal
+    var angle;                          // angle control
+    var freq;
+    var density = 10;                   // grain density
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.at(0).kind).postln;
+    "Ambisonic transforming via % transformer".format(~transformer).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // frequencies
+    freq = 220 * [ 4, 5, 7, 6 ] / 4;
+
+    // angle ---&gt; left          = pi/2
+    //            right         = -pi/2
+    angle = <a class="clslnk" href="./../Classes/MouseX.html">MouseX</a>.kr(pi/2, pi.neg/2);
+
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/Dust.html">Dust</a>.ar(<a class="clslnk" href="./../Classes/Array.html">Array</a>.fill(4, density / 4));
+
+
+    // ------------------------------------------------------------
+    // comb filter
+    sig = <a class="clslnk" href="./../Classes/BPF.html">BPF</a>.ar(sig, freq, mul: 18.dbamp);
+    sig = <a class="clslnk" href="./../Classes/CombL.html">CombL</a>.ar(sig, freq.reciprocal, freq.reciprocal, mul: 9.neg.dbamp);
+
+
+    // ------------------------------------------------------------
+    // encode
+	sig = <a class="clslnk" href="./../Classes/Mix.html">Mix</a>.fill(sig.numChannels, { arg i;  <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig.at(i), ~encoder.at(i)) });
+    
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, ~transformer, angle);
+
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="proximity">Proximity</a></h3>
+<a href="./../Classes/FoaProximity.html">FoaProximity</a> facilitates the introduction of the <a href="http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity%20effect">proximity effect</a> to encoded signals. At extremes, the proximity effect introduces a strong bass boost, as well as phase differences. The <a href="http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity%20effect">proximity effect</a> can be an important contributor to perceptions of nearness.
+<p>The soundfield is controlled by <a href="./../Classes/MouseY.html">MouseY</a>, with <strong>distance</strong> varying between 0.05 and 0.5 meter. With the mouse at the bottom of the display, the soundfield receives the strongest effect, contributing to as sense of nearness.
+</p>
+<div class="warning">
+<span class="warninglabel">WARNING:</span> As <a href="./../Classes/FoaProximity.html">FoaProximity</a> includes a 1st-order integration, signals must be highpass filtered before application. <a href="./../Classes/HPF.html">HPF</a> is usually a suitable choice to control low frequency boost.</div>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> UGen type transformer, see <a href="./../Classes/FoaProximity.html">FoaProximity</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// proximity transform
+// comb filtered dust noise source, panned across the front
+
+
+// define encoder matricies
+(
+~encoder = [ 
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi/6),
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi/12),
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi.neg/12),
+    <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirection(pi.neg/6)
+]
+)
+
+// choose transformer
+~transformer = 'proximity'
+
+(
+{
+    var sig;                            // audio signal
+    var dist;                           // distance control
+    var freq;
+    var density = 10;                   // grain density
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.at(0).kind).postln;
+    "Ambisonic transforming via % transformer".format(~transformer).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // frequencies
+    freq = 220 * [ 4, 5, 7, 6 ] / 4;
+
+    // dist  ---&gt; top           = 0.5
+    //            bottom        = 0.05
+    dist = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(0.5, 0.05);
+
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/Dust.html">Dust</a>.ar(<a class="clslnk" href="./../Classes/Array.html">Array</a>.fill(4, density / 4));
+
+
+    // ------------------------------------------------------------
+    // comb filter
+    sig = <a class="clslnk" href="./../Classes/BPF.html">BPF</a>.ar(sig, freq, mul: 18.dbamp);
+    sig = <a class="clslnk" href="./../Classes/CombL.html">CombL</a>.ar(sig, freq.reciprocal, freq.reciprocal, mul: 9.neg.dbamp);
+
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/Mix.html">Mix</a>.fill(sig.numChannels, { arg i;  <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig.at(i), ~encoder.at(i)) });
+    
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, ~transformer, dist);
+
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="nfc_(soundfile)">NFC (soundfile)</a></h3>
+<a href="./../Classes/FoaNFC.html">FoaNFC</a> facilitates the reduction or removal of the <a href="http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity%20effect">proximity effect</a> from encoded signals. The <a href="http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity%20effect">proximity effect</a> can be an important contributor to perceptions of nearness.
+<p>The soundfield is controlled by <a href="./../Classes/MouseY.html">MouseY</a>, with <strong>distance</strong> varying between 0.5 and 0.05 meter. With the mouse at the top of the display, the soundfield receives the strongest effect (removal), contributing to as sense of distance.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> UGen type transformer, see <a href="./../Classes/FoaNFC.html">FoaNFC</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// NFC transform
+// b-format soundfile read from disk
+
+
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Anderson-Nearfield.wav")
+
+
+// choose transformer
+~transformer = 'nfc'
+
+
+(
+{
+    var sig;                            // audio signal
+    var dist;                           // distance control
+
+
+
+    // display encoder and decoder
+    "Ambisonic transforming via % transformer".format(~transformer).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // dist  ---&gt; top           = 0.05
+    //            bottom        = 1.0
+    dist = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(0.05, 1.0);
+
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, ~transformer, dist);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul><li> Joseph Anderson, "Nearfield source," [unpublished recording]
+</li></ul>
+</div>
+</div>
+</body>
+</html>
