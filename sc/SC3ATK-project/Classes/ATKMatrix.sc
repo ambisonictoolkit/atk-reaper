@@ -1676,10 +1676,14 @@ FoaDecoderKernel {
 		var kernelLibPath;
 		var decodersPath;
 		
-		kernelLibPath = PathName.new("/Library/Application Support/ATK/kernels");
+		kernelLibPath = PathName.new(
+			Platform.userAppSupportDir.dirname ++ "/ATK/kernels"
+		);
 
 		if ( kernelLibPath.isFolder.not, {	// is kernel lib installed for all users?
-			kernelLibPath = PathName.new("~") +/+ kernelLibPath // no? set for single user
+			PathName.new(					// no? set for single user
+				Platform.systemAppSupportDir.dirname ++ "/ATK/kernels"
+			)
 		});
 
 		decodersPath	= PathName.new("/Foa/decoders");
@@ -1875,10 +1879,14 @@ FoaEncoderKernel {
 		var kernelLibPath;
 		var encodersPath;
 		
-		kernelLibPath = PathName.new("/Library/Application Support/ATK/kernels");
+		kernelLibPath = PathName.new(
+			Platform.userAppSupportDir.dirname ++ "/ATK/kernels"
+		);
 
 		if ( kernelLibPath.isFolder.not, {	// is kernel lib installed for all users?
-			kernelLibPath = PathName.new("~") +/+ kernelLibPath // no? set for single user
+			PathName.new(					// no? set for single user
+				Platform.systemAppSupportDir.dirname ++ "/ATK/kernels"
+			)
 		});
 
 		encodersPath	= PathName.new("/Foa/encoders");

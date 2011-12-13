@@ -9,7 +9,7 @@
 <ul id="menubar"></ul>
 <div class="contents">
 <div class="header">
-<div id="label">SuperCollider CLASSES</div>
+<div id="label">SuperCollider CLASSES (extension)</div>
 <div id="categories">
 <a href="./../Browse.html#Libraries&gt;Ambisonic%20Toolkit&gt;FOA&gt;Encoding">Libraries&gt;Ambisonic Toolkit&gt;FOA&gt;Encoding</a>, <a href="./../Browse.html#UGens&gt;Multichannel&gt;Ambisonics">UGens&gt;Multichannel&gt;Ambisonics</a>
 </div>
@@ -58,6 +58,8 @@
 <li class="toc2"><a href="#zoomh2_encoder,_reversed_(soundfile)">ZoomH2 encoder, reversed (soundfile)</a></li>
 <ul class="toc"></ul>
 <li class="toc2"><a href="#pantophonic_encoder_(soundfile)">Pantophonic encoder (soundfile)</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#directions_encoder_(soundfile)">Directions encoder (soundfile)</a></li>
 <ul class="toc"></ul>
 </ul>
 </ul>
@@ -374,7 +376,8 @@
 // A-format soundfile read from disk
 
 // define encoder matrix
-~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newAtoB('flr')
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newAtoB('flrd')   // for Thomas
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newAtoB('flr')    // for Cross
 
 
 // inspect
@@ -386,8 +389,8 @@
 // read a whole sound into memory
 // remember to free the buffer later!
 // (boot the server, if you haven't!)
-~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/a-format/Cross_Tenor_Sax.wav")
 ~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/a-format/Thomas_Mackay.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/a-format/Cross_Tenor_Sax.wav")
 
 
 (
@@ -421,9 +424,9 @@
 </pre>
 <div class="note">
 <span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
-<li> David Cross, "Tenor saxophone improvisations," [unpublished recording]
+<li> Niall Thomas, "Rob Mackay: flute improvisations," [unpublished recording]
 </li>
-<li>Niall Thomas, "Rob Mackay: flute improvisations," [unpublished recording]
+<li>David Cross, "Tenor saxophone improvisations," [unpublished recording]
 </li>
 </ul>
 </div>
@@ -951,6 +954,70 @@
 <li>John Young, "Allting Runt Omkring," [unpublished recording]
 </li>
 </ul>
+</div>
+<h3><a class="anchor" name="directions_encoder_(soundfile)">Directions encoder (soundfile)</a></h3>
+<p>The directions encoder may be used to transcode from one format to another. This example transcodes a periphonic 12-channel recording to the decoder you've chosen.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newPanto">FoaEncoderMatrix: *newPanto</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// periphonic (12-channel) encoder
+
+
+// define encoder matrix
+~directions = pi / 180 * [ [ 22.5, 0 ], [ -22.5, 0 ], [ 67.5, 0 ], [ -67.5, 0 ], [ 112.5, 0 ], [ -112.5, 0 ], [ 157.5, 0 ], [ -157.5, 0 ], [ 45, 45 ], [ -45, 45 ], [ -135, 45 ], [ 135, 45 ] ]
+~encoder = <a class="clslnk" href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>.newDirections(~directions)
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/multichannel/Wilson-Bose.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class="clslnk" href="./../Classes/FoaEncode.html">FoaEncode</a>.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul><li> Scott Wilson, "B&#246;se," [unpublished recording]
+</li></ul>
 </div>
 <div class="footnotes">
 <a class="anchor" name="footnote_1"></a><div class="footnote">[<a href="#footnote_org_1">1</a>] - We don't advise using this approach for encoding monophonic sources. The technique illustrated <a href="#omnidirectional_encoder">here</a> is the idiomatic method. If one desires a similar use of the mouse, <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a> can be mapped appropriately to <a href="./../Classes/FoaPush.html">FoaPush</a>'s <strong>angle</strong>, <strong>theta</strong>, and <strong>phi</strong> parameters. </div>

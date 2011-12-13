@@ -1,5 +1,5 @@
-<html><head><title>FoaEncode</title><link rel='stylesheet' href='./../scdoc.css' type='text/css' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><script src='./../scdoc.js' type='text/javascript'></script><script src='./../docmap.js' type='text/javascript'></script><script src='./../prettify.js' type='text/javascript'></script><script src='./../lang-sc.js' type='text/javascript'></script><script type='text/javascript'>var helpRoot='./..';</script></head><ul id='menubar'></ul><body onload='fixTOC();prettyPrint()'><div class='contents'><div class='header'><div id='label'>SuperCollider CLASSES</div><div id='categories'><a href='./../Browse.html#Libraries>Ambisonic Toolkit>FOA>Encoding'>Libraries>Ambisonic Toolkit>FOA>Encoding</a>, <a href='./../Browse.html#UGens>Multichannel>Ambisonics'>UGens>Multichannel>Ambisonics</a></div><h1>FoaEncode</h1><div id='summary'>First Order Ambisonic (FOA) encoder</div></div><div class='subheader'>
-<div id='filename'>Source: /Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/<a href='file:///Users/josephla/Library/Application Support/SuperCollider/Extensions/DXClasses/AtkClasses/ATK.sc'>ATK.sc</a></div><div class='inheritance'>Inherits from: <a href="../Classes/Object.html">Object</a></div><div id='related'>See also: <a href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>, <a href="./../Classes/FoaEncoderKernel.html">FoaEncoderKernel</a></div>[ <a href='nil'>old help</a> ]</div><div id='toc'>
+<html><head><title>FoaEncode</title><link rel='stylesheet' href='./../scdoc.css' type='text/css' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><script src='./../scdoc.js' type='text/javascript'></script><script src='./../docmap.js' type='text/javascript'></script><script src='./../prettify.js' type='text/javascript'></script><script src='./../lang-sc.js' type='text/javascript'></script><script type='text/javascript'>var helpRoot='./..';</script></head><ul id='menubar'></ul><body onload='fixTOC();prettyPrint()'><div class='contents'><div class='header'><div id='label'>SuperCollider CLASSES (extension)</div><div id='categories'><a href='./../Browse.html#Libraries>Ambisonic Toolkit>FOA>Encoding'>Libraries>Ambisonic Toolkit>FOA>Encoding</a>, <a href='./../Browse.html#UGens>Multichannel>Ambisonics'>UGens>Multichannel>Ambisonics</a></div><h1>FoaEncode</h1><div id='summary'>First Order Ambisonic (FOA) encoder</div></div><div class='subheader'>
+<div id='filename'>Source: /Users/josephla/Library/Application Support/SuperCollider/Extensions/ATK/Classes/<a href='file:///Users/josephla/Library/Application Support/SuperCollider/Extensions/ATK/Classes/ATK.sc'>ATK.sc</a></div><div class='inheritance'>Inherits from: <a href="../Classes/Object.html">Object</a></div><div id='related'>See also: <a href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a>, <a href="./../Classes/FoaEncoderKernel.html">FoaEncoderKernel</a></div>[ <a href='nil'>old help</a> ]</div><div id='toc'>
 <ul class='toc'><li class='toc1'><a href='#description'>Description</a></li>
 <ul class='toc'></ul><li class='toc1'><a href='#classmethods'>Class methods</a></li>
 <ul class='toc'><li class='toc3'><a href='#*ar'>ar</a> </li>
@@ -18,6 +18,7 @@
 <ul class='toc'></ul><li class='toc2'><a href='#zoomh2_encoder_(soundfile)'>ZoomH2 encoder (soundfile)</a></li>
 <ul class='toc'></ul><li class='toc2'><a href='#zoomh2_encoder,_reversed_(soundfile)'>ZoomH2 encoder, reversed (soundfile)</a></li>
 <ul class='toc'></ul><li class='toc2'><a href='#pantophonic_encoder_(soundfile)'>Pantophonic encoder (soundfile)</a></li>
+<ul class='toc'></ul><li class='toc2'><a href='#directions_encoder_(soundfile)'>Directions encoder (soundfile)</a></li>
 <ul class='toc'></ul></ul></ul></div><h2><a class='anchor' name='description'>Description</a></h2>
 <p>Encodes signals in a variety of configurations to a first order ambisonic signal (B-format). <a href="./../Classes/PanB.html">PanB</a> is a SuperCollider inbuilt equivalent.
 <h2><a class='anchor' name='classmethods'>Class Methods</a></h2>
@@ -284,7 +285,8 @@
 // A-format soundfile read from disk
 
 // define encoder matrix
-~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newAtoB('flr')
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newAtoB('flrd')   // for Thomas
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newAtoB('flr')    // for Cross
 
 
 // inspect
@@ -296,8 +298,8 @@
 // read a whole sound into memory
 // remember to free the buffer later!
 // (boot the server, if you haven't!)
-~sndbuf = <a class='clslnk' href='./../Classes/Buffer.html'>Buffer</a>.read(s, "sounds/ATK/a-format/Cross_Tenor_Sax.wav")
 ~sndbuf = <a class='clslnk' href='./../Classes/Buffer.html'>Buffer</a>.read(s, "sounds/ATK/a-format/Thomas_Mackay.wav")
+~sndbuf = <a class='clslnk' href='./../Classes/Buffer.html'>Buffer</a>.read(s, "sounds/ATK/a-format/Cross_Tenor_Sax.wav")
 
 
 (
@@ -330,8 +332,8 @@
 // ------------------------------------------------------------
 </pre>
 <div class='note'><span class='notelabel'>NOTE:</span>  <strong>Soundfile Credits</strong><ul>
-<li> David Cross, "Tenor saxophone improvisations," [unpublished recording]
-<li>Niall Thomas, "Rob Mackay: flute improvisations," [unpublished recording]
+<li> Niall Thomas, "Rob Mackay: flute improvisations," [unpublished recording]
+<li>David Cross, "Tenor saxophone improvisations," [unpublished recording]
 </ul>
 </div><h3><a class='anchor' name='stereophonic_encoder'>Stereophonic encoder</a></h3>
 <p>In this example we first encode a single channel of <a href="./../Classes/PinkNoise.html">PinkNoise</a> into a stereophonic signal with <a href="./../Classes/Pan2.html">Pan2</a>. <a href="./../Classes/FoaZooom.html">FoaZooom</a> is then used to balance the soundfield across the x-axis (front/back).
@@ -793,5 +795,64 @@
 <li> Robert Mackay, "Augustine's Message," [unpublished recording]
 <li>John Young, "Allting Runt Omkring," [unpublished recording]
 </ul>
+</div><h3><a class='anchor' name='directions_encoder_(soundfile)'>Directions encoder (soundfile)</a></h3>
+<p>The directions encoder may be used to transcode from one format to another. This example transcodes a periphonic 12-channel recording to the decoder you've chosen.
+<p>If you haven't already choosen a <code class='code prettyprint lang-sc'> ~decoder</code>
+ and defined <code class='code prettyprint lang-sc'> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+<div class='note'><span class='notelabel'>NOTE:</span> A matrix type encoder, see <a href="./../Classes/FoaEncoderMatrix.html#*newPanto">FoaEncoderMatrix: *newPanto</a> for further details.</div><pre class='code prettyprint lang-sc'>
+// ------------------------------------------------------------
+// periphonic (12-channel) encoder
+
+
+// define encoder matrix
+~directions = pi / 180 * [ [ 22.5, 0 ], [ -22.5, 0 ], [ 67.5, 0 ], [ -67.5, 0 ], [ 112.5, 0 ], [ -112.5, 0 ], [ 157.5, 0 ], [ -157.5, 0 ], [ 45, 45 ], [ -45, 45 ], [ -135, 45 ], [ 135, 45 ] ]
+~encoder = <a class='clslnk' href='./../Classes/FoaEncoderMatrix.html'>FoaEncoderMatrix</a>.newDirections(~directions)
+
+
+// inspect
+~encoder.kind
+~encoder.numChannels
+~encoder.dirChannels * 180/pi
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class='clslnk' href='./../Classes/Buffer.html'>Buffer</a>.read(s, "sounds/ATK/multichannel/Wilson-Bose.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic encoding via % encoder".format(~encoder.kind).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class='clslnk' href='./../Classes/PlayBuf.html'>PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // encode
+    sig = <a class='clslnk' href='./../Classes/FoaEncode.html'>FoaEncode</a>.ar(sig, ~encoder);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class='note'><span class='notelabel'>NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> Scott Wilson, "Böse," [unpublished recording]
+</ul>
 </div><div class='footnotes'>
-<a class='anchor' name='footnote_1'/><div class='footnote'>[<a href='#footnote_org_1'>1</a>] - We don't advise using this approach for encoding monophonic sources. The technique illustrated <a href="#omnidirectional_encoder">here</a> is the idiomatic method. If one desires a similar use of the mouse, <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a> can be mapped appropriately to <a href="./../Classes/FoaPush.html">FoaPush</a>'s <strong>angle</strong>, <strong>theta</strong>, and <strong>phi</strong> parameters. </div><a class='anchor' name='footnote_2'/><div class='footnote'>[<a href='#footnote_org_2'>2</a>] - See: <a href="http://en.wikipedia.org/wiki/Ambisonics#Super_stereo ">http://en.wikipedia.org/wiki/Ambisonics#Super_stereo </a></div></div><div class='doclink'>source: <a href='file:///Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaEncode.schelp'>/Users/josephla/Applications/Sound/SuperColliderJuan/HelpSource/Classes/FoaEncode.schelp</a></div></div></body></html>
+<a class='anchor' name='footnote_1'/><div class='footnote'>[<a href='#footnote_org_1'>1</a>] - We don't advise using this approach for encoding monophonic sources. The technique illustrated <a href="#omnidirectional_encoder">here</a> is the idiomatic method. If one desires a similar use of the mouse, <a href="./../Classes/MouseX.html">MouseX</a> and <a href="./../Classes/MouseY.html">MouseY</a> can be mapped appropriately to <a href="./../Classes/FoaPush.html">FoaPush</a>'s <strong>angle</strong>, <strong>theta</strong>, and <strong>phi</strong> parameters. </div><a class='anchor' name='footnote_2'/><div class='footnote'>[<a href='#footnote_org_2'>2</a>] - See: <a href="http://en.wikipedia.org/wiki/Ambisonics#Super_stereo ">http://en.wikipedia.org/wiki/Ambisonics#Super_stereo </a></div></div><div class='doclink'>source: <a href='file:///Users/josephla/Library/Application Support/SuperCollider/Extensions/ATK/HelpSource/Classes/FoaEncode.schelp'>/Users/josephla/Library/Application Support/SuperCollider/Extensions/ATK/HelpSource/Classes/FoaEncode.schelp</a></div></div></body></html>

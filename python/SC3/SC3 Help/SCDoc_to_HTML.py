@@ -19,8 +19,8 @@ import lxml.etree
 # dirs
 muse_dir = '/Users/josephla/Documents/Developer/ATK-Muse'
 
-read_dir = '/sc/SC3ATK-help/SCDocHTMLHelp'
-write_dir = '/sc/SC3ATK-help/Help'
+read_dir = '/sc/SC3ATK-project/SCDocHTMLHelp'
+write_dir = '/sc/SC3ATK-project/Help'
 
 
 # Help dirs
