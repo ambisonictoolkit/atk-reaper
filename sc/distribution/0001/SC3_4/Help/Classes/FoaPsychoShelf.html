@@ -1,0 +1,119 @@
+<html>
+<head>
+<title>FoaPsychoShelf</title>
+<link rel="stylesheet" href="./../scdoc.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="./../scdoc.js" type="text/javascript"></script><script src="./../docmap.js" type="text/javascript"></script><script src="./../prettify.js" type="text/javascript"></script><script src="./../lang-sc.js" type="text/javascript"></script><script type="text/javascript">var helpRoot='./..';</script>
+</head>
+<body>
+<ul id="menubar"></ul>
+<div class="contents">
+<div class="header">
+<div id="label">SuperCollider CLASSES</div>
+<div id="categories">
+<a href="./../Browse.html#Libraries&gt;Ambisonic%20Toolkit&gt;FOA&gt;Decoding&gt;UGens">Libraries&gt;Ambisonic Toolkit&gt;FOA&gt;Decoding&gt;UGens</a>, <a href="./../Browse.html#UGens&gt;Multichannel&gt;Ambisonics">UGens&gt;Multichannel&gt;Ambisonics</a>
+</div>
+<h1>FoaPsychoShelf</h1>
+<div id="summary">First Order Ambisonic (FOA) psychoacoustic shelf filter</div>
+</div>
+<div class="subheader">
+<div id="related">See also: <a href="./../Classes/FoaNFC.html">FoaNFC</a>, <a href="./../Classes/FoaDecode.html">FoaDecode</a>
+</div>[ </div>
+<div id="toc">
+<ul class="toc">
+<li class="toc1"><a href="#description">Description</a></li>
+<ul class="toc"></ul>
+<li class="toc1"><a href="#classmethods">Class methods</a></li>
+<ul class="toc">
+<li class="toc3">
+<a href="#*ar">ar</a> </li>
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#instancemethods">Instance methods</a></li>
+<ul class="toc">
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#examples">Examples</a></li>
+<ul class="toc"></ul>
+</ul>
+</div>
+<h2><a class="anchor" name="description">Description</a></h2>
+<p>Apply psychoacoustic shelf filtering to a first order ambisonic signal (B-format).
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> <a href="./../Classes/FoaPsychoShelf.html">FoaPsychoShelf</a> is usually called internally by <a href="./../Classes/FoaDecode.html">FoaDecode</a>.
+</div>
+<h2><a class="anchor" name="classmethods">Class Methods</a></h2>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*ar">*</a></span><a href="./../Overviews/Methods.html#ar">ar</a> (<span class="argstr">w</span>, <span class="argstr">x</span>, <span class="argstr">y</span>, <span class="argstr">z</span>, <span class="argstr">freq = 400</span>, <span class="argstr">k0</span>, <span class="argstr">k1</span>, <span class="argstr">mul = 1</span>, <span class="argstr">add = 0</span>)</h3>
+<div class="method">
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> w </td>
+<td class="argumentdesc"><p>Input signal W.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> x </td>
+<td class="argumentdesc"><p>Input signal X.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> y </td>
+<td class="argumentdesc"><p>Input signal Y.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> z </td>
+<td class="argumentdesc"><p>Input signal Z.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> freq </td>
+<td class="argumentdesc"><p>Shelf filter corner frequency, in Hz.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> k0 </td>
+<td class="argumentdesc"><p>High frequency scale for 0-order harmonic: W.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> k1 </td>
+<td class="argumentdesc"><p>High frequency scale for 1st-order harmonics: X, Y, Z.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> mul </td>
+<td class="argumentdesc"><p>Output will be multiplied by this value.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> add </td>
+<td class="argumentdesc"><p>This value will be added to the output.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<a href="./../Classes/FoaPsychoShelf.html">FoaPsychoShelf</a> is invoked by <a href="./../Classes/FoaDecode.html">FoaDecode</a> when a dual-band psychoacoustically optimised decoder<a class="footnote anchor" name="footnote_org_1" href="#footnote_1"><sup>1</sup></a> is called by setting <strong>k</strong> to <code class="code prettyprint lang-sc"> 'dual' </code>
+. This kind of decoder is the optimum choice for small scale studio or domestic settings.
+<div class="note">
+<span class="notelabel">NOTE:</span> In normal circumstances, the user will not call <a href="./../Classes/FoaPsychoShelf.html">FoaPsychoShelf</a> directly.</div>
+</div>
+<h3></h3>
+<div id="inheritedclassmets"></div>
+<h2><a class="anchor" name="instancemethods">Instance Methods</a></h2>
+<h3></h3>
+<div id="inheritedinstmets"></div>
+<h2><a class="anchor" name="examples">Examples</a></h2>
+<p>Please see <a href="./../Classes/FoaDecode.html#psychoacoustically_optimised_quadraphonic_decoder">this</a>.
+</p>
+<div class="footnotes">
+<a class="anchor" name="footnote_1"></a><div class="footnote">[<a href="#footnote_org_1">1</a>] - See: E. Benjamin, R. Lee, and A. Heller, "Is My Decoder Ambisonic?," in Proceedings of the 125th Audio Engineering Society Convention, San Francisco, 2008.</div>
+</div>
+</div>
+</body>
+</html>

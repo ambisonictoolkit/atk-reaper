@@ -1,0 +1,456 @@
+<html>
+<head>
+<title>Introducing the Ambisonic Toolkit</title>
+<link rel="stylesheet" href="./../scdoc.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="./../scdoc.js" type="text/javascript"></script><script src="./../docmap.js" type="text/javascript"></script><script src="./../prettify.js" type="text/javascript"></script><script src="./../lang-sc.js" type="text/javascript"></script><script type="text/javascript">var helpRoot='./..';</script>
+</head>
+<body>
+<ul id="menubar"></ul>
+<div class="contents">
+<div class="header">
+<div id="label">SuperCollider GUIDES</div>
+<div id="categories"><a href="./../Browse.html#Libraries&gt;Ambisonic%20Toolkit">Libraries&gt;Ambisonic Toolkit</a></div>
+<h1>Introducing the Ambisonic Toolkit</h1>
+<div id="summary">Introduction to the Ambisonic Toolkit</div>
+</div>
+<div class="subheader">
+</div>
+<div id="toc">
+<ul class="toc">
+<li class="toc1"><a href="#the_paradigm">The paradigm</a></li>
+<ul class="toc"></ul>
+<li class="toc1"><a href="#authoring">Authoring</a></li>
+<ul class="toc"></ul>
+<li class="toc1"><a href="#imaging">Imaging</a></li>
+<ul class="toc">
+<li class="toc2"><a href="#reading_imaging_illustrations">Reading imaging illustrations</a></li>
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#monitoring">Monitoring</a></li>
+<ul class="toc"></ul>
+<li class="toc1"><a href="#examples">Examples</a></li>
+<ul class="toc">
+<li class="toc2"><a href="#choose_a_decoder">Choose a decoder</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#produced_via_the_ambisonic_toolkit">Produced via the Ambisonic Toolkit</a></li>
+<ul class="toc"></ul>
+<li class="toc2"><a href="#natural_soundfields,_with_imaging_transforms">Natural soundfields, with imaging transforms</a></li>
+<ul class="toc"></ul>
+</ul>
+</ul>
+</div>
+<h2><a class="anchor" name="the_paradigm">The paradigm</a></h2>
+<p>The Ambisonic Toolkit (ATK) brings together a number of classic and novel tools and transforms for the artist working with Ambisonic surround sound and makes these available to the SuperCollider3 user. The toolset in intended to be both ergonomic and comprehensive, and is framed so that the user is encouraged to &#8216;think Ambisonically&#8217;. By this, it is meant the ATK addresses the holistic problem of creatively controlling a complete soundfield, allowing and encouraging the artist to think beyond the placement of sounds in a sound-space (sound-scene paradigm). Instead the artist is encouraged to attend to the impression and imaging of a soundfield, therefore taking advantage of the native soundfield-kernel paradigm the Ambisonic technique presents.
+</p>
+<p>The ATK's production model is illustrated below:
+</p>
+<div class="image">
+<img src="atk-network.pdf"><br><b>ATK paradigm</b>
+</div>
+<p>Here you'll see that the ATK breaks down the task of working with Ambisonics into three separate elements:
+</p>
+<dl>
+<dt>Author </dt>
+<dd>Capture or synthesise an Ambisonic soundfield.
+</dd>
+<dt>Image </dt>
+<dd>Spatially filter an Ambisonic soundfield.
+</dd>
+<dt>Monitor </dt>
+<dd>Playback or render an Ambisonic soundfield.
+</dd>
+</dl>
+<p>The below sections go into more detail as to the specifics of each task.
+</p>
+<h2><a class="anchor" name="authoring">Authoring</a></h2>
+<p>Most users approaching Ambisonics are usually presented with two avenues to author an Ambisonic soundfield: capture a natural soundfield directly with a Soundfield microphone,<a class="footnote anchor" name="footnote_org_1" href="#footnote_1"><sup>1</sup></a> or author a planewave from a monophonic signal.<a class="footnote anchor" name="footnote_org_2" href="#footnote_2"><sup>2</sup></a> SuperCollider's inbuilt <a href="./../Classes/PanB.html">PanB</a> provides the latter solution.
+</p>
+<p>The ATK provides a much wider palate of authoring tools via <a href="./../Classes/FoaEncode.html">FoaEncode</a>. These include:
+</p>
+<ul>
+<li>
+<em>planewave: </em> classic directional encoding
+</li>
+<li>
+<em>omnidirectional: </em> a soundfield from everywhere
+</li>
+<li>
+<em>virtual loudspeaker array: </em> transcoding standard formats
+</li>
+<li>
+<em>pseudoinverse microphone array: </em> encoding from discrete microphones or signals
+</li>
+</ul>
+<p>The <em>pseudoinverse</em> encoding technique provides the greatest flexibility, and can be used with both microphone arrays and synthetic signals. In the absence of a Soundfield microphone, this feature gives the opportunity to deploy real-world microphone arrays (omni, cardioid, etc.) to capture natural soundfields. With synthetic signals, <em>pseudoinverse</em> encoding is usually regarded as the method of choice to generate spatially complex synthetic Ambisonic images. In combination with the ATK's <a href="#Imaging">imaging</a> tools these can then be compositionally controlled as required.
+</p>
+<p>See <a href="./../Classes/FoaEncode.html">FoaEncode</a>, <a href="./../Classes/FoaEncoderMatrix.html">FoaEncoderMatrix</a> and <a href="./../Classes/FoaEncoderKernel.html">FoaEncoderKernel</a> for more details about encoding.
+</p>
+<h2><a class="anchor" name="imaging">Imaging</a></h2>
+<p>For the artist, the real power of the ATK is found in the imaging transforms. These are spatial domain filters which reorient, reshape or otherwise spatially filter an input soundfield. Many users will be familiar with the soundfield rotation transform, as SuperCollider provides the inbuilt <a href="./../Classes/Rotate2.html">Rotate2</a>.
+</p>
+<p>The ATK provides a much wider and comprehensive toolset, including:
+</p>
+<ul>
+<li>
+<em>rotation: </em> soundfield rotation about an axis
+</li>
+<li>
+<em>mirror: </em> soundfield reflection across an axis
+</li>
+<li>
+<em>directivity: </em> soundfield directivity
+</li>
+<li>
+<em>dominance: </em> adjust directional gain of soundfield
+</li>
+<li>
+<em>focus: </em> focus on a region of a soundfield
+</li>
+<li>
+<em>push: </em> push a soundfield in a direction
+</li>
+</ul>
+<p>The imaging tools are provided in two forms: <a href="./../Classes/FoaXform.html">static</a> and <a href="./../Classes/FoaTransform.html">dynamic</a> implementations. While most transforms are provided in both categories, a number are found in only one guise.<a class="footnote anchor" name="footnote_org_3" href="#footnote_3"><sup>3</sup></a> </p>
+<p>See <a href="./../Classes/FoaTransform.html">FoaTransform</a>, <a href="./../Classes/FoaXform.html">FoaXform</a> and <a href="./../Classes/FoaXformerMatrix.html">FoaXformerMatrix</a> for more details about imaging.
+</p>
+<h3><a class="anchor" name="reading_imaging_illustrations">Reading imaging illustrations</a></h3>
+<p>As artists working with sound, we should expect most users to be very capable expert listeners, and able to audition the results of spatial filtering of an input soundfield. However, it is often convenient to view a visual representation of the effect of a transform. The ATK illustrates a number of its included transforms in the form shown below.
+</p>
+<p>On the left hand side of the figures a plot of the unchanged soundfield is illustrated. The X-Y axis is shown, viewed from above with the top of the plot corresponding to the front of the soundfield. Eight planewaves are encoded arriving from cardinal directions:
+</p>
+<ul>
+<li>Front
+</li>
+<li>Front-Left
+</li>
+<li>Left
+</li>
+<li>Back-Left
+</li>
+<li>Back
+</li>
+<li>Back-Right
+</li>
+<li>Right
+</li>
+<li>Front-Right
+</li>
+</ul>
+<em>Front</em>, <em>Left</em>, <em>Back-Left</em> and <em>Back</em> are noted with an associated gain, in dB. Individual planewaves are coloured with respect to the gain scale at the far left of the figures. 
+<p>With changing <strong>angle</strong>, we see the encoded planewaves both move towards the front of the image (to a single planewave at the extreme) and change gain in <a href="#zoom">ZoomX</a>. When <strong>angle</strong> is 90 degrees, the planewave at <em>Front</em> has been increased to 6dB, while <em>Back</em> has disappeared.<a class="footnote anchor" name="footnote_org_4" href="#footnote_4"><sup>4</sup></a> <a class="anchor" name="zoom">&#160;</a></p>
+<div class="image">
+<img src="zoom_fig.png"><br><b>ZoomX imaging</b>
+</div>
+<a href="#push">PushX</a> also distorts the incident angles of the encoded planewaves. However, here we see two differences with <a href="#zoom">ZoomX</a>. Firstly, the gains of the individual elements don't vary as considerably, and the encoded planewaves are illustrated as moving off the perimeter of the plot.
+<p>Moving from the edge of the diagram towards the centre <em>does not imply</em> the sound moves from the edge of the loudspeakers towards the centre, as one might expect. Instead, what we are seeing is the loss of directivity. Moving towards the centre means a planewave moves toward becoming omnidirectional, or without direction. (This becomes clearer when we look at <a href="#direct">DirectO</a>.)
+</p>
+<p>With <a href="#push">PushX</a>, when <strong>angle</strong> is 90 degrees, all encoded planewaves have been pushed to the front of the image, and gain is retained at 0 dB for all elements.
+<a class="anchor" name="push">&#160;</a></p>
+<div class="image">
+<img src="push_fig.png"><br><b>PushX imaging</b>
+</div>
+<a href="#direct">DirectO</a> adjusts the directivity of the soundfield across the origin. Here we see all elements collapsing towards the centre of the plot. At this point the soundfield is omnidirectional, or directionless.
+<a class="anchor" name="direct">&#160;</a><div class="image">
+<img src="direct_fig.png"><br><b>DirectO imaging</b>
+</div>
+<p>See <a href="./../Classes/FoaZoomX.html">FoaZoomX</a>, <a href="./../Classes/FoaPushX.html">FoaPushX</a> and <a href="./../Classes/FoaDirectO.html">FoaDirectO</a> for more details about these illustrated transforms.
+</p>
+<h2><a class="anchor" name="monitoring">Monitoring</a></h2>
+<p>Perhaps one of the most celebrated aspects of the Ambisonic sound technique has been its design as a hierarchal reproduction system, able to target a number of varying loudspeaker arrays. Users may be familiar with SuperCollider's inbuilt regular polygon decoder, <a href="./../Classes/DecodeB2.html">DecodeB2</a>.
+</p>
+<p>The ATK provides a much wider palate of optimised monitoring tools via <a href="./../Classes/FoaDecode.html">FoaDecode</a>. These include:
+</p>
+<ul>
+<li>
+<em>stereo UHJ: </em> classic Ambisonic stereo decoding
+</li>
+<li>
+<em>binaural: </em> measured and synthetic HRTFs
+</li>
+<li>
+<em>regular 2D &amp; 3D: </em> single and dual polygons
+</li>
+<li>
+<em>diametric 2D &amp; 3D: </em> flexible semi-regular arrays
+</li>
+<li>
+<em>5.0: </em> <a href="http://www.brucewiggins.co.uk/##Wiggins">Wiggins</a> optimised decoders
+</li>
+</ul>
+<p>While the <em>regular</em> decoders will be suitable for many users, <em>diametric</em> decoding enables the greatest flexibility, and allows the user to design substantially varying semi-regular arrays suitable for a wide variety of playback situations.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> All decoders presume loudspeakers are placed at equal radii from the origin of the array, and gain is normalised. Loudspeaker arrays with unequal radii may be realised if the resulting wavefront arrival times are compensated through the use of delay lines.</div>
+<p>See <a href="./../Classes/FoaDecode.html">FoaDecode</a>, <a href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a> and <a href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a> for more details about decoding.
+</p>
+<h2><a class="anchor" name="examples">Examples</a></h2>
+<p>The examples below are intended to briefly illustrate playback and imaging of soundfields with the ATK. The user is encouraged to explore the ATK's documentation to gain a deeper understanding of the flexibility of these tools.
+</p>
+<p>As the Ambisonic technique is a hierarchal system, numerous options for playback are possible. These include two channel stereo, two channel binaural, pantophonic and full 3D periphonic. With the examples below, we'll take advantage of this by first choosing a suitable decoder with with to audition.
+</p>
+<h3><a class="anchor" name="choose_a_decoder">Choose a decoder</a></h3>
+<p>A number of decoders are defined below. Please choose one suitable for your system. Also, don't forget to define <code class="code prettyprint lang-sc"> ~renderDecode </code>
+ !
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> If you choose a kernel decoder, <a href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>, be sure to free the kernel after use. </div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// switch to internal server, and boot
+(
+        s = <a class="clslnk" href="./../Classes/Server.html">Server</a>.internal;
+        <a class="clslnk" href="./../Classes/Server.html">Server</a>.default = s;
+        s.boot;
+)
+
+
+// ------------------------------------------------------------
+// choose a decoder
+
+// stereophonic / binaural
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newStereo(131/2 * pi/180, 0.5) // Cardioids at 131 deg
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>.newUHJ                         // UHJ (kernel)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>.newSpherical                   // synthetic binaural (kernel)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderKernel.html">FoaDecoderKernel</a>.newCIPIC                       // KEMAR binaural (kernel)
+
+
+// pantophonic (2D)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newQuad(k: 'dual')             // psycho optimised quad
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newQuad(pi/6, 'dual')          // psycho optimised narrow quad
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.new5_0                         // 5.0
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newPanto(6, k: 'dual')         // psycho optimised hex
+
+
+// periphonic (3D)
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newPeri(k: 'dual')             // psycho optimised cube
+~decoder = <a class="clslnk" href="./../Classes/FoaDecoderMatrix.html">FoaDecoderMatrix</a>.newDiametric(                  // psycho optimised bi-rectangle
+    pi/180 * [[30, 0], [-30, 0], [90, 35.3], [-90, 35.3]],
+    'dual'
+)
+
+
+// inspect
+~decoder.kind
+
+
+// ------------------------------------------------------------
+// define ~renderDecode
+(
+~renderDecode = { arg in, decoder;
+    var kind;
+    var fl, bl, br, fr;
+    var fc, lo;
+    var sl, sr;
+    var flu, blu, bru, fru;
+    var fld, bld, brd, frd;
+    var slu, sru, sld, srd;
+        
+
+    kind = decoder.kind;
+    
+    case
+        { decoder.numChannels == 2 }
+            {
+                // decode to stereo (or binaural)
+                <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder)
+            }
+        { kind == 'quad' }
+            {
+                // decode (to quad)
+                #fl, bl, br, fr = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+
+                // reorder output to match speaker arrangement
+                [fl, fr, bl, br]
+            }
+        { kind == '5.0' }
+            {
+                // decode (to 5.0)
+                #fc, fl, bl, br, fr = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                lo = <a class="clslnk" href="./../Classes/Silent.html">Silent</a>.ar;
+                                
+                // reorder output to match speaker arrangement
+                [fl, fr, fc, lo, bl, br]
+            }
+        { kind == 'panto' }
+            {
+                // decode (to hex)
+                #fl, sl, bl, br, sr, fr = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                                
+                // reorder output to match speaker arrangement
+                [fl, fr, sl, sr, bl, br]
+            }
+        { kind == 'peri' }
+            {
+                // decode (to cube)
+                #flu, blu, bru, fru, fld, bld, brd, frd = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                                
+                // reorder output to match speaker arrangement
+                [flu, fru, blu, bru, fld, frd, bld, brd]
+            }
+        { kind == 'diametric' }
+            {
+                // decode (to bi-rectangle)
+                #fl, fr, slu, sru, br, bl, srd, sld = <a class="clslnk" href="./../Classes/FoaDecode.html">FoaDecode</a>.ar(in, ~decoder);
+                
+                // reorder output to match speaker arrangement
+                [fl, fr, bl, br, slu, sru, sld, srd]
+            };
+}
+)
+
+// ------------------------------------------------------------
+// now we're ready to try the examples below!
+// ------------------------------------------------------------
+</pre>
+<h3><a class="anchor" name="produced_via_the_ambisonic_toolkit">Produced via the Ambisonic Toolkit</a></h3>
+<p>The following three sound examples are excerpts from recordings produced via the ATK. 
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// B-format examples, produced via the ATK
+// B-format soundfile read from disk
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Anderson-Pacific_Slope.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Howle-Calling_Tunes.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Pampin-On_Space.wav")
+
+
+
+(
+{
+    var sig;                            // audio signal
+
+
+    // display encoder and decoder
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> Joseph Anderson, "Pacific Slope," Epiphanie Sequence, Sargasso SCD28056
+</li>
+<li>Tim Howle, "Calling Tunes," 20 Odd Years, FMR FMRCD316-0711
+</li>
+<li>J. Pampin, "On Space," Juan Pampin | On Space. [Online]. Available: <a href="http://www.pampin.org/onspace/index.htm.%20">http://www.pampin.org/onspace/index.htm. </a>[Accessed: 21-Mar-2011].
+</li>
+</ul>
+</div>
+<h3><a class="anchor" name="natural_soundfields,_with_imaging_transforms">Natural soundfields, with imaging transforms</a></h3>
+<p>This example illustrates the application of various spatial filtering transforms to natural soundfields, recorded via the Soundfield microphone.
+</p>
+<p>The soundfield is controlled by <a href="./../Classes/MouseY.html">MouseY</a>, which specifies the transform <strong>angle</strong> argument (90 deg to 0 deg; top to bottom of display). With the mouse at the bottom of the display, the recorded soundfield is unchanged. At the top, the transform is at its most extreme.
+</p>
+<p>If you haven't already choosen a <code class="code prettyprint lang-sc"> ~decoder</code>
+ and defined <code class="code prettyprint lang-sc"> ~renderDecode </code>
+, do so <a href="#choose_a_decoder">now</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> See <a href="./../Classes/FoaTransformer.html">FoaTransformer</a> for further details.</div>
+<pre class="code prettyprint lang-sc">
+// ------------------------------------------------------------
+// B-format examples, natural soundfield with imaging transform
+// B-format soundfile read from disk
+
+// choose transformer
+~transformer = 'zoomX'
+~transformer = 'pushX'
+~transformer = 'directO'
+
+
+
+// read a whole sound into memory
+// remember to free the buffer later!
+// (boot the server, if you haven't!)
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Hodges-Purcell.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Leonard-Orfeo_Trio.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Courville-Dialogue.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Leonard-Chinook.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Leonard-Fireworks.wav")
+~sndbuf = <a class="clslnk" href="./../Classes/Buffer.html">Buffer</a>.read(s, "sounds/ATK/b-format/Anderson-Nearfield.wav")
+
+
+(
+{
+    var sig;                            // audio signal
+    var angle;                          // angle control
+
+
+    // display transformer &amp; decoder
+    "Ambisonic transforming via % transformer".format(~transformer).postln;
+    "Ambisonic decoding via % decoder".format(~decoder.kind).postln;
+
+    // gain ---&gt; top            = 90 deg
+    //           bottom         = 0 deg
+    angle = <a class="clslnk" href="./../Classes/MouseY.html">MouseY</a>.kr(pi/2, 0);
+
+
+    // ------------------------------------------------------------
+    // test sig
+    sig = <a class="clslnk" href="./../Classes/PlayBuf.html">PlayBuf</a>.ar(~sndbuf.numChannels, ~sndbuf, doneAction:2);   // soundfile
+
+    // ------------------------------------------------------------
+    // transform
+    sig = <a class="clslnk" href="./../Classes/FoaTransform.html">FoaTransform</a>.ar(sig, ~transformer, angle);
+
+
+    // ------------------------------------------------------------
+    // decode (via ~renderDecode)
+    ~renderDecode.value(sig, ~decoder)
+
+}.scope;
+)
+
+// free buffer
+~sndbuf.free
+// ------------------------------------------------------------
+</pre>
+<div class="note">
+<span class="notelabel">NOTE:</span>  <strong>Soundfile Credits</strong><ul>
+<li> P. Hodges, "Purcell - Passacaglia (King Arthur)," Sound of Space: ambisonic surround sound. [Online]. Available: <a href="http://soundofspace.com/ambisonic_files/52%20">http://soundofspace.com/ambisonic_files/52 </a>[Accessed: 03-Nov-2011].
+</li>
+<li>J. Leonard, "The Orfeo Trio &amp; TetraMic," Sound of Space: ambisonic surround sound. [Online]. Available: <a href="http://soundofspace.com/ambisonic_files/41%20">http://soundofspace.com/ambisonic_files/41 </a>[Accessed: 03-Nov-2011].
+</li>
+<li>D. Courville, "Comparative Surround Recording," Ambisonic Studio | Comparative Surround Recording, 2007. [Online]. Available: <a href="http://www.radio.uqam.ca/ambisonic/comparative_recording.html%20">http://www.radio.uqam.ca/ambisonic/comparative_recording.html </a>[Accessed: 26-Jul-2011].
+</li>
+<li>J. Leonard, ""A couple of Chinook helicopters," Sound of Space: ambisonic surround sound, 20-Mar-2008. [Online]. Available: <a href="http://soundofspace.com/ambisonic_files/47.%20">http://soundofspace.com/ambisonic_files/47. </a>[Accessed: 03-Nov-2011].
+</li>
+<li>J. Leonard, &#8220;Fireworks,&#8221; Sound of Space: ambisonic surround sound, 25-Aug-2009. [Online]. Available: <a href="http://soundofspace.com/ambisonic_files/37.%20">http://soundofspace.com/ambisonic_files/37. </a>[Accessed: 03-Nov-2011].
+</li>
+<li>Joseph Anderson, "Nearfield source," [unpublished recording]
+</li>
+</ul>
+</div>
+<div class="footnotes">
+<a class="anchor" name="footnote_1"></a><div class="footnote">[<a href="#footnote_org_1">1</a>] - J.-M. Batke, "The B-Format Microphone Revised," presented at the Ambisonics Symposium 2009, Graz, 2009.
+</div>
+<a class="anchor" name="footnote_2"></a><div class="footnote">[<a href="#footnote_org_2">2</a>] - D. G. Malham and A. Myatt, "3-D Sound Spatialization using Ambisonic Techniques," Computer Music Journal, vol. 19, no. 4, pp. 58-70, 1995.</div>
+<a class="anchor" name="footnote_3"></a><div class="footnote">[<a href="#footnote_org_3">3</a>] - It is also useful to note that the <a href="./../Classes/FoaTransform.html">dynamic</a> transforms are also available as individual UGens. However, users are advised to use <a href="./../Classes/FoaTransform.html">FoaTransform</a> for convenience.</div>
+<a class="anchor" name="footnote_4"></a><div class="footnote">[<a href="#footnote_org_4">4</a>] - Decreased to -inf dB</div>
+</div>
+</div>
+</body>
+</html>

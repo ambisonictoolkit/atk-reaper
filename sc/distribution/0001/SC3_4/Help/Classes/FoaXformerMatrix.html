@@ -1,0 +1,945 @@
+<html>
+<head>
+<title>FoaXformerMatrix</title>
+<link rel="stylesheet" href="./../scdoc.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="./../scdoc.js" type="text/javascript"></script><script src="./../docmap.js" type="text/javascript"></script><script src="./../prettify.js" type="text/javascript"></script><script src="./../lang-sc.js" type="text/javascript"></script><script type="text/javascript">var helpRoot='./..';</script>
+</head>
+<body>
+<ul id="menubar"></ul>
+<div class="contents">
+<div class="header">
+<div id="label">SuperCollider CLASSES</div>
+<div id="categories"><a href="./../Browse.html#Libraries&gt;Ambisonic%20Toolkit&gt;FOA&gt;Transforming">Libraries&gt;Ambisonic Toolkit&gt;FOA&gt;Transforming</a></div>
+<h1>FoaXformerMatrix</h1>
+<div id="summary">First Order Ambisonic (FOA) transformer matrices</div>
+</div>
+<div class="subheader">
+<div id="related">See also: <a href="./../Classes/FoaXform.html">FoaXform</a>
+</div>[ </div>
+<div id="toc">
+<ul class="toc">
+<li class="toc1"><a href="#description">Description</a></li>
+<ul class="toc"></ul>
+<li class="toc1"><a href="#classmethods">Class methods</a></li>
+<ul class="toc">
+<li class="toc3">
+<a href="#*newRotate">newRotate</a> </li>
+<li class="toc3">
+<a href="#*newTilt">newTilt</a> </li>
+<li class="toc3">
+<a href="#*newTumble">newTumble</a> </li>
+<li class="toc3">
+<a href="#*newRTT">newRTT</a> </li>
+<li class="toc3">
+<a href="#*newMirrorO">newMirrorO</a> </li>
+<li class="toc3">
+<a href="#*newMirrorX">newMirrorX</a> </li>
+<li class="toc3">
+<a href="#*newMirrorY">newMirrorY</a> </li>
+<li class="toc3">
+<a href="#*newMirrorZ">newMirrorZ</a> </li>
+<li class="toc3">
+<a href="#*newMirror">newMirror</a> </li>
+<li class="toc3">
+<a href="#*newDirectO">newDirectO</a> </li>
+<li class="toc3">
+<a href="#*newDirectX">newDirectX</a> </li>
+<li class="toc3">
+<a href="#*newDirectY">newDirectY</a> </li>
+<li class="toc3">
+<a href="#*newDirectZ">newDirectZ</a> </li>
+<li class="toc3">
+<a href="#*newDirect">newDirect</a> </li>
+<li class="toc3">
+<a href="#*newDominateX">newDominateX</a> </li>
+<li class="toc3">
+<a href="#*newDominateY">newDominateY</a> </li>
+<li class="toc3">
+<a href="#*newDominateZ">newDominateZ</a> </li>
+<li class="toc3">
+<a href="#*newDominate">newDominate</a> </li>
+<li class="toc3">
+<a href="#*newZoomX">newZoomX</a> </li>
+<li class="toc3">
+<a href="#*newZoomY">newZoomY</a> </li>
+<li class="toc3">
+<a href="#*newZoomZ">newZoomZ</a> </li>
+<li class="toc3">
+<a href="#*newZoom">newZoom</a> </li>
+<li class="toc3">
+<a href="#*newFocusX">newFocusX</a> </li>
+<li class="toc3">
+<a href="#*newFocusY">newFocusY</a> </li>
+<li class="toc3">
+<a href="#*newFocusZ">newFocusZ</a> </li>
+<li class="toc3">
+<a href="#*newFocus">newFocus</a> </li>
+<li class="toc3">
+<a href="#*newPushX">newPushX</a> </li>
+<li class="toc3">
+<a href="#*newPushY">newPushY</a> </li>
+<li class="toc3">
+<a href="#*newPushZ">newPushZ</a> </li>
+<li class="toc3">
+<a href="#*newPush">newPush</a> </li>
+<li class="toc3">
+<a href="#*newPressX">newPressX</a> </li>
+<li class="toc3">
+<a href="#*newPressY">newPressY</a> </li>
+<li class="toc3">
+<a href="#*newPressZ">newPressZ</a> </li>
+<li class="toc3">
+<a href="#*newPress">newPress</a> </li>
+<li class="toc3">
+<a href="#*newAsymmetry">newAsymmetry</a> </li>
+<li class="toc3">
+<a href="#*newBalance">newBalance</a> </li>
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#instancemethods">Instance methods</a></li>
+<ul class="toc">
+<li class="toc3">
+<a href="#-kind">kind</a> </li>
+<li class="toc3">
+<a href="#-dim">dim</a> </li>
+<li class="toc3">
+<a href="#-numChannels">numChannels</a> </li>
+<li class="toc3">
+<a href="#-dirChannels">dirChannels</a> </li>
+<li class="toc3">
+<a href="#-matrix">matrix</a> </li>
+<li class="toc3">
+<a href="#-numOutputs">numOutputs</a> </li>
+<li class="toc3">
+<a href="#-dirOutputs">dirOutputs</a> </li>
+<li class="toc3">
+<a href="#-numInputs">numInputs</a> </li>
+<li class="toc3">
+<a href="#-dirInputs">dirInputs</a> </li>
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#examples">Examples</a></li>
+<ul class="toc"></ul>
+</ul>
+</div>
+<h2><a class="anchor" name="description">Description</a></h2>
+<p>Generates transform matrices required by the Ambisonic Toolkit's first order (matrix) transformer, <a href="./../Classes/FoaXform.html">FoaXform</a>.
+</p>
+<h2><a class="anchor" name="classmethods">Class Methods</a></h2>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newRotate">*</a></span><a href="./../Overviews/Methods.html#newRotate">newRotate</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Rotate around the z-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>Rotation angle, in radians.
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>A rotation of pi/2 will rotate a source at <code class="code prettyprint lang-sc"> [0, 0] </code>
+ to <code class="code prettyprint lang-sc"> [pi/2, 0] </code>
+.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaRotate.html">FoaRotate</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newTilt">*</a></span><a href="./../Overviews/Methods.html#newTilt">newTilt</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Rotate around the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>Rotation angle, in radians.
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>A rotation of pi/2 will rotate a source at <code class="code prettyprint lang-sc"> [pi/2, 0] </code>
+ to <code class="code prettyprint lang-sc"> [0, pi/2] </code>
+.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaTilt.html">FoaTilt</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newTumble">*</a></span><a href="./../Overviews/Methods.html#newTumble">newTumble</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Rotate around the y-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>Rotation angle, in radians.
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>A rotation of pi/2 will rotate a source at <code class="code prettyprint lang-sc"> [0, 0] </code>
+ to <code class="code prettyprint lang-sc"> [0, pi/2] </code>
+.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaTumble.html">FoaTumble</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newRTT">*</a></span><a href="./../Overviews/Methods.html#newRTT">newRTT</a> (<span class="argstr">rotAngle = 0</span>, <span class="argstr">tilAngle = 0</span>, <span class="argstr">tumAngle = 0</span>)</h3>
+<div class="method">
+<p>Rotate around the z, x and y axes.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> rotAngle </td>
+<td class="argumentdesc"><p>Rotation angle around z-axis, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> tilAngle </td>
+<td class="argumentdesc"><p>Rotation angle around x-axis, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> tumAngle </td>
+<td class="argumentdesc"><p>Rotation angle around y-axis, in radians.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<a href="#*newRotate">Rotate</a> is followed by <a href="#*newTilt">Tilt</a> and then <a href="#*newTumble">Tumble</a>.
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaRTT.html">FoaRTT</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newMirrorO">*</a></span><a href="./../Overviews/Methods.html#newMirrorO">newMirrorO</a> </h3>
+<div class="method">
+<p>Mirror across the origin.
+</p>
+<h4>Discussion:</h4>
+<p>A source at <code class="code prettyprint lang-sc"> [pi/4, pi/6] </code>
+ will be mirrored to <code class="code prettyprint lang-sc"> [-3/4*pi, -pi/6] </code>
+.
+</p>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newMirrorX">*</a></span><a href="./../Overviews/Methods.html#newMirrorX">newMirrorX</a> </h3>
+<div class="method">
+<p>Mirror in the x-axis (across the y-z plane).
+</p>
+<h4>Discussion:</h4>
+<p>A source at <code class="code prettyprint lang-sc"> [pi/4, pi/6] </code>
+ will be mirrored to <code class="code prettyprint lang-sc"> [3/4*pi, pi/6] </code>
+.
+</p>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newMirrorY">*</a></span><a href="./../Overviews/Methods.html#newMirrorY">newMirrorY</a> </h3>
+<div class="method">
+<p>Mirror in the y-axis (across the x-z plane).
+</p>
+<h4>Discussion:</h4>
+<p>A source at <code class="code prettyprint lang-sc"> [pi/4, pi/6] </code>
+ will be mirrored to <code class="code prettyprint lang-sc"> [-pi/4, pi/6] </code>
+.
+</p>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newMirrorZ">*</a></span><a href="./../Overviews/Methods.html#newMirrorZ">newMirrorZ</a> </h3>
+<div class="method">
+<p>Mirror in the y-axis (across the x-z plane).
+</p>
+<h4>Discussion:</h4>
+<p>A source at <code class="code prettyprint lang-sc"> [pi/4, pi/6] </code>
+ will be mirrored to <code class="code prettyprint lang-sc"> [pi/4, -pi/6] </code>
+.
+</p>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newMirror">*</a></span><a href="./../Overviews/Methods.html#newMirror">newMirror</a> (<span class="argstr">theta = 0</span>, <span class="argstr">phi = 0</span>)</h3>
+<div class="method">
+<p>Mirror across an arbitrary plane.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> theta </td>
+<td class="argumentdesc"><p>Azimuth for the normal to the plane, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> phi </td>
+<td class="argumentdesc"><p>Elevation for the normal to the plane, in radians.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaMirror.html">FoaMirror</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newDirectO">*</a></span><a href="./../Overviews/Methods.html#newDirectO">newDirectO</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Adjust the soundfield directivity (across the origin).
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. 0 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<strong>Angle</strong> = 0 retains the current directivity of the soundfield. Increasing <strong>angle</strong> towards pi/2 decreases the directivity, reducing the gains on the directional compenents to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes omnidirectional or directionless.
+<p>Imaging is illustrated <a href="./../Classes/FoaDirectO.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaDirectO.html">FoaDirectO</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newDirectX">*</a></span><a href="./../Overviews/Methods.html#newDirectX">newDirectX</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Adjust the soundfield directivity along the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. 0 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<strong>Angle</strong> = 0 retains the current directivity of the soundfield. Increasing <strong>angle</strong> towards pi/2 decreases the directivity along the x-axis, reducing the gain on this axis to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes directionless on the x-axis.
+<p>Imaging is illustrated <a href="./../Classes/FoaDirectX.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaDirectX.html">FoaDirectX</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newDirectY">*</a></span><a href="./../Overviews/Methods.html#newDirectY">newDirectY</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Adjust the soundfield directivity along the y-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. 0 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<strong>Angle</strong> = 0 retains the current directivity of the soundfield. Increasing <strong>angle</strong> towards pi/2 decreases the directivity along the y-axis, reducing the gain on this axis to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes directionless on the y-axis.
+<p>Imaging is illustrated <a href="./../Classes/FoaDirectY.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaDirectY.html">FoaDirectY</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newDirectZ">*</a></span><a href="./../Overviews/Methods.html#newDirectZ">newDirectZ</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Adjust the soundfield directivity along the z-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. 0 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<strong>Angle</strong> = 0 retains the current directivity of the soundfield. Increasing <strong>angle</strong> towards pi/2 decreases the directivity along the z-axis, reducing the gain on this axis to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes directionless on the z-axis.
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaDirectZ.html">FoaDirectZ</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newDirect">*</a></span><a href="./../Overviews/Methods.html#newDirect">newDirect</a> (<span class="argstr">angle = 0</span>, <span class="argstr">theta = 0</span>, <span class="argstr">phi = 0</span>)</h3>
+<div class="method">
+<p>Adjust the soundfield directivity across an arbitrary plane.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. 0 to pi/2
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> theta </td>
+<td class="argumentdesc"><p>Azimuth for the normal to the plane, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> phi </td>
+<td class="argumentdesc"><p>Elevation for the normal to the plane, in radians.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<strong>Angle</strong> = 0 retains the current directivity of the soundfield. Increasing <strong>angle</strong> towards pi/2 decreases the directivity along the normal defined by <strong>theta</strong> and <strong>phi</strong>, reducing the gain on this normal to zero, and is equivalent to a spatial low-pass filter. The resulting image becomes directionless on the normal.
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaDirect.html">FoaDirect</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newDominateX">*</a></span><a href="./../Overviews/Methods.html#newDominateX">newDominateX</a> (<span class="argstr">gain = 0</span>)</h3>
+<div class="method">
+<p>Apply dominance along the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> gain </td>
+<td class="argumentdesc"><p>Dominance gain, in dB.
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Positive values of <strong>gain</strong> increase the gain at <code class="code prettyprint lang-sc"> [0, 0] </code>
+ to <strong>+gain</strong> dB, while decreasing the gain at <code class="code prettyprint lang-sc"> [pi, 0] </code>
+ to <strong>-gain</strong>. This simultaneously results in a distortion of the image towards <code class="code prettyprint lang-sc"> [0, 0] </code>
+. Negative values of gain invert this distortion, distorting towards <code class="code prettyprint lang-sc"> [pi, 0] </code>
+ . The default, 0, results in no change.
+</p>
+<p>Imaging is illustrated <a href="./../Classes/FoaDominateX.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaDominateX.html">FoaDominateX</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newDominateY">*</a></span><a href="./../Overviews/Methods.html#newDominateY">newDominateY</a> (<span class="argstr">gain = 0</span>)</h3>
+<div class="method">
+<p>Apply dominance along the y-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> gain </td>
+<td class="argumentdesc"><p>Dominance gain, in dB.
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Positive values of <strong>gain</strong> increase the gain at <code class="code prettyprint lang-sc"> [pi/2, 0] </code>
+ to <strong>+gain</strong> dB, while decreasing the gain at <code class="code prettyprint lang-sc"> [-pi/2, 0] </code>
+ to <strong>-gain</strong>. This simultaneously results in a distortion of the image towards <code class="code prettyprint lang-sc"> [pi/2, 0] </code>
+. Negative values of gain invert this distortion, distorting towards <code class="code prettyprint lang-sc"> [-pi/2, 0] </code>
+ . The default, 0, results in no change.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaDominateY.html">FoaDominateY</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newDominateZ">*</a></span><a href="./../Overviews/Methods.html#newDominateZ">newDominateZ</a> (<span class="argstr">gain = 0</span>)</h3>
+<div class="method">
+<p>Apply dominance along the z-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> gain </td>
+<td class="argumentdesc"><p>Dominance gain, in dB.
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Positive values of <strong>gain</strong> increase the gain at <code class="code prettyprint lang-sc"> [0, pi/2] </code>
+ to <strong>+gain</strong> dB, while decreasing the gain at <code class="code prettyprint lang-sc"> [0, -pi/2] </code>
+ to <strong>-gain</strong>. This simultaneously results in a distortion of the image towards <code class="code prettyprint lang-sc"> [0, pi/2] </code>
+. Negative values of gain invert this distortion, distorting towards <code class="code prettyprint lang-sc"> [0, -pi/2] </code>
+ . The default, 0, results in no change.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaDominateZ.html">FoaDominateZ</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newDominate">*</a></span><a href="./../Overviews/Methods.html#newDominate">newDominate</a> (<span class="argstr">gain = 0</span>, <span class="argstr">theta = 0</span>, <span class="argstr">phi = 0</span>)</h3>
+<div class="method">
+<p>Apply dominance along an arbitrary axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> gain </td>
+<td class="argumentdesc"><p>Dominance gain, in dB.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> theta </td>
+<td class="argumentdesc"><p>Azimuth, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> phi </td>
+<td class="argumentdesc"><p>Elevation, in radians.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<p>Applies dominance along the axis defined by <strong>theta</strong> and <strong>phi</strong>. See <a href="#*newDominateX">*newDominateX</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaDominate.html">FoaDominate</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newZoomX">*</a></span><a href="./../Overviews/Methods.html#newZoomX">newZoomX</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply zoom along the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Zoom is a normailised dominance variant, specified in terms of a distortion angle. Positive values of <strong>angle</strong> increase gain at <code class="code prettyprint lang-sc"> [0, 0] </code>
+, while reducing at <code class="code prettyprint lang-sc"> [pi, 0] </code>
+. Negative values do the inverse. The default, 0, results in no change.
+</p>
+<p>Imaging is illustrated <a href="./../Classes/FoaZoomX.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaZoomX.html">FoaZoomX</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newZoomY">*</a></span><a href="./../Overviews/Methods.html#newZoomY">newZoomY</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply zoom along the y-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Zoom is a normailised dominance variant, specified in terms of a distortion angle. Positive values of <strong>angle</strong> increase gain at <code class="code prettyprint lang-sc"> [pi/2, 0] </code>
+, while reducing at <code class="code prettyprint lang-sc"> [-pi/2, 0] </code>
+. Negative values do the inverse. The default, 0, results in no change.
+</p>
+<p>Imaging is illustrated <a href="./../Classes/FoaZoomY.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaZoomY.html">FoaZoomY</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newZoomZ">*</a></span><a href="./../Overviews/Methods.html#newZoomZ">newZoomZ</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply zoom along the z-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Zoom is a normailised dominance variant, specified in terms of a distortion angle. Positive values of <strong>angle</strong> increase gain at <code class="code prettyprint lang-sc"> [0, pi/2] </code>
+, while reducing at <code class="code prettyprint lang-sc"> [0, -pi/2] </code>
+. Negative values do the inverse. The default, 0, results in no change.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaZoomZ.html">FoaZoomZ</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newZoom">*</a></span><a href="./../Overviews/Methods.html#newZoom">newZoom</a> (<span class="argstr">angle = 0</span>, <span class="argstr">theta = 0</span>, <span class="argstr">phi = 0</span>)</h3>
+<div class="method">
+<p>Apply zoom along an arbitrary axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> theta </td>
+<td class="argumentdesc"><p>Azimuth, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> phi </td>
+<td class="argumentdesc"><p>Elevation, in radians.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<p>Applies zoom along the axis defined by <strong>theta</strong> and <strong>phi</strong>. See <a href="#*newZoomX">*newZoomX</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaZoom.html">FoaZoom</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newFocusX">*</a></span><a href="./../Overviews/Methods.html#newFocusX">newFocusX</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply focus along the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Focus is a normalised dominance variant, specified in terms of a distortion angle. Positive values of <strong>angle</strong> maintain gain at <code class="code prettyprint lang-sc"> [0, 0] </code>
+, while reducing at <code class="code prettyprint lang-sc"> [pi, 0] </code>
+. Negative values do the inverse. The default, 0, results in no change.
+</p>
+<p>In contrast with zoom, gain is maintained at 0dB in the direction of distortion.
+</p>
+<p>Imaging is illustrated <a href="./../Classes/FoaFocusX.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaFocusX.html">FoaFocusX</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newFocusY">*</a></span><a href="./../Overviews/Methods.html#newFocusY">newFocusY</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply focus along the y-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Focus is a normalised dominance variant, specified in terms of a distortion angle. Positive values of <strong>angle</strong> maintain gain at <code class="code prettyprint lang-sc"> [pi/2, 0] </code>
+, while reducing at <code class="code prettyprint lang-sc"> [-pi/2, 0] </code>
+. Negative values do the inverse. The default, 0, results in no change.
+</p>
+<p>In contrast with zoom, gain is maintained at 0dB in the direction of distortion.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaFocusY.html">FoaFocusY</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newFocusZ">*</a></span><a href="./../Overviews/Methods.html#newFocusZ">newFocusZ</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply focus along the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Focus is a normalised dominance variant, specified in terms of a distortion angle. Positive values of <strong>angle</strong> maintain gain at <code class="code prettyprint lang-sc"> [0, pi/2] </code>
+, while reducing at <code class="code prettyprint lang-sc"> [0, -pi/2] </code>
+. Negative values do the inverse. The default, 0, results in no change.
+</p>
+<p>In contrast with zoom, gain is maintained at 0dB in the direction of distortion.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaFocusZ.html">FoaFocusZ</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newFocus">*</a></span><a href="./../Overviews/Methods.html#newFocus">newFocus</a> (<span class="argstr">angle = 0</span>, <span class="argstr">theta = 0</span>, <span class="argstr">phi = 0</span>)</h3>
+<div class="method">
+<p>Apply focus along an arbitrary axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> theta </td>
+<td class="argumentdesc"><p>Azimuth, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> phi </td>
+<td class="argumentdesc"><p>Elevation, in radians.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<p>Applies focus along the axis defined by <strong>theta</strong> and <strong>phi</strong>. See <a href="#*newFocusX">*newFocusX</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaFocus.html">FoaFocus</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newPushX">*</a></span><a href="./../Overviews/Methods.html#newPushX">newPushX</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply push along the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Push is a dominance related transform, specified in terms of a distortion angle. Positive values of <strong>angle</strong> push the image towards <code class="code prettyprint lang-sc"> [0, 0] </code>
+. Negative values push towards <code class="code prettyprint lang-sc"> [pi, 0] </code>
+. The default, 0, results in no change.
+</p>
+<p>Imaging is illustrated <a href="./../Classes/FoaPushX.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaPushX.html">FoaPushX</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newPushY">*</a></span><a href="./../Overviews/Methods.html#newPushY">newPushY</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply push along the y-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Push is a dominance related transform, specified in terms of a distortion angle. Positive values of <strong>angle</strong> push the image towards <code class="code prettyprint lang-sc"> [pi/2, 0] </code>
+. Negative values push towards <code class="code prettyprint lang-sc"> [-pi/2, 0] </code>
+. The default, 0, results in no change.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaPushY.html">FoaPushY</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newPushZ">*</a></span><a href="./../Overviews/Methods.html#newPushZ">newPushZ</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply push along the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Push is a dominance related transform, specified in terms of a distortion angle. Positive values of <strong>angle</strong> push the image towards <code class="code prettyprint lang-sc"> [0, pi/2] </code>
+. Negative values push towards <code class="code prettyprint lang-sc"> [0, -pi/2] </code>
+. The default, 0, results in no change.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaPushZ.html">FoaPushZ</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newPush">*</a></span><a href="./../Overviews/Methods.html#newPush">newPush</a> (<span class="argstr">angle = 0</span>, <span class="argstr">theta = 0</span>, <span class="argstr">phi = 0</span>)</h3>
+<div class="method">
+<p>Apply push along an arbitrary axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> theta </td>
+<td class="argumentdesc"><p>Azimuth, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> phi </td>
+<td class="argumentdesc"><p>Elevation, in radians.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<p>Applies push along the axis defined by <strong>theta</strong> and <strong>phi</strong>. See <a href="#*PushX">*PushX</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaPush.html">FoaPush</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newPressX">*</a></span><a href="./../Overviews/Methods.html#newPressX">newPressX</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply press along the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Press is a dominance related transform, specified in terms of a distortion angle. Positive values of <strong>angle</strong> press the image towards <code class="code prettyprint lang-sc"> [0, 0] </code>
+. Negative values press towards <code class="code prettyprint lang-sc"> [pi, 0] </code>
+. The default, 0, results in no change.
+</p>
+<p>Imaging is illustrated <a href="./../Classes/FoaPressX.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaPressX.html">FoaPressX</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newPressY">*</a></span><a href="./../Overviews/Methods.html#newPressY">newPressY</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply press along the x-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Press is a dominance related transform, specified in terms of a distortion angle. Positive values of <strong>angle</strong> press the image towards <code class="code prettyprint lang-sc"> [pi/2, 0] </code>
+. Negative values press towards <code class="code prettyprint lang-sc"> [-pi/2, 0] </code>
+. The default, 0, results in no change.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaPressY.html">FoaPressY</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newPressZ">*</a></span><a href="./../Overviews/Methods.html#newPressZ">newPressZ</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply press along the z-axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Press is a dominance related transform, specified in terms of a distortion angle. Positive values of <strong>angle</strong> press the image towards <code class="code prettyprint lang-sc"> [0, pi/2] </code>
+. Negative values press towards <code class="code prettyprint lang-sc"> [0, -pi/2] </code>
+. The default, 0, results in no change.
+</p>
+<p>Imaging is illustrated <a href="./../Classes/FoaPressZ.html">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaPressZ.html">FoaPressZ</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newPress">*</a></span><a href="./../Overviews/Methods.html#newPress">newPress</a> (<span class="argstr">angle = 0</span>, <span class="argstr">theta = 0</span>, <span class="argstr">phi = 0</span>)</h3>
+<div class="method">
+<p>Apply press along an arbitrary axis.
+</p>
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> theta </td>
+<td class="argumentdesc"><p>Azimuth, in radians.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> phi </td>
+<td class="argumentdesc"><p>Elevation, in radians.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<p>Applies press along the axis defined by <strong>theta</strong> and <strong>phi</strong>. See <a href="#*PressX">*PressX</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaPress.html">FoaPress</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newAsymmetry">*</a></span><a href="./../Overviews/Methods.html#newAsymmetry">newAsymmetry</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Apply soundfield asymmetry
+</p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>Positive values of <strong>angle</strong> rotate <code class="code prettyprint lang-sc"> [0, -pi/2] </code>
+ towards <code class="code prettyprint lang-sc"> [0, 0] </code>
+, and at pi/2 collapse the soundfield to a planewave. Negative values rotate <code class="code prettyprint lang-sc"> [0, pi/2] </code>
+ toowards <code class="code prettyprint lang-sc"> [0, 0] </code>
+. The default, 0, results in no change.
+</p>
+<p>Imaging is illustrated <a href="./../Classes/FoaAsymmetry.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaAsymmetry.html">FoaAsymmetry</a> </div>
+</div>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*newBalance">*</a></span><a href="./../Overviews/Methods.html#newBalance">newBalance</a> (<span class="argstr">angle = 0</span>)</h3>
+<div class="method">
+<p>Soundfield balance. A synonym for <a href="#*newZoomY">ZoomY</a></p>
+<h4>Arguments:</h4>
+<table class="arguments"><tr>
+<td class="argumentname"> angle </td>
+<td class="argumentdesc"><p>The distortion angle, in radians. -pi/2 to pi/2
+</p></td>
+</tr></table>
+<h4>Discussion:</h4>
+<p>See <a href="#*newZoomY">ZoomY</a>.
+</p>
+<p>Imaging is illustrated <a href="./../Classes/FoaBalance.html#figure">here</a>.
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> Corresponding UGen: <a href="./../Classes/FoaBalance.html">FoaBalance</a> </div>
+</div>
+<h3></h3>
+<div id="inheritedclassmets"></div>
+<h2><a class="anchor" name="instancemethods">Instance Methods</a></h2>
+<h3 class="imethodname">
+<span class="methprefix"><a class="anchor" name="-kind">-</a></span><a href="./../Overviews/Methods.html#kind">kind</a> </h3>
+<div class="method">
+<p>Answers the kind of encoder
+</p>
+<h4>Discussion:</h4>
+<pre class="code prettyprint lang-sc">
+// encoder
+~xformer = <a class="clslnk" href="./../Classes/FoaXformerMatrix.html">FoaXformerMatrix</a>.newZoomX
+
+// inspect
+~encoder.kind
+</pre>
+</div>
+<h3 class="imethodname">
+<span class="methprefix"><a class="anchor" name="-dim">-</a></span><a href="./../Overviews/Methods.html#dim">dim</a> </h3>
+<div class="method"><p>Answers the number of transformer dimensions: 3D.
+</p></div>
+<h3 class="imethodname">
+<span class="methprefix"><a class="anchor" name="-numChannels">-</a></span><a href="./../Overviews/Methods.html#numChannels">numChannels</a> </h3>
+<div class="method">
+<p>Answers the number of channels.
+</p>
+<h4>Discussion:</h4>
+<p>All Transformer matricies are square: 4.
+</p>
+</div>
+<h3 class="imethodname">
+<span class="methprefix"><a class="anchor" name="-dirChannels">-</a></span><a href="./../Overviews/Methods.html#dirChannels">dirChannels</a> </h3>
+<div class="method">
+<p>A convenience method providing polymorphism with <a href="./../Classes/FoaEncoderMatrix.html#-dirChannels">FoaEncoderMatrix: -dirChannels</a> and <a href="./../Classes/FoaDecoderMatrix.html#-dirChannels">FoaDecoderMatrix: -dirChannels</a>.
+</p>
+<h4>Returns:</h4>
+<div class="returnvalue">
+<code class="code prettyprint lang-sc"> [ inf, inf, inf , inf ] </code>
+</div>
+</div>
+<h3 class="imethodname">
+<span class="methprefix"><a class="anchor" name="-matrix">-</a></span><a href="./../Overviews/Methods.html#matrix">matrix</a> </h3>
+<div class="method"><p>Answers the transform matrix
+</p></div>
+<h3 class="imethodname">
+<span class="methprefix"><a class="anchor" name="-numOutputs">-</a></span><a href="./../Overviews/Methods.html#numOutputs">numOutputs</a> </h3>
+<div class="method"><p>A convenience method providing polymorphism with <a href="./../Classes/FoaEncoderMatrix.html#-numOutputs">FoaEncoderMatrix: -numOutputs</a> and <a href="./../Classes/FoaDecoderMatrix.html#-numOutputs">FoaDecoderMatrix: -numOutputs</a>.
+</p></div>
+<h3 class="imethodname">
+<span class="methprefix"><a class="anchor" name="-dirOutputs">-</a></span><a href="./../Overviews/Methods.html#dirOutputs">dirOutputs</a> </h3>
+<div class="method"><p>A convenience method providing polymorphism with <a href="./../Classes/FoaEncoderMatrix.html#-dirOutputs">FoaEncoderMatrix: -dirOutputs</a> and <a href="./../Classes/FoaDecoderMatrix.html#-dirOutputs">FoaDecoderMatrix: -dirOutputs</a>.
+</p></div>
+<h3 class="imethodname">
+<span class="methprefix"><a class="anchor" name="-numInputs">-</a></span><a href="./../Overviews/Methods.html#numInputs">numInputs</a> </h3>
+<div class="method"><p>A convenience method providing polymorphism with <a href="./../Classes/FoaEncoderMatrix.html#-numInputs">FoaEncoderMatrix: -numInputs</a> and <a href="./../Classes/FoaDecoderMatrix.html#-numInputs">FoaDecoderMatrix: -numInputs</a>.
+</p></div>
+<h3 class="imethodname">
+<span class="methprefix"><a class="anchor" name="-dirInputs">-</a></span><a href="./../Overviews/Methods.html#dirInputs">dirInputs</a> </h3>
+<div class="method"><p>A convenience method providing polymorphism with <a href="./../Classes/FoaEncoderMatrix.html#-dirInputs">FoaEncoderMatrix: -dirInputs</a> and <a href="./../Classes/FoaDecoderMatrix.html#-dirInputs">FoaDecoderMatrix: -dirInputs</a>.
+</p></div>
+<h3></h3>
+<div id="inheritedinstmets"></div>
+<h2><a class="anchor" name="examples">Examples</a></h2>
+<p>Please see <a href="./../Classes/FoaXform.html#Examples">FoaXform: Examples</a>.
+</p>
+</div>
+</body>
+</html>

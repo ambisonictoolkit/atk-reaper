@@ -1,0 +1,114 @@
+<html>
+<head>
+<title>FoaNFC</title>
+<link rel="stylesheet" href="./../scdoc.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="./../scdoc.js" type="text/javascript"></script><script src="./../docmap.js" type="text/javascript"></script><script src="./../prettify.js" type="text/javascript"></script><script src="./../lang-sc.js" type="text/javascript"></script><script type="text/javascript">var helpRoot='./..';</script>
+</head>
+<body>
+<ul id="menubar"></ul>
+<div class="contents">
+<div class="header">
+<div id="label">SuperCollider CLASSES</div>
+<div id="categories">
+<a href="./../Browse.html#Libraries&gt;Ambisonic%20Toolkit&gt;FOA&gt;Decoding&gt;UGens">Libraries&gt;Ambisonic Toolkit&gt;FOA&gt;Decoding&gt;UGens</a>, <a href="./../Browse.html#Libraries&gt;Ambisonic%20Toolkit&gt;FOA&gt;Transforming&gt;UGens">Libraries&gt;Ambisonic Toolkit&gt;FOA&gt;Transforming&gt;UGens</a>, <a href="./../Browse.html#UGens&gt;Multichannel&gt;Ambisonics">UGens&gt;Multichannel&gt;Ambisonics</a>, <a href="./../Browse.html#UGens&gt;Multichannel&gt;Panners">UGens&gt;Multichannel&gt;Panners</a>
+</div>
+<h1>FoaNFC</h1>
+<div id="summary">First Order Ambisonic (FOA) nearfield compensation filter</div>
+</div>
+<div class="subheader">
+<div id="related">See also: <a href="./../Classes/FoaProximity.html">FoaProximity</a>, <a href="./../Classes/FoaTransform.html">FoaTransform</a>, <a href="./../Classes/FoaDecode.html">FoaDecode</a>
+</div>[ </div>
+<div id="toc">
+<ul class="toc">
+<li class="toc1"><a href="#description">Description</a></li>
+<ul class="toc"></ul>
+<li class="toc1"><a href="#classmethods">Class methods</a></li>
+<ul class="toc">
+<li class="toc3">
+<a href="#*ar">ar</a> </li>
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#instancemethods">Instance methods</a></li>
+<ul class="toc">
+<li class="toc2">
+<ul class="toc"></ul>
+</ul>
+<li class="toc1"><a href="#examples">Examples</a></li>
+<ul class="toc"></ul>
+</ul>
+</div>
+<h2><a class="anchor" name="description">Description</a></h2>
+<p>Apply nearfield compensation filtering to a first order ambisonic signal (B-format).
+</p>
+<div class="note">
+<span class="notelabel">NOTE:</span> <a href="./../Classes/FoaNFC.html">FoaNFC</a> is usually called via the convenience wrapper <a href="./../Classes/FoaTransform.html">FoaTransform</a>.
+</div>
+<h2><a class="anchor" name="classmethods">Class Methods</a></h2>
+<h3 class="cmethodname">
+<span class="methprefix"><a class="anchor" name="*ar">*</a></span><a href="./../Overviews/Methods.html#ar">ar</a> (<span class="argstr">w</span>, <span class="argstr">x</span>, <span class="argstr">y</span>, <span class="argstr">z</span>, <span class="argstr">distance = 1</span>, <span class="argstr">mul = 1</span>, <span class="argstr">add = 0</span>)</h3>
+<div class="method">
+<h4>Arguments:</h4>
+<table class="arguments">
+<tr>
+<td class="argumentname"> w </td>
+<td class="argumentdesc"><p>Input signal W.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> x </td>
+<td class="argumentdesc"><p>Input signal X.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> y </td>
+<td class="argumentdesc"><p>Input signal Y.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> z </td>
+<td class="argumentdesc"><p>Input signal Z.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> distance </td>
+<td class="argumentdesc">
+<p>The distance, in meters.
+</p>
+<div class="warning">
+<span class="warninglabel">WARNING:</span> <strong>Distance</strong> = 0 is an invalid value! </div>
+</td>
+</tr>
+<tr>
+<td class="argumentname"> mul </td>
+<td class="argumentdesc"><p>Output will be multiplied by this value.
+</p></td>
+</tr>
+<tr>
+<td class="argumentname"> add </td>
+<td class="argumentdesc"><p>This value will be added to the output.
+</p></td>
+</tr>
+</table>
+<h4>Discussion:</h4>
+<a href="./../Classes/FoaNFC.html">FoaNFC</a> facilitates the reduction or removal of the <a href="http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity%20effect">proximity effect</a> from encoded signals. The <a href="http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity%20effect">proximity effect</a> can be an important contributor to perceptions of nearness.
+<p>Nearfield compensation<a class="footnote anchor" name="footnote_org_1" href="#footnote_1"><sup>1</sup></a> is usually used in conjunction with <a href="./../Classes/FoaDecode.html">FoaDecode</a> to compensate for the distance of loudspeakers on playback. Additionally, <a href="./../Classes/FoaNFC.html">FoaNFC</a> can also be used to reduce the <a href="http://en.wikipedia.org/wiki/Proximity_effect_(audio)##proximity%20effect">proximity effect</a> found in nearfield recordings.
+</p>
+<p>The Ambisonic Toolkit's proximity filter, <a href="./../Classes/FoaProximity.html">FoaProximity</a>, undoes <a href="./../Classes/FoaNFC.html">FoaNFC</a> given the same <strong>distance</strong> argument.
+</p>
+</div>
+<h3></h3>
+<div id="inheritedclassmets"></div>
+<h2><a class="anchor" name="instancemethods">Instance Methods</a></h2>
+<h3></h3>
+<div id="inheritedinstmets"></div>
+<h2><a class="anchor" name="examples">Examples</a></h2>
+<p>Please see <a href="./../Classes/FoaDecode.html#psychoacoustically_optimised_quadraphonic_decoder">this</a> and <a href="./../Classes/FoaTransform.html#nfc_(soundfile)">this</a>.
+</p>
+<div class="footnotes">
+<a class="anchor" name="footnote_1"></a><div class="footnote">[<a href="#footnote_org_1">1</a>] - Usually called distance compensation in the classic Ambisonics literature.</div>
+</div>
+</div>
+</body>
+</html>
