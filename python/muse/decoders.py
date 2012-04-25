@@ -527,7 +527,8 @@ def uhj_decoder_kernel(N):
 
 
 def sHRIR_decoder_kernel(positions, k, N, T, \
-                           r = 0.0875, theta_e = 5./9*pi, width = pi):
+                             r = 0.0875, theta_e = 5./9*pi, width = pi, \
+                            phase = True):
     """sHRIR_decoder_kernel(positions, k, N, T, \
                            r = 0.0875, theta_e = 5./9*pi, width = pi)
     
@@ -574,7 +575,8 @@ def sHRIR_decoder_kernel(positions, k, N, T, \
         - r         : sphere radius (default is Brown/Duda value)
         - theta_e   : +/- ear angle (default is Brown/Duda value)
         - width     : beta for Kaiser window FIR design.
-                      pi = minimum ripple for steepest cutoff.    
+                      pi = minimum ripple for steepest cutoff.
+        - phase     : retain phase?
 
     Outputs:
     
@@ -619,6 +621,11 @@ def sHRIR_decoder_kernel(positions, k, N, T, \
         speaker_kernels[i] = sHRIR(N, azimuth, elevation, T, \
                                    r, theta_e, width)
 
+        # discard phase for speaker..?
+        if not phase:
+            for chan in range(nchannels(speaker_kernels[i])):
+                speaker_kernels[i][:, chan] = linf(speaker_kernels[i][:, chan])
+
         # sum to decoder kernels
         for j in range(m + 1):          # j is harmonic number
             decoder_kernels[j] += gains[i, j] * speaker_kernels[i]
@@ -626,8 +633,10 @@ def sHRIR_decoder_kernel(positions, k, N, T, \
     return decoder_kernels
 
 
-def lHRIR_decoder_kernel(positions, k, subject_id, database_dir, status = 'C'):
-    """lHRIR_decoder_kernel(positions, k, subject_id, database_dir, status = 'C')
+def lHRIR_decoder_kernel(positions, k, subject_id, database_dir, status = 'C', \
+                            phase = True):
+    """lHRIR_decoder_kernel(positions, k, subject_id, database_dir, \
+                                status = 'C', phase = True)
     
     DDT / HRIR FIR Filter decoder using measured HRIRs from the
     IRCAM hosted Listen HRTF database.
@@ -667,6 +676,7 @@ def lHRIR_decoder_kernel(positions, k, subject_id, database_dir, status = 'C'):
                           for the Listen database are located                          
         - status        : compensated ('C') or raw ('R') HRIRs
                             len('C' ) = 512, len('R') = 8192
+        - phase         : retain phase?
 
     Outputs:
     
@@ -742,6 +752,11 @@ def lHRIR_decoder_kernel(positions, k, subject_id, database_dir, status = 'C'):
         speaker_kernels[i] = lHRIR(azimuth, elevation, \
                                    subject_id, database_dir, status)
 
+        # discard phase for speaker..?
+        if not phase:
+            for chan in range(nchannels(speaker_kernels[i])):
+                speaker_kernels[i][:, chan] = linf(speaker_kernels[i][:, chan])
+
         # sum to decoder kernels
         for j in range(m + 1):          # j is harmonic number
             decoder_kernels[j] += gains[i, j] * speaker_kernels[i]
@@ -749,8 +764,9 @@ def lHRIR_decoder_kernel(positions, k, subject_id, database_dir, status = 'C'):
     return decoder_kernels
 
 
-def cHRIR_decoder_kernel(positions, k, subject_id, database_dir):
-    """cHRIR_decoder_kernel(positions, k, subject_id, database_dir)
+def cHRIR_decoder_kernel(positions, k, subject_id, database_dir, phase = True):
+    """cHRIR_decoder_kernel(positions, k, subject_id, database_dir, \
+                                phase = True)
     
     DDT / HRIR FIR Filter decoder using measured HRIRs from the
     CIPIC HRTF database.
@@ -789,6 +805,7 @@ def cHRIR_decoder_kernel(positions, k, subject_id, database_dir):
                           subjects '021' and '165' are the KEMAR head
         - database_dir  : path to local directory where subject directories
                           for the Listen database are located                          
+        - phase         : retain phase?
 
     Outputs:
     
@@ -840,6 +857,11 @@ def cHRIR_decoder_kernel(positions, k, subject_id, database_dir):
         # find speaker kernel
         speaker_kernels[i] = cHRIR(azimuth, elevation, \
                                    subject_id, database_dir)
+
+        # discard phase for speaker..?
+        if not phase:
+            for chan in range(nchannels(speaker_kernels[i])):
+                speaker_kernels[i][:, chan] = linf(speaker_kernels[i][:, chan])
 
         # sum to decoder kernels
         for j in range(m + 1):          # j is harmonic number
