@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # vim:syntax=python
 
@@ -483,6 +484,124 @@ def minf(b, min = -120., oversampling = 8):
 
     # take the inverse real cepstrum to return minimum phase
     res = irceps(x)[:n_b]
+
+    return res
+
+
+# kirkeby normalisation filter
+# kernel is kernel to normalise
+# Wns are LF and HF corner freqs defining band for normalisation
+# roll_off is roll off in octaves from Wns (defines transition band)
+# Es is the regularization parameter E(f)
+# Note: kirkeby in the form described by Farina results in a 
+#       normalised band pass filter between Wns
+def kirkeby(b, Wns, roll_off = 1./3, Es = array([.01, 10.])):
+    """kirkeby(b, Wns, roll_off = 1./3, Es = array([.01, 10.]))
+
+    Return a Kirkeby normalisation filter kernel to normalise input kernel.
+    
+    Inputs:
+    
+      b         -- filter kernel (expected to be odd length)
+      Wns       -- frequencies to normalise between, [Wn0, Wn1]
+      roll_off  -- filter rolloff
+      Es        -- Kirkeby regularisation parameter E(f)
+
+    Outputs:
+    
+      resulting normalisation kernel.
+    """
+    
+    N = nframes(b)         # kernel size
+    M = N/2 + 1            # freqs (fft, has +-freqs)
+
+    # Wn transition bands, for roll off
+    c_Wns0 = empty(2)
+    c_Wns0[0] = 2**(-roll_off/2) * Wns[0]
+    c_Wns0[1] = 2**(roll_off/2) * Wns[0]
+
+    c_Wns1 = empty(2)
+    c_Wns1[0] = 2**(-roll_off/2) * Wns[1]
+    c_Wns1[1] = 2**(roll_off/2) * Wns[1]
+
+    # design regularization parameter E(f)
+    kirkebyE = ones(M)
+
+    fftWns = (scipy.fftpack.fftfreq(N) * 2)[:M] # only need zero + positive vals
+
+    # test for mode...
+    #          mode 1: [True, True], normalise all Wns
+    #          mode 2: [False, False], normalise between Wns[0] and Wns[1]
+    #          mode 3: [False, True], normalise above Wns[0] only
+    #          mode 4: [True, False], normalise below Wns[1] only
+    nanWns = isnan(Wns)
+
+    if all(nanWns):             # mode 1
+        kirkebyE = Es[0] * kirkebyE
+        
+    elif all(logical_not(nanWns)): # mode 2
+        for n, k_Wn in zip(range(M), fftWns):
+            if 0. <= k_Wn and k_Wn < c_Wns0[0]:
+                kirkebyE[n] = Es[1]
+
+            elif c_Wns0[0] <= k_Wn and k_Wn < c_Wns0[1]:
+                kirkebyE[n] = (Es[1] - Es[0]) * \
+                    (cos(((k_Wn - c_Wns0[0]) * pi) / (c_Wns0[1] - c_Wns0[0])) + 1) / 2 + Es[0]
+
+            elif c_Wns0[1] <= k_Wn and k_Wn < c_Wns1[0]:
+                kirkebyE[n] = Es[0]
+
+            elif c_Wns1[0] <= k_Wn and k_Wn < c_Wns1[1]:
+                kirkebyE[n] = (Es[1] - Es[0]) * \
+                    (cos(((k_Wn - c_Wns1[0]) * pi) / (c_Wns1[1] - c_Wns1[0]) + pi) \
+                         + 1) / 2 + Es[0]
+
+            else:               # c_Wns1[1] <= k_Wn:
+                kirkebyE[n] = Es[1]
+
+    elif logical_not(nanWns[0]):    # mode 3
+        for n, k_Wn in zip(range(M), fftWns):
+            if 0. <= k_Wn and k_Wn < c_Wns0[0]:
+                kirkebyE[n] = Es[1]
+
+            elif c_Wns0[0] <= k_Wn and k_Wn < c_Wns0[1]:
+                kirkebyE[n] = (Es[1] - Es[0]) * \
+                    (cos(((k_Wn - c_Wns0[0]) * pi) / (c_Wns0[1] - c_Wns0[0])) + 1) / 2 + Es[0]
+
+            else:               # c_Wns0[1] <= k_Wn
+                kirkebyE[n] = Es[0]
+
+    else:                       # mode 4
+        for n, k_Wn in zip(range(M), fftWns):
+            if 0. <= k_Wn and k_Wn < c_Wns1[0]:
+                kirkebyE[n] = Es[0]
+
+            elif c_Wns1[0] <= k_Wn and k_Wn < c_Wns1[1]:
+                kirkebyE[n] = (Es[1] - Es[0]) * \
+                    (cos(((k_Wn - c_Wns1[0]) * pi) / (c_Wns1[1] - c_Wns1[0]) + pi) \
+                         + 1) / 2 + Es[0]
+
+            else:               # c_Wns1[1] <= k_Wn
+                kirkebyE[n] = Es[1]
+
+    kirkebyE = concatenate((    # complete building kirkebyE by mirroring
+            kirkebyE,
+            kirkebyE[::-1][:-1]
+            ))
+
+    # compute kirkeby "packing" (normalisation) filter
+
+    # 1) take fft, transform to freq domain
+    fftH = scipy.fftpack.fft(b)
+
+    # 2) compute inverse filter in freq domain
+    conjH = conjugate(fftH)
+    print len(conjH), len(fftH), len(kirkebyE)
+    fftK = conjH / (conjH * fftH + kirkebyE)
+
+    # 3) take ifft, transform back to time domain (and window)
+    res = real(scipy.fftpack.ifft(fftK))
+    res *= hann(N)
 
     return res
 
