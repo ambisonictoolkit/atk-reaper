@@ -596,7 +596,6 @@ def kirkeby(b, Wns, roll_off = 1./3, Es = array([.01, 10.])):
 
     # 2) compute inverse filter in freq domain
     conjH = conjugate(fftH)
-    print len(conjH), len(fftH), len(kirkebyE)
     fftK = conjH / (conjH * fftH + kirkebyE)
 
     # 3) take ifft, transform back to time domain (and window)

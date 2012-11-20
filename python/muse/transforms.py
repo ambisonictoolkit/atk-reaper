@@ -510,7 +510,7 @@ def tumble(a, theta = 0.):
     
     Tumble an ambisonic B-format sound field counter-clockwise around the x-axis.
     
-    (Rotation around x-axis)
+    (Rotation around y-axis)
 
     Args:
         - a         : Input b-format signal
