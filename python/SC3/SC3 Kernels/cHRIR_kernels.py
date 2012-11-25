@@ -56,7 +56,6 @@ pos = spher_to_cart(
     )
 
 # HRIR dirs
-#database_dir = '/Users/josephla/Documents/Developer/CIPIC_hrtf_database/standard_hrir_database/'
 hrir_database_dir = '/Library/Application Support/HRTF/CIPIC/standard_hrir_database'
 
 
@@ -65,8 +64,6 @@ encoding    = 'pcm32'
 endianness  = 'file'
 
 
-##target_dir  = '/Volumes/Audio/test'      # temp write dir
-##file_dir    = '/ATK_kernels/FOA/decoders/CIPIC_HRIR'
 user_dir        = True                              # write library to user dir?
 library_dir     = '/Library/Application Support/ATK'      # library location
 database_dir    = '/kernels/FOA/decoders/cipic_raw'
@@ -120,11 +117,6 @@ for sr in srs:                          # SR
             # ----- generate file names
             write_files = [] 
             for name in file_names:
-##                write_files += [
-##                    target_dir + file_dir + \
-##                    '/SR_' + str(sr).zfill(6) + '/N_' + str(N).zfill(4) + '/' + \
-##                    '0' + subject_id + '/' + name + '.' + file_type[:3]
-##                    ]
                 write_files += [
                     os.path.join(library_dir + database_dir, str(sr), str(N), \
                                  '0' + subject_id, \
