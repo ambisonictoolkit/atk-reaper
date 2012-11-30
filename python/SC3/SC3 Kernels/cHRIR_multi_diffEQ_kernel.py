@@ -246,8 +246,8 @@ def normalise_diffuse_field(kern, norm_freqs, norm_coeffs):
 # -----parameters
 srs         = array([44100])    # sample rates
 ##Ns          = array([256]) # target kernel lengths
-Ns          = array([256, 512]) # target kernel lengths
-##Ns          = array([512]) # target kernel lengths
+##Ns          = array([256, 512]) # target kernel lengths
+Ns          = array([512]) # target kernel lengths
 
 # -------> edit target kernel lengths --> set = to 512 only
 #          need to modify SC code to do so!!!!

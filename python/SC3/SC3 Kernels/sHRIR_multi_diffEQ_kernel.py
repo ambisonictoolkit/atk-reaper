@@ -246,11 +246,34 @@ def normalise_diffuse_field(kern, norm_freqs, norm_coeffs):
 
 
 # -----parameters
-srs         = array([44100, 48000, 88200, 96000, 192000]) # sample rates
-Ns          = array([256, 512])    # kernel lengths
+##srs         = array([44100, 48000, 88200, 96000, 192000]) # sample rates
+##Ns          = array([256, 512])    # kernel lengths
 
 # NOTE: for distribution Ns should be correlated to SR
 #       44.1kHz: 512; 88.2kHz: 1024; 176.4kHz: 2048
+#
+# -->[sr, N]
+#    [44100, 512]
+#    [48000, 512]
+#    [88200, 1024]
+#    [96000, 1024]
+#    [192000, 2048]
+
+##srs         = array([44100]) # sample rates
+##Ns          = array([512])    # kernel lengths
+
+##srs         = array([48000]) # sample rates
+##Ns          = array([512])    # kernel lengths
+
+##srs         = array([88200]) # sample rates
+##Ns          = array([1024])    # kernel lengths
+
+##srs         = array([96000]) # sample rates
+##Ns          = array([1024])    # kernel lengths
+
+srs         = array([192000]) # sample rates
+Ns          = array([2048])    # kernel lengths
+
 
 
 # --> Duda data
