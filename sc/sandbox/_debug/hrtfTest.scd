@@ -33,6 +33,7 @@ s.quit
 
 // inspect
 ~decoder.kind
+~decoder.kernelSize
 
 // free kernel
 ~decoder.free
