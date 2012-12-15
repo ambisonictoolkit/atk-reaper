@@ -137,10 +137,10 @@ for sr in srs:                          # SR
             # ----- create b-format kernel - normalised for diffuse field
             encoder_kernel = interleave(
                 array([
-                    sqrt(2)/sqrt(3) * pulse,
-                    tmp[:, 0],
-                    tmp[:, 1],
-                    tmp[:, 2]
+                    1./sqrt(2) * pulse,
+                    sqrt(3)/2. * tmp[:, 0],
+                    sqrt(3)/2. * tmp[:, 1],
+                    sqrt(3)/2. * tmp[:, 2]
                     ])
                 )
 
