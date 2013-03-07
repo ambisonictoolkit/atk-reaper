@@ -20,7 +20,7 @@
 
 from muse import *
 import os.path
-#import pylab
+import pylab
 
 # kirkeby normalisation filter
 # kernel is kernel to normalise
@@ -123,13 +123,12 @@ drcN = kirN - 1
 #drcN = (kirN - 1) / 2           # temporary!!! bug in Convolution2.ar
 
 
-#kfreqs = array([20., sr / 2])   # kirkeby cutoff freqs, in Hz (for mains)
-#kfreqs = array([10., 150.])   # kirkeby cutoff freqs, in Hz (for subs)
-#kfreqs = array([10., 200.])   # kirkeby cutoff freqs, in Hz (for subs)
+# the values here should be in sync with the speaker measurements made
 kfreqs = concatenate((
     interleave(ones(24)) * array([20., sr / 2]),   # kirkeby cutoff freqs, in Hz (for mains)
     interleave(ones(4)) * array([10., 200.]),   # kirkeby cutoff freqs, in Hz (for subs)
     ))
+
 
 roll_off = 1./3                 # kirkeby filter roll off, in octaves
 
@@ -138,15 +137,16 @@ dut_norm_name = 'dut_norm'
 dut_delay_name = 'dut_delay'    # txt file with delay in samples
 drc_measure_gains_name = 'drc_measure_gains' # txt file with measurement gains
 working_dir = '/Users/josephla/Sound/Seattle Feb-Mar 2013/Turnkey DRC'
-filter_dir = 'filters'
+filter_dir = 'filters_single'
 signal_dir = 'signals'
 
 
-#num_speakers = 2                # minimum
-#num_speakers = 4
-#num_speakers = 12
-#num_speakers = 24
-num_speakers = 28
+num_speakers = 28               # number of speakers measured
+
+
+spkr_num = 0                    # speaker number to view
+#spkr_num = 1
+#spkr_num = 24
 
 
 normalise_dut = True            # use DUT normalisation filter?
@@ -274,9 +274,10 @@ normal_dbs = zeros(num_speakers)
 
 # ******************************************************
 # loop over each speaker!
+# NOTE: this loop is redundant, is only included to keep
+#       this code in sync with DRC_system_correction.py
 
-
-for spkr in range(num_speakers):
+for spkr in [spkr_num]:
 
     print "\nProcessing speaker :", spkr
 
@@ -484,66 +485,66 @@ savetxt(delays_file, normal_delays, '%3.12f')
 savetxt(gains_file, normal_dbs, '%3.12f')
 
 
-### ******************************************************
-### display
-##min_db = -24.
-##max_db = 18.
-##min_hz = 10.
-##
-### display vals*******************
-##max_Wn = 2 * scipy.fftpack.fftfreq(kirN)[argmax(abs(scipy.fftpack.fft(norm_filter)))]
-##
-##print "Max Kirkeby gain = ", amp_to_db(max_amp), "dB at", Wn_to_freq(max_Wn, sr), "Hz"
-##
-##
-### Plot IRS***************
-##
-### normalise the measured RIR
-##normalised_response = convfilt(response, norm_filter, 'full')
-##normalised_response = normalised_response[kirN/2:kirN/2 + kirN]
-##
-##
-### impulse response...
-##ax1 = pylab.subplot(231)
-##pylab.plot(response, color = 'b')
-##ax1.set_ylim(-1., 1.)
-##pylab.title('RIR')
-##
-### normalisation filter impulse response...
-##ax2 = pylab.subplot(232)
-##pylab.plot(norm_filter, color = 'g')
-##ax2.set_ylim(-1., 1.)
-##pylab.title('normalisation IR')
-##
-### DUT normalised impulse response...
-##ax3 = pylab.subplot(233)
-##pylab.plot(normalised_response, color = 'r')
-##ax3.set_ylim(-1., 1.)
-##pylab.title('normalised RIR')
-##
-##
-##
-### Plot spectra***************
-##
-##ax4 = pylab.subplot(212)
-##ax4.set_xscale('log', basex = 2, nonposx='clip')
-##
-### spectrum of DUT...
-##plot_spec(response, min_db, max_db, sr)
-##
-### spectrum of normalisation filter
-##plot_spec(norm_filter, min_db, max_db, sr)
-##
-### spectrum of the normalised DUT
-##plot_spec(normalised_response, min_db, max_db, sr)
-##
-##ax4.grid(True)
-##
-##pylab.title('frequency response')
-##ax4.set_ylim(min_db, max_db)
-##ax4.set_xlim(min_hz)
-##
-##pylab.show()
+# ******************************************************
+# display
+min_db = -24.
+max_db = 18.
+min_hz = 10.
+
+# display vals*******************
+max_Wn = 2 * scipy.fftpack.fftfreq(kirN)[argmax(abs(scipy.fftpack.fft(norm_filter)))]
+
+print "Max Kirkeby gain = ", amp_to_db(max_amp), "dB at", Wn_to_freq(max_Wn, sr), "Hz"
+
+
+# Plot IRS***************
+
+# normalise the measured RIR
+normalised_response = convfilt(response, norm_filter, 'full')
+normalised_response = normalised_response[kirN/2:kirN/2 + kirN]
+
+
+# impulse response...
+ax1 = pylab.subplot(231)
+pylab.plot(response, color = 'b')
+ax1.set_ylim(-1., 1.)
+pylab.title('RIR')
+
+# normalisation filter impulse response...
+ax2 = pylab.subplot(232)
+pylab.plot(norm_filter, color = 'g')
+ax2.set_ylim(-1., 1.)
+pylab.title('normalisation IR')
+
+# DUT normalised impulse response...
+ax3 = pylab.subplot(233)
+pylab.plot(normalised_response, color = 'r')
+ax3.set_ylim(-1., 1.)
+pylab.title('normalised RIR')
+
+
+
+# Plot spectra***************
+
+ax4 = pylab.subplot(212)
+ax4.set_xscale('log', basex = 2, nonposx='clip')
+
+# spectrum of DUT...
+plot_spec(response, min_db, max_db, sr)
+
+# spectrum of normalisation filter
+plot_spec(norm_filter, min_db, max_db, sr)
+
+# spectrum of the normalised DUT
+plot_spec(normalised_response, min_db, max_db, sr)
+
+ax4.grid(True)
+
+pylab.title('frequency response')
+ax4.set_ylim(min_db, max_db)
+ax4.set_xlim(min_hz)
+
+pylab.show()
 
 
 
