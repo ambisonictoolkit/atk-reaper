@@ -31,12 +31,11 @@ file_encoding = 'pcm24'         # note: only applies to the signal
                                 # not the deco filter. Deco filter
                                 # is set to 'pcm32
 
-freq0 = sr/2.**13               # log sweep start
-#freq0 = sr/2.**14               # log sweep start
+freqs = array([sr/2.**13, sr/2.])   # signal start and end freqs
+#freqs = array([sr/2.**14, sr/2.])
 
 # roll_off = None                   # upper and lower freq roll off in octaves
-roll_off = 1./7                   # for log, applies only to lower freq
-                                  # for lin, applies only to upper freq
+roll_off = 1./7                   # if freqs[1] != sr/2, applies to freqs[0]
                                   # used for time domain windowing (filter)
                                   # roll_off may be set to None, for no envelope
                                   # note: enhanced pre and post ringing may result
@@ -85,7 +84,6 @@ decon_filter_file = os.path.join(
 # ******************************************************
 # calculate signal parms
 
-freqs = array([freq0, sr/2.])   # signal start and end freqs
 Wns = freq_to_Wn(freqs, 1./sr)  # signal freqs as Wns
 
 # signal duration
@@ -126,7 +124,13 @@ if roll_off is not None:        # apply roll off filter?
     dec_nframes = ris_nframes
 
     ris = (1 - cos(lin([0., pi], ris_nframes))) / 2
-    dec = ones(ris_nframes) # replace w/ no fade-out, a la Farina to reduce HF pre-ring
+
+    if Wns[1] < 1.:
+        dec = ris[::-1]         # apply a roll off for HFs
+
+    else:
+        dec = ones(ris_nframes) # replace w/ no fade-out,
+                                # a la Farina to reduce HF pre-ring
 
     signal *= concatenate(
         (
