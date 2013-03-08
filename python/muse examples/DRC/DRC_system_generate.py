@@ -201,10 +201,6 @@ if display:
 # ***********# ******************************************************
 # write signal and filter out
 
-# check if output path exists, and create if no
-if not os.path.exists(os.path.join(working_dir, filter_dir)):
-    os.mkdir(os.path.join(working_dir, filter_dir))
-
 signal_sfile =  Sndfile(
     signal_file,
     'w',
