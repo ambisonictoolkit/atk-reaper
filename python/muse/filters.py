@@ -18,6 +18,7 @@
 # seem to need to have these imports here. . . to make sure names are defined
 # from numpy import *
 # from pyaudiolab import *
+import numpy
 from muse import *
 from generators import *
 from sndfile import *          # uses sndfile rather than scikits.audiolab
