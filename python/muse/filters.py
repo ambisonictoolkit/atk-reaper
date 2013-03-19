@@ -1245,7 +1245,7 @@ def fir_violet(N, width = pi):
     return res
 
 
-def fir_pink(N, width):
+def fir_pink(N, width = pi):
     """fir_pink(N, width = pi)
 
     Pink FIR Filter design using frequency sampling.
@@ -1279,7 +1279,7 @@ def fir_pink(N, width):
     return res
 
 
-def fir_blue(N, width):
+def fir_blue(N, width = pi):
     """fir_blue(N, width = pi)
 
     Blue FIR Filter design using frequency sampling.
