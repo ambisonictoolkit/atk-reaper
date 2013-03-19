@@ -1194,6 +1194,125 @@ def fir_lap(M, Wn, N = None, width = pi, phase = pi):
     return ap_b
 
 
+# coloured noise
+def fir_brown(N, width = pi):
+    """fir_brown(N, width = pi)
+
+    Brown FIR Filter design using frequency sampling.
+    
+    Inputs:
+    
+      N         -- order of filter (number of taps)
+      width     -- beta for Kaiser window FIR design.
+                  pi = minimum ripple for steepest cutoff.
+    
+    Outputs:
+    
+      b      -- coefficients of length N FIR filter.
+    """
+
+    res = -1 * integ_filt(
+        imag(
+            fir_hb(N + 1, width)
+            )
+        )[:-1]
+
+    return res
+
+
+def fir_violet(N, width = pi):
+    """fir_violet(N, width = pi)
+
+    Violet FIR Filter design using frequency sampling.
+    
+    Inputs:
+    
+      N         -- order of filter (number of taps)
+      width     -- beta for Kaiser window FIR design.
+                  pi = minimum ripple for steepest cutoff.
+    
+    Outputs:
+    
+      b      -- coefficients of length N FIR filter.
+    """
+
+    res = diff_filt(
+        imag(
+            fir_hb(N + 1, beta)
+            )[1:]
+        )
+
+    return res
+
+
+def fir_pink(N, width):
+    """fir_pink(N, width = pi)
+
+    Pink FIR Filter design using frequency sampling.
+    
+    Inputs:
+    
+      N         -- order of filter (number of taps)
+      width     -- beta for Kaiser window FIR design.
+                  pi = minimum ripple for steepest cutoff.
+    
+    Outputs:
+    
+      b      -- coefficients of length N FIR filter.
+    """
+
+    # prototype brown
+    b = fir_brown(N, width)
+
+    # take real fft
+    fft_b = rfft(b)
+    
+    # find magnitude
+    mag = abs(fft_b)
+
+    # find phase
+    phase = angle(fft_b)
+
+    # take the ifft (real)
+    res = irfft(sqrt(mag) * (cos(phase) + sin(phase) * 1j), N)
+    
+    return res
+
+
+def fir_blue(N, width):
+    """fir_blue(N, width = pi)
+
+    Blue FIR Filter design using frequency sampling.
+    
+    Inputs:
+    
+      N         -- order of filter (number of taps)
+      width     -- beta for Kaiser window FIR design.
+                  pi = minimum ripple for steepest cutoff.
+    
+    Outputs:
+    
+      b      -- coefficients of length N FIR filter.
+    """
+
+    # prototype violet
+    b = fir_violet(N, width)
+
+    # take real fft
+    fft_b = rfft(b)
+    
+    # find magnitude
+    mag = abs(fft_b)
+
+    # find phase
+    phase = angle(fft_b)
+
+    # take the ifft (real)
+    res = irfft(sqrt(mag) * (cos(phase) + sin(phase) * 1j), N)
+    
+    return res
+
+
 #=========================
 # Convolution Function
 #=========================
