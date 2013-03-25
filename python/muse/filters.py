@@ -1239,7 +1239,7 @@ def fir_violet(N, width = pi):
 
     res = diff_filt(
         imag(
-            fir_hb(N + 1, beta)
+            fir_hb(N + 1, width)
             )[1:]
         )
 
