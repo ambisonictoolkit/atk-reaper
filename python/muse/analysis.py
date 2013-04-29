@@ -174,64 +174,73 @@ def venv(a, N, t, T, width=pi, mode = 'z', kind = 'fft', zi = None):
 
 
 # vaed (azimuth, elevation, directivity)
-def vaed(b):
-    """vaed(a)
+def vaed(a, zi = None):
+    """vaed(a, zi = None)
     
     Analyze an ambisonic B-format sound field, returning azimuth,
-    elevation and directivity. Returns values as time varying.
+    elevation and directivity.
     
     Inputs:
         - b         : Input b-format signal
-
+      zi -- Initial conditions for the filter delays.  It is a vector
+            of shape (4, 2).  If zi=None or is not given then initial
+            rest is assumed.  SEE signal.lfiltic for more information.
+    
     Outputs: ([a, e, d])
     
       [a, e, d] -- Azimuth, elevation and directivity in radians.
                    (See direct for details on directivity.)
+      zf -- If zi is None, this is not returned, otherwise, zf holds the
+            final filter delay values.
 
     """
-
-    # find the square of b
-    b_sqrd = b**2
-
     # normalise W
-    b_sqrd *= array([2, 1, 1, 1])
+    b = copy(a)
+    b[:, 0] *= sqrt(2)
 
-    # calculate directivity
-    d = pi/2 - 2 * arctan2(
-        sqrt((b_sqrd[:, 1] + b_sqrd[:, 2] + b_sqrd[:, 3])),
-        sqrt(b_sqrd[:, 0])
-        )
+    # pv & b**2
+    if zi is None:
+        pv = integ_filt(
+            b * interleave(b[:, 0])
+            )
+        b_sqrd = integ_filt(
+            b**2
+            )
+    else:
+        zf = zeros_like(zi)
+        
+        pv, zf[:, :1] = integ_filt(
+            b * interleave(b[:, 0]),
+            zi[:, :1]
+            )
+        b_sqrd, zf[:, 1:] = integ_filt(
+            b**2,
+            zi[:, 1:]
+            )
 
-    # adjust directivity so that it is idealized
-    b_dir = direct(
-        b,
-        -d
-        )
+    # p**2 and v**2
+    p_sqrd = b_sqrd[:, 0]
+    v_sqrd = sum(b_sqrd[:, 1:], 1)
 
     # calculate azimuth, elevation
-    b_abs = a_to_b(
-        abs(
-            b_to_a(b_dir, weight = 'car')
-            ),
-        weight = 'car'
-        )
+    a = unwrap(arctan2(pv[:, 2], pv[:, 1]))
+    e = unwrap(arctan2(pv[:, 3], sqrt((pv[:, 1])**2 + (pv[:, 2])**2)))
 
-    # translated to [r, theta, phi]
-    spher = cart_to_spher(b_abs[:, 1:])
+    # calculate directivity
+    # pi/2 - 2 * arctan(v/p)
+    d = unwrap(pi/2 - 2 * arctan2(sqrt(v_sqrd), sqrt(p_sqrd)))
 
-    # return [theta, phi, d]
-    res = hstack(
-        (spher[:, 1:],
-        interleave(d))
-        )
+    res = interleave(array([a, e, d]))
 
-    return res
+    if zi is None:
+        return res
+    else:
+        return res, zf
 
 
 # aed (azimuth, elevation, directivity)
 # return constants
-# may want to make more like aed_rms
-def aed(b):
+def aed(a):
     """aed(a)
     
     Analyze an ambisonic B-format sound field, returning azimuth,
@@ -247,94 +256,27 @@ def aed(b):
 
     """
 
-    # find the mean of b**2
-    b_sqrd_mean = (b**2).mean(0)
-
     # normalise W
-    b_sqrd_mean[0] *= 2
+    b = copy(a)
+    b[:, 0] *= sqrt(2)
 
-    # calculate directivity
-    d = pi/2 - 2 * arctan2(
-        sqrt(b_sqrd_mean[1] + b_sqrd_mean[2] + b_sqrd_mean[3]),
-        sqrt(b_sqrd_mean[0])
-        )
+    # pv & b**2 mean
+    pv_mean = mean(b * interleave(b[:, 0]), 0)
+    b_sqrd_mean = mean((b**2), 0)
 
-    # adjust directivity so that it is idealized
-    b_dir = direct(
-	b,
-	-d
-	)
+    # p**2 and v**2
+    p_sqrd = b_sqrd_mean[0]
+    v_sqrd = sum(b_sqrd_mean[1:])
 
     # calculate azimuth, elevation
-    b_abs = a_to_b(
-        abs(
-            b_to_a(b_dir, weight = 'car')
-            ),
-        weight = 'car'
-        )
-
-    # translated to [r, theta, phi]
-    spher = mean(
-        cart_to_spher(b_abs[:, 1:]),
-        0
-        )
-
-    # return [theta, phi, d]
-    res = append(spher[1:], d)
-
-    return res
-
-
-# aed (azimuth, elevation)
-# return constants
-def aed_rms(b):
-    """aed_rms(a)
-    
-    Analyze an ambisonic B-format sound field, returning azimuth,
-    elevation and directivity. (Using RMS.)
-    
-    Inputs:
-        - b         : Input b-format signal
-
-    Outputs: ([a, e, d])
-    
-      [a, e, d] -- Azimuth, elevation and directivity in radians.
-                   (See direct for details on directivity.)
-
-    """
-
-    # find the mean of b**2
-    b_sqrd_mean = (b**2).mean(0)
-
-    # normalise W
-    b_sqrd_mean[0] *= 2
+    a = arctan2(pv_mean[2], pv_mean[1])
+    e = arctan2(pv_mean[3], sqrt((pv_mean[1])**2 + (pv_mean[2])**2))
 
     # calculate directivity
-    d = pi/2 - 2 * arctan2(
-        sqrt(b_sqrd_mean[1] + b_sqrd_mean[2] + b_sqrd_mean[3]),
-        sqrt(b_sqrd_mean[0])
-        )
+    # pi/2 - 2 * arctan(v/p)
+    d = pi/2 - 2 * arctan2(sqrt(v_sqrd), sqrt(p_sqrd))
 
-    # adjust directivity so that it is idealized
-    b_dir = direct(
-        b,
-        -d
-        )
-    
-    # calculate azimuth, elevation
-    b_rms = a_to_b(
-        rms(
-            b_to_a(b_dir, weight = 'car'),
-            0
-            ),
-        weight = 'car'
-        )
-
-    spher = cart_to_spher(
-        b_rms[1:],
-        )
-
-    # return [theta, phi, d]
-    res = append(spher[1:], d)
+    # return [azimuth, elevation, directivity]
+    res = array([a, e, d])
 
     return res
