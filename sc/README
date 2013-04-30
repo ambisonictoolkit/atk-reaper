@@ -1,0 +1,17 @@
+The files found in sc3-plugins/source/ATK make up the current SC3-ATK distribution.
+
+NOTE: sc3-plugins/source/ATK may not be in sync with the official repository found at 
+
+https://github.com/supercollider/sc3-plugins
+
+The public github source is the official repository for the SC3-ATK project. 
+
+
+
+The other folders found in this directory contain files not for public distribution and are for archival reference only.
+
+
+
+
+J Anderson
+April 2013
