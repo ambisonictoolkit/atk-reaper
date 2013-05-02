@@ -42,14 +42,14 @@ else:
         from scikits.audiolab import *
         print '                         ... success!'
 
-        print 'Importing sndfiles...'
-        from sndfiles import *        # old soundfiles module to be deprecated
-        print '                         ... success'
-
-        print '                             WARNING: Sndfiles uses the old ' +\
-              'audiolab API, \n' +\
-              '                                      and is soon to be ' +\
-              'deprecated.'
+#        print 'Importing sndfiles...'
+#        from sndfiles import *        # old soundfiles module to be deprecated
+#        print '                         ... success'
+#
+#        print '                             WARNING: Sndfiles uses the old ' +\
+#              'audiolab API, \n' +\
+#              '                                      and is soon to be ' +\
+#              'deprecated.'
 
         try:                                    # try samplerate...
             print 'Importing samplerate...'
