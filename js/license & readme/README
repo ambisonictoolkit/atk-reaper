@@ -1,10 +1,11 @@
-This is the Supercollider3 version of the Ambisonic Toolkit (ATK).
+This is the JS-plugins version of the Ambisonic Toolkit (ATK).
 
-	Copyright the ATK Community,
-		Joseph Anderson, and Josh Parmenter, 2011
+        Copyright the ATK Community,
+               Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
 
-		J Anderson	j.anderson[at]ambisonictoolkit.net 
-		J Parmenter	j.parmenter[at]ambisonictoolkit.net 
+               J Anderson     j.anderson[at]ambisonictoolkit.net 
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net 
+               T Lossius      trond.lossius[at]bek.no
 
 ------------------------------------------------------------------------
 
