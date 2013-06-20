@@ -1,0 +1,120 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net 
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net 
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+	Class: testSignal
+	Generates 4-channel static (DC) signal.
+	used to verify expected behavior in other plugins
+---------------------------------------------------------------------
+*/
+
+
+
+desc: Displays instant values for incoming signal, before silencing
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+// No sliders
+
+@init
+
+/**********************************************************
+Initialisation
+**********************************************************/
+sigW = 0.;
+sigX = 0.03;
+sigY = 0.;
+sigZ = 0.;
+
+
+/**********************************************************
+Graphics
+**********************************************************/
+@gfx [300] [600]
+
+function gxColorSet(alpha, red, green, blue)
+(
+	gfx_a = alpha;
+	gfx_r = red;
+	gfx_g = green;
+	gfx_b  = blue;
+);
+
+function gxPositionSet(x, y)
+(
+	gfx_x = x;
+	gfx_y = y;
+);
+
+function drawFooEquals(character)
+(
+	gfx_drawchar(character);
+	gfx_drawchar($' ');
+	gfx_drawchar($'=');
+	gfx_drawchar($' ');
+);
+
+gxColorSet(1., 1., 1., 1.);
+
+gxPositionSet(40, 20);
+drawFooEquals($'W');
+gfx_drawnumber(sigW,8);
+
+gxPositionSet(40, 40);
+drawFooEquals($'X');
+gfx_drawnumber(sigX,8);
+
+gxPositionSet(40, 60);
+drawFooEquals($'Y');
+gfx_drawnumber(sigY,8);
+
+gxPositionSet(40, 80);
+drawFooEquals($'Z');
+gfx_drawnumber(sigZ,8);
+
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+// Snapshot of current signal values
+sigW = spl0;
+sigX = spl1;
+sigY = spl2;
+sigZ = spl3;
+
+// Set the four channels to zero to prevent nasty signals from reaching the speakers
+spl0 = 0.;
+spl1 = 0.;
+spl2 = 0.;
+spl3 = 0.;
