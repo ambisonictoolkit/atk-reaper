@@ -22,8 +22,8 @@ and GNU General Public License along with this program.  If not, see
 
 
 ---------------------------------------------------------------------
-	Class: BtoA
-	B to A format decoder for a variety of tetrahedral orientations and W channel weights.
+  Class: BtoA
+  B to A format decoder for a variety of tetrahedral orientations and W channel weights.
 ---------------------------------------------------------------------
 */
 
@@ -41,7 +41,7 @@ out_pin:Z
 
 slider1:0<0,7,1{Front Left Up [FLU FRD BLD BRU], Front Left Down [FLD FRU BLU BRD], Front Left-Right [FL FR BU BD], Front Up-Down [FU FD BL BR], Front & Back Down [F BD BLU BRU], Front & Back Up [F BU BLD BRD], Front Left-Right Up [FLU FRU FD B], Front Left-Right Down [FLD FRD FU B] }>Orientation
 
-slider2:0<-0,3,0{Decorrelated (On the sphere), Canonical, Unscaled, Cardioid}>Weight
+slider2:0<-0,3,0{Decorrelated (Planewaves), Canonical, Unscaled, Cardioid}>Weight
 
 
 /**********************************************************
@@ -50,11 +50,11 @@ Initialisation
 @init
 
 // Some constants:
-recSqrt2 	= 1. / sqrt(2.);
-sqrt3Div2 	= sqrt(3.) / 2.;
-sqrt3Div6 	= sqrt(3.) / 6.;
-sqrt6Div3 	= sqrt(6.) / 3.;
-recSqrt6 	= 1. / sqrt(6.);
+recSqrt2   = 1. / sqrt(2.);
+sqrt3Div2   = sqrt(3.) / 2.;
+sqrt3Div6   = sqrt(3.) / 6.;
+sqrt6Div3   = sqrt(6.) / 3.;
+recSqrt6   = 1. / sqrt(6.);
 
 
 /**********************************************************
@@ -67,257 +67,257 @@ Updated slider value:
 // Option 0: orthogonal (front left up) [ FLU, FRD, BLD, BRU ]
 slider1 == 0 ?
 (
-	/*
-	[ 0.5, 0.5, 0.5, 0.5 ],
-	[ 0.5, 0.5, -0.5, -0.5 ],
-	[ 0.5, -0.5, 0.5, -0.5 ],
-	[ 0.5, -0.5, -0.5, 0.5 ]
-	*/
-	
-	matrix00 =  0.5;
-	matrix01 =  0.5;
-	matrix02 =  0.5;
-	matrix03 =  0.5;
+  /*
+  [ 0.5, 0.5, 0.5, 0.5 ],
+  [ 0.5, 0.5, -0.5, -0.5 ],
+  [ 0.5, -0.5, 0.5, -0.5 ],
+  [ 0.5, -0.5, -0.5, 0.5 ]
+  */
+  
+  matrix00 =  0.5;
+  matrix01 =  0.5;
+  matrix02 =  0.5;
+  matrix03 =  0.5;
 
-	matrix10 =  0.5;
-	matrix11 =  0.5;
-	matrix12 = -0.5;
-	matrix13 = -0.5;
+  matrix10 =  0.5;
+  matrix11 =  0.5;
+  matrix12 = -0.5;
+  matrix13 = -0.5;
 
-	matrix20 =  0.5;
-	matrix21 = -0.5;
-	matrix22 =  0.5;
-	matrix23 = -0.5;
+  matrix20 =  0.5;
+  matrix21 = -0.5;
+  matrix22 =  0.5;
+  matrix23 = -0.5;
 
-	matrix30 =  0.5;
-	matrix31 = -0.5;
-	matrix32 = -0.5;
-	matrix33 =  0.5;
+  matrix30 =  0.5;
+  matrix31 = -0.5;
+  matrix32 = -0.5;
+  matrix33 =  0.5;
 ) :
 (
-	// Option 1: front left down [ FLD, FRU, BLU, BRD ]
-	slider1 == 1 ?
-	(
-		/*
-		[ 0.5, 0.5, 0.5, -0.5 ],
-		[ 0.5, 0.5, -0.5, 0.5 ],
-		[ 0.5, -0.5, 0.5, 0.5 ],
-		[ 0.5, -0.5, -0.5, -0.5 ]
-		*/
-		
-		matrix00 =  0.5;
-		matrix01 =  0.5;
-		matrix02 =  0.5;
-		matrix03 = -0.5;
+  // Option 1: front left down [ FLD, FRU, BLU, BRD ]
+  slider1 == 1 ?
+  (
+    /*
+    [ 0.5, 0.5, 0.5, -0.5 ],
+    [ 0.5, 0.5, -0.5, 0.5 ],
+    [ 0.5, -0.5, 0.5, 0.5 ],
+    [ 0.5, -0.5, -0.5, -0.5 ]
+    */
+    
+    matrix00 =  0.5;
+    matrix01 =  0.5;
+    matrix02 =  0.5;
+    matrix03 = -0.5;
 
-		matrix10 =  0.5;
-		matrix11 =  0.5;
-		matrix12 = -0.5;
-		matrix13 =  0.5;
+    matrix10 =  0.5;
+    matrix11 =  0.5;
+    matrix12 = -0.5;
+    matrix13 =  0.5;
 
-		matrix20 =  0.5;
-		matrix21 = -0.5;
-		matrix22 =  0.5;
-		matrix23 =  0.5;
+    matrix20 =  0.5;
+    matrix21 = -0.5;
+    matrix22 =  0.5;
+    matrix23 =  0.5;
 
-		matrix30 =  0.5;
-		matrix31 = -0.5;
-		matrix32 = -0.5;
-		matrix33 = -0.5;
-	) :
-	(
-		// Option 2: front left-right [ FL, FR, BU, BD ]
-		slider1 == 2 ?
-		(
-			/*
-			[ 0.5, 0.5, recSqrt2, 0 ],
-			[ 0.5, 0.5, recSqrt2.neg, 0 ],
-			[ 0.5, -0.5, 0, recSqrt2 ],
-			[ 0.5, -0.5, 0, recSqrt2.neg ]
-			*/
-			
-			matrix00 =  0.5;
-			matrix01 =  0.5;
-			matrix02 =  recSqrt2;
-			matrix03 =  0.;
+    matrix30 =  0.5;
+    matrix31 = -0.5;
+    matrix32 = -0.5;
+    matrix33 = -0.5;
+  ) :
+  (
+    // Option 2: front left-right [ FL, FR, BU, BD ]
+    slider1 == 2 ?
+    (
+      /*
+      [ 0.5, 0.5, recSqrt2, 0 ],
+      [ 0.5, 0.5, recSqrt2.neg, 0 ],
+      [ 0.5, -0.5, 0, recSqrt2 ],
+      [ 0.5, -0.5, 0, recSqrt2.neg ]
+      */
+      
+      matrix00 =  0.5;
+      matrix01 =  0.5;
+      matrix02 =  recSqrt2;
+      matrix03 =  0.;
 
-			matrix10 =  0.5;
-			matrix11 =  0.5;
-			matrix12 = -recSqrt2;
-			matrix13 =  0.;
+      matrix10 =  0.5;
+      matrix11 =  0.5;
+      matrix12 = -recSqrt2;
+      matrix13 =  0.;
 
-			matrix20 =  0.5;
-			matrix21 = -0.5;
-			matrix22 =  0.;
-			matrix23 =  recSqrt2;
+      matrix20 =  0.5;
+      matrix21 = -0.5;
+      matrix22 =  0.;
+      matrix23 =  recSqrt2;
 
-			matrix30 =  0.5;
-			matrix31 = -0.5;
-			matrix32 =  0.;
-			matrix33 = -recSqrt2;
-		) :
-		(
-			// Option 3: front up-down [ FU, FD, BL, BR ]
-			slider1 == 3 ?
-			(
-				/*
-				[ 0.5, 0.5, 0, recSqrt2 ],
-				[ 0.5, 0.5, 0, recSqrt2.neg ],
-				[ 0.5, -0.5, recSqrt2, 0 ],
-				[ 0.5, -0.5, recSqrt2.neg, 0 ]
-				*/
-				
-				matrix00 =  0.5;
-				matrix01 =  0.5;
-				matrix02 =  0.;
-				matrix03 =  recSqrt2;
+      matrix30 =  0.5;
+      matrix31 = -0.5;
+      matrix32 =  0.;
+      matrix33 = -recSqrt2;
+    ) :
+    (
+      // Option 3: front up-down [ FU, FD, BL, BR ]
+      slider1 == 3 ?
+      (
+        /*
+        [ 0.5, 0.5, 0, recSqrt2 ],
+        [ 0.5, 0.5, 0, recSqrt2.neg ],
+        [ 0.5, -0.5, recSqrt2, 0 ],
+        [ 0.5, -0.5, recSqrt2.neg, 0 ]
+        */
+        
+        matrix00 =  0.5;
+        matrix01 =  0.5;
+        matrix02 =  0.;
+        matrix03 =  recSqrt2;
 
-				matrix10 =  0.5;
-				matrix11 =  0.5;
-				matrix12 =  0.;
-				matrix13 = -recSqrt2;
+        matrix10 =  0.5;
+        matrix11 =  0.5;
+        matrix12 =  0.;
+        matrix13 = -recSqrt2;
 
-				matrix20 =  0.5;
-				matrix21 = -0.5;
-				matrix22 =  recSqrt2;
-				matrix23 =  0.;
+        matrix20 =  0.5;
+        matrix21 = -0.5;
+        matrix22 =  recSqrt2;
+        matrix23 =  0.;
 
-				matrix30 =  0.5;
-				matrix31 = -0.5;
-				matrix32 = -recSqrt2;
-				matrix33 =  0.;
-			) :
-			(
-				// Option 4: front & back down [ F, BD, BLU, BRU ]
-				slider1 == 4 ?
-				(
-					/*
-					[ 0.5, sqrt3Div2, 0, 0 ],
-					[ 0.5, sqrt3Div6.neg, 0, sqrt6Div3.neg ],
-					[ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6 ],
-					[ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6 ]
-					*/
-					
-					matrix00 =  0.5;
-					matrix01 =  sqrt3Div2;
-					matrix02 =  0.;
-					matrix03 =  0.;
+        matrix30 =  0.5;
+        matrix31 = -0.5;
+        matrix32 = -recSqrt2;
+        matrix33 =  0.;
+      ) :
+      (
+        // Option 4: front & back down [ F, BD, BLU, BRU ]
+        slider1 == 4 ?
+        (
+          /*
+          [ 0.5, sqrt3Div2, 0, 0 ],
+          [ 0.5, sqrt3Div6.neg, 0, sqrt6Div3.neg ],
+          [ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6 ],
+          [ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6 ]
+          */
+          
+          matrix00 =  0.5;
+          matrix01 =  sqrt3Div2;
+          matrix02 =  0.;
+          matrix03 =  0.;
 
-					matrix10 =  0.5;
-					matrix11 = -sqrt3Div6;
-					matrix12 =  0.;
-					matrix13 = -sqrt3Div6;
+          matrix10 =  0.5;
+          matrix11 = -sqrt3Div6;
+          matrix12 =  0.;
+          matrix13 = -sqrt6Div3;
 
-					matrix20 =  0.5;
-					matrix21 = -sqrt3Div6;
-					matrix22 =  recSqrt2;
-					matrix23 =  recSqrt6;
+          matrix20 =  0.5;
+          matrix21 = -sqrt3Div6;
+          matrix22 =  recSqrt2;
+          matrix23 =  recSqrt6;
 
-					matrix30 =  0.5;
-					matrix31 = -sqrt3Div6;
-					matrix32 = -recSqrt2;
-					matrix33 =  recSqrt6;
-				) :
-				(
-					// Option 5: front & back up [ F, BU, BLD, BRD ]
-					slider1 == 5 ?
-					(
-						/*
-						[ 0.5, sqrt3Div2, 0, 0 ],
-						[ 0.5, sqrt3Div6.neg, 0, sqrt6Div3 ],
-						[ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6.neg ],
-						[ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6.neg ]
-						*/
-						
-						matrix00 =  0.5;
-						matrix01 =  sqrt3Div2;
-						matrix02 =  0.;
-						matrix03 =  0.;
+          matrix30 =  0.5;
+          matrix31 = -sqrt3Div6;
+          matrix32 = -recSqrt2;
+          matrix33 =  recSqrt6;
+        ) :
+        (
+          // Option 5: front & back up [ F, BU, BLD, BRD ]
+          slider1 == 5 ?
+          (
+            /*
+            [ 0.5, sqrt3Div2, 0, 0 ],
+            [ 0.5, sqrt3Div6.neg, 0, sqrt6Div3 ],
+            [ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6.neg ],
+            [ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6.neg ]
+            */
+            
+            matrix00 =  0.5;
+            matrix01 =  sqrt3Div2;
+            matrix02 =  0.;
+            matrix03 =  0.;
 
-						matrix10 =  0.5;
-						matrix11 = -sqrt3Div6;
-						matrix12 =  recSqrt2;
-						matrix13 = -recSqrt6;
+            matrix10 =  0.5;
+            matrix11 = -sqrt3Div6;
+            matrix12 =  0.0;
+            matrix13 =  sqrt6Div3;
 
-						matrix20 =  0.5;
-						matrix21 = -sqrt3Div6;
-						matrix22 =  recSqrt2;
-						matrix23 = -recSqrt6;
+            matrix20 =  0.5;
+            matrix21 = -sqrt3Div6;
+            matrix22 =  recSqrt2;
+            matrix23 = -recSqrt6;
 
-						matrix30 = 0.5;
-						matrix31 = -sqrt3Div6;
-						matrix32 = -recSqrt2;
-						matrix33 = -recSqrt6;
-					) :
-					(
-						// Option 6: front left-right up [ FLU, FRU, FD, B ]
-						slider1 == 6 ?
-						(
-							/*
-							[ 0.5, sqrt3Div6, recSqrt2, recSqrt6 ],
-							[ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6 ],
-							[ 0.5, sqrt3Div6, 0, sqrt6Div3.neg ],
-							[ 0.5, sqrt3Div2.neg, 0, 0 ]
-							*/
-							
-							matrix00 =  0.5;
-							matrix01 =  sqrt3Div6;
-							matrix02 =  recSqrt2;
-							matrix03 =  recSqrt6;
+            matrix30 =  0.5;
+            matrix31 = -sqrt3Div6;
+            matrix32 = -recSqrt2;
+            matrix33 = -recSqrt6;
+          ) :
+          (
+            // Option 6: front left-right up [ FLU, FRU, FD, B ]
+            slider1 == 6 ?
+            (
+              /*
+              [ 0.5, sqrt3Div6, recSqrt2, recSqrt6 ],
+              [ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6 ],
+              [ 0.5, sqrt3Div6, 0, sqrt6Div3.neg ],
+              [ 0.5, sqrt3Div2.neg, 0, 0 ]
+              */
+              
+              matrix00 =  0.5;
+              matrix01 =  sqrt3Div6;
+              matrix02 =  recSqrt2;
+              matrix03 =  recSqrt6;
 
-							matrix10 =  0.5;
-							matrix11 =  sqrt3Div6;
-							matrix12 = -recSqrt2;
-							matrix13 =  recSqrt6;
+              matrix10 =  0.5;
+              matrix11 =  sqrt3Div6;
+              matrix12 = -recSqrt2;
+              matrix13 =  recSqrt6;
 
-							matrix20 =  0.5;
-							matrix21 =  sqrt3Div6;
-							matrix22 = 0.;
-							matrix23 = -sqrt6Div3;
+              matrix20 =  0.5;
+              matrix21 =  sqrt3Div6;
+              matrix22 =  0.;
+              matrix23 = -sqrt6Div3;
 
-							matrix30 =  0.5;
-							matrix31 = -sqrt3Div2;
-							matrix32 =  0.;
-							matrix33 =  0.;
-						) :
-						(
-							// Option 7: front left-right down [ FLD, FRD, FU, B ]
-							/*
-							[ 0.5, sqrt3Div6, recSqrt2, recSqrt6.neg ],
-							[ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6.neg ],
-							[ 0.5, sqrt3Div6, 0, sqrt6Div3 ],
-							[ 0.5, sqrt3Div2.neg, 0, 0 ]
-							*/
-							
-							matrix00 =  0.5;
-							matrix01 =  sqrt3Div6;
-							matrix02 =  recSqrt2;
-							matrix03 = -recSqrt6;
+              matrix30 =  0.5;
+              matrix31 = -sqrt3Div2;
+              matrix32 =  0.;
+              matrix33 =  0.;
+            ) :
+            (
+              // Option 7: front left-right down [ FLD, FRD, FU, B ]
+              /*
+              [ 0.5, sqrt3Div6, recSqrt2, recSqrt6.neg ],
+              [ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6.neg ],
+              [ 0.5, sqrt3Div6, 0, sqrt6Div3 ],
+              [ 0.5, sqrt3Div2.neg, 0, 0 ]
+              */
+              
+              matrix00 =  0.5;
+              matrix01 =  sqrt3Div6;
+              matrix02 =  recSqrt2;
+              matrix03 = -recSqrt6;
 
-							matrix10 =  0.5;
-							matrix11 =  sqrt3Div6;
-							matrix12 = -recSqrt2;
-							matrix13 = -recSqrt6;
+              matrix10 =  0.5;
+              matrix11 =  sqrt3Div6;
+              matrix12 = -recSqrt2;
+              matrix13 = -recSqrt6;
 
-							matrix20 =  0.5;
-							matrix21 =  sqrt3Div6;
-							matrix22 =  0.;
-							matrix23 =  sqrt6Div3;
+              matrix20 =  0.5;
+              matrix21 =  sqrt3Div6;
+              matrix22 =  0.;
+              matrix23 =  sqrt6Div3;
 
-							matrix30 =  0.5;
-							matrix31 = -sqrt3Div2;
-							matrix32 =  0.5;
-							matrix33 =  0.;
-						);
+              matrix30 =  0.5;
+              matrix31 = -sqrt3Div2;
+              matrix32 =  0.;
+              matrix33 =  0.;
+            );
 
-					);
+          );
 
-				);
+        );
 
-			);
+      );
 
-		);
-	);
+    );
+  );
 );
 
 
@@ -325,25 +325,25 @@ slider1 == 0 ?
 // Option 0: Decorrelated (on the sphere)
 slider2 == 0 ?
 (
-	g0 = sqrt(2./3.);
+  g0 = sqrt(2./3.);
 ) :
 (
-	// Option 1: Canonical
-	slider2 == 1 ?
-	(
-		g0 = 1.;
-	) :
-	(
-		// Option 2: Unscaled, W_gain = 1
-		slider2 == 2 ?
-		(
-			g0 = sqrt(2.);
-		) :
-		// Option 3: Cardioid
-		(
-			g0 = sqrt(6.);
-		);
-	);
+  // Option 1: Canonical
+  slider2 == 1 ?
+  (
+    g0 = 1.;
+  ) :
+  (
+    // Option 2: Unscaled, W_gain = 1
+    slider2 == 2 ?
+    (
+      g0 = sqrt(2.);
+    ) :
+    // Option 3: Cardioid
+    (
+      g0 = sqrt(6.);
+    );
+  );
 );
 
 
