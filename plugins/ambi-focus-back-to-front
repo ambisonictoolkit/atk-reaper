@@ -1,0 +1,101 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net 
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net 
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+	Class: AtoB
+	A-format to B-format encoder. Encodes to a variety of tetrahedral orientations and W channel weights.
+---------------------------------------------------------------------
+*/
+
+
+desc: A-format to B-format encoder. Encodes to a variety of tetrahedral orientations and W channel weights.
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+slider1:0<0,7,1{orthogonal (front left up) [FLU FRD BLD BRU], front left down [FLD FRU BLU BRD], front left-right [FL FR BU BD], front up-down [FU FD BL BR], front & back down [F BD BLU BRU], front & back up [F BU BLD BRD], front left-right up [FLU FRU FD B], front left-right down [FLD FRD FU B] }>orientation
+slider2<-1,1,0.01>back - normal - front
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+angle = slider1 * 3.14159265359 * 0.5;
+
+// zero matrix, but commenting out the ones that we'll calculate afterwards:
+
+//matrix00 = 0.;
+//matrix01 = 0.;
+matrix02 = 0.;
+matrix03 = 0.;
+
+//matrix10 = 0.;
+//matrix11 = 0.;
+matrix12 = 0.;
+matrix13 = 0.;
+
+matrix20 = 0.;
+matrix21 = 0.;
+//matrix22 = 0.;
+matrix23 = 0.;
+
+matrix30 = 0.;
+matrix31 = 0.;
+matrix32 = 0.;
+//matrix33 = 0.;
+
+matrix00 = 1. / (1. + sin(abs(angle)));
+matrix11 = matrix00;
+matrix22 = cos(angle) / matrix00;
+matrix33 = matrix22;
+
+// This is an intermediate calculation for efficiency:
+matrix01 = sin(angle) / (1. + sin(abs(angle)));
+
+matrix10 = sqrt(2) * matrix01;
+matrix01 = matrix01 / sqrt(2);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Matrix multiplication with input signal:
+spl0 = wIn * matrix00 + xIn * matrix01 + yIn * matrix02 + zIn * matrix03;
+spl1 = wIn * matrix10 + xIn * matrix11 + yIn * matrix12 + zIn * matrix13;
+spl2 = wIn * matrix20 + xIn * matrix21 + yIn * matrix22 + zIn * matrix23;
+spl3 = wIn * matrix30 + xIn * matrix31 + yIn * matrix32 + zIn * matrix33;
