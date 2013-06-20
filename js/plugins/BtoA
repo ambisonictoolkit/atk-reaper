@@ -341,7 +341,7 @@ slider2 == 0 ?
 		) :
 		// Option 3: Cardioid
 		(
-			go = sqrt(6.);
+			g0 = sqrt(6.);
 		);
 	);
 );
