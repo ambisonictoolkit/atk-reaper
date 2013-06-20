@@ -24,13 +24,16 @@ end
 def copyPluginsToReaper
   
   if mac?
-    
+        
     # Create plugin folder if it doesn't exist already
     pluginFolderPath = File.expand_path("~") + "/Library/Application Support/REAPER/Effects/AmbiToolkit"
+    testPluginFolderPath = pluginFolderPath + "/test-plugins"
+    
     FileUtils.mkdir_p(pluginFolderPath) unless File.exists?(pluginFolderPath)
     
     # Copy plugins
     `cp -r "../plugins/" "#{pluginFolderPath}"`
+    `cp -r "../test-plugins/" "#{testPluginFolderPath}"`
   end
   
   if win?
