@@ -1,0 +1,531 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: AtoB
+  A to B format encoder for a variety of tetrahedral orientations and W channel weights.
+---------------------------------------------------------------------
+*/
+
+desc: A to B format encoder for a variety of tetrahedral orientations and W channel weights.
+
+in_pin:A
+in_pin:B
+in_pin:C
+in_pin:D
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+slider1:0<0,7,1{Front Left Up [FLU FRD BLD BRU], Front Left Down [FLD FRU BLU BRD], Front Left-Right [FL FR BU BD], Front Up-Down [FU FD BL BR], Front & Back Down [F BD BLU BRU], Front & Back Up [F BU BLD BRD], Front Left-Right Up [FLU FRU FD B], Front Left-Right Down [FLD FRD FU B] }>Orientation
+
+slider2:0<-0,3,0{Decorrelated (Planewaves), Canonical, Unscaled, Cardioid}>Weight
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Some constants:
+recSqrt2   = 1. / sqrt(2.);
+sqrt3Div2   = sqrt(3.) / 2.;
+sqrt3Div6   = sqrt(3.) / 6.;
+sqrt6Div3   = sqrt(6.) / 3.;
+recSqrt6   = 1. / sqrt(6.);
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+/* Invert the 4x4 matrix with coefficients matrix00..matrix33
+
+  The function for inverting a 4x4 matrix is lifted of StackOverflow:
+  http://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix
+
+  The code there is itself lifted of the MESA implementation of the GLU library:
+  http://www.mesa3d.org/
+*/
+function invertMatrix()
+(
+  inv00 =  matrix11 * matrix22 * matrix33 -
+           matrix11 * matrix23 * matrix32 -
+           matrix21 * matrix12 * matrix33 +
+           matrix21 * matrix13 * matrix32 +
+           matrix31 * matrix12 * matrix23 -
+           matrix31 * matrix13 * matrix22;
+
+  inv10 = -matrix10 * matrix22 * matrix33 +
+           matrix10 * matrix23 * matrix32 +
+           matrix20 * matrix12 * matrix33 -
+           matrix20 * matrix13 * matrix32 -
+           matrix30 * matrix12 * matrix23 +
+           matrix30 * matrix13 * matrix22;
+
+  inv20 =  matrix10 * matrix21 * matrix33 -
+           matrix10 * matrix23 * matrix31 -
+           matrix20 * matrix11 * matrix33 +
+           matrix20 * matrix13 * matrix31 +
+           matrix30 * matrix11 * matrix23 -
+           matrix30 * matrix13 * matrix21;
+
+  inv30 = -matrix10 * matrix21 * matrix32 +
+           matrix10 * matrix22 * matrix31 +
+           matrix20 * matrix11 * matrix32 -
+           matrix20 * matrix12 * matrix31 -
+           matrix30 * matrix11 * matrix22 +
+           matrix30 * matrix12 * matrix21;
+
+  inv01 = -matrix01 * matrix22 * matrix33 +
+           matrix01 * matrix23 * matrix32 +
+           matrix21 * matrix02 * matrix33 -
+           matrix21 * matrix03 * matrix32 -
+           matrix31 * matrix02 * matrix23 +
+           matrix31 * matrix03 * matrix22;
+
+  inv11 =  matrix00 * matrix22 * matrix33 -
+           matrix00 * matrix23 * matrix32 -
+           matrix20 * matrix02 * matrix33 +
+           matrix20 * matrix03 * matrix32 +
+           matrix30 * matrix02 * matrix23 -
+           matrix30 * matrix03 * matrix22;
+
+  inv21 = -matrix00 * matrix21 * matrix33 +
+           matrix00 * matrix23 * matrix31 +
+           matrix20 * matrix01 * matrix33 -
+           matrix20 * matrix03 * matrix31 -
+           matrix30 * matrix01 * matrix23 +
+           matrix30 * matrix03 * matrix21;
+
+  inv31 =  matrix00 * matrix21 * matrix32 -
+           matrix00 * matrix22 * matrix31 -
+           matrix20 * matrix01 * matrix32 +
+           matrix20 * matrix02 * matrix31 +
+           matrix30 * matrix01 * matrix22 -
+           matrix30 * matrix02 * matrix21;
+
+  inv02 =  matrix01 * matrix12 * matrix33 -
+           matrix01 * matrix13 * matrix32 -
+           matrix11 * matrix02 * matrix33 +
+           matrix11 * matrix03 * matrix32 +
+           matrix31 * matrix02 * matrix13 -
+           matrix31 * matrix03 * matrix12;
+
+  inv12 = -matrix00 * matrix12 * matrix33 +
+           matrix00 * matrix13 * matrix32 +
+           matrix10 * matrix02 * matrix33 -
+           matrix10 * matrix03 * matrix32 -
+           matrix30 * matrix02 * matrix13 +
+           matrix30 * matrix03 * matrix12;
+
+  inv22 =  matrix00 * matrix11 * matrix33 -
+           matrix00 * matrix13 * matrix31 -
+           matrix10 * matrix01 * matrix33 +
+           matrix10 * matrix03 * matrix31 +
+           matrix30 * matrix01 * matrix13 -
+           matrix30 * matrix03 * matrix11;
+
+  inv32 = -matrix00 * matrix11 * matrix32 +
+           matrix00 * matrix12 * matrix31 +
+           matrix10 * matrix01 * matrix32 -
+           matrix10 * matrix02 * matrix31 -
+           matrix30 * matrix01 * matrix12 +
+           matrix30 * matrix02 * matrix11;
+
+  inv03 = -matrix01 * matrix12 * matrix23 +
+           matrix01 * matrix13 * matrix22 +
+           matrix11 * matrix02 * matrix23 -
+           matrix11 * matrix03 * matrix22 -
+           matrix21 * matrix02 * matrix13 +
+           matrix21 * matrix03 * matrix12;
+
+  inv13 =  matrix00 * matrix12 * matrix23 -
+           matrix00 * matrix13 * matrix22 -
+           matrix10 * matrix02 * matrix23 +
+           matrix10 * matrix03 * matrix22 +
+           matrix20 * matrix02 * matrix13 -
+           matrix20 * matrix03 * matrix12;
+
+  inv23 = -matrix00 * matrix11 * matrix23 +
+           matrix00 * matrix13 * matrix21 +
+           matrix10 * matrix01 * matrix23 -
+           matrix10 * matrix03 * matrix21 -
+           matrix20 * matrix01 * matrix13 +
+           matrix20 * matrix03 * matrix11;
+
+  inv33 =  matrix00 * matrix11 * matrix22 -
+           matrix00 * matrix12 * matrix21 -
+	         matrix10 * matrix01 * matrix22 +
+           matrix10 * matrix02 * matrix21 +
+           matrix20 * matrix01 * matrix12 -
+           matrix20 * matrix02 * matrix11;
+					
+  determinant = matrix00 * inv00 +
+	              matrix01 * inv10 +
+				        matrix02 * inv20 +
+				        matrix03 * inv30;
+
+  /* Might be difficult to check this in Reaper/JS, but it might also be redundant?
+	if (determinant == 0)
+    return false;
+	*/
+
+  determinant = 1.0 / determinant;
+
+  matrix00 = inv00 * determinant;
+	matrix01 = inv01 * determinant;
+	matrix02 = inv02 * determinant;
+	matrix03 = inv03 * determinant;
+	
+	matrix10 = inv10 * determinant;
+	matrix11 = inv11 * determinant;
+	matrix12 = inv12 * determinant;
+	matrix13 = inv13 * determinant;
+	
+	matrix20 = inv20 * determinant;
+	matrix21 = inv21 * determinant;
+	matrix22 = inv22 * determinant;
+	matrix23 = inv23 * determinant;
+	
+	matrix30 = inv30 * determinant;
+	matrix31 = inv31 * determinant;
+	matrix32 = inv32 * determinant;
+	matrix33 = inv33 * determinant;
+);
+
+
+// Transformation matrix depends on direction
+// This is the same code as for BtoA, but at the end we invert the matrix
+
+// Option 0: orthogonal (front left up) [ FLU, FRD, BLD, BRU ]
+slider1 == 0 ?
+(
+  /*
+  [ 0.5, 0.5, 0.5, 0.5 ],
+  [ 0.5, 0.5, -0.5, -0.5 ],
+  [ 0.5, -0.5, 0.5, -0.5 ],
+  [ 0.5, -0.5, -0.5, 0.5 ]
+  */
+ 
+  matrix00 =  0.5;
+  matrix01 =  0.5;
+  matrix02 =  0.5;
+  matrix03 =  0.5;
+
+  matrix10 =  0.5;
+  matrix11 =  0.5;
+  matrix12 = -0.5;
+  matrix13 = -0.5;
+
+  matrix20 =  0.5;
+  matrix21 = -0.5;
+  matrix22 =  0.5;
+  matrix23 = -0.5;
+
+  matrix30 =  0.5;
+  matrix31 = -0.5;
+  matrix32 = -0.5;
+  matrix33 =  0.5;
+) :
+(
+  // Option 1: front left down [ FLD, FRU, BLU, BRD ]
+  slider1 == 1 ?
+  (
+    /*
+    [ 0.5, 0.5, 0.5, -0.5 ],
+    [ 0.5, 0.5, -0.5, 0.5 ],
+    [ 0.5, -0.5, 0.5, 0.5 ],
+    [ 0.5, -0.5, -0.5, -0.5 ]
+    */
+   
+    matrix00 =  0.5;
+    matrix01 =  0.5;
+    matrix02 =  0.5;
+    matrix03 = -0.5;
+
+    matrix10 =  0.5;
+    matrix11 =  0.5;
+    matrix12 = -0.5;
+    matrix13 =  0.5;
+
+    matrix20 =  0.5;
+    matrix21 = -0.5;
+    matrix22 =  0.5;
+    matrix23 =  0.5;
+
+    matrix30 =  0.5;
+    matrix31 = -0.5;
+    matrix32 = -0.5;
+    matrix33 = -0.5;
+  ) :
+  (
+    // Option 2: front left-right [ FL, FR, BU, BD ]
+    slider1 == 2 ?
+    (
+      /*
+      [ 0.5, 0.5, recSqrt2, 0 ],
+      [ 0.5, 0.5, recSqrt2.neg, 0 ],
+      [ 0.5, -0.5, 0, recSqrt2 ],
+      [ 0.5, -0.5, 0, recSqrt2.neg ]
+      */
+     
+      matrix00 =  0.5;
+      matrix01 =  0.5;
+      matrix02 =  recSqrt2;
+      matrix03 =  0.;
+
+      matrix10 =  0.5;
+      matrix11 =  0.5;
+      matrix12 = -recSqrt2;
+      matrix13 =  0.;
+
+      matrix20 =  0.5;
+      matrix21 = -0.5;
+      matrix22 =  0.;
+      matrix23 =  recSqrt2;
+
+      matrix30 =  0.5;
+      matrix31 = -0.5;
+      matrix32 =  0.;
+      matrix33 = -recSqrt2;
+    ) :
+    (
+      // Option 3: front up-down [ FU, FD, BL, BR ]
+      slider1 == 3 ?
+      (
+        /*
+        [ 0.5, 0.5, 0, recSqrt2 ],
+        [ 0.5, 0.5, 0, recSqrt2.neg ],
+        [ 0.5, -0.5, recSqrt2, 0 ],
+        [ 0.5, -0.5, recSqrt2.neg, 0 ]
+        */
+       
+        matrix00 =  0.5;
+        matrix01 =  0.5;
+        matrix02 =  0.;
+        matrix03 =  recSqrt2;
+
+        matrix10 =  0.5;
+        matrix11 =  0.5;
+        matrix12 =  0.;
+        matrix13 = -recSqrt2;
+
+        matrix20 =  0.5;
+        matrix21 = -0.5;
+        matrix22 =  recSqrt2;
+        matrix23 =  0.;
+
+        matrix30 =  0.5;
+        matrix31 = -0.5;
+        matrix32 = -recSqrt2;
+        matrix33 =  0.;
+      ) :
+      (
+        // Option 4: front & back down [ F, BD, BLU, BRU ]
+        slider1 == 4 ?
+        (
+          /*
+          [ 0.5, sqrt3Div2, 0, 0 ],
+          [ 0.5, sqrt3Div6.neg, 0, sqrt6Div3.neg ],
+          [ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6 ],
+          [ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6 ]
+          */
+         
+          matrix00 =  0.5;
+          matrix01 =  sqrt3Div2;
+          matrix02 =  0.;
+          matrix03 =  0.;
+
+          matrix10 =  0.5;
+          matrix11 = -sqrt3Div6;
+          matrix12 =  0.;
+          matrix13 = -sqrt6Div3;
+
+          matrix20 =  0.5;
+          matrix21 = -sqrt3Div6;
+          matrix22 =  recSqrt2;
+          matrix23 =  recSqrt6;
+
+          matrix30 =  0.5;
+          matrix31 = -sqrt3Div6;
+          matrix32 = -recSqrt2;
+          matrix33 =  recSqrt6;
+        ) :
+        (
+          // Option 5: front & back up [ F, BU, BLD, BRD ]
+          slider1 == 5 ?
+          (
+            /*
+            [ 0.5, sqrt3Div2, 0, 0 ],
+            [ 0.5, sqrt3Div6.neg, 0, sqrt6Div3 ],
+            [ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6.neg ],
+            [ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6.neg ]
+            */
+           
+            matrix00 =  0.5;
+            matrix01 =  sqrt3Div2;
+            matrix02 =  0.;
+            matrix03 =  0.;
+
+            matrix10 =  0.5;
+            matrix11 = -sqrt3Div6;
+            matrix12 =  0.0;
+            matrix13 =  sqrt6Div3;
+
+            matrix20 =  0.5;
+            matrix21 = -sqrt3Div6;
+            matrix22 =  recSqrt2;
+            matrix23 = -recSqrt6;
+
+            matrix30 =  0.5;
+            matrix31 = -sqrt3Div6;
+            matrix32 = -recSqrt2;
+            matrix33 = -recSqrt6;
+          ) :
+          (
+            // Option 6: front left-right up [ FLU, FRU, FD, B ]
+            slider1 == 6 ?
+            (
+              /*
+              [ 0.5, sqrt3Div6, recSqrt2, recSqrt6 ],
+              [ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6 ],
+              [ 0.5, sqrt3Div6, 0, sqrt6Div3.neg ],
+              [ 0.5, sqrt3Div2.neg, 0, 0 ]
+              */
+             
+              matrix00 =  0.5;
+              matrix01 =  sqrt3Div6;
+              matrix02 =  recSqrt2;
+              matrix03 =  recSqrt6;
+
+              matrix10 =  0.5;
+              matrix11 =  sqrt3Div6;
+              matrix12 = -recSqrt2;
+              matrix13 =  recSqrt6;
+
+              matrix20 =  0.5;
+              matrix21 =  sqrt3Div6;
+              matrix22 =  0.;
+              matrix23 = -sqrt6Div3;
+
+              matrix30 =  0.5;
+              matrix31 = -sqrt3Div2;
+              matrix32 =  0.;
+              matrix33 =  0.;
+            ) :
+            (
+              // Option 7: front left-right down [ FLD, FRD, FU, B ]
+              /*
+              [ 0.5, sqrt3Div6, recSqrt2, recSqrt6.neg ],
+              [ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6.neg ],
+              [ 0.5, sqrt3Div6, 0, sqrt6Div3 ],
+              [ 0.5, sqrt3Div2.neg, 0, 0 ]
+              */
+             
+              matrix00 =  0.5;
+              matrix01 =  sqrt3Div6;
+              matrix02 =  recSqrt2;
+              matrix03 = -recSqrt6;
+
+              matrix10 =  0.5;
+              matrix11 =  sqrt3Div6;
+              matrix12 = -recSqrt2;
+              matrix13 = -recSqrt6;
+
+              matrix20 =  0.5;
+              matrix21 =  sqrt3Div6;
+              matrix22 =  0.;
+              matrix23 =  sqrt6Div3;
+
+              matrix30 =  0.5;
+              matrix31 = -sqrt3Div2;
+              matrix32 =  0.;
+              matrix33 =  0.;
+            );
+
+          );
+
+        );
+
+      );
+
+    );
+  );
+);
+
+
+// Weight:
+// Option 0: Decorrelated (on the sphere)
+slider2 == 0 ?
+(
+  g0 = sqrt(2./3.);
+) :
+(
+  // Option 1: Canonical
+  slider2 == 1 ?
+  (
+    g0 = 1.;
+  ) :
+  (
+    // Option 2: Unscaled, W_gain = 1
+    slider2 == 2 ?
+    (
+      g0 = sqrt(2.);
+    ) :
+    // Option 3: Cardioid
+    (
+      g0 = sqrt(6.);
+    );
+  );
+);
+
+
+// Compensate matrix for weight:
+matrix00 = g0 * matrix00;
+matrix10 = g0 * matrix10;
+matrix20 = g0 * matrix20;
+matrix30 = g0 * matrix30;
+
+// As compared to BtoA we now invert the matrix
+invertMatrix();
+
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Matrix multiplication with input signal:
+spl0 = wIn * matrix00 + xIn * matrix01 + yIn * matrix02 + zIn * matrix03;
+spl1 = wIn * matrix10 + xIn * matrix11 + yIn * matrix12 + zIn * matrix13;
+spl2 = wIn * matrix20 + xIn * matrix21 + yIn * matrix22 + zIn * matrix23;
+spl3 = wIn * matrix30 + xIn * matrix31 + yIn * matrix32 + zIn * matrix33;
