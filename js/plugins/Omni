@@ -1,0 +1,69 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: Omni
+  Encode mono signal as omnidirectional soundfield
+
+  An omnidirectional soundfield can be regarded in two ways:
+  A soundfield with an infinite number of planewaves arriving in all
+  directions, or a soundfield with no directions. In a well aligned,
+  dampend studio environment, this usually sounds "in the head",
+  while in concert hall listening usually appears as omnipresent.
+
+  To control the soundfield, Push and Focus can be applied to
+  either "push" or "focus" an omnidirectional soundfield into a
+  planewave, giving the soundfield an angle of arrival.
+
+  Reaper is treating mono files as stereo files with identical
+  content for left and right channel. Hence this plugin is set to
+  expect a stereo signal in. The stereo signal will be mixed to mono
+  before encoding.
+---------------------------------------------------------------------
+*/
+
+desc: Encode mono signal as omnidirectional soundfield
+
+in_pin:L
+in_pin:R
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+halfRecSqrt2 = 0.5 / sqrt(2.);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+spl0 = (spl0+spl1)*halfRecSqrt2;
+spl1 = 0.;
+spl2 = 0.;
+spl3 = 0.;
