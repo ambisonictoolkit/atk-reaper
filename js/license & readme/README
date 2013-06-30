@@ -175,3 +175,16 @@ BRIAN PAUL BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
 AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -----------------------------------------------------------------------
+
+Some background images are generated in Cycling'74 Max using the
+ambimonitor external, part of Ambisonics Externals for MaxMSP.
+
+http://www.icst.net/research/downloads/ambisonics-externals-for-maxmsp/
+
+ambimonitor is copyright © 2006 - 2011 by Philippe Kocher
+ICST Institute for Computer Music and Sound Technology
+Zurich University of the Arts
+
+Released under the terms of the GNU Lesser General Public License (LGPL)
+
+-----------------------------------------------------------------------
