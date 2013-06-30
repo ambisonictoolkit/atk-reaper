@@ -52,7 +52,11 @@ out_pin:Z
 Initialisation
 **********************************************************/
 @init
+// Constants
 recSqrt2 = 1./sqrt(2.);
+
+// Flag indicating that the plugin has not been fully initialised yet
+initialised = 0;
 
 
 /**********************************************************
@@ -66,15 +70,41 @@ sinAzimuth   = sin(azimuth);
 cosElevation = cos(elevation);
 sinElevation = sin(elevation);
 
+// Set coefficients if the plugin has not yet been initialised
+initialised == 0 ?
+(
+  coeff1 = cosAzimuth * cosElevation;
+  coeff2 = sinAzimuth * cosElevation;
+  coeff3 =              sinElevation;
+
+  // Now we are fully initialised
+  initialised = 1;
+)
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+inverseSamplesblock = 1. / samplesblock;
+// Linear ramp to new coefficient values over the vector to prevent clicks
+inc1 = ( (cosAzimuth * cosElevation) - coeff1) * inverseSamplesblock;
+inc2 = ( (sinAzimuth * cosElevation) - coeff2) * inverseSamplesblock;
+inc3 = (               sinElevation  - coeff3) * inverseSamplesblock;
 
 
 /**********************************************************
 Calculate audio sample
 **********************************************************/
-@sample 
+@sample
+// Mix left and right as mono signal
 input = 0.5 * (spl0 + spl1);
 
+coeff1 = coeff1 + inc1;
+coeff2 = coeff2 + inc2;
+coeff3 = coeff3 + inc3;
+
 spl0 =  input * recSqrt2;
-spl1 =  input * cosAzimuth * cosElevation;
-spl2 = -input * sinAzimuth * cosElevation;
-spl3 =  input              * sinElevation;
+spl1 =  input * coeff1;
+spl2 = -input * coeff2;
+spl3 =  input * coeff3;
