@@ -1,0 +1,104 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: RotateTiltTumble
+  First Order Ambisonic (FOA) multi-axes rotation transformer
+---------------------------------------------------------------------
+*/
+
+
+desc: Rotate a first order ambisonic signal (B-format) around the z, x and y axes.
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+// Slider range is set to [-360,360] rather than [-180, 180] for more flexible scripting of rotating movements
+
+slider1:0<-180,180,1>Rotate
+slider2:0<-180,180,1>Tilt
+slider3:0<-180,180,1>Tumble
+
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+deg2rad = $pi / 180.;
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+// We use SpatDIF (navigational) coordinate system rather than mathematical.
+// Hence we need to invert the sign of sinRotation
+rotateAngle = slider1 * deg2rad;
+cosRotation = cos(rotateAngle);
+sinRotation = sin(rotateAngle);
+
+tiltAngle = slider2 * deg2rad;
+cosTilt = cos(tiltAngle);
+sinTilt = sin(tiltAngle);
+
+// We use SpatDIF (navigational) coordinate system rather than mathematical.
+// Hence we need to invert the sign of sinTumble
+tumbleAngle = slider3 * deg2rad;
+cosTumble = cos(tumbleAngle);
+sinTumble = sin(tumbleAngle);
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+// w remains unchanged:
+//spl0 = spl0;
+
+// Rotation only affects x and y:
+x = spl1;
+y = spl2;
+// We use SpatDIF (navigational) coordinate system rather than mathematical.
+// Hence we need to invert sign of sinRotation as compared to Malham's formula.
+spl1 =  x * cosRotation + y * sinRotation;
+spl2 = -x * sinRotation + y * cosRotation;
+
+// Tilt only affects y and z:
+y = spl2;
+z = spl3;
+spl2 = y * cosTilt - z * sinTilt;
+spl3 = y * sinTilt + z * cosTilt;
+
+// Tumble only affects x and z:
+x = spl1;
+z = spl3;
+spl1 = x * cosTumble - z * sinTumble;
+spl3 = x * sinTumble + z * cosTumble;
