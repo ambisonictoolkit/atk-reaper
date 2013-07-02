@@ -44,9 +44,9 @@ out_pin:Z
 
 // Slider range is set to [-360,360] rather than [-180, 180] for more flexible scripting of rotating movements
 
-slider1:0<-180,180,1>Rotate
-slider2:0<-180,180,1>Tilt
-slider3:0<-180,180,1>Tumble
+slider1:0<-180,180,1>Rotate (mouse)
+slider2:0<-180,180,1>Tilt (shift + mouse)
+slider3:0<-180,180,1>Tumble (cmd + mouse)
 
 
 
@@ -85,7 +85,7 @@ Updated slider value:
 @slider
 
 rotateAngle = slider1 * deg2rad;
-tiltAngle = slider2 * deg2rad;
+tiltAngle   = slider2 * deg2rad;
 tumbleAngle = slider3 * deg2rad;
 
 calculateCoefficients();
@@ -133,8 +133,9 @@ mouse_cap == 1 ?
   mouseY = mouse_y - centerY;
   rotateAngle = atan2(mouseX, -mouseY);
   slider1 = rotateAngle * rad2deg;
-  // Notify GUI that azimuth has changed, and update coefficients
-  sliderchange(slider1);
+  
+  // Notify GUI that rotation has changed, and update coefficients
+  slider_automate(slider1);
   calculateCoefficients();
 );
 
@@ -152,8 +153,17 @@ gfx_rectto(posX+squareSize, posY+squareSize);
 // Draw tilt indicator as interactive (shift + mouse) blue square and plane
 mouse_cap == 9 ?
 (
-  // Draw square?
-  gfx_x = 20;
+  mouseX = mouse_x - centerX;
+  mouseX > radius ? mouseX = radius : 
+  (
+    mouseX < -radius ? mouseX = -radius;
+  );
+  tiltAngle = mouseX  * $pi / radius;
+  slider2 = tiltAngle * rad2deg;
+  
+  // Notify GUI/automation that tilt has changed, and update coefficients
+  slider_automate(slider2);
+  calculateCoefficients();
 );
 
 // Set color
@@ -190,13 +200,18 @@ gfx_lineto(centerX - tiltDeltaX, centerY - radiusFraction - tiltDeltaY, 1.);
 // CMD + mouse: Draw tumble indicator as interactive green square
 mouse_cap == 5 ?
 (
-  gfx_x = 20;
-  gfx_y = 20;
+  mouseY = centerY - mouse_y;
+  mouseY > radius ? mouseY = radius : 
+  (
+    mouseY < -radius ? mouseY = -radius;
+  );
+  mouseY = mouseY * $pi / radius;
+  tumbleAngle = mouseY;
+  slider3 = tumbleAngle * rad2deg;
   
-  gfx_r = 0.;
-  gfx_g = 0;
-  gfx_b = 1;
-  gfx_rectto(30, 30);
+  // Notify GUI/automation that tumble has changed, and update coefficients
+  slider_automate(slider3);
+  calculateCoefficients();
 );
 
 // Set color
