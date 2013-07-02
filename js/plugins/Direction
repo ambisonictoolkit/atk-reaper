@@ -52,8 +52,8 @@ desc: Encode mono signal as directional (planewave) soundfield
 
 filename:0,HorizontalBackground.png
 
-slider1:0<-180,180,1>Azimuth (degrees)
-slider2:0<-90,90,1>Elevation (degrees)
+slider1:0<-180,180,1>Azimuth
+slider2:0<-90,90,1>Elevation
 
 in_pin:L
 in_pin:R
@@ -68,10 +68,14 @@ out_pin:Z
 Initialisation
 **********************************************************/
 @init
+
+azimuth   = 0;
+elevation = 0.;
+
 // Constants
 recSqrt2 = 1./sqrt(2.);
-rad2deg = 180./$pi;
-deg2rad = $pi/180.;
+rad2deg = 180. / $pi;
+deg2rad = $pi / 180.;
 
 posX = 200;
 posY = 200;
@@ -102,8 +106,10 @@ function calculateCoefficients()
 Updated slider value:
 **********************************************************/
 @slider
-azimuth      = slider1*deg2rad;
-elevation    = slider2*deg2rad;
+
+azimuth      = slider1 * deg2rad;
+elevation    = slider2 * deg2rad;
+
 calculateCoefficients();
 
 
@@ -111,7 +117,9 @@ calculateCoefficients();
 Preprocessing prior to audio vector processing.
 **********************************************************/
 @block
+
 inverseSamplesblock = 1. / samplesblock;
+
 // Linear ramp to new coefficient values over the vector to prevent clicks
 inc1 = ( (cosAzimuth * cosElevation) - coeff1) * inverseSamplesblock;
 inc2 = ( (sinAzimuth * cosElevation) - coeff2) * inverseSamplesblock;
@@ -124,8 +132,8 @@ Custom graphic interface
 @gfx 400 300
 
 // Set colors
-gfx_a=1;
-gfx_r=gfx_g=gfx_b=1;
+gfx_a = 1;
+gfx_r = gfx_g = gfx_b = 1;
 
 // Determine geometry
 centerX = gfx_w  * 0.5;
@@ -159,23 +167,26 @@ mouse_cap == 1 ?
   calculateCoefficients();
 );
 
-posX = centerX + radius*(sin(azimuth) * cos(elevation));
-posY = centerY - radius*(cos(azimuth) * cos(elevation));
+posX = centerX + radius*(sinAzimuth * cosElevation);
+posY = centerY - radius*(cosAzimuth * cosElevation);
 
-// Red square as interactive direction indicator
-gfx_r = 1;
-gfx_g = 0;
-gfx_b = 0;;
+// Red square as interactive direction indicator, color tint depends on elevation
+gfx_r =  1.0 + 0.3 * sinElevation;
+gfx_g =  0.5 * sinElevation;
+gfx_b =  0.5 * sinElevation;
 
-gfx_x = posX-5;
-gfx_y = posY-5;
-gfx_rectto(posX+5, posY+5);
+squareSize = 2. * sinElevation + 6.;
+
+gfx_x = posX-squareSize;
+gfx_y = posY-squareSize;
+gfx_rectto(posX+squareSize, posY+squareSize);
 
 
 /**********************************************************
 Calculate audio sample
 **********************************************************/
 @sample
+
 // Mix left and right as mono signal
 input = 0.5 * (spl0 + spl1);
 
