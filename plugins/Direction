@@ -163,7 +163,7 @@ mouse_cap == 1 ?
   azimuth = atan2(mouseX, -mouseY);
   slider1 = azimuth * rad2deg;
   // Notify GUI that azimuth has changed, and update coefficients
-  sliderchange(slider1);
+  slider_automate(slider1);
   calculateCoefficients();
 );
 
