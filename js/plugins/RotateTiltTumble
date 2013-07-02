@@ -30,6 +30,8 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Rotate a first order ambisonic signal (B-format) around the z, x and y axes.
 
+filename:0,HorizontalBackground.png
+
 in_pin:W
 in_pin:X
 in_pin:Y
@@ -52,29 +54,180 @@ slider3:0<-180,180,1>Tumble
 Initialisation
 **********************************************************/
 @init
-deg2rad = $pi / 180.;
 
+// Constants
+rad2deg  = 180. / $pi;
+deg2rad  = $pi / 180.;
+rad2norm = 1. / $pi;
+
+// Graphics constants:
+squareSize = 5.;
+
+function calculateCoefficients()
+(
+  // We use SpatDIF (navigational) coordinate system rather than mathematical.
+  // Hence we need to invert the sign of sinRotation
+  cosRotation = cos(rotateAngle);
+  sinRotation = sin(rotateAngle);
+  
+  cosTilt = cos(tiltAngle);
+  sinTilt = sin(tiltAngle);
+  
+  // We use SpatDIF (navigational) coordinate system rather than mathematical.
+  // Hence we need to invert the sign of sinTumble
+  cosTumble = cos(tumbleAngle);
+  sinTumble = sin(tumbleAngle);
+);
 
 /**********************************************************
 Updated slider value:
 **********************************************************/
 @slider
 
-// We use SpatDIF (navigational) coordinate system rather than mathematical.
-// Hence we need to invert the sign of sinRotation
 rotateAngle = slider1 * deg2rad;
-cosRotation = cos(rotateAngle);
-sinRotation = sin(rotateAngle);
-
 tiltAngle = slider2 * deg2rad;
-cosTilt = cos(tiltAngle);
-sinTilt = sin(tiltAngle);
-
-// We use SpatDIF (navigational) coordinate system rather than mathematical.
-// Hence we need to invert the sign of sinTumble
 tumbleAngle = slider3 * deg2rad;
-cosTumble = cos(tumbleAngle);
-sinTumble = sin(tumbleAngle);
+
+calculateCoefficients();
+
+
+
+/**********************************************************
+Custom graphic interface
+**********************************************************/
+@gfx 400 300
+
+// Set colors
+gfx_a = 1;
+gfx_r = 1;
+gfx_g = 1;
+gfx_b = 1;
+
+// Determine geometry
+centerX = gfx_w * 0.5;
+centerY = gfx_h * 0.5;
+
+// Is radius controlled by height or width?
+centerX < centerY ? radius = centerX : radius = centerY;
+
+radius = radius - 10;
+
+// Draw background
+coordinatelist[0] = 0;                  //left-most pixel location for source
+coordinatelist[1] = 0;                  //top-most pixel location for source
+coordinatelist[2] = 800;                //width of source
+coordinatelist[3] = 800;                //height of source
+coordinatelist[4] = centerX - radius;   //left-most pixel location of destination
+coordinatelist[5] = centerY - radius;   //top-most pixel location of destination
+coordinatelist[6] = 2 * radius;         //width of destination to fill
+coordinatelist[7] = 2 * radius;         //height of destination to fill
+coordinatelist[8] =0;                   //represents offset from center of image
+coordinatelist[9] =0;                   //represents offset from center of image
+gfx_blitext(0,coordinatelist,0);
+
+
+// Draw rotation indicator as interactive orange square
+mouse_cap == 1 ?
+(
+  mouseX = mouse_x - centerX;
+  mouseY = mouse_y - centerY;
+  rotateAngle = atan2(mouseX, -mouseY);
+  slider1 = rotateAngle * rad2deg;
+  // Notify GUI that azimuth has changed, and update coefficients
+  sliderchange(slider1);
+  calculateCoefficients();
+);
+
+gfx_r =  1.0;
+gfx_g =  0.75;
+gfx_b =  0.5;
+
+posX = centerX + radius* sinRotation;
+posY = centerY - radius*cosRotation;
+
+gfx_x = posX-squareSize;
+gfx_y = posY-squareSize;
+gfx_rectto(posX+squareSize, posY+squareSize);
+
+// Draw tilt indicator as interactive (shift + mouse) blue square and plane
+mouse_cap == 9 ?
+(
+  // Draw square?
+  gfx_x = 20;
+);
+
+// Set color
+gfx_r = 0.5;
+gfx_g = 0.75;
+gfx_b = 1.;
+
+// Draw square
+posX = centerX + tiltAngle * rad2norm * radius;
+gfx_x = posX - squareSize;
+gfx_y = centerY - squareSize;
+gfx_rectto(posX + squareSize, centerY + squareSize);
+
+// Draw plane - gray if the plane is tilted upside down
+cosTilt < 0 ?
+(
+  gfx_r = 0.7;
+  gfx_g = 0.7;
+  gfx_b = 0.7;
+);
+
+tiltDeltaX = radius * cosTilt;
+tiltDeltaY = radius * sinTilt * 0.1;
+radiusFraction = 0.2 * radius;
+
+gfx_x = centerX - tiltDeltaX;
+gfx_y = centerY - radiusFraction - tiltDeltaY;
+gfx_lineto(centerX + tiltDeltaX, centerY - radiusFraction + tiltDeltaY, 1.);
+gfx_lineto(centerX + tiltDeltaX, centerY + radiusFraction - tiltDeltaY, 1.);
+gfx_lineto(centerX - tiltDeltaX, centerY + radiusFraction + tiltDeltaY, 1.);
+gfx_lineto(centerX - tiltDeltaX, centerY - radiusFraction - tiltDeltaY, 1.);
+
+
+// CMD + mouse: Draw tumble indicator as interactive green square
+mouse_cap == 5 ?
+(
+  gfx_x = 20;
+  gfx_y = 20;
+  
+  gfx_r = 0.;
+  gfx_g = 0;
+  gfx_b = 1;
+  gfx_rectto(30, 30);
+);
+
+// Set color
+gfx_r = 0.5;
+gfx_g = 1.;
+gfx_b = 0.75;
+
+// Draw square
+gfx_x = centerX - squareSize;
+posY = centerY - tumbleAngle * rad2norm * radius;
+gfx_y = posY - squareSize;
+gfx_rectto(centerX + squareSize, posY + squareSize);
+
+// Draw plane - gray if the plane is tilted upside down
+cosTumble < 0 ?
+(
+  gfx_r = 0.7;
+  gfx_g = 0.7;
+  gfx_b = 0.7;
+);
+
+tumbleDeltaX = radius * sinTumble * 0.1;
+tumbleDeltaY = radius * cosTumble;
+
+gfx_x = centerX - radiusFraction - tumbleDeltaX;
+gfx_y = centerY - tumbleDeltaY;
+gfx_lineto(centerX - radiusFraction + tumbleDeltaX, centerY + tumbleDeltaY, 1.);
+gfx_lineto(centerX + radiusFraction - tumbleDeltaX, centerY + tumbleDeltaY, 1.);
+gfx_lineto(centerX + radiusFraction + tumbleDeltaX, centerY - tumbleDeltaY, 1.);
+gfx_lineto(centerX - radiusFraction - tumbleDeltaX, centerY - tumbleDeltaY, 1.);
+
 
 /**********************************************************
 Calculate audio sample
