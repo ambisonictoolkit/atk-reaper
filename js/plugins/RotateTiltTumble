@@ -43,7 +43,6 @@ out_pin:Y
 out_pin:Z
 
 // Slider range is set to [-360,360] rather than [-180, 180] for more flexible scripting of rotating movements
-
 slider1:0<-180,180,1>Rotate (mouse)
 slider2:0<-180,180,1>Tilt (shift + mouse)
 slider3:0<-180,180,1>Tumble (cmd + mouse)
@@ -63,6 +62,9 @@ rad2norm = 1. / $pi;
 // Graphics constants:
 squareSize = 5.;
 
+// Flag indicating that the plugin has not been fully initialised yet
+initialised = 0;
+
 function calculateCoefficients()
 (
   // We use SpatDIF (navigational) coordinate system rather than mathematical.
@@ -77,6 +79,22 @@ function calculateCoefficients()
   // Hence we need to invert the sign of sinTumble
   cosTumble = cos(tumbleAngle);
   sinTumble = sin(tumbleAngle);
+  
+  // Set coefficients if the plugin has not yet been initialised
+  initialised == 0 ?
+  (
+    cosRotationDspCoeff = cosRotation;
+    sinRotationDspCoeff = sinRotation;
+
+    cosTiltDspCoeff = cosTilt;
+    sinTiltDspCoeff = sinTilt;
+
+    cosTumbleDspCoeff = cosTumble;
+    sinTumbleDspCoeff = sinTumble;
+
+    // Now we are fully initialised
+    initialised = 1;
+  );
 );
 
 /**********************************************************
@@ -245,10 +263,39 @@ gfx_lineto(centerX - radiusFraction - tumbleDeltaX, centerY - tumbleDeltaY, 1.);
 
 
 /**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+inverseSamplesblock = 1. / samplesblock;
+
+// Linear ramp to new coefficient values over the vector to prevent clicks
+incCosRotation = (cosRotation - cosRotationDspCoeff) * inverseSamplesblock;
+incSinRotation = (sinRotation - sinRotationDspCoeff) * inverseSamplesblock;
+
+incCosTilt  = (cosTilt - cosTiltDspCoeff) * inverseSamplesblock;
+incSinTilt = (sinTilt - sinTiltDspCoeff) * inverseSamplesblock;
+
+incCosTumble = (cosTumble - cosTumbleDspCoeff) * inverseSamplesblock;
+incSinTumble = (sinTumble - sinTumbleDspCoeff) * inverseSamplesblock;
+
+
+/**********************************************************
 Calculate audio sample
 **********************************************************/
 @sample
-// w remains unchanged:
+
+// Increment matric coefficients for linear interpolation
+cosRotationDspCoeff = cosRotationDspCoeff + incCosRotation;
+sinRotationDspCoeff = sinRotationDspCoeff + incSinRotation;
+
+cosTiltDspCoeff = cosTiltDspCoeff + incCosTilt;
+sinTiltDspCoeff = sinTiltDspCoeff + incSinTilt;
+
+cosTumbleDspCoeff = cosTumbleDspCoeff + incCosTumble;
+sinTumbleDspCoeff = sinTumbleDspCoeff + incSinTumble;
+
+// w remains unchanged, so we don't need to change spl0
 //spl0 = spl0;
 
 // Rotation only affects x and y:
@@ -256,17 +303,17 @@ x = spl1;
 y = spl2;
 // We use SpatDIF (navigational) coordinate system rather than mathematical.
 // Hence we need to invert sign of sinRotation as compared to Malham's formula.
-spl1 =  x * cosRotation + y * sinRotation;
-spl2 = -x * sinRotation + y * cosRotation;
+spl1 =  x * cosRotationDspCoeff + y * sinRotationDspCoeff;
+spl2 = -x * sinRotationDspCoeff + y * cosRotationDspCoeff;
 
 // Tilt only affects y and z:
 y = spl2;
 z = spl3;
-spl2 = y * cosTilt - z * sinTilt;
-spl3 = y * sinTilt + z * cosTilt;
+spl2 = y * cosTiltDspCoeff - z * sinTiltDspCoeff;
+spl3 = y * sinTiltDspCoeff + z * cosTiltDspCoeff;
 
 // Tumble only affects x and z:
 x = spl1;
 z = spl3;
-spl1 = x * cosTumble - z * sinTumble;
-spl3 = x * sinTumble + z * cosTumble;
+spl1 = x * cosTumbleDspCoeff - z * sinTumbleDspCoeff;
+spl3 = x * sinTumbleDspCoeff + z * cosTumbleDspCoeff;
