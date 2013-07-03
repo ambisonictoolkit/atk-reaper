@@ -99,8 +99,9 @@ function calculateCoefficients()
 
     // Now we are fully initialised
     initialised = 1;
-  )
+  );
 );
+
 
 /**********************************************************
 Updated slider value:
@@ -111,19 +112,6 @@ azimuth      = slider1 * deg2rad;
 elevation    = slider2 * deg2rad;
 
 calculateCoefficients();
-
-
-/**********************************************************
-Preprocessing prior to audio vector processing.
-**********************************************************/
-@block
-
-inverseSamplesblock = 1. / samplesblock;
-
-// Linear ramp to new coefficient values over the vector to prevent clicks
-inc1 = ( (cosAzimuth * cosElevation) - coeff1) * inverseSamplesblock;
-inc2 = ( (sinAzimuth * cosElevation) - coeff2) * inverseSamplesblock;
-inc3 = (               sinElevation  - coeff3) * inverseSamplesblock;
 
 
 /**********************************************************
@@ -180,6 +168,19 @@ squareSize = 2. * sinElevation + 6.;
 gfx_x = posX-squareSize;
 gfx_y = posY-squareSize;
 gfx_rectto(posX+squareSize, posY+squareSize);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+inverseSamplesblock = 1. / samplesblock;
+
+// Linear ramp to new coefficient values over the vector to prevent clicks
+inc1 = ( (cosAzimuth * cosElevation) - coeff1) * inverseSamplesblock;
+inc2 = ( (sinAzimuth * cosElevation) - coeff2) * inverseSamplesblock;
+inc3 = (               sinElevation  - coeff3) * inverseSamplesblock;
 
 
 /**********************************************************
