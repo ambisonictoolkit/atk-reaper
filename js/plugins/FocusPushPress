@@ -47,7 +47,7 @@ slider4:0<-1,1,0.01>Degree of transform
 
 // Debug sliders:
 slider5:0<0,1,1{GUI, Debug}>Display mode
-slider6:0<0,7,1{matrixRotate1, matrixTilt1, matrixTransform, matrixTilt2, matrixRotate2, matrixDSP, matrixNewDSP, matrixInc}>Matrix to display
+slider6:0<0,7,1{matrixRotate1, matrixTumble1, matrixTransform, matrixTumble2, matrixRotate2, matrixDSP, matrixNewDSP, matrixInc}>Matrix to display
 
 
 /**********************************************************
@@ -69,9 +69,9 @@ rsqrt2  = 1. / sqrt2;
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
-matrixTilt1     = 1020;
+matrixTumble1     = 1020;
 matrixTransform = 1040;
-matrixTilt2     = 1060;
+matrixTumble2     = 1060;
 matrixRotate2   = 1080;
 
 // These are used for matrix multiplications
@@ -108,27 +108,27 @@ function generateRotationMatrix(matrix, angle)
   matrix[15] = 1.;
 );
 
-function generateTiltlMatrix(matrix, angle)
-(
-  matrix[0]  = 1.;
-  matrix[1]  = 0.;
-  matrix[2]  = 0.;
-  matrix[3]  = 0.;
+function generateTumblelMatrix(matrix, angle)
+(  
+  matrix[0]  =  1.;
+  matrix[1]  =  0.;
+  matrix[2]  =  0.;
+  matrix[3]  =  0.;
   
-  matrix[4]  = 0.;
-  matrix[5]  = 1.;
-  matrix[6]  = 0.;
-  matrix[7]  = 0.;
+  matrix[4]  =  0.;
+  matrix[5]  =  cos(angle);
+  matrix[6]  =  0.;
+  matrix[7]  = -sin(angle);
   
-  matrix[8]  = 0.;
-  matrix[9]  = 0.;
-  matrix[10] =  cos(angle);
-  matrix[11] = -sin(angle);
+  matrix[8]  =  0.;
+  matrix[9]  =  0.;
+  matrix[10] =  1.;
+  matrix[11] =  0.;
   
-  matrix[12] = 0.;
-  matrix[13] = 0.;
-  matrix[14] = -matrix[11];
-  matrix[15] =  matrix[10];  
+  matrix[12] =  0.;
+  matrix[13] = -matrix[7];
+  matrix[14] =  0.;
+  matrix[15] =  matrix[5];  
 );
 
 function generateFocusMatrix(matrix, angle)
@@ -230,7 +230,7 @@ function matrixMultiplication(result, left, right)
 function calculateMatrix()
 (
   generateRotationMatrix(matrixRotate1, (-azimuth));
-  generateTiltlMatrix(matrixTilt1, -elevation);
+  generateTumblelMatrix(matrixTumble1, -elevation);
   mode == 0 ?
   (
     generateFocusMatrix(matrixTransform, transformAngle);
@@ -247,13 +247,13 @@ function calculateMatrix()
     );
   );
   generateRotationMatrix(matrixRotate2, azimuth);
-  generateTiltlMatrix(matrixTilt2, elevation);
+  generateTumblelMatrix(matrixTumble2, elevation);
   
   /* Matrix multiplications: result = left x right
                         result:          left:              right:             */
-  matrixMultiplication  (matrixTemp1,    matrixTilt1,      matrixRotate1);
+  matrixMultiplication  (matrixTemp1,    matrixTumble1,      matrixRotate1);
   matrixMultiplication  (matrixTemp2,    matrixTransform,  matrixTemp1);
-  matrixMultiplication  (matrixTemp1,    matrixTilt2,      matrixTemp2);
+  matrixMultiplication  (matrixTemp1,    matrixTumble2,      matrixTemp2);
   matrixMultiplication  (matrixNewDSP,   matrixRotate2,    matrixTemp1);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
@@ -287,7 +287,7 @@ slider6 == 0 ?
 (
   slider6 == 1 ?
   (
-    viewMatrix = matrixTilt1;
+    viewMatrix = matrixTumble1;
   ) :
   (
     slider6 == 2 ?
@@ -297,7 +297,7 @@ slider6 == 0 ?
     (
       slider6 == 3 ?
       (
-        viewMatrix = matrixTilt2;
+        viewMatrix = matrixTumble2;
       ) :
       (
         slider6 == 4 ?
