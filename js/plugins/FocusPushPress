@@ -40,7 +40,7 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
-slider1:0<0,2,1{Focus, Push, Press}>Transformation mode
+slider1:0<0,3,1{Focus, Press, Push, Zoom}>Transformation mode
 slider2:0<-180,180,1>Azimuth
 slider3:0<-90,90,1>Elevation
 slider4:0<-1,1,0.01>Degree of transform
@@ -159,6 +159,35 @@ function generateFocusMatrix(matrix, angle)
   matrix[15] = cosa * roneplussinaa;
 );
 
+function generatePressMatrix(matrix, angle)
+(
+  cosa = cos(angle);
+  sina = sin(angle);
+  cosa2 = cosa * cosa;
+  asina = sin(abs(angle));
+  sqrt2asinasina = sqrt2 * (asina * sina);
+    
+  matrix[0]  = 1.;
+  matrix[1]  = 0.;
+  matrix[2]  = 0.;
+  matrix[3]  = 0.;
+  
+  matrix[4]  = sqrt2asinasina;
+  matrix[5]  = cosa2;
+  matrix[6]  = 0.;
+  matrix[7]  = 0.;
+  
+  matrix[8]  = 0.;
+  matrix[9]  = 0.;
+  matrix[10] = cosa;
+  matrix[11] = 0.;
+  
+  matrix[12] = 0.;
+  matrix[13] = 0.;
+  matrix[14] = cosa;
+  matrix[15] = 1.;
+);
+
 function generatePushMatrix(matrix, angle)
 (
   cosa = cos(angle);
@@ -189,21 +218,18 @@ function generatePushMatrix(matrix, angle)
   matrix[15] = cosa2;
 );
 
-function generatePressMatrix(matrix, angle)
-(
+function generateZoomMatrix(matrix, angle)
+(  
   cosa = cos(angle);
   sina = sin(angle);
-  cosa2 = cosa * cosa;
-  asina = sin(abs(angle));
-  sqrt2asinasina = sqrt2 * (asina * sina);
     
   matrix[0]  = 1.;
-  matrix[1]  = 0.;
+  matrix[1]  = rsqrt2 * sina;
   matrix[2]  = 0.;
   matrix[3]  = 0.;
   
-  matrix[4]  = sqrt2asinasina;
-  matrix[5]  = cosa2;
+  matrix[4]  = sqrt2 * sina;
+  matrix[5]  = 1.;
   matrix[6]  = 0.;
   matrix[7]  = 0.;
   
@@ -217,6 +243,8 @@ function generatePressMatrix(matrix, angle)
   matrix[14] = cosa;
   matrix[15] = 1.;
 );
+
+
 
 function matrixMultiplication(result, left, right)
 (
@@ -244,19 +272,19 @@ function calculateMatrix()
 (
   generateRotationMatrix(matrixRotate1, (-azimuth));
   generateTumblelMatrix(matrixTumble1, -elevation);
-  mode == 0 ?
-  (
+  
+  // Determine what transform to do
+  mode == 0 ? (
     generateFocusMatrix(matrixTransform, transformAngle);
-  )
- :
-  (
-    mode == 1 ?
-    (
-      generatePushMatrix(matrixTransform, transformAngle)
-    )
-    :
-    (
+  ) : (
+    mode == 1 ? (
       generatePressMatrix(matrixTransform, transformAngle)
+    ) : (
+      mode == 2? (
+        generatePushMatrix(matrixTransform, transformAngle)
+      ) : (
+        generateZoomMatrix(matrixTransform, transformAngle)
+      );
     );
   );
   generateRotationMatrix(matrixRotate2, azimuth);
@@ -264,10 +292,10 @@ function calculateMatrix()
   
   /* Matrix multiplications: result = left x right
                         result:          left:              right:             */
-  matrixMultiplication  (matrixTemp1,    matrixTumble1,      matrixRotate1);
-  matrixMultiplication  (matrixTemp2,    matrixTransform,  matrixTemp1);
-  matrixMultiplication  (matrixTemp1,    matrixTumble2,      matrixTemp2);
-  matrixMultiplication  (matrixNewDSP,   matrixRotate2,    matrixTemp1);
+  matrixMultiplication  (matrixTemp1,    matrixTumble1,     matrixRotate1);
+  matrixMultiplication  (matrixTemp2,    matrixTransform,   matrixTemp1);
+  matrixMultiplication  (matrixTemp1,    matrixTumble2,     matrixTemp2);
+  matrixMultiplication  (matrixNewDSP,   matrixRotate2,     matrixTemp1);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   initialised == 0 ?
@@ -296,38 +324,25 @@ transformAngle  = slider4 * 3.14159265359 * 0.5;
 slider6 == 0 ?
 (
   viewMatrix = matrixRotate1;
-) :
-(
-  slider6 == 1 ?
-  (
+) : (
+  slider6 == 1 ? (
     viewMatrix = matrixTumble1;
-  ) :
-  (
-    slider6 == 2 ?
-    (
+  ) : (
+    slider6 == 2 ? (
       viewMatrix = matrixTransform;
-    ) :
-    (
-      slider6 == 3 ?
-      (
+    ) : (
+      slider6 == 3 ? (
         viewMatrix = matrixTumble2;
-      ) :
-      (
-        slider6 == 4 ?
-        (
+      ) : (
+        slider6 == 4 ? (
           viewMatrix = matrixRotate2;
-        ) :
-        (
-          slider6 == 5 ?
-          (
+        ) : (
+          slider6 == 5 ? (
             viewMatrix = matrixDSP;
-          ) :
-          (
-            slider6 == 6 ?
-            (
+          ) : (
+            slider6 == 6 ? (
               viewMatrix = matrixNewDSP;
-            ) :
-            (
+            ) : (
               viewMatrix = matrixInc;
             );
           );
