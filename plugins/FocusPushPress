@@ -64,6 +64,8 @@ elevation = 0.;
 // Constants
 rad2deg = 180. / $pi;
 deg2rad = $pi / 180.;
+sqrt2   = sqrt(2.);
+rsqrt2  = 1. / sqrt2;
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
@@ -131,25 +133,30 @@ function generateTiltlMatrix(matrix, angle)
 
 function generateFocusMatrix(matrix, angle)
 (
-  matrix[0]  = 1.;
-  matrix[1]  = 0.;
+  cosa = cos(angle);
+  sina = sin(angle);
+  roneplussinaa = 1. / (1. + sin(abs(angle)));
+  sina1sina = sina * roneplussinaa;
+  
+  matrix[0]  = roneplussinaa;
+  matrix[1]  = rsqrt2 * sina1sina;
   matrix[2]  = 0.;
   matrix[3]  = 0.;
-  
-  matrix[4]  = 0.;
-  matrix[5]  = 1.;
+
+  matrix[4]  = sqrt2 * sina1sina; 
+  matrix[5]  = roneplussinaa;
   matrix[6]  = 0.;
   matrix[7]  = 0.;
   
   matrix[8]  = 0.;
   matrix[9]  = 0.;
-  matrix[10] = 1.;
+  matrix[10] = cosa * roneplussinaa;
   matrix[11] = 0.;
   
   matrix[12] = 0.;
   matrix[13] = 0.;
   matrix[14] = 0.;
-  matrix[15] = 1.;
+  matrix[15] = cosa * roneplussinaa;
 );
 
 function generatePushMatrix(matrix, angle)
