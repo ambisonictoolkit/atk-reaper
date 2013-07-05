@@ -22,8 +22,8 @@ and GNU General Public License along with this program.  If not, see
 
 
 ---------------------------------------------------------------------
-  Class: FocusPushPress
-  First Order Ambisonic (FOA) focus, push and press transformer
+  Class: FocusPushPressZoom
+  First Order Ambisonic (FOA) focus, press, push and zoom transformer
 ---------------------------------------------------------------------
 */
 
@@ -37,7 +37,7 @@ For regular use of the plugin the debug code is commented out in the same way as
 --- DEBUG STUFF --- */
 
 
-desc: First Order Ambisonic focus, push and press transformer
+desc: First Order Ambisonic focus, press, push and zoom transformer
 
 filename:0,HorizontalBackground.png
 
