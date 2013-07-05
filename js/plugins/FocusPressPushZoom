@@ -30,6 +30,8 @@ and GNU General Public License along with this program.  If not, see
 
 desc: First Order Ambisonic focus, push and press transformer
 
+filename:0,HorizontalBackground.png
+
 in_pin:W
 in_pin:X
 in_pin:Y
@@ -43,7 +45,7 @@ out_pin:Z
 slider1:0<0,3,1{Focus, Press, Push, Zoom}>Transformation mode
 slider2:0<-180,180,1>Azimuth
 slider3:0<-90,90,1>Elevation
-slider4:0<-1,1,0.01>Degree of transform
+slider4:0<0,1,0.01>Degree of transform
 
 // Debug sliders:
 slider5:0<0,1,1{GUI, Debug}>Display mode
@@ -270,6 +272,14 @@ function matrixMultiplication(result, left, right)
 
 function calculateMatrix()
 (
+  // Required for graphics
+  cosAzimuth   = cos(azimuth);
+  sinAzimuth   = sin(azimuth);
+
+  cosElevation = cos(elevation);
+  sinElevation = sin(elevation);
+  
+  // Generate matrixes
   generateRotationMatrix(matrixRotate1, (-azimuth));
   generateTumblelMatrix(matrixTumble1, -elevation);
   
@@ -290,8 +300,8 @@ function calculateMatrix()
   generateRotationMatrix(matrixRotate2, azimuth);
   generateTumblelMatrix(matrixTumble2, elevation);
   
-  /* Matrix multiplications: result = left x right
-                        result:          left:              right:             */
+  /* Build processing matrix by performing a series of matrix multiplications
+                        result =         left     X         right             */
   matrixMultiplication  (matrixTemp1,    matrixTumble1,     matrixRotate1);
   matrixMultiplication  (matrixTemp2,    matrixTransform,   matrixTemp1);
   matrixMultiplication  (matrixTemp1,    matrixTumble2,     matrixTemp2);
@@ -319,7 +329,7 @@ mode            = slider1;
 azimuth         = slider2 * deg2rad;
 elevation       = slider3 * deg2rad;
 transformAngle  = slider4 * 3.14159265359 * 0.5;
-
+debugMode       = slider5;
 
 slider6 == 0 ?
 (
@@ -352,7 +362,6 @@ slider6 == 0 ?
   );
 );
 
-
 calculateMatrix();
 
 
@@ -360,7 +369,7 @@ calculateMatrix();
 /**********************************************************
 Graphics
 **********************************************************/
-@gfx [300] [600]
+@gfx 500 500
 
 function gxColorSet(alpha, red, green, blue)
 (
@@ -376,20 +385,87 @@ function gxPositionSet(x, y)
 	gfx_y = y;
 );
 
-gxColorSet(1., 1., 1., 1.);
+debugMode == 0 ?
+(
+  // This is the regular interactive GUI mode:
+  
+  // Set colors
+  gfx_a = 1;
+  gfx_r = gfx_g = gfx_b = 1;
 
+  // Determine geometry
+  centerX = gfx_w  * 0.5;
+  centerY = gfx_h * 0.5;
 
-// Iterate over columns:
-iii = 0;
-loop(4,
-  // Iterate over rows
-  jjj = 0;
-  loop(4,
-    gxPositionSet(iii*80 + 40, jjj*20 + 20);
-    gfx_drawnumber( viewMatrix[iii + 4*jjj],5);
-    jjj = jjj + 1;
+  centerX < centerY ? radius = centerX : radius = centerY;
+  radius = radius - 10;
+  inverseRadius = 1. / radius;
+
+  // Background graphics
+  coordinatelist[0] = 0;                  //left-most pixel location for source
+  coordinatelist[1] = 0;                  //top-most pixel location for source
+  coordinatelist[2] = 800;                //width of source
+  coordinatelist[3] = 800;                //height of source
+  coordinatelist[4] = centerX - radius;   //left-most pixel location of destination
+  coordinatelist[5] = centerY - radius;   //top-most pixel location of destination
+  coordinatelist[6] = 2 * radius;         //width of destination to fill
+  coordinatelist[7] = 2 * radius;         //height of destination to fill
+  coordinatelist[8] =0;                   //represents offset from center of image
+  coordinatelist[9] =0;                   //represents offset from center of image
+  gfx_blitext(0,coordinatelist,0);
+
+  // Reset azimuth and transformAngle on mouse click
+  mouse_cap == 1 ?
+  (
+    mouseX = mouse_x - centerX;
+    mouseY = mouse_y - centerY;
+    
+    // Update azimuth and slider2 and notify GUI of the change
+    azimuth = atan2(mouseX, -mouseY);
+    slider2 = azimuth * rad2deg;
+    slider_automate(slider2);
+    
+    // Update transformAngle and slider4 and notify GUI of the change
+    slider4 = sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
+    // Restrict the range to [0, 1]
+    slider4 > 1. ? slider4 = 1.;
+    transformAngle = slider4 * $pi * 0.5;
+    slider_automate(slider4);
+    
+    calculateMatrix();
   );
-  iii = iii + 1;
+  
+  posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
+  posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
+
+  // Red square as interactive direction indicator, color tint depends on elevation
+  gfx_r =  1.0 + 0.3 * sinElevation;
+  gfx_g =  0.5 * sinElevation;
+  gfx_b =  0.5 * sinElevation;
+
+  squareSize = 2. * sinElevation + 6.;
+
+  gfx_x = posX-squareSize;
+  gfx_y = posY-squareSize;
+  gfx_rectto(posX+squareSize, posY+squareSize);
+  
+) : (
+  
+  // Debug mode can be used to inspect the content of the various matrixes
+  gxColorSet(1., 1., 1., 1.);
+
+  // Iterate over columns:
+  iii = 0;
+  loop(4,
+    // Iterate over rows
+    jjj = 0;
+    loop(4,
+      gxPositionSet(iii*80 + 40, jjj*20 + 20);
+      gfx_drawnumber( viewMatrix[iii + 4*jjj],5);
+      jjj = jjj + 1;
+    );
+    iii = iii + 1;
+  );
 );
 
 
