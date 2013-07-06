@@ -39,7 +39,11 @@ For regular use of the plugin the debug code is commented out in the same way as
 
 desc: First Order Ambisonic focus, press, push and zoom transformer
 
+// Graphics file
 filename:0,HorizontalBackground.png
+
+// Library with shared functions
+import atkFunctionLibrary.jsfx-inc
 
 in_pin:W
 in_pin:X
@@ -61,7 +65,6 @@ slider4:0<0,1,0.01>Degree of transformation (mouse)
 // slider5:0<0,1,1{GUI, Debug}>Display mode
 // slider6:0<0,7,1{matrixRotate1, matrixTumble1, matrixTransform, matrixTumble2, matrixRotate2, matrixDSP, matrixNewDSP, matrixInc}>Matrix to display
 --- DEBUG STUFF --- */
-
 
 
 /**********************************************************
@@ -387,20 +390,6 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
-function gxColorSet(alpha, red, green, blue)
-(
-	gfx_a = alpha;
-	gfx_r = red;
-	gfx_g = green;
-	gfx_b  = blue;
-);
-
-function gxPositionSet(x, y)
-(
-	gfx_x = x;
-	gfx_y = y;
-);
-
 /* --- DEBUG STUFF ---
 debugMode == 0 ?
 (
@@ -409,8 +398,9 @@ debugMode == 0 ?
   // This is the regular interactive GUI mode:
   
   // Set colors
-  gfx_a = 1;
-  gfx_r = gfx_g = gfx_b = 1;
+  gxColorSet(1, 1, 1, 1);
+  //gfx_a = 1;
+  //gfx_r = gfx_g = gfx_b = 1;
 
   // Determine geometry
   centerX = gfx_w  * 0.5;
@@ -467,7 +457,7 @@ debugMode == 0 ?
   gfx_x = posX-squareSize;
   gfx_y = posY-squareSize;
   gfx_rectto(posX+squareSize, posY+squareSize);
-  
+    
 /* --- DEBUG STUFF ---  
 ) : (
   
