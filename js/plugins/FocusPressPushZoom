@@ -42,7 +42,7 @@ desc: First Order Ambisonic focus, press, push and zoom transformer
 // Graphics file
 filename:0,HorizontalBackground.png
 
-// Library with shared functions
+// Import library with shared functions for matrix and graphics processing
 import atkFunctionLibrary.jsfx-inc
 
 in_pin:W
@@ -199,7 +199,6 @@ slider6 == 0 ?
 calculateMatrix();
 
 
-
 /**********************************************************
 Graphics
 **********************************************************/
@@ -214,29 +213,9 @@ debugMode == 0 ?
   
   // Set colors
   gxColorSet(1, 1, 1, 1);
-  //gfx_a = 1;
-  //gfx_r = gfx_g = gfx_b = 1;
 
-  // Determine geometry
-  centerX = gfx_w  * 0.5;
-  centerY = gfx_h * 0.5;
-
-  centerX < centerY ? radius = centerX : radius = centerY;
-  radius = radius - 10;
-  inverseRadius = 1. / radius;
-
-  // Background graphics
-  coordinatelist[0] = 0;                  //left-most pixel location for source
-  coordinatelist[1] = 0;                  //top-most pixel location for source
-  coordinatelist[2] = 800;                //width of source
-  coordinatelist[3] = 800;                //height of source
-  coordinatelist[4] = centerX - radius;   //left-most pixel location of destination
-  coordinatelist[5] = centerY - radius;   //top-most pixel location of destination
-  coordinatelist[6] = 2 * radius;         //width of destination to fill
-  coordinatelist[7] = 2 * radius;         //height of destination to fill
-  coordinatelist[8] =0;                   //represents offset from center of image
-  coordinatelist[9] =0;                   //represents offset from center of image
-  gfx_blitext(0,coordinatelist,0);
+  determineGeometry();
+  drawBackgroundImage();
 
   // Reset azimuth and transformAngle on mouse click
   mouse_cap == 1 ?
@@ -258,19 +237,13 @@ debugMode == 0 ?
     
     calculateMatrix();
   );
-  
+
+  // Draw red square as interactive direction indicator, size and color tint depends on elevation
+  gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
   posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
   posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
-
-  // Red square as interactive direction indicator, color tint depends on elevation
-  gfx_r =  1.0 + 0.3 * sinElevation;
-  gfx_g =  0.5 * sinElevation;
-  gfx_b =  0.5 * sinElevation;
-
   squareSize = 2. * sinElevation + 6.;
-
-  gfx_x = posX-squareSize;
-  gfx_y = posY-squareSize;
+  gxPositionSet(posX-squareSize, posY-squareSize);
   gfx_rectto(posX+squareSize, posY+squareSize);
     
 /* --- DEBUG STUFF ---  
