@@ -244,9 +244,9 @@ function matrixMultiplication(result, left, right)
 );
 
 
-/**********************************************************
+/********************************************************************
 Graphics: Set drawing color
-**********************************************************/
+********************************************************************/
 function gxColorSet(alpha, red, green, blue)
 (
 	gfx_a = alpha;
@@ -256,11 +256,45 @@ function gxColorSet(alpha, red, green, blue)
 );
 
 
-/**********************************************************
+/********************************************************************
 Graphics: Set drawing position
-**********************************************************/
+********************************************************************/
 function gxPositionSet(x, y)
 (
 	gfx_x = x;
 	gfx_y = y;
+);
+
+
+/********************************************************************
+Graphics: Determine geometry
+********************************************************************/
+function determineGeometry()
+(
+  centerX = gfx_w  * 0.5;
+  centerY = gfx_h * 0.5;
+
+  centerX < centerY ? radius = centerX : radius = centerY;
+  radius = radius - 10;
+  inverseRadius = 1. / radius;
+);
+
+
+/********************************************************************
+Graphics: Draw background image based on ICST ambimonitor
+********************************************************************/
+function drawBackgroundImage()
+(
+  // Background graphics
+  coordinatelist[0] = 0;                  //left-most pixel location for source
+  coordinatelist[1] = 0;                  //top-most pixel location for source
+  coordinatelist[2] = 800;                //width of source
+  coordinatelist[3] = 800;                //height of source
+  coordinatelist[4] = centerX - radius;   //left-most pixel location of destination
+  coordinatelist[5] = centerY - radius;   //top-most pixel location of destination
+  coordinatelist[6] = 2 * radius;         //width of destination to fill
+  coordinatelist[7] = 2 * radius;         //height of destination to fill
+  coordinatelist[8] =0;                   //represents offset from center of image
+  coordinatelist[9] =0;                   //represents offset from center of image
+  gfx_blitext(0,coordinatelist,0);
 );
