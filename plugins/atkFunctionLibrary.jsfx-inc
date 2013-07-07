@@ -721,3 +721,29 @@ function drawBackgroundImage()
   coordinatelist[9] =0;                   //represents offset from center of image
   gfx_blitext(0,coordinatelist,0);
 );
+
+
+/********************************************************************
+Graphics: Draw centered filled-in square
+********************************************************************/
+function drawCenteredSquare(centerX, centerY, squareSize)
+(
+  halfSize = squareSize * 0.5;
+  gfx_x = centerX - halfSize;
+  gfx_y = centerY - halfSize;
+  gfx_rectto(centerX + halfSize, centerY + halfSize);
+);
+
+
+/********************************************************************
+Graphics: Draw outline of polygon with four sides and four corners
+********************************************************************/
+function drawQuadrangleOutline(position1x, position1y, position2x, position2y, position3x, position3y, position4x, position4y, antiAliasing)
+(
+  gfx_x = position1x;
+  gfx_y = position1y;
+  gfx_lineto(position2x, position2y, antiAliasing);
+  gfx_lineto(position3x, position3y, antiAliasing);
+  gfx_lineto(position4x, position4y, antiAliasing);
+  gfx_lineto(position1x, position1y, antiAliasing);
+);
