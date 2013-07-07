@@ -56,13 +56,16 @@ sqrt3Div6   = sqrt(3.) / 6.;
 sqrt6Div3   = sqrt(6.) / 3.;
 recSqrt6   = 1. / sqrt(6.);
 
+// Setting memory locations for 4x4 matrix as 1D arrays
+matrixDSP       = 1000;
+
 
 /**********************************************************
 Updated slider value:
 **********************************************************/
 @slider
 
-/* Invert the 4x4 matrix with coefficients matrix00..matrix33
+/* Invert the 4x4 matrix with coefficients matrixDSP[0]..matrixDSP[15]
 
   The function for inverting a 4x4 matrix is lifted of StackOverflow:
   http://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix
@@ -72,122 +75,122 @@ Updated slider value:
 */
 function invertMatrix()
 (
-  inv00 =  matrix11 * matrix22 * matrix33 -
-           matrix11 * matrix23 * matrix32 -
-           matrix21 * matrix12 * matrix33 +
-           matrix21 * matrix13 * matrix32 +
-           matrix31 * matrix12 * matrix23 -
-           matrix31 * matrix13 * matrix22;
+  inv00 =  matrixDSP[5]  * matrixDSP[10] * matrixDSP[15] -
+           matrixDSP[5]  * matrixDSP[11] * matrixDSP[14] -
+           matrixDSP[9]  * matrixDSP[6]  * matrixDSP[15] +
+           matrixDSP[9]  * matrixDSP[7]  * matrixDSP[14] +
+           matrixDSP[13] * matrixDSP[6]  * matrixDSP[11] -
+           matrixDSP[13] * matrixDSP[7]  * matrixDSP[10];
 
-  inv10 = -matrix10 * matrix22 * matrix33 +
-           matrix10 * matrix23 * matrix32 +
-           matrix20 * matrix12 * matrix33 -
-           matrix20 * matrix13 * matrix32 -
-           matrix30 * matrix12 * matrix23 +
-           matrix30 * matrix13 * matrix22;
+  inv10 = -matrixDSP[4]  * matrixDSP[10]  * matrixDSP[15] +
+           matrixDSP[4]  * matrixDSP[11]  * matrixDSP[14] +
+           matrixDSP[8]  * matrixDSP[6]  * matrixDSP[15] -
+           matrixDSP[8]  * matrixDSP[7]  * matrixDSP[14] -
+           matrixDSP[12] * matrixDSP[6]  * matrixDSP[11] +
+           matrixDSP[12] * matrixDSP[7]  * matrixDSP[10];
 
-  inv20 =  matrix10 * matrix21 * matrix33 -
-           matrix10 * matrix23 * matrix31 -
-           matrix20 * matrix11 * matrix33 +
-           matrix20 * matrix13 * matrix31 +
-           matrix30 * matrix11 * matrix23 -
-           matrix30 * matrix13 * matrix21;
+  inv20 =  matrixDSP[4]  * matrixDSP[9]  * matrixDSP[15] -
+           matrixDSP[4]  * matrixDSP[11] * matrixDSP[13] -
+           matrixDSP[8]  * matrixDSP[5]  * matrixDSP[15] +
+           matrixDSP[8]  * matrixDSP[7]  * matrixDSP[13] +
+           matrixDSP[12] * matrixDSP[5]  * matrixDSP[11] -
+           matrixDSP[12] * matrixDSP[7]  * matrixDSP[9];
 
-  inv30 = -matrix10 * matrix21 * matrix32 +
-           matrix10 * matrix22 * matrix31 +
-           matrix20 * matrix11 * matrix32 -
-           matrix20 * matrix12 * matrix31 -
-           matrix30 * matrix11 * matrix22 +
-           matrix30 * matrix12 * matrix21;
+  inv30 = -matrixDSP[4]  * matrixDSP[9]  * matrixDSP[14] +
+           matrixDSP[4]  * matrixDSP[10] * matrixDSP[13] +
+           matrixDSP[8]  * matrixDSP[5]  * matrixDSP[14] -
+           matrixDSP[8]  * matrixDSP[6]  * matrixDSP[13] -
+           matrixDSP[12] * matrixDSP[5]  * matrixDSP[10] +
+           matrixDSP[12] * matrixDSP[6]  * matrixDSP[9];
 
-  inv01 = -matrix01 * matrix22 * matrix33 +
-           matrix01 * matrix23 * matrix32 +
-           matrix21 * matrix02 * matrix33 -
-           matrix21 * matrix03 * matrix32 -
-           matrix31 * matrix02 * matrix23 +
-           matrix31 * matrix03 * matrix22;
+  inv01 = -matrixDSP[1]  * matrixDSP[10] * matrixDSP[15] +
+           matrixDSP[1]  * matrixDSP[11] * matrixDSP[14] +
+           matrixDSP[9]  * matrixDSP[2]  * matrixDSP[15] -
+           matrixDSP[9]  * matrixDSP[3]  * matrixDSP[14] -
+           matrixDSP[13] * matrixDSP[2]  * matrixDSP[11] +
+           matrixDSP[13] * matrixDSP[3]  * matrixDSP[10];
 
-  inv11 =  matrix00 * matrix22 * matrix33 -
-           matrix00 * matrix23 * matrix32 -
-           matrix20 * matrix02 * matrix33 +
-           matrix20 * matrix03 * matrix32 +
-           matrix30 * matrix02 * matrix23 -
-           matrix30 * matrix03 * matrix22;
+  inv11 =  matrixDSP[0]  * matrixDSP[10] * matrixDSP[15] -
+           matrixDSP[0]  * matrixDSP[11] * matrixDSP[14] -
+           matrixDSP[8]  * matrixDSP[2]  * matrixDSP[15] +
+           matrixDSP[8]  * matrixDSP[3]  * matrixDSP[14] +
+           matrixDSP[12] * matrixDSP[2]  * matrixDSP[11] - 
+           matrixDSP[12] * matrixDSP[3]  * matrixDSP[10];
 
-  inv21 = -matrix00 * matrix21 * matrix33 +
-           matrix00 * matrix23 * matrix31 +
-           matrix20 * matrix01 * matrix33 -
-           matrix20 * matrix03 * matrix31 -
-           matrix30 * matrix01 * matrix23 +
-           matrix30 * matrix03 * matrix21;
+  inv21 = -matrixDSP[0]  * matrixDSP[9]  * matrixDSP[15] +
+           matrixDSP[0]  * matrixDSP[11] * matrixDSP[13] +
+           matrixDSP[8]  * matrixDSP[1]  * matrixDSP[15] -
+           matrixDSP[8]  * matrixDSP[3]  * matrixDSP[13] -
+           matrixDSP[12] * matrixDSP[1]  * matrixDSP[11] +
+           matrixDSP[12] * matrixDSP[3]  * matrixDSP[9];
 
-  inv31 =  matrix00 * matrix21 * matrix32 -
-           matrix00 * matrix22 * matrix31 -
-           matrix20 * matrix01 * matrix32 +
-           matrix20 * matrix02 * matrix31 +
-           matrix30 * matrix01 * matrix22 -
-           matrix30 * matrix02 * matrix21;
+  inv31 =  matrixDSP[0]  * matrixDSP[9]  * matrixDSP[14] -
+           matrixDSP[0]  * matrixDSP[10] * matrixDSP[13] -
+           matrixDSP[8]  * matrixDSP[1]  * matrixDSP[14] +
+           matrixDSP[8]  * matrixDSP[2]  * matrixDSP[13] +
+           matrixDSP[12] * matrixDSP[1]  * matrixDSP[10] -
+           matrixDSP[12] * matrixDSP[2]  * matrixDSP[9];
 
-  inv02 =  matrix01 * matrix12 * matrix33 -
-           matrix01 * matrix13 * matrix32 -
-           matrix11 * matrix02 * matrix33 +
-           matrix11 * matrix03 * matrix32 +
-           matrix31 * matrix02 * matrix13 -
-           matrix31 * matrix03 * matrix12;
+  inv02 =  matrixDSP[1]  * matrixDSP[6]  * matrixDSP[15] -
+           matrixDSP[1]  * matrixDSP[7]  * matrixDSP[14] -
+           matrixDSP[5]  * matrixDSP[2]  * matrixDSP[15] +
+           matrixDSP[5]  * matrixDSP[3]  * matrixDSP[14] +
+           matrixDSP[13] * matrixDSP[2]  * matrixDSP[7] -
+           matrixDSP[13] * matrixDSP[3]  * matrixDSP[6];
 
-  inv12 = -matrix00 * matrix12 * matrix33 +
-           matrix00 * matrix13 * matrix32 +
-           matrix10 * matrix02 * matrix33 -
-           matrix10 * matrix03 * matrix32 -
-           matrix30 * matrix02 * matrix13 +
-           matrix30 * matrix03 * matrix12;
+  inv12 = -matrixDSP[0]  * matrixDSP[6]  * matrixDSP[15] +
+           matrixDSP[0]  * matrixDSP[7]  * matrixDSP[14] +
+           matrixDSP[4]  * matrixDSP[2]  * matrixDSP[15] -
+           matrixDSP[4]  * matrixDSP[3]  * matrixDSP[14] -
+           matrixDSP[12] * matrixDSP[2]  * matrixDSP[7] +
+           matrixDSP[12] * matrixDSP[3]  * matrixDSP[6];
 
-  inv22 =  matrix00 * matrix11 * matrix33 -
-           matrix00 * matrix13 * matrix31 -
-           matrix10 * matrix01 * matrix33 +
-           matrix10 * matrix03 * matrix31 +
-           matrix30 * matrix01 * matrix13 -
-           matrix30 * matrix03 * matrix11;
+  inv22 =  matrixDSP[0]  * matrixDSP[5]  * matrixDSP[15] -
+           matrixDSP[0]  * matrixDSP[7]  * matrixDSP[13] -
+           matrixDSP[4]  * matrixDSP[1]  * matrixDSP[15] +
+           matrixDSP[4]  * matrixDSP[3]  * matrixDSP[13] +
+           matrixDSP[12] * matrixDSP[1]  * matrixDSP[7] -
+           matrixDSP[12] * matrixDSP[3]  * matrixDSP[5];
 
-  inv32 = -matrix00 * matrix11 * matrix32 +
-           matrix00 * matrix12 * matrix31 +
-           matrix10 * matrix01 * matrix32 -
-           matrix10 * matrix02 * matrix31 -
-           matrix30 * matrix01 * matrix12 +
-           matrix30 * matrix02 * matrix11;
+  inv32 = -matrixDSP[0]  * matrixDSP[5]  * matrixDSP[14] +
+           matrixDSP[0]  * matrixDSP[6]  * matrixDSP[13] +
+           matrixDSP[4]  * matrixDSP[1]  * matrixDSP[14] -
+           matrixDSP[4]  * matrixDSP[2]  * matrixDSP[13] -
+           matrixDSP[12] * matrixDSP[1]  * matrixDSP[6] +
+           matrixDSP[12] * matrixDSP[2]  * matrixDSP[5];
 
-  inv03 = -matrix01 * matrix12 * matrix23 +
-           matrix01 * matrix13 * matrix22 +
-           matrix11 * matrix02 * matrix23 -
-           matrix11 * matrix03 * matrix22 -
-           matrix21 * matrix02 * matrix13 +
-           matrix21 * matrix03 * matrix12;
+  inv03 = -matrixDSP[1]  * matrixDSP[6]  * matrixDSP[11] +
+           matrixDSP[1]  * matrixDSP[7]  * matrixDSP[10] +
+           matrixDSP[5]  * matrixDSP[2]  * matrixDSP[11] -
+           matrixDSP[5]  * matrixDSP[3]  * matrixDSP[10] -
+           matrixDSP[9]  * matrixDSP[2]  * matrixDSP[7] +
+           matrixDSP[9]  * matrixDSP[3]  * matrixDSP[6];
 
-  inv13 =  matrix00 * matrix12 * matrix23 -
-           matrix00 * matrix13 * matrix22 -
-           matrix10 * matrix02 * matrix23 +
-           matrix10 * matrix03 * matrix22 +
-           matrix20 * matrix02 * matrix13 -
-           matrix20 * matrix03 * matrix12;
+  inv13 =  matrixDSP[0]  * matrixDSP[6]  * matrixDSP[11] -
+           matrixDSP[0]  * matrixDSP[7]  * matrixDSP[10] -
+           matrixDSP[4]  * matrixDSP[2]  * matrixDSP[11] +
+           matrixDSP[4]  * matrixDSP[3]  * matrixDSP[10] +
+           matrixDSP[8]  * matrixDSP[2]  * matrixDSP[7] -
+           matrixDSP[8]  * matrixDSP[3]  * matrixDSP[6];
 
-  inv23 = -matrix00 * matrix11 * matrix23 +
-           matrix00 * matrix13 * matrix21 +
-           matrix10 * matrix01 * matrix23 -
-           matrix10 * matrix03 * matrix21 -
-           matrix20 * matrix01 * matrix13 +
-           matrix20 * matrix03 * matrix11;
+  inv23 = -matrixDSP[0]  * matrixDSP[5]  * matrixDSP[11] +
+           matrixDSP[0]  * matrixDSP[7]  * matrixDSP[9] +
+           matrixDSP[4]  * matrixDSP[1]  * matrixDSP[11] -
+           matrixDSP[4]  * matrixDSP[3]  * matrixDSP[9] -
+           matrixDSP[8]  * matrixDSP[1]  * matrixDSP[7] +
+           matrixDSP[8]  * matrixDSP[3]  * matrixDSP[5];
 
-  inv33 =  matrix00 * matrix11 * matrix22 -
-           matrix00 * matrix12 * matrix21 -
-	         matrix10 * matrix01 * matrix22 +
-           matrix10 * matrix02 * matrix21 +
-           matrix20 * matrix01 * matrix12 -
-           matrix20 * matrix02 * matrix11;
+  inv33 =  matrixDSP[0]  * matrixDSP[5]  * matrixDSP[10] -
+           matrixDSP[0]  * matrixDSP[6]  * matrixDSP[9] -
+	         matrixDSP[4]  * matrixDSP[1]  * matrixDSP[10] +
+           matrixDSP[4]  * matrixDSP[2]  * matrixDSP[9] +
+           matrixDSP[8]  * matrixDSP[1]  * matrixDSP[6] -
+           matrixDSP[8]  * matrixDSP[2]  * matrixDSP[5];
 					
-  determinant = matrix00 * inv00 +
-	              matrix01 * inv10 +
-				        matrix02 * inv20 +
-				        matrix03 * inv30;
+  determinant = matrixDSP[0] * inv00 +
+	              matrixDSP[1] * inv10 +
+				        matrixDSP[2] * inv20 +
+				        matrixDSP[3] * inv30;
 
   /* Might be difficult to check this in Reaper/JS, but it might also be redundant?
 	if (determinant == 0)
@@ -196,25 +199,25 @@ function invertMatrix()
 
   determinant = 1.0 / determinant;
 
-  matrix00 = inv00 * determinant;
-	matrix01 = inv01 * determinant;
-	matrix02 = inv02 * determinant;
-	matrix03 = inv03 * determinant;
+  matrixDSP[0] = inv00 * determinant;
+	matrixDSP[1] = inv01 * determinant;
+	matrixDSP[2] = inv02 * determinant;
+	matrixDSP[3] = inv03 * determinant;
 	
-	matrix10 = inv10 * determinant;
-	matrix11 = inv11 * determinant;
-	matrix12 = inv12 * determinant;
-	matrix13 = inv13 * determinant;
+	matrixDSP[4] = inv10 * determinant;
+	matrixDSP[5] = inv11 * determinant;
+	matrixDSP[6] = inv12 * determinant;
+	matrixDSP[7] = inv13 * determinant;
 	
-	matrix20 = inv20 * determinant;
-	matrix21 = inv21 * determinant;
-	matrix22 = inv22 * determinant;
-	matrix23 = inv23 * determinant;
+	matrixDSP[8] = inv20 * determinant;
+	matrixDSP[9] = inv21 * determinant;
+	matrixDSP[10] = inv22 * determinant;
+	matrixDSP[11] = inv23 * determinant;
 	
-	matrix30 = inv30 * determinant;
-	matrix31 = inv31 * determinant;
-	matrix32 = inv32 * determinant;
-	matrix33 = inv33 * determinant;
+	matrixDSP[12] = inv30 * determinant;
+	matrixDSP[13] = inv31 * determinant;
+	matrixDSP[14] = inv32 * determinant;
+	matrixDSP[15] = inv33 * determinant;
 );
 
 
@@ -223,248 +226,198 @@ function invertMatrix()
 
 // Option 0: orthogonal (front left up) [ FLU, FRD, BLD, BRU ]
 slider1 == 0 ?
-(
-  /*
-  [ 0.5, 0.5, 0.5, 0.5 ],
-  [ 0.5, 0.5, -0.5, -0.5 ],
-  [ 0.5, -0.5, 0.5, -0.5 ],
-  [ 0.5, -0.5, -0.5, 0.5 ]
-  */
- 
-  matrix00 =  0.5;
-  matrix01 =  0.5;
-  matrix02 =  0.5;
-  matrix03 =  0.5;
+( 
+  matrixDSP[0] =   0.5;
+  matrixDSP[1] =   0.5;
+  matrixDSP[2] =   0.5;
+  matrixDSP[3] =   0.5;
 
-  matrix10 =  0.5;
-  matrix11 =  0.5;
-  matrix12 = -0.5;
-  matrix13 = -0.5;
+  matrixDSP[4] =   0.5;
+  matrixDSP[5] =   0.5;
+  matrixDSP[6] =  -0.5;
+  matrixDSP[7] =  -0.5;
 
-  matrix20 =  0.5;
-  matrix21 = -0.5;
-  matrix22 =  0.5;
-  matrix23 = -0.5;
+  matrixDSP[8] =   0.5;
+  matrixDSP[9] =  -0.5;
+  matrixDSP[10] =  0.5;
+  matrixDSP[11] = -0.5;
 
-  matrix30 =  0.5;
-  matrix31 = -0.5;
-  matrix32 = -0.5;
-  matrix33 =  0.5;
+  matrixDSP[12] =  0.5;
+  matrixDSP[13] = -0.5;
+  matrixDSP[14] = -0.5;
+  matrixDSP[15] =  0.5;
 ) :
 (
   // Option 1: front left down [ FLD, FRU, BLU, BRD ]
   slider1 == 1 ?
   (
-    /*
-    [ 0.5, 0.5, 0.5, -0.5 ],
-    [ 0.5, 0.5, -0.5, 0.5 ],
-    [ 0.5, -0.5, 0.5, 0.5 ],
-    [ 0.5, -0.5, -0.5, -0.5 ]
-    */
-   
-    matrix00 =  0.5;
-    matrix01 =  0.5;
-    matrix02 =  0.5;
-    matrix03 = -0.5;
+    matrixDSP[0] =  0.5;
+    matrixDSP[1] =  0.5;
+    matrixDSP[2] =  0.5;
+    matrixDSP[3] = -0.5;
 
-    matrix10 =  0.5;
-    matrix11 =  0.5;
-    matrix12 = -0.5;
-    matrix13 =  0.5;
+    matrixDSP[4] =  0.5;
+    matrixDSP[5] =  0.5;
+    matrixDSP[6] = -0.5;
+    matrixDSP[7] =  0.5;
 
-    matrix20 =  0.5;
-    matrix21 = -0.5;
-    matrix22 =  0.5;
-    matrix23 =  0.5;
+    matrixDSP[8] =  0.5;
+    matrixDSP[9] = -0.5;
+    matrixDSP[10] =  0.5;
+    matrixDSP[11] =  0.5;
 
-    matrix30 =  0.5;
-    matrix31 = -0.5;
-    matrix32 = -0.5;
-    matrix33 = -0.5;
+    matrixDSP[12] =  0.5;
+    matrixDSP[13] = -0.5;
+    matrixDSP[14] = -0.5;
+    matrixDSP[15] = -0.5;
   ) :
   (
     // Option 2: front left-right [ FL, FR, BU, BD ]
+    
     slider1 == 2 ?
-    (
-      /*
-      [ 0.5, 0.5, recSqrt2, 0 ],
-      [ 0.5, 0.5, recSqrt2.neg, 0 ],
-      [ 0.5, -0.5, 0, recSqrt2 ],
-      [ 0.5, -0.5, 0, recSqrt2.neg ]
-      */
-     
-      matrix00 =  0.5;
-      matrix01 =  0.5;
-      matrix02 =  recSqrt2;
-      matrix03 =  0.;
+    (     
+      matrixDSP[0] =  0.5;
+      matrixDSP[1] =  0.5;
+      matrixDSP[2] =  recSqrt2;
+      matrixDSP[3] =  0.;
 
-      matrix10 =  0.5;
-      matrix11 =  0.5;
-      matrix12 = -recSqrt2;
-      matrix13 =  0.;
+      matrixDSP[4] =  0.5;
+      matrixDSP[5] =  0.5;
+      matrixDSP[6] = -recSqrt2;
+      matrixDSP[7] =  0.;
 
-      matrix20 =  0.5;
-      matrix21 = -0.5;
-      matrix22 =  0.;
-      matrix23 =  recSqrt2;
+      matrixDSP[8] =  0.5;
+      matrixDSP[9] = -0.5;
+      matrixDSP[10] =  0.;
+      matrixDSP[11] =  recSqrt2;
 
-      matrix30 =  0.5;
-      matrix31 = -0.5;
-      matrix32 =  0.;
-      matrix33 = -recSqrt2;
+      matrixDSP[12] =  0.5;
+      matrixDSP[13] = -0.5;
+      matrixDSP[14] =  0.;
+      matrixDSP[15] = -recSqrt2;
     ) :
     (
       // Option 3: front up-down [ FU, FD, BL, BR ]
+      
       slider1 == 3 ?
       (
-        /*
-        [ 0.5, 0.5, 0, recSqrt2 ],
-        [ 0.5, 0.5, 0, recSqrt2.neg ],
-        [ 0.5, -0.5, recSqrt2, 0 ],
-        [ 0.5, -0.5, recSqrt2.neg, 0 ]
-        */
-       
-        matrix00 =  0.5;
-        matrix01 =  0.5;
-        matrix02 =  0.;
-        matrix03 =  recSqrt2;
+        matrixDSP[0] =  0.5;
+        matrixDSP[1] =  0.5;
+        matrixDSP[2] =  0.;
+        matrixDSP[3] =  recSqrt2;
 
-        matrix10 =  0.5;
-        matrix11 =  0.5;
-        matrix12 =  0.;
-        matrix13 = -recSqrt2;
+        matrixDSP[4] =  0.5;
+        matrixDSP[5] =  0.5;
+        matrixDSP[6] =  0.;
+        matrixDSP[7] = -recSqrt2;
 
-        matrix20 =  0.5;
-        matrix21 = -0.5;
-        matrix22 =  recSqrt2;
-        matrix23 =  0.;
+        matrixDSP[8] =  0.5;
+        matrixDSP[9] = -0.5;
+        matrixDSP[10] =  recSqrt2;
+        matrixDSP[11] =  0.;
 
-        matrix30 =  0.5;
-        matrix31 = -0.5;
-        matrix32 = -recSqrt2;
-        matrix33 =  0.;
+        matrixDSP[12] =  0.5;
+        matrixDSP[13] = -0.5;
+        matrixDSP[14] = -recSqrt2;
+        matrixDSP[15] =  0.;
       ) :
       (
         // Option 4: front & back down [ F, BD, BLU, BRU ]
+        
         slider1 == 4 ?
         (
-          /*
-          [ 0.5, sqrt3Div2, 0, 0 ],
-          [ 0.5, sqrt3Div6.neg, 0, sqrt6Div3.neg ],
-          [ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6 ],
-          [ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6 ]
-          */
-         
-          matrix00 =  0.5;
-          matrix01 =  sqrt3Div2;
-          matrix02 =  0.;
-          matrix03 =  0.;
+          matrixDSP[0] =  0.5;
+          matrixDSP[1] =  sqrt3Div2;
+          matrixDSP[2] =  0.;
+          matrixDSP[3] =  0.;
 
-          matrix10 =  0.5;
-          matrix11 = -sqrt3Div6;
-          matrix12 =  0.;
-          matrix13 = -sqrt6Div3;
+          matrixDSP[4] =  0.5;
+          matrixDSP[5] = -sqrt3Div6;
+          matrixDSP[6] =  0.;
+          matrixDSP[7] = -sqrt6Div3;
 
-          matrix20 =  0.5;
-          matrix21 = -sqrt3Div6;
-          matrix22 =  recSqrt2;
-          matrix23 =  recSqrt6;
+          matrixDSP[8] =  0.5;
+          matrixDSP[9] = -sqrt3Div6;
+          matrixDSP[10] =  recSqrt2;
+          matrixDSP[11] =  recSqrt6;
 
-          matrix30 =  0.5;
-          matrix31 = -sqrt3Div6;
-          matrix32 = -recSqrt2;
-          matrix33 =  recSqrt6;
+          matrixDSP[12] =  0.5;
+          matrixDSP[13] = -sqrt3Div6;
+          matrixDSP[14] = -recSqrt2;
+          matrixDSP[15] =  recSqrt6;
         ) :
         (
           // Option 5: front & back up [ F, BU, BLD, BRD ]
+          
           slider1 == 5 ?
           (
-            /*
-            [ 0.5, sqrt3Div2, 0, 0 ],
-            [ 0.5, sqrt3Div6.neg, 0, sqrt6Div3 ],
-            [ 0.5, sqrt3Div6.neg, recSqrt2, recSqrt6.neg ],
-            [ 0.5, sqrt3Div6.neg, recSqrt2.neg, recSqrt6.neg ]
-            */
-           
-            matrix00 =  0.5;
-            matrix01 =  sqrt3Div2;
-            matrix02 =  0.;
-            matrix03 =  0.;
+            matrixDSP[0] =  0.5;
+            matrixDSP[1] =  sqrt3Div2;
+            matrixDSP[2] =  0.;
+            matrixDSP[3] =  0.;
 
-            matrix10 =  0.5;
-            matrix11 = -sqrt3Div6;
-            matrix12 =  0.0;
-            matrix13 =  sqrt6Div3;
+            matrixDSP[4] =  0.5;
+            matrixDSP[5] = -sqrt3Div6;
+            matrixDSP[6] =  0.0;
+            matrixDSP[7] =  sqrt6Div3;
 
-            matrix20 =  0.5;
-            matrix21 = -sqrt3Div6;
-            matrix22 =  recSqrt2;
-            matrix23 = -recSqrt6;
+            matrixDSP[8] =  0.5;
+            matrixDSP[9] = -sqrt3Div6;
+            matrixDSP[10] =  recSqrt2;
+            matrixDSP[11] = -recSqrt6;
 
-            matrix30 =  0.5;
-            matrix31 = -sqrt3Div6;
-            matrix32 = -recSqrt2;
-            matrix33 = -recSqrt6;
+            matrixDSP[12] =  0.5;
+            matrixDSP[13] = -sqrt3Div6;
+            matrixDSP[14] = -recSqrt2;
+            matrixDSP[15] = -recSqrt6;
           ) :
           (
             // Option 6: front left-right up [ FLU, FRU, FD, B ]
+            
             slider1 == 6 ?
             (
-              /*
-              [ 0.5, sqrt3Div6, recSqrt2, recSqrt6 ],
-              [ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6 ],
-              [ 0.5, sqrt3Div6, 0, sqrt6Div3.neg ],
-              [ 0.5, sqrt3Div2.neg, 0, 0 ]
-              */
-             
-              matrix00 =  0.5;
-              matrix01 =  sqrt3Div6;
-              matrix02 =  recSqrt2;
-              matrix03 =  recSqrt6;
+              matrixDSP[0] =  0.5;
+              matrixDSP[1] =  sqrt3Div6;
+              matrixDSP[2] =  recSqrt2;
+              matrixDSP[3] =  recSqrt6;
 
-              matrix10 =  0.5;
-              matrix11 =  sqrt3Div6;
-              matrix12 = -recSqrt2;
-              matrix13 =  recSqrt6;
+              matrixDSP[4] =  0.5;
+              matrixDSP[5] =  sqrt3Div6;
+              matrixDSP[6] = -recSqrt2;
+              matrixDSP[7] =  recSqrt6;
 
-              matrix20 =  0.5;
-              matrix21 =  sqrt3Div6;
-              matrix22 =  0.;
-              matrix23 = -sqrt6Div3;
+              matrixDSP[8] =  0.5;
+              matrixDSP[9] =  sqrt3Div6;
+              matrixDSP[10] =  0.;
+              matrixDSP[11] = -sqrt6Div3;
 
-              matrix30 =  0.5;
-              matrix31 = -sqrt3Div2;
-              matrix32 =  0.;
-              matrix33 =  0.;
+              matrixDSP[12] =  0.5;
+              matrixDSP[13] = -sqrt3Div2;
+              matrixDSP[14] =  0.;
+              matrixDSP[15] =  0.;
             ) :
             (
               // Option 7: front left-right down [ FLD, FRD, FU, B ]
-              /*
-              [ 0.5, sqrt3Div6, recSqrt2, recSqrt6.neg ],
-              [ 0.5, sqrt3Div6, recSqrt2.neg, recSqrt6.neg ],
-              [ 0.5, sqrt3Div6, 0, sqrt6Div3 ],
-              [ 0.5, sqrt3Div2.neg, 0, 0 ]
-              */
-             
-              matrix00 =  0.5;
-              matrix01 =  sqrt3Div6;
-              matrix02 =  recSqrt2;
-              matrix03 = -recSqrt6;
 
-              matrix10 =  0.5;
-              matrix11 =  sqrt3Div6;
-              matrix12 = -recSqrt2;
-              matrix13 = -recSqrt6;
+              matrixDSP[0] =  0.5;
+              matrixDSP[1] =  sqrt3Div6;
+              matrixDSP[2] =  recSqrt2;
+              matrixDSP[3] = -recSqrt6;
 
-              matrix20 =  0.5;
-              matrix21 =  sqrt3Div6;
-              matrix22 =  0.;
-              matrix23 =  sqrt6Div3;
+              matrixDSP[4] =  0.5;
+              matrixDSP[5] =  sqrt3Div6;
+              matrixDSP[6] = -recSqrt2;
+              matrixDSP[7] = -recSqrt6;
 
-              matrix30 =  0.5;
-              matrix31 = -sqrt3Div2;
-              matrix32 =  0.;
-              matrix33 =  0.;
+              matrixDSP[8] =  0.5;
+              matrixDSP[9] =  sqrt3Div6;
+              matrixDSP[10] =  0.;
+              matrixDSP[11] =  sqrt6Div3;
+
+              matrixDSP[12] =  0.5;
+              matrixDSP[13] = -sqrt3Div2;
+              matrixDSP[14] =  0.;
+              matrixDSP[15] =  0.;
             );
 
           );
@@ -505,10 +458,10 @@ slider2 == 0 ?
 
 
 // Compensate matrix for weight:
-matrix00 = g0 * matrix00;
-matrix10 = g0 * matrix10;
-matrix20 = g0 * matrix20;
-matrix30 = g0 * matrix30;
+matrixDSP[0] =  g0 * matrixDSP[0];
+matrixDSP[4] =  g0 * matrixDSP[4];
+matrixDSP[8] =  g0 * matrixDSP[8];
+matrixDSP[12] = g0 * matrixDSP[12];
 
 // As compared to BtoA we now invert the matrix
 invertMatrix();
@@ -525,7 +478,7 @@ yIn = spl2;
 zIn = spl3;
 
 // Matrix multiplication with input signal:
-spl0 = wIn * matrix00 + xIn * matrix01 + yIn * matrix02 + zIn * matrix03;
-spl1 = wIn * matrix10 + xIn * matrix11 + yIn * matrix12 + zIn * matrix13;
-spl2 = wIn * matrix20 + xIn * matrix21 + yIn * matrix22 + zIn * matrix23;
-spl3 = wIn * matrix30 + xIn * matrix31 + yIn * matrix32 + zIn * matrix33;
+spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
+spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+spl2 = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
+spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];
