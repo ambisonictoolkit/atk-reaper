@@ -86,9 +86,9 @@ rsqrt2  = 1. / sqrt2;
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
-matrixTumble1     = 1020;
+matrixTumble1   = 1020;
 matrixTransform = 1040;
-matrixTumble2     = 1060;
+matrixTumble2   = 1060;
 matrixRotate2   = 1080;
 
 // These are used for matrix multiplications
