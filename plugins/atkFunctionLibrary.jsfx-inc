@@ -22,10 +22,22 @@ and GNU General Public License along with this program.  If not, see
 
 
 ---------------------------------------------------------------------
+The function for inverting a 4x4 matrix is lifted of StackOverflow:
+http://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix
+
+The code there is itself lifted of the MESA implementation of the GLU library:
+http://www.mesa3d.org/
+---------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------
   Class: atk-function-library.jsfx-inc
   Library of shared functions
 ---------------------------------------------------------------------
 */
+
+
 
 /********************************************************************
 Functions in the init section can be used by any plugin loading this
@@ -35,10 +47,256 @@ file, encouraging DRY (don't repeat yourself)
 
 
 
-
 /*---------------------------------------------------------------------
   Matrix section
 ---------------------------------------------------------------------*/
+
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for rotation transformation
+********************************************************************/
+function generateBtoAMatrix(matrix, orientation, weight)
+(
+  // Option 0: orthogonal (front left up) [ FLU, FRD, BLD, BRU ]
+  orientation == 0 ?
+  ( 
+    matrixDSP[0] =   0.5;
+    matrixDSP[1] =   0.5;
+    matrixDSP[2] =   0.5;
+    matrixDSP[3] =   0.5;
+
+    matrixDSP[4] =   0.5;
+    matrixDSP[5] =   0.5;
+    matrixDSP[6] =  -0.5;
+    matrixDSP[7] =  -0.5;
+
+    matrixDSP[8] =   0.5;
+    matrixDSP[9] =  -0.5;
+    matrixDSP[10] =  0.5;
+    matrixDSP[11] = -0.5;
+
+    matrixDSP[12] =  0.5;
+    matrixDSP[13] = -0.5;
+    matrixDSP[14] = -0.5;
+    matrixDSP[15] =  0.5;
+  ) :
+  (
+    // Option 1: front left down [ FLD, FRU, BLU, BRD ]
+    orientation == 1 ?
+    (
+      matrixDSP[0] =  0.5;
+      matrixDSP[1] =  0.5;
+      matrixDSP[2] =  0.5;
+      matrixDSP[3] = -0.5;
+
+      matrixDSP[4] =  0.5;
+      matrixDSP[5] =  0.5;
+      matrixDSP[6] = -0.5;
+      matrixDSP[7] =  0.5;
+
+      matrixDSP[8] =  0.5;
+      matrixDSP[9] = -0.5;
+      matrixDSP[10] =  0.5;
+      matrixDSP[11] =  0.5;
+
+      matrixDSP[12] =  0.5;
+      matrixDSP[13] = -0.5;
+      matrixDSP[14] = -0.5;
+      matrixDSP[15] = -0.5;
+    ) :
+    (
+      // Option 2: front left-right [ FL, FR, BU, BD ]
+    
+      orientation == 2 ?
+      (     
+        matrixDSP[0] =  0.5;
+        matrixDSP[1] =  0.5;
+        matrixDSP[2] =  recSqrt2;
+        matrixDSP[3] =  0.;
+
+        matrixDSP[4] =  0.5;
+        matrixDSP[5] =  0.5;
+        matrixDSP[6] = -recSqrt2;
+        matrixDSP[7] =  0.;
+
+        matrixDSP[8] =  0.5;
+        matrixDSP[9] = -0.5;
+        matrixDSP[10] =  0.;
+        matrixDSP[11] =  recSqrt2;
+
+        matrixDSP[12] =  0.5;
+        matrixDSP[13] = -0.5;
+        matrixDSP[14] =  0.;
+        matrixDSP[15] = -recSqrt2;
+      ) :
+      (
+        // Option 3: front up-down [ FU, FD, BL, BR ]
+      
+        orientation == 3 ?
+        (
+          matrixDSP[0] =  0.5;
+          matrixDSP[1] =  0.5;
+          matrixDSP[2] =  0.;
+          matrixDSP[3] =  recSqrt2;
+
+          matrixDSP[4] =  0.5;
+          matrixDSP[5] =  0.5;
+          matrixDSP[6] =  0.;
+          matrixDSP[7] = -recSqrt2;
+
+          matrixDSP[8] =  0.5;
+          matrixDSP[9] = -0.5;
+          matrixDSP[10] =  recSqrt2;
+          matrixDSP[11] =  0.;
+
+          matrixDSP[12] =  0.5;
+          matrixDSP[13] = -0.5;
+          matrixDSP[14] = -recSqrt2;
+          matrixDSP[15] =  0.;
+        ) :
+        (
+          // Option 4: front & back down [ F, BD, BLU, BRU ]
+        
+          orientation == 4 ?
+          (
+            matrixDSP[0] =  0.5;
+            matrixDSP[1] =  sqrt3Div2;
+            matrixDSP[2] =  0.;
+            matrixDSP[3] =  0.;
+
+            matrixDSP[4] =  0.5;
+            matrixDSP[5] = -sqrt3Div6;
+            matrixDSP[6] =  0.;
+            matrixDSP[7] = -sqrt6Div3;
+
+            matrixDSP[8] =  0.5;
+            matrixDSP[9] = -sqrt3Div6;
+            matrixDSP[10] =  recSqrt2;
+            matrixDSP[11] =  recSqrt6;
+
+            matrixDSP[12] =  0.5;
+            matrixDSP[13] = -sqrt3Div6;
+            matrixDSP[14] = -recSqrt2;
+            matrixDSP[15] =  recSqrt6;
+          ) :
+          (
+            // Option 5: front & back up [ F, BU, BLD, BRD ]
+          
+            orientation == 5 ?
+            (
+              matrixDSP[0] =  0.5;
+              matrixDSP[1] =  sqrt3Div2;
+              matrixDSP[2] =  0.;
+              matrixDSP[3] =  0.;
+
+              matrixDSP[4] =  0.5;
+              matrixDSP[5] = -sqrt3Div6;
+              matrixDSP[6] =  0.0;
+              matrixDSP[7] =  sqrt6Div3;
+
+              matrixDSP[8] =  0.5;
+              matrixDSP[9] = -sqrt3Div6;
+              matrixDSP[10] =  recSqrt2;
+              matrixDSP[11] = -recSqrt6;
+
+              matrixDSP[12] =  0.5;
+              matrixDSP[13] = -sqrt3Div6;
+              matrixDSP[14] = -recSqrt2;
+              matrixDSP[15] = -recSqrt6;
+            ) :
+            (
+              // Option 6: front left-right up [ FLU, FRU, FD, B ]
+            
+              orientation == 6 ?
+              (
+                matrixDSP[0] =  0.5;
+                matrixDSP[1] =  sqrt3Div6;
+                matrixDSP[2] =  recSqrt2;
+                matrixDSP[3] =  recSqrt6;
+
+                matrixDSP[4] =  0.5;
+                matrixDSP[5] =  sqrt3Div6;
+                matrixDSP[6] = -recSqrt2;
+                matrixDSP[7] =  recSqrt6;
+
+                matrixDSP[8] =  0.5;
+                matrixDSP[9] =  sqrt3Div6;
+                matrixDSP[10] =  0.;
+                matrixDSP[11] = -sqrt6Div3;
+
+                matrixDSP[12] =  0.5;
+                matrixDSP[13] = -sqrt3Div2;
+                matrixDSP[14] =  0.;
+                matrixDSP[15] =  0.;
+              ) :
+              (
+                // Option 7: front left-right down [ FLD, FRD, FU, B ]
+
+                matrixDSP[0] =  0.5;
+                matrixDSP[1] =  sqrt3Div6;
+                matrixDSP[2] =  recSqrt2;
+                matrixDSP[3] = -recSqrt6;
+
+                matrixDSP[4] =  0.5;
+                matrixDSP[5] =  sqrt3Div6;
+                matrixDSP[6] = -recSqrt2;
+                matrixDSP[7] = -recSqrt6;
+
+                matrixDSP[8] =  0.5;
+                matrixDSP[9] =  sqrt3Div6;
+                matrixDSP[10] =  0.;
+                matrixDSP[11] =  sqrt6Div3;
+
+                matrixDSP[12] =  0.5;
+                matrixDSP[13] = -sqrt3Div2;
+                matrixDSP[14] =  0.;
+                matrixDSP[15] =  0.;
+              );
+
+            );
+
+          );
+
+        );
+
+      );
+    );
+  );
+
+
+  // Weight:
+  // Option 0: Decorrelated (on the sphere)
+  weight == 0 ?
+  (
+    g0 = sqrt(2./3.);
+  ) :
+  (
+    // Option 1: Canonical
+    weight == 1 ?
+    (
+      g0 = 1.;
+    ) :
+    (
+      // Option 2: Unscaled, W_gain = 1
+      weight == 2 ?
+      (
+        g0 = sqrt(2.);
+      ) :
+      // Option 3: Cardioid
+      (
+        g0 = sqrt(6.);
+      );
+    );
+  );
+
+  // Compensate matrix for weight:
+  matrixDSP[0] =  g0 * matrixDSP[0];
+  matrixDSP[4] =  g0 * matrixDSP[4];
+  matrixDSP[8] =  g0 * matrixDSP[8];
+  matrixDSP[12] = g0 * matrixDSP[12];
+);
+
 
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for rotation transformation
