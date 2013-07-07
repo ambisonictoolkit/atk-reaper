@@ -29,6 +29,9 @@ and GNU General Public License along with this program.  If not, see
 
 desc: A to B format encoder for a variety of tetrahedral orientations and W channel weights.
 
+// Import library with shared functions for matrix and graphics processing
+import atkFunctionLibrary.jsfx-inc
+
 in_pin:A
 in_pin:B
 in_pin:C
@@ -73,153 +76,6 @@ Updated slider value:
   The code there is itself lifted of the MESA implementation of the GLU library:
   http://www.mesa3d.org/
 */
-function invertMatrix()
-(
-  inv00 =  matrixDSP[5]  * matrixDSP[10] * matrixDSP[15] -
-           matrixDSP[5]  * matrixDSP[11] * matrixDSP[14] -
-           matrixDSP[9]  * matrixDSP[6]  * matrixDSP[15] +
-           matrixDSP[9]  * matrixDSP[7]  * matrixDSP[14] +
-           matrixDSP[13] * matrixDSP[6]  * matrixDSP[11] -
-           matrixDSP[13] * matrixDSP[7]  * matrixDSP[10];
-
-  inv10 = -matrixDSP[4]  * matrixDSP[10]  * matrixDSP[15] +
-           matrixDSP[4]  * matrixDSP[11]  * matrixDSP[14] +
-           matrixDSP[8]  * matrixDSP[6]  * matrixDSP[15] -
-           matrixDSP[8]  * matrixDSP[7]  * matrixDSP[14] -
-           matrixDSP[12] * matrixDSP[6]  * matrixDSP[11] +
-           matrixDSP[12] * matrixDSP[7]  * matrixDSP[10];
-
-  inv20 =  matrixDSP[4]  * matrixDSP[9]  * matrixDSP[15] -
-           matrixDSP[4]  * matrixDSP[11] * matrixDSP[13] -
-           matrixDSP[8]  * matrixDSP[5]  * matrixDSP[15] +
-           matrixDSP[8]  * matrixDSP[7]  * matrixDSP[13] +
-           matrixDSP[12] * matrixDSP[5]  * matrixDSP[11] -
-           matrixDSP[12] * matrixDSP[7]  * matrixDSP[9];
-
-  inv30 = -matrixDSP[4]  * matrixDSP[9]  * matrixDSP[14] +
-           matrixDSP[4]  * matrixDSP[10] * matrixDSP[13] +
-           matrixDSP[8]  * matrixDSP[5]  * matrixDSP[14] -
-           matrixDSP[8]  * matrixDSP[6]  * matrixDSP[13] -
-           matrixDSP[12] * matrixDSP[5]  * matrixDSP[10] +
-           matrixDSP[12] * matrixDSP[6]  * matrixDSP[9];
-
-  inv01 = -matrixDSP[1]  * matrixDSP[10] * matrixDSP[15] +
-           matrixDSP[1]  * matrixDSP[11] * matrixDSP[14] +
-           matrixDSP[9]  * matrixDSP[2]  * matrixDSP[15] -
-           matrixDSP[9]  * matrixDSP[3]  * matrixDSP[14] -
-           matrixDSP[13] * matrixDSP[2]  * matrixDSP[11] +
-           matrixDSP[13] * matrixDSP[3]  * matrixDSP[10];
-
-  inv11 =  matrixDSP[0]  * matrixDSP[10] * matrixDSP[15] -
-           matrixDSP[0]  * matrixDSP[11] * matrixDSP[14] -
-           matrixDSP[8]  * matrixDSP[2]  * matrixDSP[15] +
-           matrixDSP[8]  * matrixDSP[3]  * matrixDSP[14] +
-           matrixDSP[12] * matrixDSP[2]  * matrixDSP[11] - 
-           matrixDSP[12] * matrixDSP[3]  * matrixDSP[10];
-
-  inv21 = -matrixDSP[0]  * matrixDSP[9]  * matrixDSP[15] +
-           matrixDSP[0]  * matrixDSP[11] * matrixDSP[13] +
-           matrixDSP[8]  * matrixDSP[1]  * matrixDSP[15] -
-           matrixDSP[8]  * matrixDSP[3]  * matrixDSP[13] -
-           matrixDSP[12] * matrixDSP[1]  * matrixDSP[11] +
-           matrixDSP[12] * matrixDSP[3]  * matrixDSP[9];
-
-  inv31 =  matrixDSP[0]  * matrixDSP[9]  * matrixDSP[14] -
-           matrixDSP[0]  * matrixDSP[10] * matrixDSP[13] -
-           matrixDSP[8]  * matrixDSP[1]  * matrixDSP[14] +
-           matrixDSP[8]  * matrixDSP[2]  * matrixDSP[13] +
-           matrixDSP[12] * matrixDSP[1]  * matrixDSP[10] -
-           matrixDSP[12] * matrixDSP[2]  * matrixDSP[9];
-
-  inv02 =  matrixDSP[1]  * matrixDSP[6]  * matrixDSP[15] -
-           matrixDSP[1]  * matrixDSP[7]  * matrixDSP[14] -
-           matrixDSP[5]  * matrixDSP[2]  * matrixDSP[15] +
-           matrixDSP[5]  * matrixDSP[3]  * matrixDSP[14] +
-           matrixDSP[13] * matrixDSP[2]  * matrixDSP[7] -
-           matrixDSP[13] * matrixDSP[3]  * matrixDSP[6];
-
-  inv12 = -matrixDSP[0]  * matrixDSP[6]  * matrixDSP[15] +
-           matrixDSP[0]  * matrixDSP[7]  * matrixDSP[14] +
-           matrixDSP[4]  * matrixDSP[2]  * matrixDSP[15] -
-           matrixDSP[4]  * matrixDSP[3]  * matrixDSP[14] -
-           matrixDSP[12] * matrixDSP[2]  * matrixDSP[7] +
-           matrixDSP[12] * matrixDSP[3]  * matrixDSP[6];
-
-  inv22 =  matrixDSP[0]  * matrixDSP[5]  * matrixDSP[15] -
-           matrixDSP[0]  * matrixDSP[7]  * matrixDSP[13] -
-           matrixDSP[4]  * matrixDSP[1]  * matrixDSP[15] +
-           matrixDSP[4]  * matrixDSP[3]  * matrixDSP[13] +
-           matrixDSP[12] * matrixDSP[1]  * matrixDSP[7] -
-           matrixDSP[12] * matrixDSP[3]  * matrixDSP[5];
-
-  inv32 = -matrixDSP[0]  * matrixDSP[5]  * matrixDSP[14] +
-           matrixDSP[0]  * matrixDSP[6]  * matrixDSP[13] +
-           matrixDSP[4]  * matrixDSP[1]  * matrixDSP[14] -
-           matrixDSP[4]  * matrixDSP[2]  * matrixDSP[13] -
-           matrixDSP[12] * matrixDSP[1]  * matrixDSP[6] +
-           matrixDSP[12] * matrixDSP[2]  * matrixDSP[5];
-
-  inv03 = -matrixDSP[1]  * matrixDSP[6]  * matrixDSP[11] +
-           matrixDSP[1]  * matrixDSP[7]  * matrixDSP[10] +
-           matrixDSP[5]  * matrixDSP[2]  * matrixDSP[11] -
-           matrixDSP[5]  * matrixDSP[3]  * matrixDSP[10] -
-           matrixDSP[9]  * matrixDSP[2]  * matrixDSP[7] +
-           matrixDSP[9]  * matrixDSP[3]  * matrixDSP[6];
-
-  inv13 =  matrixDSP[0]  * matrixDSP[6]  * matrixDSP[11] -
-           matrixDSP[0]  * matrixDSP[7]  * matrixDSP[10] -
-           matrixDSP[4]  * matrixDSP[2]  * matrixDSP[11] +
-           matrixDSP[4]  * matrixDSP[3]  * matrixDSP[10] +
-           matrixDSP[8]  * matrixDSP[2]  * matrixDSP[7] -
-           matrixDSP[8]  * matrixDSP[3]  * matrixDSP[6];
-
-  inv23 = -matrixDSP[0]  * matrixDSP[5]  * matrixDSP[11] +
-           matrixDSP[0]  * matrixDSP[7]  * matrixDSP[9] +
-           matrixDSP[4]  * matrixDSP[1]  * matrixDSP[11] -
-           matrixDSP[4]  * matrixDSP[3]  * matrixDSP[9] -
-           matrixDSP[8]  * matrixDSP[1]  * matrixDSP[7] +
-           matrixDSP[8]  * matrixDSP[3]  * matrixDSP[5];
-
-  inv33 =  matrixDSP[0]  * matrixDSP[5]  * matrixDSP[10] -
-           matrixDSP[0]  * matrixDSP[6]  * matrixDSP[9] -
-	         matrixDSP[4]  * matrixDSP[1]  * matrixDSP[10] +
-           matrixDSP[4]  * matrixDSP[2]  * matrixDSP[9] +
-           matrixDSP[8]  * matrixDSP[1]  * matrixDSP[6] -
-           matrixDSP[8]  * matrixDSP[2]  * matrixDSP[5];
-					
-  determinant = matrixDSP[0] * inv00 +
-	              matrixDSP[1] * inv10 +
-				        matrixDSP[2] * inv20 +
-				        matrixDSP[3] * inv30;
-
-  /* Might be difficult to check this in Reaper/JS, but it might also be redundant?
-	if (determinant == 0)
-    return false;
-	*/
-
-  determinant = 1.0 / determinant;
-
-  matrixDSP[0] = inv00 * determinant;
-	matrixDSP[1] = inv01 * determinant;
-	matrixDSP[2] = inv02 * determinant;
-	matrixDSP[3] = inv03 * determinant;
-	
-	matrixDSP[4] = inv10 * determinant;
-	matrixDSP[5] = inv11 * determinant;
-	matrixDSP[6] = inv12 * determinant;
-	matrixDSP[7] = inv13 * determinant;
-	
-	matrixDSP[8] = inv20 * determinant;
-	matrixDSP[9] = inv21 * determinant;
-	matrixDSP[10] = inv22 * determinant;
-	matrixDSP[11] = inv23 * determinant;
-	
-	matrixDSP[12] = inv30 * determinant;
-	matrixDSP[13] = inv31 * determinant;
-	matrixDSP[14] = inv32 * determinant;
-	matrixDSP[15] = inv33 * determinant;
-);
-
 
 // Transformation matrix depends on direction
 // This is the same code as for BtoA, but at the end we invert the matrix
@@ -464,7 +320,7 @@ matrixDSP[8] =  g0 * matrixDSP[8];
 matrixDSP[12] = g0 * matrixDSP[12];
 
 // As compared to BtoA we now invert the matrix
-invertMatrix();
+invertMatrix(matrixDSP);
 
 
 
