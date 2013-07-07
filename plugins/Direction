@@ -50,7 +50,11 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Encode mono signal as directional (planewave) soundfield
 
+// Graphics file
 filename:0,HorizontalBackground.png
+
+// Import library with shared functions for matrix and graphics processing
+import atkFunctionLibrary.jsfx-inc
 
 slider1:0<-180,180,1>Azimuth
 slider2:0<-90,90,1>Elevation
@@ -119,29 +123,9 @@ Custom graphic interface
 **********************************************************/
 @gfx 400 300
 
-// Set colors
-gfx_a = 1;
-gfx_r = gfx_g = gfx_b = 1;
-
-// Determine geometry
-centerX = gfx_w  * 0.5;
-centerY = gfx_h * 0.5;
-
-centerX < centerY ? radius = centerX : radius = centerY;
-radius = radius - 10;
-
-// Background graphics
-coordinatelist[0] = 0;                  //left-most pixel location for source
-coordinatelist[1] = 0;                  //top-most pixel location for source
-coordinatelist[2] = 800;                //width of source
-coordinatelist[3] = 800;                //height of source
-coordinatelist[4] = centerX - radius;   //left-most pixel location of destination
-coordinatelist[5] = centerY - radius;   //top-most pixel location of destination
-coordinatelist[6] = 2 * radius;         //width of destination to fill
-coordinatelist[7] = 2 * radius;         //height of destination to fill
-coordinatelist[8] =0;                   //represents offset from center of image
-coordinatelist[9] =0;                   //represents offset from center of image
-gfx_blitext(0,coordinatelist,0);
+gxColorSet(1, 1, 1, 1);
+determineGeometry();
+drawBackgroundImage();
 
 // Reset azimuth on mouse click
 mouse_cap == 1 ?
@@ -155,19 +139,12 @@ mouse_cap == 1 ?
   calculateCoefficients();
 );
 
+// Draw red square as interactive direction indicator, color tint depends on elevation
 posX = centerX + radius*(sinAzimuth * cosElevation);
 posY = centerY - radius*(cosAzimuth * cosElevation);
-
-// Red square as interactive direction indicator, color tint depends on elevation
-gfx_r =  1.0 + 0.3 * sinElevation;
-gfx_g =  0.5 * sinElevation;
-gfx_b =  0.5 * sinElevation;
-
-squareSize = 2. * sinElevation + 6.;
-
-gfx_x = posX-squareSize;
-gfx_y = posY-squareSize;
-gfx_rectto(posX+squareSize, posY+squareSize);
+squareSize = 4. * sinElevation + 12.;
+gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
+drawCenteredSquare(posX, posY, squareSize);
 
 
 /**********************************************************
