@@ -46,12 +46,32 @@ file, encouraging DRY (don't repeat yourself)
 @init
 
 
+/*---------------------------------------------------------------------
+  Mathematical functions
+---------------------------------------------------------------------*/
+
+/********************************************************************
+Maths: Convert linear gain to decibel
+********************************************************************/
+function db2amp(gain)
+(
+  pow(10.0, gain * 0.05);  // returns linear gain
+);
+
+
+/********************************************************************
+Maths: Convert linear gain to decibel
+********************************************************************/
+function amp2db(gain)
+(
+  20 * log10(gain);       // returns dB gain
+);
+
+
 
 /*---------------------------------------------------------------------
   Matrix section
 ---------------------------------------------------------------------*/
-
-
 
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for rotation transformation
@@ -484,6 +504,40 @@ function generateZoomMatrix(matrix, angle)
 
 
 /********************************************************************
+Matrix: Generate 1st order 4x4 matrix for dominate transformation
+********************************************************************/
+function generateDominateMatrix(matrix, gain) local(k, g0, g1)
+(
+	k = db2amp(gain);		
+	g0 = (k + 1. / k) * 0.5;
+	g1 = (k - 1. / k) / sqrt(2.);
+  
+  cosa = cos(angle);
+  sina = sin(angle);
+    
+  matrix[0]  = g0;
+  matrix[1]  = g1 * 0.5;
+  matrix[2]  = 0.;
+  matrix[3]  = 0.;
+  
+  matrix[4]  = g1;
+  matrix[5]  = g0;
+  matrix[6]  = 0.;
+  matrix[7]  = 0.;
+  
+  matrix[8]  = 0.;
+  matrix[9]  = 0.;
+  matrix[10] = 1.;
+  matrix[11] = 0.;
+  
+  matrix[12] = 0.;
+  matrix[13] = 0.;
+  matrix[14] = 0.;
+  matrix[15] = 1.;
+);
+
+
+/********************************************************************
 Matrix: Multiplication of two 4x4 matrixes: result = left x right
 ********************************************************************/
 function matrixMultiplication(result, left, right)
@@ -662,10 +716,10 @@ function invertMatrix(matrix)
 
 
 
-
 /*---------------------------------------------------------------------
   Graphics section
 ---------------------------------------------------------------------*/
+
 
 /********************************************************************
 Graphics: Set drawing color
