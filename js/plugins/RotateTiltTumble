@@ -30,7 +30,11 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Rotate a first order ambisonic signal (B-format) around the z, x and y axes.
 
+// Graphics file
 filename:0,HorizontalBackground.png
+
+// Import library with shared functions for matrix and graphics processing
+import atkFunctionLibrary.jsfx-inc
 
 in_pin:W
 in_pin:X
@@ -48,7 +52,6 @@ slider2:0<-180,180,1>Tilt (shift + mouse)
 slider3:0<-180,180,1>Tumble (cmd + mouse)
 
 
-
 /**********************************************************
 Initialisation
 **********************************************************/
@@ -60,7 +63,7 @@ deg2rad  = $pi / 180.;
 rad2norm = 1. / $pi;
 
 // Graphics constants:
-squareSize = 5.;
+squareSize = 10.;
 
 // Flag indicating that the plugin has not been fully initialised yet
 initialised = 0;
@@ -109,40 +112,14 @@ tumbleAngle = slider3 * deg2rad;
 calculateCoefficients();
 
 
-
 /**********************************************************
 Custom graphic interface
 **********************************************************/
 @gfx 400 300
 
-// Set colors
-gfx_a = 1;
-gfx_r = 1;
-gfx_g = 1;
-gfx_b = 1;
-
-// Determine geometry
-centerX = gfx_w * 0.5;
-centerY = gfx_h * 0.5;
-
-// Is radius controlled by height or width?
-centerX < centerY ? radius = centerX : radius = centerY;
-
-radius = radius - 10;
-
-// Draw background
-coordinatelist[0] = 0;                  //left-most pixel location for source
-coordinatelist[1] = 0;                  //top-most pixel location for source
-coordinatelist[2] = 800;                //width of source
-coordinatelist[3] = 800;                //height of source
-coordinatelist[4] = centerX - radius;   //left-most pixel location of destination
-coordinatelist[5] = centerY - radius;   //top-most pixel location of destination
-coordinatelist[6] = 2 * radius;         //width of destination to fill
-coordinatelist[7] = 2 * radius;         //height of destination to fill
-coordinatelist[8] =0;                   //represents offset from center of image
-coordinatelist[9] =0;                   //represents offset from center of image
-gfx_blitext(0,coordinatelist,0);
-
+gxColorSet(1, 1, 1, 1);
+determineGeometry();
+drawBackgroundImage();
 
 // Draw rotation indicator as interactive orange square
 mouse_cap == 1 ?
@@ -157,16 +134,8 @@ mouse_cap == 1 ?
   calculateCoefficients();
 );
 
-gfx_r =  1.0;
-gfx_g =  0.75;
-gfx_b =  0.5;
-
-posX = centerX + radius* sinRotation;
-posY = centerY - radius*cosRotation;
-
-gfx_x = posX-squareSize;
-gfx_y = posY-squareSize;
-gfx_rectto(posX+squareSize, posY+squareSize);
+gxColorSet(1, 1, 0.75, 0.5);
+drawCenteredSquare(centerX + radius* sinRotation, centerY - radius*cosRotation, squareSize);
 
 // Draw tilt indicator as interactive (shift + mouse) blue square and plane
 mouse_cap == 9 ?
@@ -183,37 +152,24 @@ mouse_cap == 9 ?
   slider_automate(slider2);
   calculateCoefficients();
 );
+gxColorSet(1, 0.5, 0.75, 1.);
+drawCenteredSquare(centerX + tiltAngle * rad2norm * radius, centerY, squareSize);
 
-// Set color
-gfx_r = 0.5;
-gfx_g = 0.75;
-gfx_b = 1.;
-
-// Draw square
-posX = centerX + tiltAngle * rad2norm * radius;
-gfx_x = posX - squareSize;
-gfx_y = centerY - squareSize;
-gfx_rectto(posX + squareSize, centerY + squareSize);
-
-// Draw plane - gray if the plane is tilted upside down
+// Draw outline of tilt plane - gray if the plane is tilted upside down
 cosTilt < 0 ?
 (
-  gfx_r = 0.7;
-  gfx_g = 0.7;
-  gfx_b = 0.7;
+  gxColorSet(1, 0.7, 0.7, 0.7);
 );
 
 tiltDeltaX = radius * cosTilt;
 tiltDeltaY = radius * sinTilt * 0.1;
 radiusFraction = 0.2 * radius;
 
-gfx_x = centerX - tiltDeltaX;
-gfx_y = centerY - radiusFraction - tiltDeltaY;
-gfx_lineto(centerX + tiltDeltaX, centerY - radiusFraction + tiltDeltaY, 1.);
-gfx_lineto(centerX + tiltDeltaX, centerY + radiusFraction - tiltDeltaY, 1.);
-gfx_lineto(centerX - tiltDeltaX, centerY + radiusFraction + tiltDeltaY, 1.);
-gfx_lineto(centerX - tiltDeltaX, centerY - radiusFraction - tiltDeltaY, 1.);
-
+drawQuadrangleOutline(centerX - tiltDeltaX, centerY - radiusFraction - tiltDeltaY,
+                      centerX + tiltDeltaX, centerY - radiusFraction + tiltDeltaY,
+                      centerX + tiltDeltaX, centerY + radiusFraction - tiltDeltaY,
+                      centerX - tiltDeltaX, centerY + radiusFraction + tiltDeltaY, 
+                      1.);
 
 // CMD + mouse: Draw tumble indicator as interactive green square
 mouse_cap == 5 ?
@@ -231,35 +187,23 @@ mouse_cap == 5 ?
   slider_automate(slider3);
   calculateCoefficients();
 );
+gxColorSet(1, 0.5, 1., 0.75);
+drawCenteredSquare(centerX, centerY - tumbleAngle * rad2norm * radius, squareSize);
 
-// Set color
-gfx_r = 0.5;
-gfx_g = 1.;
-gfx_b = 0.75;
-
-// Draw square
-gfx_x = centerX - squareSize;
-posY = centerY - tumbleAngle * rad2norm * radius;
-gfx_y = posY - squareSize;
-gfx_rectto(centerX + squareSize, posY + squareSize);
-
-// Draw plane - gray if the plane is tilted upside down
+// Draw outline of tumble plane - gray if the plane is tilted upside down
 cosTumble < 0 ?
 (
-  gfx_r = 0.7;
-  gfx_g = 0.7;
-  gfx_b = 0.7;
+  gxColorSet(1, 0.7, 0.7, 0.7);
 );
 
 tumbleDeltaX = radius * sinTumble * 0.1;
 tumbleDeltaY = radius * cosTumble;
 
-gfx_x = centerX - radiusFraction - tumbleDeltaX;
-gfx_y = centerY - tumbleDeltaY;
-gfx_lineto(centerX - radiusFraction + tumbleDeltaX, centerY + tumbleDeltaY, 1.);
-gfx_lineto(centerX + radiusFraction - tumbleDeltaX, centerY + tumbleDeltaY, 1.);
-gfx_lineto(centerX + radiusFraction + tumbleDeltaX, centerY - tumbleDeltaY, 1.);
-gfx_lineto(centerX - radiusFraction - tumbleDeltaX, centerY - tumbleDeltaY, 1.);
+drawQuadrangleOutline(centerX - radiusFraction - tumbleDeltaX, centerY - tumbleDeltaY,
+                      centerX - radiusFraction + tumbleDeltaX, centerY + tumbleDeltaY,
+                      centerX + radiusFraction - tumbleDeltaX, centerY + tumbleDeltaY,
+                      centerX + radiusFraction + tumbleDeltaX, centerY - tumbleDeltaY,
+                      1.);
 
 
 /**********************************************************
