@@ -143,7 +143,7 @@ Updated slider value:
 mode            = slider1;
 azimuth         = slider2 * deg2rad;
 elevation       = slider3 * deg2rad;
-transformAngle  = slider4 * 3.14159265359 * 0.5;
+transformAngle  = slider4 * $pi * 0.5;
 
 calculateMatrix();
 
