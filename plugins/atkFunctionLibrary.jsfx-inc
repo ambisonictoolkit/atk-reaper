@@ -76,7 +76,7 @@ function amp2db(gain)
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for rotation transformation
 ********************************************************************/
-function generateBtoAMatrix(matrix, orientation, weight)
+function generateBtoAMatrix(matrix, orientation, weight) local(g0)
 (
   // Option 0: orthogonal (front left up) [ FLU, FRD, BLD, BRU ]
   orientation == 0 ?
@@ -356,9 +356,6 @@ function generateDominateMatrix(matrix, gain) local(k, g0, g1)
 	k = db2amp(gain);		
 	g0 = (k + 1. / k) * 0.5;
 	g1 = (k - 1. / k) / sqrt(2.);
-  
-  cosa = cos(angle);
-  sina = sin(angle);
     
   matrix[0]  = g0;
   matrix[1]  = g1 * 0.5;
@@ -385,99 +382,93 @@ function generateDominateMatrix(matrix, gain) local(k, g0, g1)
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for tilt transformation
 ********************************************************************/
-function generateFocusMatrix(matrix, angle)
-(
-  cosa = cos(angle);
-  sina = sin(angle);
-  roneplussinaa = 1. / (1. + sin(abs(angle)));
-  sina1sina = sina * roneplussinaa;
+function generateFocusMatrix(matrix, angle) local(g0, g1, g2)
+(  
+	g0 = 1. / (1 + sin(abs(angle)));
+	g1 = sqrt(2) *  sin(angle) * g0;
+	g2 = cos(angle) * g0;
   
-  matrix[0]  = roneplussinaa;
-  matrix[1]  = rsqrt2 * sina1sina;
+  matrix[0]  = g0;
+  matrix[1]  = g1 * 0.5;
   matrix[2]  = 0.;
   matrix[3]  = 0.;
 
-  matrix[4]  = sqrt2 * sina1sina; 
-  matrix[5]  = roneplussinaa;
+  matrix[4]  = g1; 
+  matrix[5]  = g0;
   matrix[6]  = 0.;
   matrix[7]  = 0.;
   
   matrix[8]  = 0.;
   matrix[9]  = 0.;
-  matrix[10] = cosa * roneplussinaa;
+  matrix[10] = g2;
   matrix[11] = 0.;
   
   matrix[12] = 0.;
   matrix[13] = 0.;
   matrix[14] = 0.;
-  matrix[15] = cosa * roneplussinaa;
+  matrix[15] = g2;
 );
 
 
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for pressX transformation
 ********************************************************************/
-function generatePressMatrix(matrix, angle)
+function generatePressMatrix(matrix, angle) local(g0, g1, g2)
 (
-  cosa = cos(angle);
-  sina = sin(angle);
-  cosa2 = cosa * cosa;
-  asina = sin(abs(angle));
-  sqrt2asinasina = sqrt2 * (asina * sina);
-    
+	g0 = sqrt(2.) * sin(angle) * sin(abs(angle));
+  g2 = cos(angle);
+  g1 = g2 * g2;
+  
   matrix[0]  = 1.;
   matrix[1]  = 0.;
   matrix[2]  = 0.;
   matrix[3]  = 0.;
   
-  matrix[4]  = sqrt2asinasina;
-  matrix[5]  = cosa2;
+  matrix[4]  = g0;
+  matrix[5]  = g1;
   matrix[6]  = 0.;
   matrix[7]  = 0.;
   
   matrix[8]  = 0.;
   matrix[9]  = 0.;
-  matrix[10] = cosa;
+  matrix[10] = g2;
   matrix[11] = 0.;
   
   matrix[12] = 0.;
   matrix[13] = 0.;
-  matrix[14] = cosa;
-  matrix[15] = 1.;
+  matrix[14] = 0.;
+  matrix[15] = g2;
 );
 
 
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for pushX transformation
 ********************************************************************/
-function generatePushMatrix(matrix, angle)
-(
-  cosa = cos(angle);
-  sina = sin(angle);
-  
-  cosa2 = cosa * cosa;
-  asina = sin(abs(angle));
-  sqrt2asinasina = sqrt2 * (asina * sina);
-  
+function generatePushMatrix(matrix, angle) local(g0, g1)
+(  
+  g0 = sqrt(2.) * sin(angle) * sin(abs(angle));
+  g1 = cos(angle);
+  g1 = g1 * g1;
+    
   matrix[0]  = 1.;
   matrix[1]  = 0.;
   matrix[2]  = 0.;
   matrix[3]  = 0.;
   
-  matrix[4]  = sqrt2asinasina;
-  matrix[5]  = cosa2;
+  matrix[4]  = g0;
+  matrix[5]  = g1;
   matrix[6]  = 0.;
   matrix[7]  = 0.;
   
   matrix[8]  = 0.;
   matrix[9]  = 0.;
-  matrix[10] = cosa2;
+  matrix[10] = g1;
   matrix[11] = 0.;
   
   matrix[12] = 0.;
   matrix[13] = 0.;
   matrix[14] = 0.;
-  matrix[15] = cosa2;
+  matrix[15] = g1;
 );
 
 
@@ -540,49 +531,52 @@ function generateTumblelMatrix(matrix, angle)
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for zoomX transformation
 ********************************************************************/
-function generateZoomMatrix(matrix, angle)
-(  
-  cosa = cos(angle);
-  sina = sin(angle);
+function generateZoomMatrix(matrix, angle) local(g0, g1)
+(
+  g0 = sin(angle);
+  g1 = cos(angle);
     
   matrix[0]  = 1.;
-  matrix[1]  = rsqrt2 * sina;
+  matrix[1]  = g0 / sqrt(2.);
   matrix[2]  = 0.;
   matrix[3]  = 0.;
   
-  matrix[4]  = sqrt2 * sina;
+  matrix[4]  = g0 * sqrt(2.);
   matrix[5]  = 1.;
   matrix[6]  = 0.;
   matrix[7]  = 0.;
   
   matrix[8]  = 0.;
   matrix[9]  = 0.;
-  matrix[10] = cosa;
+  matrix[10] = g1;
   matrix[11] = 0.;
   
   matrix[12] = 0.;
   matrix[13] = 0.;
-  matrix[14] = cosa;
-  matrix[15] = 1.;
+  matrix[14] = 0.;
+  matrix[15] = g1;
 );
 
 
 /********************************************************************
 Matrix: Multiplication of two 4x4 matrixes: result = left x right
 ********************************************************************/
-function matrixMultiplication(result, left, right)
+function matrixMultiplication(resultMatrix, numRowsLeft, numColsLeft, leftMatrix, numRowsRight, numColsRight, rightMatrix)
 (
-  // Iterate over columns of left matrix
+  // It is the responsibility of each plugin calling this function to ensure that numColsLeft == numRowsRight.
+  // We do not check for that here.
+  
+  // Iterate over rows of left matrix
   i = 0;
-  loop(4, 
-    // Iterate over rows of right matrix
+  loop(numRowsLeft, 
+    // Iterate over columns of right matrix
     j = 0;
-    loop(4,
+    loop(numColsRight,
       // Calculate one cell
-      result[4*i+j] = 0.;
+      resultMatrix[numRowsLeft*i + j] = 0.;
       k = 0;
-      loop(4,
-        result[4*i+j] += left[4*i+k]*right[4*k+j];
+      loop(numColsLeft,
+        resultMatrix[numRowsLeft*i + j] += leftMatrix[numRowsLeft*i + k] * rightMatrix[numRowsRight*k + j];
         k += 1;
       );
       j+= 1;
@@ -810,7 +804,7 @@ function drawBackgroundImage()
 /********************************************************************
 Graphics: Draw centered filled-in square
 ********************************************************************/
-function drawCenteredSquare(centerX, centerY, squareSize)
+function drawCenteredSquare(centerX, centerY, squareSize) local(halfSize)
 (
   halfSize = squareSize * 0.5;
   gfx_x = centerX - halfSize;
