@@ -23,12 +23,13 @@ and GNU General Public License along with this program.  If not, see
 
 ---------------------------------------------------------------------
   Class: DirectO
-  Adjust the soundfield directivity of a first order ambisonic signal (B-format) across the origin.
+  Adjust the soundfield directivity of a first order ambisonic signal 
+  (B-format) across the origin. A spatial low-pass filter.
 ---------------------------------------------------------------------
 */
 
 
-desc: Adjust the soundfield directivity of a first order ambisonic signal (B-format) across the origin.
+desc: Adjust soundfield directivity of first order ambisonic signal across the origin
 
 /* Graphics are commented out for the time being until it might be used for illustration purposes
 
