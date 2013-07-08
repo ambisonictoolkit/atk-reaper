@@ -102,11 +102,11 @@ function calculateMatrix()
   generateTumblelMatrix(matrixTumble2, elevation);
   
   /* Build processing matrix by performing a series of matrix multiplications
-                        result =         left     X         right             */
-  matrixMultiplication  (matrixTemp1,    matrixTumble1,     matrixRotate1);
-  matrixMultiplication  (matrixTemp2,    matrixTransform,   matrixTemp1);
-  matrixMultiplication  (matrixTemp1,    matrixTumble2,     matrixTemp2);
-  matrixMultiplication  (matrixNewDSP,   matrixRotate2,     matrixTemp1);
+                        result =         left     X               right             */
+  matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1);
+  matrixMultiplication  (matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
+  matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
+  matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   initialised == 0 ?
