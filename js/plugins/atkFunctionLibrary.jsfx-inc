@@ -127,6 +127,57 @@ function generateDisplaySignalMatrix(matrix)
 
 
 /********************************************************************
+Matrix: TODO
+********************************************************************/
+function interpreteProcessedPoints(matrixOut, matrixIn) local(i, g0square, g1square, w, x, y, z, azi, ele, omni, gain)
+(
+  /* In the resulting matrix:
+     - Row 1 is x position of transformed point
+     - Row 2 is y position of transformed point
+     - Row 3 is z position of transformed point
+     - Row 4 is gain value in dB for transformed point
+  */
+  i = 0;
+  loop(8,
+    w = matrixIn[i];
+    x = matrixIn[8+i];
+    y = matrixIn[16+i];
+    z = matrixIn[24+i];
+    
+    azi  = atan2(y, x);
+    ele  = atan2(z, x*x + y*y);
+    
+    // Omni transform angle
+    g0square        = w * w;
+    g1square        = x*x + y*y + z*z;
+    omni = asin((2.*g0square - g1square) / (2.*g0square + g1square));
+    
+    // Gain
+    gain = w / sqrt(1. + sin(omni));
+    
+    // Normalise omni to [0,1] range
+    omni = 2 * omni / $pi;
+    omni = 1. - omni;
+    
+    // From this we calculate relative xyz position of the transformed point
+    //matrixOut[i]   = azi;
+    //matrixOut[8+i] = ele;
+    //matrixOut[16+i] = g0square;
+    //matrixOut[24+i] = g1square;
+    
+    matrixOut[i]    = omni * cos(azi) * cos(ele);
+    matrixOut[8+i]  = omni * sin(azi) * cos(ele);
+    matrixOut[16+i] = omni * sin(ele);
+    //matrixOut[16+i] = omni;
+    matrixOut[24+i] = amp2db(gain);
+    //matrixOut[24+i] = omni;
+    
+    i += 1;
+  );
+);
+
+
+/********************************************************************
 Matrix: Generate 1st order 4x4 matrix for rotation transformation
 ********************************************************************/
 function generateBtoAMatrix(matrix, orientation, weight) local(g0)
@@ -614,27 +665,27 @@ function generateZoomMatrix(matrix, angle) local(g0, g1)
 /********************************************************************
 Matrix: Multiplication of two 4x4 matrixes: result = left x right
 ********************************************************************/
-function matrixMultiplication(resultMatrix, numRowsLeft, numColsLeft, leftMatrix, numRowsRight, numColsRight, rightMatrix)
+function matrixMultiplication(resultMatrix, numRowsLeft, numColsLeft, leftMatrix, numRowsRight, numColsRight, rightMatrix) local(row, col, i)
 (
   // It is the responsibility of each plugin calling this function to ensure that numColsLeft == numRowsRight.
   // We do not check for that here.
   
   // Iterate over rows of left matrix
-  i = 0;
+  row = 0;
   loop(numRowsLeft, 
     // Iterate over columns of right matrix
-    j = 0;
+    col = 0;
     loop(numColsRight,
       // Calculate one cell
-      resultMatrix[numRowsLeft*i + j] = 0.;
-      k = 0;
+      resultMatrix[numColsRight*row + col] = 0.;
+      i = 0;
       loop(numColsLeft,
-        resultMatrix[numRowsLeft*i + j] += leftMatrix[numRowsLeft*i + k] * rightMatrix[numRowsRight*k + j];
-        k += 1;
+        resultMatrix[numColsRight*row + col] += leftMatrix[numColsLeft*row + i] * rightMatrix[numColsRight*i + col];
+        i += 1;
       );
-      j+= 1;
+      col += 1;
     );
-    i+= 1;
+    row += 1;
   );
 );
 
