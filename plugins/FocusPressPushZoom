@@ -85,6 +85,50 @@ matrixDSP       = 1200;
 matrixNewDSP    = 1220;
 matrixInc       = 1240;
 
+// 4x8 matrixes for graphic display of transformations
+matrixDisplayPoints      = 1300;
+matrixDisplayTransformed = 1332;
+matrixDisplayInterpreted = 1364;
+
+// This only needs to be generated once:
+generateDisplaySignalMatrix(matrixDisplayPoints); 
+
+function interpreteProcessedPoints(matrixOut, matrixIn) local(i, g0square, g1square, azi, ele, omni, gain)
+(
+  /* In the resulting matrix:
+     - Row 1 is x position of transformed point
+     - Row 2 is y position of transformed point
+     - Row 3 is z position of transformed point
+     - Row 4 is gain value in dB for transformed point
+  */
+  i = 0;
+  loop(8,
+    // Azimuth
+    azi    = atan2(matrixIn[8+i], matrixIn[16+i]);
+    
+    // Elevation
+    ele  = atan2(sqrt(matrixIn[8+i] * matrixIn[8+i] + matrixIn[16+i] * matrixIn[16+i]), matrix[24+i]);
+    
+    // Omni transform angle
+    g0square        = matrixIn[i] * matrixIn[i];
+    g1square        = sqrt(matrixIn[8+i] * matrixIn[8+i] + matrixIn[16+i] * matrixIn[16+i] + matrixIn[24+i] * matrixIn[24+i]);
+    omni = asin((2.*g0square - g1square) / (2.*g0square + g1square));
+    
+    // Gain
+    gain = matrixIn[i] / sqrt(1. + sin(omni));
+    
+    // Normalise omni to [0,1] range
+    omni = 2 * omni / $pi;
+    
+    // From this we calculate relative xyz position of the transformed point
+    matrixOut[i]    = omni * cos(azi) * cos(ele);
+    matrixOut[8+i]  = omni * sin(azi) * cos(ele);
+    matrixOut[16+i] = omni * sin(ele);
+    matrixOut[24+i] = amp2db(gain);
+    i += 1;
+  )
+);
+
 function calculateMatrix()
 (
   // Required for graphics
@@ -121,6 +165,10 @@ function calculateMatrix()
   matrixMultiplication  (matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
   matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
   matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
+  
+  /* Transformation and interpretation of display points */
+  matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, 8, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   initialised == 0 ?
@@ -176,6 +224,15 @@ mouse_cap == 1 ?
   slider_automate(slider4);
   
   calculateMatrix();
+);
+
+i = 0;
+loop(
+  8,
+  gxColorSet(1., 0., i/7., (7.-i.)/7.);
+  posX = centerX + radius * matrixDisplayInterpreted[i];
+  posY = centerY - radius * matrixDisplayInterpreted[8+i];
+  drawCenteredSquare(posX, posY, 10.);
 );
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation

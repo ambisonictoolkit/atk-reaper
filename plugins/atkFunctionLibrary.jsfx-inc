@@ -47,6 +47,14 @@ file, encouraging DRY (don't repeat yourself)
 
 
 /*---------------------------------------------------------------------
+  Constants
+---------------------------------------------------------------------*/
+recSqrt2   = 1. / sqrt(2.);
+
+
+
+
+/*---------------------------------------------------------------------
   Mathematical functions
 ---------------------------------------------------------------------*/
 
@@ -72,6 +80,51 @@ function amp2db(gain)
 /*---------------------------------------------------------------------
   Matrix section
 ---------------------------------------------------------------------*/
+
+
+/********************************************************************
+Matrix: Generate 4x8 matrix with 8 source signals for display purposes
+********************************************************************/
+function generateDisplaySignalMatrix(matrix)
+(
+  // Encoding 8 equally distributed points in the horisontal plane
+  matrix[0]  = recSqrt2;
+  matrix[1]  = recSqrt2;
+  matrix[2]  = recSqrt2;
+  matrix[3]  = recSqrt2;
+  matrix[4]  = recSqrt2;
+  matrix[5]  = recSqrt2;
+  matrix[6]  = recSqrt2;
+  matrix[7]  = recSqrt2;
+  
+  matrix[8]  = cos(0.);
+  matrix[9]  = cos($pi * 0.25);
+  matrix[10] = cos($pi * 0.5);
+  matrix[11] = cos($pi * 0.75);
+  matrix[12] = cos($pi * 1.);
+  matrix[13] = cos($pi * 1.25);
+  matrix[14] = cos($pi * 1.5);
+  matrix[15] = cos($pi * 1.75);
+  
+  matrix[16] = sin(0.);
+  matrix[17] = sin($pi * 0.25);
+  matrix[18] = sin($pi * 0.5);
+  matrix[19] = sin($pi * 0.75);
+  matrix[20] = sin($pi * 1.);
+  matrix[21] = sin($pi * 1.25);
+  matrix[22] = sin($pi * 1.5);
+  matrix[23] = sin($pi * 1.75);
+  
+  matrix[24] = 0.;
+  matrix[25] = 0.;
+  matrix[26] = 0.;
+  matrix[27] = 0.;
+  matrix[28] = 0.;
+  matrix[29] = 0.;
+  matrix[30] = 0.;
+  matrix[31] = 0.;
+);
+
 
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for rotation transformation
