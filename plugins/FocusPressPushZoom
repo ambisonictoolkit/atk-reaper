@@ -63,8 +63,9 @@ slider4:0<0,1,0.01>Degree of transformation (mouse)
 /* --- DEBUG STUFF ---*/
 // Debug sliders:
 slider5:0<0,1,1{GUI, Debug}>Display mode
-slider6:0<0,10,1{matrixRotate1, matrixTumble1, matrixTransform, matrixTumble2, matrixRotate2, matrixDSP, matrixNewDSP, matrixInc, matrixDisplayPoints, matrixDisplayTransformed, matrixDisplayInterpreted}>Matrix to display
+slider6:0<0,13,1{matrixRotate1, matrixTumble1, matrixTransform, matrixTumble2, matrixRotate2, matrixDSP, matrixNewDSP, matrixInc, matrixDisplayPoints, matrixDisplayTransformed, matrixDisplayInterpreted, matrixCounter, matrixTest, matrixUnity}>Matrix to display
 /*--- DEBUG STUFF --- */
+
 
 
 /**********************************************************
@@ -102,47 +103,40 @@ matrixInc       = 1240;
 
 // 4x8 matrixes for graphic display of transformations
 matrixDisplayPoints      = 1300;
-matrixDisplayTransformed = 1332;
-matrixDisplayInterpreted = 1364;
+matrixDisplayTransformed = 1400;
+matrixDisplayInterpreted = 5500;
+
+// For testing
+matrixCounter = 2000;
+matrixTest    = 2100;
+matrixUnity   = 2200;
+
+// Generate test matrixes
+i = 0;
+loop(
+  32,
+  matrixCounter[i] = i * 0.01;
+  i += 1;
+);
+
+i = 0;
+loop(
+  16,
+  matrixUnity[i] = 0.;
+  i += 1;
+);
+
+matrixUnity[0] = 1.;
+matrixUnity[5] = 1.;
+matrixUnity[10] = 1;
+matrixUnity[15] = 1.;
+
+matrixMultiplication  (matrixTest,    4, 4, matrixUnity,     4, 8, matrixCounter);
+
+
 
 // This only needs to be generated once:
 generateDisplaySignalMatrix(matrixDisplayPoints); 
-
-function interpreteProcessedPoints(matrixOut, matrixIn) local(i, g0square, g1square, azi, ele, omni, gain)
-(
-  /* In the resulting matrix:
-     - Row 1 is x position of transformed point
-     - Row 2 is y position of transformed point
-     - Row 3 is z position of transformed point
-     - Row 4 is gain value in dB for transformed point
-  */
-  i = 0;
-  loop(8,
-    // Azimuth
-    azi    = atan2(matrixIn[8+i], matrixIn[16+i]);
-    
-    // Elevation
-    ele  = atan2(sqrt(matrixIn[8+i] * matrixIn[8+i] + matrixIn[16+i] * matrixIn[16+i]), matrix[24+i]);
-    
-    // Omni transform angle
-    g0square        = matrixIn[i] * matrixIn[i];
-    g1square        = sqrt(matrixIn[8+i] * matrixIn[8+i] + matrixIn[16+i] * matrixIn[16+i] + matrixIn[24+i] * matrixIn[24+i]);
-    omni = asin((2.*g0square - g1square) / (2.*g0square + g1square));
-    
-    // Gain
-    gain = matrixIn[i] / sqrt(1. + sin(omni));
-    
-    // Normalise omni to [0,1] range
-    omni = 2 * omni / $pi;
-    
-    // From this we calculate relative xyz position of the transformed point
-    matrixOut[i]    = omni * cos(azi) * cos(ele);
-    matrixOut[8+i]  = omni * sin(azi) * cos(ele);
-    matrixOut[16+i] = omni * sin(ele);
-    matrixOut[24+i] = amp2db(gain);
-    i += 1;
-  )
-);
 
 function calculateMatrix()
 (
@@ -238,10 +232,22 @@ slider6 == 0 ? (
                 slider6 == 8 ? (
                   viewMatrix = matrixDisplayPoints;
                 ) : (
-                  slider6 = 9 ? (
+                  slider6 == 9 ? (
                     viewMatrix = matrixDisplayTransformed;
                   ) : (
-                    viewMatrix = matrixDisplayInterpreted;
+                    slider6 == 10 ? (
+                      viewMatrix = matrixDisplayInterpreted;
+                    ) : (
+                      slider6 == 11 ? (
+                        viewMatrix = matrixCounter;
+                      ) : (
+                        slider6 == 12 ? (
+                          viewMatrix = matrixTest;
+                        ) : (
+                          viewMatrix = matrixUnity;
+                        );
+                      );
+                    );
                   );
                 );
               );
@@ -252,6 +258,8 @@ slider6 == 0 ? (
     );
   );
 );
+
+
 
 /*--- DEBUG STUFF --- */
 
@@ -297,13 +305,14 @@ debugMode == 0 ?
   );
   
   // Draw eight points indicating the effect of the transform
-  i = 0;
+  iii = 0;
   loop(
     8,
-    gxColorSet(1., 0., i/7., (7.-i.)/7.);
-    posX = centerX + radius * matrixDisplayInterpreted[i];
-    posY = centerY - radius * matrixDisplayInterpreted[8+i];
+    gxColorSet(1., 0., 1., 1.);
+    posX = centerX - radius * matrixDisplayInterpreted[8+iii];
+    posY = centerY - radius * matrixDisplayInterpreted[iii];
     drawCenteredSquare(posX, posY, 10.);
+    iii += 1;
   );
 
   // Draw red square as interactive direction indicator, size and color tint depends on elevation
@@ -319,10 +328,10 @@ debugMode == 0 ?
   // Debug mode can be used to inspect the content of the various matrixes
   gxColorSet(1., 1., 1., 1.);
 
+  (slider6 > 7) && (slider6 < 13) ? numCols = 8. : numCols = 4.;
+  
   // Iterate over columns:
   iii = 0;
-  slider6 > 7 ? numCols = 8. : numCols = 4.;
-  
   loop(numCols,
     // Iterate over rows
     jjj = 0;
