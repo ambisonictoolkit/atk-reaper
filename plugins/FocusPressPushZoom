@@ -28,6 +28,15 @@ and GNU General Public License along with this program.  If not, see
 */
 
 
+/* --- DEBUG STUFF ---
+
+This plugin contains some code that ight be useful for debugging,
+providing an alternative GUI displaying the content of various matrixes.
+For regular use of the plugin the debug code is commented out in the same way as here.
+
+--- DEBUG STUFF --- */
+
+
 desc: First Order Ambisonic focus, press, push and zoom transformer
 
 // Graphics file
@@ -50,6 +59,12 @@ slider1:0<0,3,1{Focus, Press, Push, Zoom}>Transformation mode
 slider2:0<-180,180,1>Azimuth (mouse)
 slider3:0<-90,90,1>Elevation
 slider4:0<0,1,0.01>Degree of transformation (mouse)
+
+/* --- DEBUG STUFF ---*/
+// Debug sliders:
+slider5:0<0,1,1{GUI, Debug}>Display mode
+slider6:0<0,10,1{matrixRotate1, matrixTumble1, matrixTransform, matrixTumble2, matrixRotate2, matrixDSP, matrixNewDSP, matrixInc, matrixDisplayPoints, matrixDisplayTransformed, matrixDisplayInterpreted}>Matrix to display
+/*--- DEBUG STUFF --- */
 
 
 /**********************************************************
@@ -193,6 +208,53 @@ azimuth         = slider2 * deg2rad;
 elevation       = slider3 * deg2rad;
 transformAngle  = slider4 * $pi * 0.5;
 
+/* --- DEBUG STUFF ---*/
+debugMode       = slider5;
+
+slider6 == 0 ? (
+  viewMatrix = matrixRotate1;
+) : (
+  slider6 == 1 ? (
+    viewMatrix = matrixTumble1;
+  ) : (
+    slider6 == 2 ? (
+      viewMatrix = matrixTransform;
+    ) : (
+      slider6 == 3 ? (
+        viewMatrix = matrixTumble2;
+      ) : (
+        slider6 == 4 ? (
+          viewMatrix = matrixRotate2;
+        ) : (
+          slider6 == 5 ? (
+            viewMatrix = matrixDSP;
+          ) : (
+            slider6 == 6 ? (
+              viewMatrix = matrixNewDSP;
+            ) : (
+              slider6 == 7 ? (
+                viewMatrix = matrixInc;
+              ) : (
+                slider6 == 8 ? (
+                  viewMatrix = matrixDisplayPoints;
+                ) : (
+                  slider6 = 9 ? (
+                    viewMatrix = matrixDisplayTransformed;
+                  ) : (
+                    viewMatrix = matrixDisplayInterpreted;
+                  );
+                );
+              );
+            );
+          );
+        );
+      );
+    );
+  );
+);
+
+/*--- DEBUG STUFF --- */
+
 calculateMatrix();
 
 
@@ -201,46 +263,78 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
-gxColorSet(1, 1, 1, 1);
-determineGeometry();
-drawBackgroundImage();
-
-// Reset azimuth and transformAngle on mouse click
-mouse_cap == 1 ?
+/* --- DEBUG STUFF ---*/
+debugMode == 0 ?
 (
-  mouseX = mouse_x - centerX;
-  mouseY = mouse_y - centerY;
-  
-  // Update azimuth and slider2 and notify GUI of the change
-  azimuth = atan2(mouseX, -mouseY);
-  slider2 = azimuth * rad2deg;
-  slider_automate(slider2);
-  
-  // Update transformAngle and slider4 and notify GUI of the change
-  slider4 = sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
-  // Restrict the range to [0, 1]
-  slider4 > 1. ? slider4 = 1.;
-  transformAngle = slider4 * $pi * 0.5;
-  slider_automate(slider4);
-  
-  calculateMatrix();
-);
+/*--- DEBUG STUFF --- */
 
-i = 0;
-loop(
-  8,
-  gxColorSet(1., 0., i/7., (7.-i.)/7.);
-  posX = centerX + radius * matrixDisplayInterpreted[i];
-  posY = centerY - radius * matrixDisplayInterpreted[8+i];
-  drawCenteredSquare(posX, posY, 10.);
-);
+  // This is the regular interactive GUI mode:
+  
+  // Set colors
+  gxColorSet(1, 1, 1, 1);
+  determineGeometry();
+  drawBackgroundImage();
 
-// Draw red square as interactive direction indicator, size and color tint depends on elevation
-gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
-posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
-posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
-squareSize = 4. * sinElevation + 12.;
-drawCenteredSquare(posX, posY, squareSize);
+  // Reset azimuth and transformAngle on mouse click
+  mouse_cap == 1 ?
+  (
+    mouseX = mouse_x - centerX;
+    mouseY = mouse_y - centerY;
+    
+    // Update azimuth and slider2 and notify GUI of the change
+    azimuth = atan2(mouseX, -mouseY);
+    slider2 = azimuth * rad2deg;
+    slider_automate(slider2);
+    
+    // Update transformAngle and slider4 and notify GUI of the change
+    slider4 = sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
+    // Restrict the range to [0, 1]
+    slider4 > 1. ? slider4 = 1.;
+    transformAngle = slider4 * $pi * 0.5;
+    slider_automate(slider4);
+    
+    calculateMatrix();
+  );
+  
+  // Draw eight points indicating the effect of the transform
+  i = 0;
+  loop(
+    8,
+    gxColorSet(1., 0., i/7., (7.-i.)/7.);
+    posX = centerX + radius * matrixDisplayInterpreted[i];
+    posY = centerY - radius * matrixDisplayInterpreted[8+i];
+    drawCenteredSquare(posX, posY, 10.);
+  );
+
+  // Draw red square as interactive direction indicator, size and color tint depends on elevation
+  gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
+  posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
+  posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
+  squareSize = 4. * sinElevation + 12.;
+  drawCenteredSquare(posX, posY, squareSize);
+    
+/* --- DEBUG STUFF ---  */
+) : (
+  
+  // Debug mode can be used to inspect the content of the various matrixes
+  gxColorSet(1., 1., 1., 1.);
+
+  // Iterate over columns:
+  iii = 0;
+  slider6 > 7 ? numCols = 8. : numCols = 4.;
+  
+  loop(numCols,
+    // Iterate over rows
+    jjj = 0;
+    loop(4,
+      gxPositionSet(iii*80 + 40, jjj*20 + 20);
+      gfx_drawnumber( viewMatrix[iii + numCols*jjj],5);
+      jjj = jjj + 1;
+    );
+    iii = iii + 1;
+  );
+);
+/*--- DEBUG STUFF --- */
     
 
 /**********************************************************
