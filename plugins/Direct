@@ -92,7 +92,9 @@ matrixDisplayTransformed = 1400;
 matrixDisplayInterpreted = 1500;
 
 // This only needs to be generated once:
-generateDisplaySignalMatrix(matrixDisplayPoints);
+numDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
+
 
 function calculateMatrix()
 (
@@ -118,8 +120,8 @@ function calculateMatrix()
   matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
   
   /* Transformation and interpretation of display points */
-  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, 8, matrixDisplayPoints);
-  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed);
+  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   initialised == 0 ?
@@ -177,7 +179,7 @@ mouse_cap == 1 ?
 );
 
 // Draw eight points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted);
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
 gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);

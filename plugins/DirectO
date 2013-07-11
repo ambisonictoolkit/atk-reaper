@@ -63,21 +63,22 @@ matrixDSP       = 1200;
 matrixNewDSP    = 1220;
 matrixInc       = 1240;
 
-// 4x8 matrixes for graphic display of transformations
+// Matrixes for graphic display of transformations
 matrixDisplayPoints      = 1300;
 matrixDisplayTransformed = 1400;
 matrixDisplayInterpreted = 1500;
 
 // This only needs to be generated once:
-generateDisplaySignalMatrix(matrixDisplayPoints);
+numDisplayedPoints = 12;
+generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
 
 function calculateMatrix()
 (
   generateDirectOrigoMatrix(matrixNewDSP, transformAngle);
   
   /* Transformation and interpretation of display points */
-  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, 8, matrixDisplayPoints);
-  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed);
+  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
 
   // Set initial DSP matrix at initialisation
   initialised == 0 ?
@@ -134,7 +135,7 @@ mouse_cap == 1 ?
 );
 
 // Draw eight points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted);
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
 gxColorSet(alpha, 1.0, 0., 0.);

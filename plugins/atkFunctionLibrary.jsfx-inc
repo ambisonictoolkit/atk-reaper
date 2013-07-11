@@ -85,64 +85,41 @@ function amp2db(gain)
 /********************************************************************
 Matrix: Generate 4x8 matrix with 8 source signals for display purposes
 ********************************************************************/
-function generateDisplaySignalMatrix(matrix)
+function generateDisplaySignalMatrix(matrix, numPoints) local(i, angle, inc)
 (
-  // Encoding 8 equally distributed points in the horisontal plane
-  matrix[0]  = recSqrt2;
-  matrix[1]  = recSqrt2;
-  matrix[2]  = recSqrt2;
-  matrix[3]  = recSqrt2;
-  matrix[4]  = recSqrt2;
-  matrix[5]  = recSqrt2;
-  matrix[6]  = recSqrt2;
-  matrix[7]  = recSqrt2;
-  
-  matrix[8]  = cos(0.);
-  matrix[9]  = cos($pi * 0.25);
-  matrix[10] = cos($pi * 0.5);
-  matrix[11] = cos($pi * 0.75);
-  matrix[12] = cos($pi * 1.);
-  matrix[13] = cos($pi * 1.25);
-  matrix[14] = cos($pi * 1.5);
-  matrix[15] = cos($pi * 1.75);
-  
-  matrix[16] = sin(0.);
-  matrix[17] = sin($pi * 0.25);
-  matrix[18] = sin($pi * 0.5);
-  matrix[19] = sin($pi * 0.75);
-  matrix[20] = sin($pi * 1.);
-  matrix[21] = sin($pi * 1.25);
-  matrix[22] = sin($pi * 1.5);
-  matrix[23] = sin($pi * 1.75);
-  
-  matrix[24] = 0.;
-  matrix[25] = 0.;
-  matrix[26] = 0.;
-  matrix[27] = 0.;
-  matrix[28] = 0.;
-  matrix[29] = 0.;
-  matrix[30] = 0.;
-  matrix[31] = 0.;
+  // Encoding equally distributed points in the horisontal plane
+  i = 0;
+  angle = 0.;
+  inc = 2. * $pi / numPoints;
+  loop(numPoints,
+    matrix[i]                = recSqrt2;
+    matrix[i + numPoints]    = cos(angle);
+    matrix[i + 2*numPoints]  = sin(angle);
+    matrix[i + 3*numPoints]  = 0.;
+    
+    angle += inc;
+    i += 1;
+  );
 );
 
 
 /********************************************************************
-Matrix: TODO
+Matrix: Interprete processed points
+
+In the resulting matrixOut:
+- Row 1 is x position of transformed point
+- Row 2 is y position of transformed point
+- Row 3 is z position of transformed point
+- Row 4 is gain value in dB for transformed point
 ********************************************************************/
-function interpreteProcessedPoints(matrixOut, matrixIn) local(i, g0square, g1square, w, x, y, z, azi, ele, omni, gain)
+function interpreteProcessedPoints(matrixOut, matrixIn, numPoints) local(i, g0square, g1square, w, x, y, z, azi, ele, omni, gain)
 (
-  /* In the resulting matrix:
-     - Row 1 is x position of transformed point
-     - Row 2 is y position of transformed point
-     - Row 3 is z position of transformed point
-     - Row 4 is gain value in dB for transformed point
-  */
   i = 0;
-  loop(8,
+  loop(numPoints,
     w = matrixIn[i];
-    x = matrixIn[8+i];
-    y = matrixIn[16+i];
-    z = matrixIn[24+i];
+    x = matrixIn[numPoints + i];
+    y = matrixIn[numPoints*2 + i];
+    z = matrixIn[numPoints*3 + i];
     
     azi  = atan2(y, x);
     ele  = atan2(z, x*x + y*y);
@@ -161,9 +138,9 @@ function interpreteProcessedPoints(matrixOut, matrixIn) local(i, g0square, g1squ
     
     // From this we calculate relative xyz position of the transformed point
     matrixOut[i]    = omni * cos(azi) * cos(ele);
-    matrixOut[8+i]  = omni * sin(azi) * cos(ele);
-    matrixOut[16+i] = omni * sin(ele);
-    matrixOut[24+i] = amp2db(gain);
+    matrixOut[numPoints + i]  = omni * sin(azi) * cos(ele);
+    matrixOut[numPoints*2 + i] = omni * sin(ele);
+    matrixOut[numPoints*3 + i] = amp2db(gain);
     
     i += 1;
   );
@@ -1052,20 +1029,20 @@ function drawInteractionSquare(centerX, centerY, squareSize) local(halfSize)
 );
 
 
-function displayTransformedPoints(matrix) local(i, posX, posY, posZ)
+function displayTransformedPoints(matrix, numPoints) local(i, posX, posY, posZ)
 (
   // Draw eight points indicating the effect of the transform
   // TODO: Also take z value into account in this visualisation?
   i = 0;
   loop(
-    8,
-    posX = centerX - radius * matrix[8+i];
+    numPoints,
+    posX = centerX - radius * matrix[numPoints+i];
     posY = centerY - radius * matrix[i];
-    posZ = matrix[i+16];
+    posZ = matrix[2*numPoints+i];
     
     // Size, saturation and luminocity depends on posZ
     squareSize = 2. * posZ + 8.;
-    gainToColor(matrix[24+i], -24., 6., posZ);
+    gainToColor(matrix[3*numPoints+i], -24., 6., posZ);
     
     drawCenteredSquare(posX, posY, squareSize);
     i += 1;
