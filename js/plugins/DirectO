@@ -66,7 +66,7 @@ matrixInc       = 1240;
 // 4x8 matrixes for graphic display of transformations
 matrixDisplayPoints      = 1300;
 matrixDisplayTransformed = 1400;
-matrixDisplayInterpreted = 5500;
+matrixDisplayInterpreted = 1500;
 
 // This only needs to be generated once:
 generateDisplaySignalMatrix(matrixDisplayPoints);
@@ -74,6 +74,7 @@ generateDisplaySignalMatrix(matrixDisplayPoints);
 function calculateMatrix()
 (
   generateDirectOrigoMatrix(matrixNewDSP, transformAngle);
+  
   /* Transformation and interpretation of display points */
   matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, 8, matrixDisplayPoints);
   interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed);
@@ -110,18 +111,11 @@ gxColorSet(1, 1, 1, 1);
 determineGeometry();
 drawBackgroundImage();
 
-// Draw eight points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted);
-
-// This GUI provides no interaction
-
 mouseX = mouse_x - centerX;
 mouseY = mouse_y - centerY;
-
 azimuth = atan2(mouseX, -mouseY);
 
 tentativeNewTransformationAngle = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
-
 // Restrict the range to [0, 1]
 tentativeNewTransformationAngle < 0. ? tentativeNewTransformationAngle = 0.;
 
@@ -133,11 +127,15 @@ mouse_cap == 1 ?
   slider_automate(slider1);
   calculateMatrix();
   
+  // Set alpha value of interaction square
   alpha = 0.5;
 ) : (
   alpha = 0.25;
 );
-  
+
+// Draw eight points illustrating the effect of the transform
+displayTransformedPoints(matrixDisplayInterpreted);
+
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
 gxColorSet(alpha, 1.0, 0., 0.);
 posX = centerX + radius * (1. - tentativeNewTransformationAngle) * sin(azimuth);
