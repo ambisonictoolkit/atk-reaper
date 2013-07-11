@@ -295,7 +295,9 @@ debugMode == 0 ?
     slider_automate(slider2);
     
     // Update transformAngle and slider4 and notify GUI of the change
-    slider4 = sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
+    // COMMENT: There is a risk of dividing by zero here (for elevation = 90), but Reaper seems to handle this grazefully.
+    // At 90 deg elevation the GUI has a dead lock and can't be used for changing the degree of transformation, but the slider is still available.
+    slider4 = sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius / cos(elevation);
     // Restrict the range to [0, 1]
     slider4 > 1. ? slider4 = 1.;
     transformAngle = slider4 * $pi * 0.5;
@@ -312,7 +314,8 @@ debugMode == 0 ?
   posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
   posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
   squareSize = 4. * sinElevation + 14.;
-  drawCenteredSquare(posX, posY, squareSize);
+  drawInteractionSquare(posX, posY, squareSize);
+  //drawCenteredSquare(posX, posY, squareSize);
     
 /* --- DEBUG STUFF ---  */
 ) : (

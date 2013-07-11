@@ -965,18 +965,7 @@ function drawBackgroundImage()
   coordinatelist[8] =0;                   //represents offset from center of image
   coordinatelist[9] =0;                   //represents offset from center of image
   gfx_blitext(0,coordinatelist,0);
-);
 
-
-/********************************************************************
-Graphics: Draw centered filled-in square
-********************************************************************/
-function drawCenteredSquare(centerX, centerY, squareSize) local(halfSize)
-(
-  halfSize = squareSize * 0.5;
-  gfx_x = centerX - halfSize;
-  gfx_y = centerY - halfSize;
-  gfx_rectto(centerX + halfSize, centerY + halfSize);
 );
 
 
@@ -993,6 +982,37 @@ function drawQuadrangleOutline(position1x, position1y, position2x, position2y, p
   gfx_lineto(position1x, position1y, antiAliasing);
 );
 
+
+/********************************************************************
+Graphics: Draw centered filled-in square
+********************************************************************/
+function drawCenteredSquare(centerX, centerY, squareSize) local(halfSize)
+(
+  halfSize = squareSize * 0.5;
+  gfx_x = centerX - halfSize;
+  gfx_y = centerY - halfSize;
+  gfx_rectto(centerX + halfSize, centerY + halfSize);
+
+);
+
+
+/********************************************************************
+Graphics: Draw interactive square
+********************************************************************/
+function drawInteractionSquare(centerX, centerY, squareSize) local(halfSize)
+(
+  drawCenteredSquare(centerX, centerY, squareSize);
+  
+  // Drawing white frame:
+  gxColorSet(1., 1., 1., 1.);
+  halfSize = squareSize * 0.5;
+  drawQuadrangleOutline(centerX-halfSize, centerY-halfSize, 
+                        centerX+halfSize, centerY-halfSize,
+                        centerX+halfSize, centerY+halfSize,
+                        centerX-halfSize, centerY+halfSize,
+                        1.
+                      );
+);
 
 
 function displayTransformedPoints(matrix) local(i, posX, posY)
