@@ -310,7 +310,7 @@ debugMode == 0 ?
   displayTransformedPoints(matrixDisplayInterpreted);
 
   // Draw red square as interactive direction indicator, size and color tint depends on elevation
-  gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
+  gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
   posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
   posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
   squareSize = 4. * sinElevation + 14.;
