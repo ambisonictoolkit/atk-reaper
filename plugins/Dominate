@@ -85,6 +85,16 @@ matrixDSP       = 1200;
 matrixNewDSP    = 1220;
 matrixInc       = 1240;
 
+// Matrixes for graphic display of transformations
+matrixDisplayPoints      = 1300;
+matrixDisplayTransformed = 1400;
+matrixDisplayInterpreted = 1500;
+
+// This only needs to be generated once:
+numDisplayedPoints = 12;
+generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
+
+
 function calculateMatrix()
 (
   // Required for graphics
@@ -107,6 +117,10 @@ function calculateMatrix()
   matrixMultiplication  (matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
   matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
   matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
+  
+  /* Transformation and interpretation of display points */
+  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   initialised == 0 ?
@@ -163,12 +177,15 @@ mouse_cap == 1 ?
   calculateMatrix();
 );
 
+// Draw points illustrating the effect of the transform
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
+
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
-gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
+gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
 posX = centerX + radius * slider3 * inv24 * (sinAzimuth * cosElevation);
 posY = centerY - radius * slider3 * inv24 * (cosAzimuth * cosElevation);
 squareSize = 4. * sinElevation + 12.;
-drawCenteredSquare(posX, posY, squareSize);
+drawInteractionSquare(posX, posY, squareSize);
     
 
 /**********************************************************
