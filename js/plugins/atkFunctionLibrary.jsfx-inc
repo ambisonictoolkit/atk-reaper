@@ -153,24 +153,17 @@ function interpreteProcessedPoints(matrixOut, matrixIn) local(i, g0square, g1squ
     omni = asin((2.*g0square - g1square) / (2.*g0square + g1square));
     
     // Gain
-    gain = w / sqrt(1. + sin(omni));
+    gain = w * sqrt(2. / (1. + sin(omni)));
     
     // Normalise omni to [0,1] range
     omni = 2 * omni / $pi;
     omni = 1. - omni;
     
     // From this we calculate relative xyz position of the transformed point
-    //matrixOut[i]   = azi;
-    //matrixOut[8+i] = ele;
-    //matrixOut[16+i] = g0square;
-    //matrixOut[24+i] = g1square;
-    
     matrixOut[i]    = omni * cos(azi) * cos(ele);
     matrixOut[8+i]  = omni * sin(azi) * cos(ele);
     matrixOut[16+i] = omni * sin(ele);
-    //matrixOut[16+i] = omni;
     matrixOut[24+i] = amp2db(gain);
-    //matrixOut[24+i] = omni;
     
     i += 1;
   );
@@ -868,6 +861,76 @@ function gxPositionSet(x, y)
 (
 	gfx_x = x;
 	gfx_y = y;
+);
+
+
+/********************************************************************
+Graphics: Color convertion utility for hsl to rgb convertions
+********************************************************************/
+function hls_value(n1, n2, hue)
+(
+	// Restrict incoming range to [0., 360.]
+  hue > 360.0 ? (
+    hue -= 360.;
+  ) : (
+    hue < 0.0 ? (
+      hue += 360.;
+    );
+  );
+  
+  hue < 60. ? (
+    n1+(n2-n1)*hue/60.
+  ) : (
+    hue < 180. ? (
+      n2;
+    ) : (
+      hue < 240. ? (
+        n1+(n2-n1)*(240-hue)/60.;
+      ) : (
+        n1;
+      );
+    );
+  );
+);
+
+
+/********************************************************************
+Graphics: Express gain (in dB) as graphics color
+********************************************************************/
+function gainToColor(gain, gainLowLimit, gainHighLimit)
+(
+  // Clip gain to prescribed range:
+  gain < gainLowLimit ? (
+    gain = gainLowLimit;
+  ) : (
+    gain > gainHighLimit ? (
+      gain = gainHighLimit;
+    );
+  );
+  
+  hue = ((gain - gainHighLimit) / (gainLowLimit - gainHighLimit)) * 240.;
+  saturation = 1.;
+  lightness = 0.5;
+  
+  lightness <= 0.5 ? (
+    m2 = lightness*(1.0+saturation);
+  ) : (
+    m2 = lightness+saturation-lightness*saturation;
+  );
+  
+  m1 = 2.0 * lightness-m2;
+  
+  saturation == 0.0 ? (
+    red = lightness;
+  	green = lightness;
+  	blue = lightness;
+  ) : (
+    red = hls_value(m1, m2, hue+120.0);
+  	green = hls_value(m1, m2, hue);
+  	blue = hls_value(m1, m2, hue-120.0);
+  );
+
+  gxColorSet(1., red, green, blue)
 );
 
 

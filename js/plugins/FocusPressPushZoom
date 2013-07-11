@@ -305,13 +305,14 @@ debugMode == 0 ?
   );
   
   // Draw eight points indicating the effect of the transform
+  // TODO: Also take z value into account in this visualisation?
   iii = 0;
   loop(
     8,
-    gxColorSet(1., 0., 1., 1.);
     posX = centerX - radius * matrixDisplayInterpreted[8+iii];
     posY = centerY - radius * matrixDisplayInterpreted[iii];
-    drawCenteredSquare(posX, posY, 10.);
+    gainToColor(matrixDisplayInterpreted[24+iii], -24., 6.);
+    drawCenteredSquare(posX, posY, 8.);
     iii += 1;
   );
 
