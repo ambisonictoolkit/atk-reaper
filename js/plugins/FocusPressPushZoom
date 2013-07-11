@@ -315,7 +315,6 @@ debugMode == 0 ?
   posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
   squareSize = 4. * sinElevation + 14.;
   drawInteractionSquare(posX, posY, squareSize);
-  //drawCenteredSquare(posX, posY, squareSize);
     
 /* --- DEBUG STUFF ---  */
 ) : (
