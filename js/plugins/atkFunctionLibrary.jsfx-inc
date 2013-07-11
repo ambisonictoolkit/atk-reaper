@@ -992,3 +992,20 @@ function drawQuadrangleOutline(position1x, position1y, position2x, position2y, p
   gfx_lineto(position4x, position4y, antiAliasing);
   gfx_lineto(position1x, position1y, antiAliasing);
 );
+
+
+
+function displayTransformedPoints(matrix) local(i, posX, posY)
+(
+  // Draw eight points indicating the effect of the transform
+  // TODO: Also take z value into account in this visualisation?
+  i = 0;
+  loop(
+    8,
+    posX = centerX - radius * matrix[8+i];
+    posY = centerY - radius * matrix[i];
+    gainToColor(matrix[24+i], -24., 6.);
+    drawCenteredSquare(posX, posY, 8.);
+    i += 1;
+  );
+);

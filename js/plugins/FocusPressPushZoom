@@ -304,23 +304,14 @@ debugMode == 0 ?
     calculateMatrix();
   );
   
-  // Draw eight points indicating the effect of the transform
-  // TODO: Also take z value into account in this visualisation?
-  iii = 0;
-  loop(
-    8,
-    posX = centerX - radius * matrixDisplayInterpreted[8+iii];
-    posY = centerY - radius * matrixDisplayInterpreted[iii];
-    gainToColor(matrixDisplayInterpreted[24+iii], -24., 6.);
-    drawCenteredSquare(posX, posY, 8.);
-    iii += 1;
-  );
+  // Draw eight points illustrating the effect of the transform
+  displayTransformedPoints(matrixDisplayInterpreted);
 
   // Draw red square as interactive direction indicator, size and color tint depends on elevation
   gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
   posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
   posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
-  squareSize = 4. * sinElevation + 12.;
+  squareSize = 4. * sinElevation + 14.;
   drawCenteredSquare(posX, posY, squareSize);
     
 /* --- DEBUG STUFF ---  */
