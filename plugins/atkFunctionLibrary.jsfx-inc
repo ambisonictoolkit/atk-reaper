@@ -897,7 +897,7 @@ function hls_value(n1, n2, hue)
 /********************************************************************
 Graphics: Express gain (in dB) as graphics color
 ********************************************************************/
-function gainToColor(gain, gainLowLimit, gainHighLimit)
+function gainToColor(gain, gainLowLimit, gainHighLimit, verticalOffset) local(saturation, lightness, m1, m2, red, gree, blue)
 (
   // Clip gain to prescribed range:
   gain < gainLowLimit ? (
@@ -909,8 +909,15 @@ function gainToColor(gain, gainLowLimit, gainHighLimit)
   );
   
   hue = ((gain - gainHighLimit) / (gainLowLimit - gainHighLimit)) * 240.;
-  saturation = 1.;
-  lightness = 0.5;
+  
+  // Saturation and lightness depends on vertical position
+  verticalOffset < 0 ? (
+    saturation = 1. - 0.3*verticalOffset;
+    lightness = 0.5;
+  ) : (
+    saturation = 1.;
+    lightness = 0.5 + 0.3*verticalOffset;
+  );
   
   lightness <= 0.5 ? (
     m2 = lightness*(1.0+saturation);
@@ -1015,7 +1022,7 @@ function drawInteractionSquare(centerX, centerY, squareSize) local(halfSize)
 );
 
 
-function displayTransformedPoints(matrix) local(i, posX, posY)
+function displayTransformedPoints(matrix) local(i, posX, posY, posZ)
 (
   // Draw eight points indicating the effect of the transform
   // TODO: Also take z value into account in this visualisation?
@@ -1024,8 +1031,13 @@ function displayTransformedPoints(matrix) local(i, posX, posY)
     8,
     posX = centerX - radius * matrix[8+i];
     posY = centerY - radius * matrix[i];
-    gainToColor(matrix[24+i], -24., 6.);
-    drawCenteredSquare(posX, posY, 8.);
+    posZ = matrix[i+16];
+    
+    // Size, saturation and luminocity depends on posZ
+    squareSize = 2. * posZ + 8.;
+    gainToColor(matrix[24+i], -24., 6., posZ);
+    
+    drawCenteredSquare(posX, posY, squareSize);
     i += 1;
   );
 );
