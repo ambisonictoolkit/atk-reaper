@@ -86,6 +86,14 @@ matrixDSP       = 1200;
 matrixNewDSP    = 1220;
 matrixInc       = 1240;
 
+// 4x8 matrixes for graphic display of transformations
+matrixDisplayPoints      = 1300;
+matrixDisplayTransformed = 1400;
+matrixDisplayInterpreted = 1500;
+
+// This only needs to be generated once:
+generateDisplaySignalMatrix(matrixDisplayPoints);
+
 function calculateMatrix()
 (
   // Required for graphics
@@ -108,6 +116,10 @@ function calculateMatrix()
   matrixMultiplication  (matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
   matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
   matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
+  
+  /* Transformation and interpretation of display points */
+  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, 8, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   initialised == 0 ?
@@ -155,22 +167,24 @@ mouse_cap == 1 ?
   slider_automate(slider1);
   
   // Update transformAngle and slider4 and notify GUI of the change
-  slider3 = sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
+  slider3 = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
   // Restrict the range to [0, 1]
-  slider3 > 1. ? slider3 = 1.;
+  slider3 < 0. ? slider3 = 0.;
   transformAngle = slider3 * $pi * 0.5;
   slider_automate(slider3);
   
   calculateMatrix();
 );
 
+// Draw eight points illustrating the effect of the transform
+displayTransformedPoints(matrixDisplayInterpreted);
+
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
-gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
-posX = centerX + radius * slider3 * (sinAzimuth * cosElevation);
-posY = centerY - radius * slider3 * (cosAzimuth * cosElevation);
+gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
+posX = centerX + radius * (1. - slider3) * (sinAzimuth * cosElevation);
+posY = centerY - radius * (1. - slider3) * (cosAzimuth * cosElevation);
 squareSize = 4. * sinElevation + 12.;
-drawCenteredSquare(posX, posY, squareSize);
-    
+drawInteractionSquare(posX, posY, squareSize);
 
 /**********************************************************
 Preprocessing prior to audio vector processing.
