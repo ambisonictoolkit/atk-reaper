@@ -115,7 +115,7 @@ calculateCoefficients();
 /**********************************************************
 Custom graphic interface
 **********************************************************/
-@gfx 400 300
+@gfx 500 500
 
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
