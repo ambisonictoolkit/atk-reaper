@@ -446,6 +446,36 @@ function generateDirectMatrix(matrix, angle) local(g0, g1)
 
 
 /********************************************************************
+Matrix: Generate 1st order 4x4 matrix for directX transformation
+********************************************************************/
+function generateDirectOrigoMatrix(matrix, angle) local(g0, g1)
+(
+  
+  g0 = sqrt(1 + sin(transformAngle));
+  g1 = sqrt(1 - sin(transformAngle));
+  
+  matrix[0]  = g0;
+  matrix[1]  = 0.;
+  matrix[2]  = 0.;
+  matrix[3]  = 0.;
+  
+  matrix[4]  = 0.;
+  matrix[5]  = g1;
+  matrix[6]  = 0.;
+  matrix[7]  = 0.;
+  
+  matrix[8]  = 0.;
+  matrix[9]  = 0.;
+  matrix[10] = g1;
+  matrix[11] = 0.;
+  
+  matrix[12] = 0.;
+  matrix[13] = 0.;
+  matrix[14] = 0.;
+  matrix[15] = g1;
+);
+
+/********************************************************************
 Matrix: Generate 1st order 4x4 matrix for dominateX transformation
 ********************************************************************/
 function generateDominateMatrix(matrix, gain) local(k, g0, g1)

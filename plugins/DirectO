@@ -31,12 +31,8 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Adjust soundfield directivity of first order ambisonic signal across the origin
 
-/* Graphics are commented out for the time being until it might be used for illustration purposes
-
 // Graphics file
-//filename:0,HorizontalBackground.png
-
-*/
+filename:0,HorizontalBackground.png
 
 // Import library with shared functions for matrix and graphics processing
 import atkFunctionLibrary.jsfx-inc
@@ -62,7 +58,37 @@ Initialisation
 // Flag indicating that the plugin has not been fully initialised yet
 initialised = 0;
 
+// Matrixes used for DSP processing
+matrixDSP       = 1200;
+matrixNewDSP    = 1220;
+matrixInc       = 1240;
 
+// 4x8 matrixes for graphic display of transformations
+matrixDisplayPoints      = 1300;
+matrixDisplayTransformed = 1400;
+matrixDisplayInterpreted = 5500;
+
+// This only needs to be generated once:
+generateDisplaySignalMatrix(matrixDisplayPoints);
+
+function calculateMatrix()
+(
+  generateDirectOrigoMatrix(matrixNewDSP, transformAngle);
+  /* Transformation and interpretation of display points */
+  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, 8, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed);
+
+  // Set initial DSP matrix at initialisation
+  initialised == 0 ?
+  (
+    loop(
+      16,
+      matrixDSP[i] = matrixNewDSP[i];
+    );
+    // Now we are initialised
+    initialised = 1;
+  );
+);
 
 /**********************************************************
 Updated slider value:
@@ -70,58 +96,60 @@ Updated slider value:
 @slider
 
 transformAngle  = slider1 * $pi * 0.5;
-
-// Calculate g0 and g1 at initialisation
-initialised == 0 ?
-(
-  g0 = sqrt(1 + sin(transformAngle));
-  g1 = sqrt(1 - sin(transformAngle));
-  // Now we are initialised
-  initialised = 1;
-)
+calculateMatrix();
 
 
 /**********************************************************
 Graphics
 **********************************************************/
 
-//@gfx 500 500
+@gfx 500 500
 
-/* COMMENTED OUT
-
+// Set colors
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
 drawBackgroundImage();
 
-// Reset azimuth and transformAngle on mouse click
+// Draw eight points illustrating the effect of the transform
+displayTransformedPoints(matrixDisplayInterpreted);
+
+// This GUI provides no interaction
+
+mouseX = mouse_x - centerX;
+mouseY = mouse_y - centerY;
+
+azimuth = atan2(mouseX, -mouseY);
+
+tentativeNewTransformationAngle = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
+
+// Restrict the range to [0, 1]
+tentativeNewTransformationAngle < 0. ? tentativeNewTransformationAngle = 0.;
+
+// Only update transformation settings at mouse drag
 mouse_cap == 1 ?
-(
-  mouseX = mouse_x - centerX;
-  mouseY = mouse_y - centerY;
-  
-  // Update azimuth and slider2 and notify GUI of the change
-  azimuth = atan2(mouseX, -mouseY);
-  slider2 = azimuth * rad2deg;
-  slider_automate(slider2);
-  
-  // Update transformAngle and slider4 and notify GUI of the change
-  slider4 = sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
-  // Restrict the range to [0, 1]
-  slider4 > 1. ? slider4 = 1.;
-  transformAngle = slider4 * $pi * 0.5;
-  slider_automate(slider4);
-  
+(  
+  slider1 = tentativeNewTransformationAngle;
+  transformAngle = tentativeNewTransformationAngle * $pi * 0.5;
+  slider_automate(slider1);
   calculateMatrix();
+  
+  alpha = 0.5;
+) : (
+  alpha = 0.25;
+);
+  
+// Draw red square as interactive direction indicator, size and color tint depends on elevation
+gxColorSet(alpha, 1.0, 0., 0.);
+posX = centerX + radius * (1. - tentativeNewTransformationAngle) * sin(azimuth);
+posY = centerY - radius * (1. - tentativeNewTransformationAngle) * cos(azimuth);
+squareSize = 14;
+
+mouse_cap == 1 ? (
+  drawInteractionSquare(posX, posY, squareSize);
+) : (
+  drawCenteredSquare(posX, posY, squareSize);
 );
 
-// Draw red square as interactive direction indicator, size and color tint depends on elevation
-gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
-posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
-posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
-squareSize = 4. * sinElevation + 12.;
-drawCenteredSquare(posX, posY, squareSize);
-
-*/
 
 /**********************************************************
 Preprocessing prior to audio vector processing.
@@ -130,8 +158,12 @@ Preprocessing prior to audio vector processing.
 
 inverseSamplesblock = 1. / samplesblock;
 
-inc0 = (sqrt(1 + sin(transformAngle)) - g0) * inverseSamplesblock;
-inc1 = (sqrt(1 - sin(transformAngle)) - g1) * inverseSamplesblock;
+// Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
+ii = 0;
+loop(16,
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  ii += 1;
+);
 
 
 /**********************************************************
@@ -139,10 +171,19 @@ Calculate audio sample
 **********************************************************/
 @sample
 
-g0 = g0 + inc0;
-g1 = g1 + inc1;
+ii = 0;
+loop(16,
+  matrixDSP[ii] += matrixInc[ii];
+  ii += 1;
+);
 
-spl0 = spl0 * g0;
-spl1 = spl1 * g1;
-spl2 = spl2 * g1;
-spl3 = spl3 * g1;
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Matrix multiplication with input signal:
+spl0 = wIn * matrixDSP[0] + xIn  * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
+spl1 = wIn * matrixDSP[4] + xIn  * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+spl2 = wIn * matrixDSP[8] + xIn  * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
+spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];
