@@ -101,12 +101,12 @@ matrixDSP       = 1200;
 matrixNewDSP    = 1220;
 matrixInc       = 1240;
 
-// 4x8 matrixes for graphic display of transformations
+// Matrixes for graphic display of transformations
 matrixDisplayPoints      = 1300;
 matrixDisplayTransformed = 1400;
 matrixDisplayInterpreted = 1500;
 
-// For testing
+// Matrixes for testing and debugging of matrixMultiplication()
 matrixCounter = 2000;
 matrixTest    = 2100;
 matrixUnity   = 2200;
@@ -174,7 +174,7 @@ function calculateMatrix()
   matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
   matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
   
-  /* Transformation and interpretation of display points */
+  // Transformation and interpretation of display points
   matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
   interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
   

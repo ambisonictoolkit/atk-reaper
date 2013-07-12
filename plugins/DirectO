@@ -134,7 +134,7 @@ mouse_cap == 1 ?
   alpha = 0.25;
 );
 
-// Draw eight points illustrating the effect of the transform
+// Draw points illustrating the effect of the transform
 displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
