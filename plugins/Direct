@@ -70,6 +70,9 @@ deg2rad = $pi / 180.;
 sqrt2   = sqrt(2.);
 rsqrt2  = 1. / sqrt2;
 
+// Graphics constant
+squareSize = 14.;
+
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
 matrixTumble1   = 1020;
@@ -157,47 +160,40 @@ gxColorSet(1, 1, 1, 1);
 determineGeometry();
 drawBackgroundImage();
 
-mouseX = mouse_x - centerX;
-mouseY = mouse_y - centerY;
-azimuth = atan2(mouseX, -mouseY);
-
-tentativeNewTransformationSliderValue = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
-// Restrict the range to [0, 1]
-tentativeNewTransformationSliderValue < 0. ? tentativeNewTransformationSliderValue = 0.;
-
 // Only update transformation settings at mouse drag
 mouse_cap == 1 ?
-(  
+(
+  mouseX = mouse_x - centerX;
+  mouseY = mouse_y - centerY;
+  azimuth = atan2(mouseX, -mouseY);
+
   // Update slider2 and notify GUI of the change  
   slider1 = azimuth * rad2deg;
   slider_automate(slider1);
   
-  // Update transformAngle and slider3 and notify GUI of the change
-  slider3 = tentativeNewTransformationSliderValue;
+  slider3 = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
+  // Restrict the range to [0, 1]
+  slider3 < 0. ? slider3 = 0.;
+  
+  // Update transformAngle and notify GUI of the change
   transformAngle = slider3 * $pi * 0.5;
   slider_automate(slider3);
   
   calculateMatrix();
-  
-  // Set alpha value of interaction square
-  alpha = 0.5;
-) : (
-  alpha = 0.25;
 );
 
 // Draw points illustrating the effect of the transform
 displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
 
-// Draw red square as interactive direction indicator, size and color tint depends on elevation
-gxColorSet(alpha, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
-posX = centerX + radius * (1. - tentativeNewTransformationSliderValue) * (sin(azimuth) * cosElevation);
-posY = centerY - radius * (1. - tentativeNewTransformationSliderValue) * (cos(azimuth) * cosElevation);
-squareSize = 4. * sinElevation + 12.;
-mouse_cap == 1 ? (
-  drawInteractionSquare(posX, posY, squareSize);
-) : (
-  drawCenteredSquare(posX, posY, squareSize);
-);
+// Drawing green line and square as interactive direction/transform indicator
+gxColorSet(0.5, 0.0 , 1.0, 0.5);
+
+drawLineSegment(centerX, centerY, posX, posY, 1.);
+
+gxColorSet(0.5, 0.0 , 1.0, 0.5);
+posX = centerX + radius * (1. - slider3) * sin(azimuth);
+posY = centerY - radius * (1. - slider3) * cos(azimuth);
+drawInteractionSquare(posX, posY, squareSize);
 
 
 /**********************************************************
