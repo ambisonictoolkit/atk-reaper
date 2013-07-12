@@ -68,8 +68,64 @@ squareSize = 10.;
 // Flag indicating that the plugin has not been fully initialised yet
 initialised = 0;
 
+// Setting memory locations for a number of 4x4 matrixes as 1D arrays
+matrixRotate    = 1000;
+matrixTumble    = 1020;
+matrixTilt      = 1040;
+
+// These are used for matrix multiplications
+matrixTemp      = 1100;
+
+// Resulting matrixes used for DSP processing
+matrixDSP       = 1200;
+matrixNewDSP    = 1220;
+matrixInc       = 1240;
+
+// Matrixes for graphic display of transformations
+matrixDisplayPoints      = 1300;
+matrixDisplayTransformed = 1400;
+matrixDisplayInterpreted = 1500;
+
+// This only needs to be generated once:
+numDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints); 
+
 function calculateCoefficients()
 (
+  generateRotationMatrix(matrixRotate, rotateAngle);
+  generateTiltlMatrix(matrixTilt,  tiltAngle);
+  generateTumblelMatrix(matrixTumble,  tumbleAngle);
+  
+  /* Build processing matrix by performing a series of matrix multiplications
+                        result =         left X                   right             */
+  matrixMultiplication  (matrixTemp,     4, 4, matrixTilt,        4, 4, matrixRotate);
+  matrixMultiplication  (matrixNewDSP,   4, 4, matrixTumble,      4, 4, matrixTemp);
+  
+  /* Transformation and interpretation of display points */
+  matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
+  
+  // Set initial DSP processing coefficients if the plugin has not yet been initialised
+  initialised == 0 ?
+  (
+    i = 0;
+    loop(16,
+      matrixDSP[i] = matrixNewDSP[i];
+    );
+    // Now we are fully initialised
+    initialised = 1;
+  );
+  
+  cosRotation = cos(rotateAngle);
+  sinRotation = sin(rotateAngle);
+  
+  cosTilt = cos(tiltAngle);
+  sinTilt = sin(tiltAngle);
+  
+  cosTumble = cos(tumbleAngle);
+  sinTumble = sin(tumbleAngle);
+  
+  /*
   // We use SpatDIF (navigational) coordinate system rather than mathematical.
   // Hence we need to invert the sign of sinRotation
   cosRotation = cos(rotateAngle);
@@ -98,6 +154,7 @@ function calculateCoefficients()
     // Now we are fully initialised
     initialised = 1;
   );
+  */
 );
 
 /**********************************************************
@@ -205,12 +262,16 @@ drawQuadrangleOutline(centerX - radiusFraction - tumbleDeltaX, centerY - tumbleD
                       centerX + radiusFraction + tumbleDeltaX, centerY - tumbleDeltaY,
                       1.);
 
+// Draw points illustrating the effect of the transform
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
+
 
 /**********************************************************
 Preprocessing prior to audio vector processing.
 **********************************************************/
 @block
 
+/*
 inverseSamplesblock = 1. / samplesblock;
 
 // Linear ramp to new coefficient values over the vector to prevent clicks
@@ -223,12 +284,24 @@ incSinTilt = (sinTilt - sinTiltDspCoeff) * inverseSamplesblock;
 incCosTumble = (cosTumble - cosTumbleDspCoeff) * inverseSamplesblock;
 incSinTumble = (sinTumble - sinTumbleDspCoeff) * inverseSamplesblock;
 
+*/
+
+inverseSamplesblock = 1. / samplesblock;
+
+// Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
+ii = 0;
+loop(16,
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  ii += 1;
+);
+
 
 /**********************************************************
 Calculate audio sample
 **********************************************************/
 @sample
 
+/*
 // Increment matric coefficients for linear interpolation
 cosRotationDspCoeff = cosRotationDspCoeff + incCosRotation;
 sinRotationDspCoeff = sinRotationDspCoeff + incSinRotation;
@@ -261,3 +334,21 @@ x = spl1;
 z = spl3;
 spl1 = x * cosTumbleDspCoeff - z * sinTumbleDspCoeff;
 spl3 = x * sinTumbleDspCoeff + z * cosTumbleDspCoeff;
+*/
+
+ii = 0;
+loop(16,
+  matrixDSP[ii] += matrixInc[ii];
+  ii += 1;
+);
+
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Matrix multiplication with input signal:
+spl0 = wIn * matrixDSP[0] + xIn  * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
+spl1 = wIn * matrixDSP[4] + xIn  * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+spl2 = wIn * matrixDSP[8] + xIn  * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
+spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];

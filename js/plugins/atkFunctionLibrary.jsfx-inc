@@ -484,7 +484,7 @@ function generateDominateMatrix(matrix, gain) local(k, g0, g1)
 
 
 /********************************************************************
-Matrix: Generate 1st order 4x4 matrix for tilt transformation
+Matrix: Generate 1st order 4x4 matrix for focus transformation
 ********************************************************************/
 function generateFocusMatrix(matrix, angle) local(g0, g1, g2)
 (  
@@ -603,6 +603,36 @@ function generateRotationMatrix(matrix, angle)
   matrix[14] = 0.;
   matrix[15] = 1.;
 );
+
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for tilt transformation
+********************************************************************/
+function generateTiltlMatrix(matrix, angle)
+(  
+  matrix[0]  =  1.;
+  matrix[1]  =  0.;
+  matrix[2]  =  0.;
+  matrix[3]  =  0.;
+  
+  matrix[4]  =  0.;
+  matrix[5]  =  1.;
+  matrix[6]  =  0.;
+  matrix[7]  =  0.;
+  
+  matrix[8]  =  0.;
+  matrix[9]  =  0.;
+  matrix[10] =  cos(angle);
+  matrix[11] = -sin(angle);
+  
+  matrix[12] =  0.;
+  matrix[13] =  0.;
+  matrix[14] = -matrix[11];
+  matrix[15] =  matrix[10];  
+);
+
+
 
 
 /********************************************************************
