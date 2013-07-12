@@ -878,7 +878,6 @@ function invertMatrix(matrix)
   Graphics section
 ---------------------------------------------------------------------*/
 
-
 /********************************************************************
 Graphics: Set drawing color
 ********************************************************************/
@@ -887,7 +886,7 @@ function gxColorSet(alpha, red, green, blue)
 	gfx_a = alpha;
 	gfx_r = red;
 	gfx_g = green;
-	gfx_b  = blue;
+	gfx_b = blue;
 );
 
 
@@ -1043,11 +1042,16 @@ function drawCenteredSquare(centerX, centerY, squareSize) local(halfSize)
 /********************************************************************
 Graphics: Draw interactive square
 ********************************************************************/
-function drawInteractionSquare(centerX, centerY, squareSize) local(halfSize)
+function drawInteractionSquare(centerX, centerY, squareSize) local(halfSize, a, r, g, b)
 (
-  drawCenteredSquare(centerX, centerY, squareSize);
+  // Temporarily store incoming color
+	a = gfx_a;
+	r = gfx_r;
+	g = gfx_g;
+	b = gfx_b;
   
-  // Drawing white frame:
+  // Draw square with white frame:
+  drawCenteredSquare(centerX, centerY, squareSize);
   gxColorSet(1., 1., 1., 1.);
   halfSize = squareSize * 0.5;
   drawQuadrangleOutline(centerX-halfSize, centerY-halfSize, 
@@ -1056,10 +1060,16 @@ function drawInteractionSquare(centerX, centerY, squareSize) local(halfSize)
                         centerX-halfSize, centerY+halfSize,
                         1.
                       );
+                      
+  // Return color to its prior value
+  gxColorSet(a, r, g, b);
 );
 
 
-function displayTransformedPoints(matrix, numPoints) local(i, posX, posY, posZ)
+/********************************************************************
+Graphics: Draw points illustrating the effect of various transforms
+********************************************************************/
+function displayTransformedPoints(matrix, numPoints) local(i, posX, posY, posZ, squareSize)
 (
   // Draw eight points indicating the effect of the transform
   // TODO: Also take z value into account in this visualisation?
