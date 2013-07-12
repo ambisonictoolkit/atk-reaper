@@ -131,14 +131,14 @@ mouse_cap == 1 ?
   // Set alpha value of interaction square
   alpha = 0.5;
 ) : (
-  alpha = 0.25;
+  alpha = 0.35;
 );
 
 // Draw points illustrating the effect of the transform
 displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
-gxColorSet(alpha, 1.0, 0., 0.);
+gxColorSet(alpha, 0., 1.0, 0.5);
 posX = centerX + radius * (1. - tentativeNewTransformationAngle) * sin(azimuth);
 posY = centerY - radius * (1. - tentativeNewTransformationAngle) * cos(azimuth);
 squareSize = 14;
