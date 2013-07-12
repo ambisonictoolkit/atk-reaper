@@ -63,7 +63,7 @@ deg2rad  = $pi / 180.;
 rad2norm = 1. / $pi;
 
 // Graphics constants:
-squareSize = 10.;
+squareSize = 14.;
 
 // Flag indicating that the plugin has not been fully initialised yet
 initialised = 0;
@@ -116,6 +116,7 @@ function calculateCoefficients()
     initialised = 1;
   );
   
+  // The following are used for graphics processing:
   cosRotation = cos(rotateAngle);
   sinRotation = sin(rotateAngle);
   
@@ -124,37 +125,6 @@ function calculateCoefficients()
   
   cosTumble = cos(tumbleAngle);
   sinTumble = sin(tumbleAngle);
-  
-  /*
-  // We use SpatDIF (navigational) coordinate system rather than mathematical.
-  // Hence we need to invert the sign of sinRotation
-  cosRotation = cos(rotateAngle);
-  sinRotation = sin(rotateAngle);
-  
-  cosTilt = cos(tiltAngle);
-  sinTilt = sin(tiltAngle);
-  
-  // We use SpatDIF (navigational) coordinate system rather than mathematical.
-  // Hence we need to invert the sign of sinTumble
-  cosTumble = cos(tumbleAngle);
-  sinTumble = sin(tumbleAngle);
-  
-  // Set coefficients if the plugin has not yet been initialised
-  initialised == 0 ?
-  (
-    cosRotationDspCoeff = cosRotation;
-    sinRotationDspCoeff = sinRotation;
-
-    cosTiltDspCoeff = cosTilt;
-    sinTiltDspCoeff = sinTilt;
-
-    cosTumbleDspCoeff = cosTumble;
-    sinTumbleDspCoeff = sinTumble;
-
-    // Now we are fully initialised
-    initialised = 1;
-  );
-  */
 );
 
 /**********************************************************
@@ -174,11 +144,9 @@ Custom graphic interface
 **********************************************************/
 @gfx 500 500
 
-gxColorSet(1, 1, 1, 1);
-determineGeometry();
-drawBackgroundImage();
+// First we deal with mouse interactions:
 
-// Draw rotation indicator as interactive orange square
+// Mouse drag: Update rotateAngle
 mouse_cap == 1 ?
 (
   mouseX = mouse_x - centerX;
@@ -191,17 +159,19 @@ mouse_cap == 1 ?
   calculateCoefficients();
 );
 
-gxColorSet(1, 1, 0.75, 0.5);
-drawCenteredSquare(centerX + radius* sinRotation, centerY - radius*cosRotation, squareSize);
-
-// Draw tilt indicator as interactive (shift + mouse) blue square and plane
+// SHIFT + mouse drag: Update tiltAngle
 mouse_cap == 9 ?
 (
   mouseX = mouse_x - centerX;
-  mouseX > radius ? mouseX = radius : 
-  (
-    mouseX < -radius ? mouseX = -radius;
+  
+  mouseX > radius ? (
+    mouseX = radius
+  ) : (
+    mouseX < -radius ? (
+      mouseX = -radius
+    );
   );
+  
   tiltAngle = mouseX  * $pi / radius;
   slider2 = tiltAngle * rad2deg;
   
@@ -209,10 +179,47 @@ mouse_cap == 9 ?
   slider_automate(slider2);
   calculateCoefficients();
 );
-gxColorSet(1, 0.5, 0.75, 1.);
-drawCenteredSquare(centerX + tiltAngle * rad2norm * radius, centerY, squareSize);
 
-// Draw outline of tilt plane - gray if the plane is tilted upside down
+
+// CMD + mouse: Update tumbleAngle
+mouse_cap == 5 ?
+(
+  mouseY = centerY - mouse_y;
+  mouseY > radius ? (
+    mouseY = radius
+  ) : (
+    mouseY < -radius ? mouseY = -radius;
+  );
+  mouseY = mouseY * $pi / radius;
+  tumbleAngle = mouseY;
+  slider3 = tumbleAngle * rad2deg;
+  
+  // Notify GUI/automation that tumble has changed, and update coefficients
+  slider_automate(slider3);
+  calculateCoefficients();
+);
+
+
+// Track geometry and draw background
+gxColorSet(1, 1, 1, 1);
+determineGeometry();
+drawBackgroundImage();
+
+
+// Draw points illustrating the effect of the transform
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
+
+
+// Draw rotation indicator
+gxColorSet(0.75, 1, 0.5, 0.75);
+drawInteractionSquare(centerX + radius* sinRotation, centerY - radius*cosRotation, squareSize);
+
+
+// Draw tilt indicator. This is shiftes slightly upwards in order to avoid intial overlap with tumble indicator
+gxColorSet(0.75, 0.5, 0.75, 1.);
+drawInteractionSquare(centerX + tiltAngle * rad2norm * radius, centerY-20., squareSize);
+
+// Draw tilt plane. Color is gray when upside down
 cosTilt < 0 ?
 (
   gxColorSet(1, 0.7, 0.7, 0.7);
@@ -228,26 +235,12 @@ drawQuadrangleOutline(centerX - tiltDeltaX, centerY - radiusFraction - tiltDelta
                       centerX - tiltDeltaX, centerY + radiusFraction + tiltDeltaY, 
                       1.);
 
-// CMD + mouse: Draw tumble indicator as interactive green square
-mouse_cap == 5 ?
-(
-  mouseY = centerY - mouse_y;
-  mouseY > radius ? mouseY = radius : 
-  (
-    mouseY < -radius ? mouseY = -radius;
-  );
-  mouseY = mouseY * $pi / radius;
-  tumbleAngle = mouseY;
-  slider3 = tumbleAngle * rad2deg;
-  
-  // Notify GUI/automation that tumble has changed, and update coefficients
-  slider_automate(slider3);
-  calculateCoefficients();
-);
-gxColorSet(1, 0.5, 1., 0.75);
-drawCenteredSquare(centerX, centerY - tumbleAngle * rad2norm * radius, squareSize);
 
-// Draw outline of tumble plane - gray if the plane is tilted upside down
+// Draw tumble indicator
+gxColorSet(0.75, 0.5, 1., 0.75);
+drawInteractionSquare(centerX, centerY - tumbleAngle * rad2norm * radius, squareSize);
+
+// Draw tumble plane. Color is gray when upside down
 cosTumble < 0 ?
 (
   gxColorSet(1, 0.7, 0.7, 0.7);
@@ -262,8 +255,7 @@ drawQuadrangleOutline(centerX - radiusFraction - tumbleDeltaX, centerY - tumbleD
                       centerX + radiusFraction + tumbleDeltaX, centerY - tumbleDeltaY,
                       1.);
 
-// Draw points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
+
 
 
 /**********************************************************
