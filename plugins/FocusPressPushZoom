@@ -134,7 +134,7 @@ matrixUnity[15] = 1.;
 matrixMultiplication  (matrixTest,    4, 4, matrixUnity,     4, 8, matrixCounter);
 
 // This only needs to be generated once:
-numDisplayedPoints = 12;
+numDisplayedPoints = 24;
 generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints); 
 
 function calculateMatrix()

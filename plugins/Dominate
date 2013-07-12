@@ -91,7 +91,7 @@ matrixDisplayTransformed = 1400;
 matrixDisplayInterpreted = 1500;
 
 // This only needs to be generated once:
-numDisplayedPoints = 12;
+numDisplayedPoints = 24;
 generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
 
 
