@@ -1012,6 +1012,18 @@ function drawBackgroundImage()
 );
 
 
+
+/********************************************************************
+Graphics: Draw line segment
+********************************************************************/
+function drawLineSegment(position1x, position1y, position2x, position2y, antiAliasing)
+(
+  gfx_x = position1x;
+  gfx_y = position1y;
+  gfx_lineto(position2x, position2y, antiAliasing);
+);
+
+
 /********************************************************************
 Graphics: Draw outline of polygon with four sides and four corners
 ********************************************************************/
