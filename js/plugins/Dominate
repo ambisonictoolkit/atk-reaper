@@ -154,7 +154,7 @@ Graphics
 
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
 
 // Reset azimuth and transformAngle on mouse click
 mouse_cap == 1 ?

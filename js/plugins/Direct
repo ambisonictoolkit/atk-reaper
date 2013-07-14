@@ -158,7 +158,7 @@ Graphics
 
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
 
 // Only update transformation settings at mouse drag
 mouse_cap == 1 ?

@@ -203,7 +203,7 @@ mouse_cap == 5 ?
 // Track geometry and draw background
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
 
 
 // Draw points illustrating the effect of the transform
