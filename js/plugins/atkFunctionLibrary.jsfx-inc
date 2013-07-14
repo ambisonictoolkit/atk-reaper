@@ -160,212 +160,208 @@ function interpreteProcessedPoints(matrixOut, matrixIn, numPoints) local(i, g0sq
 
 
 /********************************************************************
-Matrix: Generate 1st order 4x4 matrix for rotation transformation
+Matrix: Generate 1st order 4x4 matrix for B to A decoding
 ********************************************************************/
 function generateBtoAMatrix(matrix, orientation, weight) local(g0)
-(
+(  
   // Option 0: orthogonal (front left up) [ FLU, FRD, BLD, BRU ]
   orientation == 0 ?
   ( 
-    matrixDSP[0] =   0.5;
-    matrixDSP[1] =   0.5;
-    matrixDSP[2] =   0.5;
-    matrixDSP[3] =   0.5;
+    matrix[0] =   0.5;
+    matrix[1] =   0.5;
+    matrix[2] =   0.5;
+    matrix[3] =   0.5;
 
-    matrixDSP[4] =   0.5;
-    matrixDSP[5] =   0.5;
-    matrixDSP[6] =  -0.5;
-    matrixDSP[7] =  -0.5;
+    matrix[4] =   0.5;
+    matrix[5] =   0.5;
+    matrix[6] =  -0.5;
+    matrix[7] =  -0.5;
 
-    matrixDSP[8] =   0.5;
-    matrixDSP[9] =  -0.5;
-    matrixDSP[10] =  0.5;
-    matrixDSP[11] = -0.5;
+    matrix[8] =   0.5;
+    matrix[9] =  -0.5;
+    matrix[10] =  0.5;
+    matrix[11] = -0.5;
 
-    matrixDSP[12] =  0.5;
-    matrixDSP[13] = -0.5;
-    matrixDSP[14] = -0.5;
-    matrixDSP[15] =  0.5;
+    matrix[12] =  0.5;
+    matrix[13] = -0.5;
+    matrix[14] = -0.5;
+    matrix[15] =  0.5;
   ) :
   (
     // Option 1: front left down [ FLD, FRU, BLU, BRD ]
     orientation == 1 ?
     (
-      matrixDSP[0] =  0.5;
-      matrixDSP[1] =  0.5;
-      matrixDSP[2] =  0.5;
-      matrixDSP[3] = -0.5;
+      matrix[0] =  0.5;
+      matrix[1] =  0.5;
+      matrix[2] =  0.5;
+      matrix[3] = -0.5;
 
-      matrixDSP[4] =  0.5;
-      matrixDSP[5] =  0.5;
-      matrixDSP[6] = -0.5;
-      matrixDSP[7] =  0.5;
+      matrix[4] =  0.5;
+      matrix[5] =  0.5;
+      matrix[6] = -0.5;
+      matrix[7] =  0.5;
 
-      matrixDSP[8] =  0.5;
-      matrixDSP[9] = -0.5;
-      matrixDSP[10] =  0.5;
-      matrixDSP[11] =  0.5;
+      matrix[8] =  0.5;
+      matrix[9] = -0.5;
+      matrix[10] =  0.5;
+      matrix[11] =  0.5;
 
-      matrixDSP[12] =  0.5;
-      matrixDSP[13] = -0.5;
-      matrixDSP[14] = -0.5;
-      matrixDSP[15] = -0.5;
+      matrix[12] =  0.5;
+      matrix[13] = -0.5;
+      matrix[14] = -0.5;
+      matrix[15] = -0.5;
     ) :
     (
       // Option 2: front left-right [ FL, FR, BU, BD ]
     
       orientation == 2 ?
       (     
-        matrixDSP[0] =  0.5;
-        matrixDSP[1] =  0.5;
-        matrixDSP[2] =  recSqrt2;
-        matrixDSP[3] =  0.;
+        matrix[0] =  0.5;
+        matrix[1] =  0.5;
+        matrix[2] =  recSqrt2;
+        matrix[3] =  0.;
 
-        matrixDSP[4] =  0.5;
-        matrixDSP[5] =  0.5;
-        matrixDSP[6] = -recSqrt2;
-        matrixDSP[7] =  0.;
+        matrix[4] =  0.5;
+        matrix[5] =  0.5;
+        matrix[6] = -recSqrt2;
+        matrix[7] =  0.;
 
-        matrixDSP[8] =  0.5;
-        matrixDSP[9] = -0.5;
-        matrixDSP[10] =  0.;
-        matrixDSP[11] =  recSqrt2;
+        matrix[8] =  0.5;
+        matrix[9] = -0.5;
+        matrix[10] =  0.;
+        matrix[11] =  recSqrt2;
 
-        matrixDSP[12] =  0.5;
-        matrixDSP[13] = -0.5;
-        matrixDSP[14] =  0.;
-        matrixDSP[15] = -recSqrt2;
+        matrix[12] =  0.5;
+        matrix[13] = -0.5;
+        matrix[14] =  0.;
+        matrix[15] = -recSqrt2;
       ) :
       (
         // Option 3: front up-down [ FU, FD, BL, BR ]
       
         orientation == 3 ?
         (
-          matrixDSP[0] =  0.5;
-          matrixDSP[1] =  0.5;
-          matrixDSP[2] =  0.;
-          matrixDSP[3] =  recSqrt2;
+          matrix[0] =  0.5;
+          matrix[1] =  0.5;
+          matrix[2] =  0.;
+          matrix[3] =  recSqrt2;
 
-          matrixDSP[4] =  0.5;
-          matrixDSP[5] =  0.5;
-          matrixDSP[6] =  0.;
-          matrixDSP[7] = -recSqrt2;
+          matrix[4] =  0.5;
+          matrix[5] =  0.5;
+          matrix[6] =  0.;
+          matrix[7] = -recSqrt2;
 
-          matrixDSP[8] =  0.5;
-          matrixDSP[9] = -0.5;
-          matrixDSP[10] =  recSqrt2;
-          matrixDSP[11] =  0.;
+          matrix[8] =  0.5;
+          matrix[9] = -0.5;
+          matrix[10] =  recSqrt2;
+          matrix[11] =  0.;
 
-          matrixDSP[12] =  0.5;
-          matrixDSP[13] = -0.5;
-          matrixDSP[14] = -recSqrt2;
-          matrixDSP[15] =  0.;
+          matrix[12] =  0.5;
+          matrix[13] = -0.5;
+          matrix[14] = -recSqrt2;
+          matrix[15] =  0.;
         ) :
         (
           // Option 4: front & back down [ F, BD, BLU, BRU ]
         
           orientation == 4 ?
           (
-            matrixDSP[0] =  0.5;
-            matrixDSP[1] =  sqrt3Div2;
-            matrixDSP[2] =  0.;
-            matrixDSP[3] =  0.;
+            matrix[0] =  0.5;
+            matrix[1] =  sqrt3Div2;
+            matrix[2] =  0.;
+            matrix[3] =  0.;
 
-            matrixDSP[4] =  0.5;
-            matrixDSP[5] = -sqrt3Div6;
-            matrixDSP[6] =  0.;
-            matrixDSP[7] = -sqrt6Div3;
+            matrix[4] =  0.5;
+            matrix[5] = -sqrt3Div6;
+            matrix[6] =  0.;
+            matrix[7] = -sqrt6Div3;
 
-            matrixDSP[8] =  0.5;
-            matrixDSP[9] = -sqrt3Div6;
-            matrixDSP[10] =  recSqrt2;
-            matrixDSP[11] =  recSqrt6;
+            matrix[8] =  0.5;
+            matrix[9] = -sqrt3Div6;
+            matrix[10] =  recSqrt2;
+            matrix[11] =  recSqrt6;
 
-            matrixDSP[12] =  0.5;
-            matrixDSP[13] = -sqrt3Div6;
-            matrixDSP[14] = -recSqrt2;
-            matrixDSP[15] =  recSqrt6;
+            matrix[12] =  0.5;
+            matrix[13] = -sqrt3Div6;
+            matrix[14] = -recSqrt2;
+            matrix[15] =  recSqrt6;
           ) :
           (
             // Option 5: front & back up [ F, BU, BLD, BRD ]
           
             orientation == 5 ?
             (
-              matrixDSP[0] =  0.5;
-              matrixDSP[1] =  sqrt3Div2;
-              matrixDSP[2] =  0.;
-              matrixDSP[3] =  0.;
+              matrix[0] =  0.5;
+              matrix[1] =  sqrt3Div2;
+              matrix[2] =  0.;
+              matrix[3] =  0.;
 
-              matrixDSP[4] =  0.5;
-              matrixDSP[5] = -sqrt3Div6;
-              matrixDSP[6] =  0.0;
-              matrixDSP[7] =  sqrt6Div3;
+              matrix[4] =  0.5;
+              matrix[5] = -sqrt3Div6;
+              matrix[6] =  0.0;
+              matrix[7] =  sqrt6Div3;
 
-              matrixDSP[8] =  0.5;
-              matrixDSP[9] = -sqrt3Div6;
-              matrixDSP[10] =  recSqrt2;
-              matrixDSP[11] = -recSqrt6;
+              matrix[8] =  0.5;
+              matrix[9] = -sqrt3Div6;
+              matrix[10] =  recSqrt2;
+              matrix[11] = -recSqrt6;
 
-              matrixDSP[12] =  0.5;
-              matrixDSP[13] = -sqrt3Div6;
-              matrixDSP[14] = -recSqrt2;
-              matrixDSP[15] = -recSqrt6;
+              matrix[12] =  0.5;
+              matrix[13] = -sqrt3Div6;
+              matrix[14] = -recSqrt2;
+              matrix[15] = -recSqrt6;
             ) :
             (
               // Option 6: front left-right up [ FLU, FRU, FD, B ]
             
               orientation == 6 ?
               (
-                matrixDSP[0] =  0.5;
-                matrixDSP[1] =  sqrt3Div6;
-                matrixDSP[2] =  recSqrt2;
-                matrixDSP[3] =  recSqrt6;
+                matrix[0] =  0.5;
+                matrix[1] =  sqrt3Div6;
+                matrix[2] =  recSqrt2;
+                matrix[3] =  recSqrt6;
 
-                matrixDSP[4] =  0.5;
-                matrixDSP[5] =  sqrt3Div6;
-                matrixDSP[6] = -recSqrt2;
-                matrixDSP[7] =  recSqrt6;
+                matrix[4] =  0.5;
+                matrix[5] =  sqrt3Div6;
+                matrix[6] = -recSqrt2;
+                matrix[7] =  recSqrt6;
 
-                matrixDSP[8] =  0.5;
-                matrixDSP[9] =  sqrt3Div6;
-                matrixDSP[10] =  0.;
-                matrixDSP[11] = -sqrt6Div3;
+                matrix[8] =  0.5;
+                matrix[9] =  sqrt3Div6;
+                matrix[10] =  0.;
+                matrix[11] = -sqrt6Div3;
 
-                matrixDSP[12] =  0.5;
-                matrixDSP[13] = -sqrt3Div2;
-                matrixDSP[14] =  0.;
-                matrixDSP[15] =  0.;
+                matrix[12] =  0.5;
+                matrix[13] = -sqrt3Div2;
+                matrix[14] =  0.;
+                matrix[15] =  0.;
               ) :
               (
                 // Option 7: front left-right down [ FLD, FRD, FU, B ]
 
-                matrixDSP[0] =  0.5;
-                matrixDSP[1] =  sqrt3Div6;
-                matrixDSP[2] =  recSqrt2;
-                matrixDSP[3] = -recSqrt6;
+                matrix[0] =  0.5;
+                matrix[1] =  sqrt3Div6;
+                matrix[2] =  recSqrt2;
+                matrix[3] = -recSqrt6;
 
-                matrixDSP[4] =  0.5;
-                matrixDSP[5] =  sqrt3Div6;
-                matrixDSP[6] = -recSqrt2;
-                matrixDSP[7] = -recSqrt6;
+                matrix[4] =  0.5;
+                matrix[5] =  sqrt3Div6;
+                matrix[6] = -recSqrt2;
+                matrix[7] = -recSqrt6;
 
-                matrixDSP[8] =  0.5;
-                matrixDSP[9] =  sqrt3Div6;
-                matrixDSP[10] =  0.;
-                matrixDSP[11] =  sqrt6Div3;
+                matrix[8] =  0.5;
+                matrix[9] =  sqrt3Div6;
+                matrix[10] =  0.;
+                matrix[11] =  sqrt6Div3;
 
-                matrixDSP[12] =  0.5;
-                matrixDSP[13] = -sqrt3Div2;
-                matrixDSP[14] =  0.;
-                matrixDSP[15] =  0.;
+                matrix[12] =  0.5;
+                matrix[13] = -sqrt3Div2;
+                matrix[14] =  0.;
+                matrix[15] =  0.;
               );
-
             );
-
           );
-
         );
-
       );
     );
   );
@@ -397,10 +393,10 @@ function generateBtoAMatrix(matrix, orientation, weight) local(g0)
   );
 
   // Compensate matrix for weight:
-  matrixDSP[0] =  g0 * matrixDSP[0];
-  matrixDSP[4] =  g0 * matrixDSP[4];
-  matrixDSP[8] =  g0 * matrixDSP[8];
-  matrixDSP[12] = g0 * matrixDSP[12];
+  matrix[0] =  g0 * matrix[0];
+  matrix[4] =  g0 * matrix[4];
+  matrix[8] =  g0 * matrix[8];
+  matrix[12] = g0 * matrix[12];
 );
 
 
