@@ -22,6 +22,18 @@ and GNU General Public License along with this program.  If not, see
 
 
 ---------------------------------------------------------------------
+  Class: atk-function-library.jsfx-inc
+  Library of shared functions
+---------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------
+Third Party Notices
+---------------------------------------------------------------------
+
+
+---------------------------------------------------------------------
 The function for inverting a 4x4 matrix is lifted of StackOverflow:
 http://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix
 
@@ -994,17 +1006,23 @@ function determineGeometry()
 /********************************************************************
 Graphics: Draw background image based on ICST ambimonitor
 ********************************************************************/
-function drawBackgroundImage()
+function drawBackgroundImage(sourceWidth, sourceHeight, dstLeft, dstTop, dstWidth, dstHeight)
 (
   // Background graphics
   coordinatelist[0] = 0;                  //left-most pixel location for source
   coordinatelist[1] = 0;                  //top-most pixel location for source
-  coordinatelist[2] = 800;                //width of source
-  coordinatelist[3] = 800;                //height of source
-  coordinatelist[4] = centerX - radius;   //left-most pixel location of destination
-  coordinatelist[5] = centerY - radius;   //top-most pixel location of destination
-  coordinatelist[6] = 2 * radius;         //width of destination to fill
-  coordinatelist[7] = 2 * radius;         //height of destination to fill
+  coordinatelist[2] = sourceWidth;        //width of source
+  coordinatelist[3] = sourceHeight;       //height of source
+  
+  //coordinatelist[4] = centerX - radius;   //left-most pixel location of destination
+  //coordinatelist[5] = centerY - radius;   //top-most pixel location of destination
+  //coordinatelist[6] = 2 * radius;         //width of destination to fill
+  //coordinatelist[7] = 2 * radius;         //height of destination to fill
+  
+  coordinatelist[4] = dstLeft;            //left-most pixel location of destination
+  coordinatelist[5] = dstTop;             //top-most pixel location of destination
+  coordinatelist[6] = dstWidth;           //width of destination to fill
+  coordinatelist[7] = dstHeight;          //height of destination to fill
   coordinatelist[8] =0;                   //represents offset from center of image
   coordinatelist[9] =0;                   //represents offset from center of image
   gfx_blitext(0,coordinatelist,0);

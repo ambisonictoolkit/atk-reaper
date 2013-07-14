@@ -110,7 +110,7 @@ Graphics
 // Set colors
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
 
 mouseX = mouse_x - centerX;
 mouseY = mouse_y - centerY;
