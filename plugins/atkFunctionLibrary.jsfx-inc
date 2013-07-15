@@ -162,8 +162,14 @@ function interpreteProcessedPoints(matrixOut, matrixIn, numPoints) local(i, g0sq
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for B to A decoding
 ********************************************************************/
-function generateBtoAMatrix(matrix, orientation, weight) local(g0)
-(  
+function generateBtoAMatrix(matrix, orientation, weight) local(g0, recSqrt6, sqrt3Div2, sqrt3Div6, sqrt6Div3, recSqrt2)
+(
+  recSqrt2   = 1. / sqrt(2.);
+  sqrt3Div2   = sqrt(3.) / 2.;
+  sqrt3Div6   = sqrt(3.) / 6.;
+  sqrt6Div3   = sqrt(6.) / 3.;
+  recSqrt6   = 1. / sqrt(6.);
+  
   // Option 0: orthogonal (front left up) [ FLU, FRD, BLD, BRU ]
   orientation == 0 ?
   ( 
@@ -436,8 +442,8 @@ Matrix: Generate 1st order 4x4 matrix for directX transformation
 function generateDirectOrigoMatrix(matrix, angle) local(g0, g1)
 (
   
-  g0 = sqrt(1 + sin(transformAngle));
-  g1 = sqrt(1 - sin(transformAngle));
+  g0 = sqrt(1 + sin(angle));
+  g1 = sqrt(1 - sin(angle));
   
   matrix[0]  = g0;
   matrix[1]  = 0.;
@@ -731,7 +737,7 @@ function matrixMultiplication(resultMatrix, numRowsLeft, numColsLeft, leftMatrix
 /********************************************************************
 Matrix: Invert a 4x4 matrix
 ********************************************************************/
-function invertMatrix(matrix)
+function invertMatrix(matrix) local(determinant)
 (
   inv[0] =   matrix[5]  * matrix[10] * matrix[15] -
              matrix[5]  * matrix[11] * matrix[14] -
@@ -941,7 +947,7 @@ function hls_value(n1, n2, hue)
 /********************************************************************
 Graphics: Express gain (in dB) as graphics color
 ********************************************************************/
-function gainToColor(gain, gainLowLimit, gainHighLimit, verticalOffset) local(saturation, lightness, m1, m2, red, gree, blue)
+function gainToColor(gain, gainLowLimit, gainHighLimit, verticalOffset) local(saturation, lightness, m1, m2, red, green, blue)
 (
   // Clip gain to prescribed range:
   gain < gainLowLimit ? (

@@ -52,13 +52,6 @@ Initialisation
 **********************************************************/
 @init
 
-// Some constants:
-recSqrt2   = 1. / sqrt(2.);
-sqrt3Div2   = sqrt(3.) / 2.;
-sqrt3Div6   = sqrt(3.) / 6.;
-sqrt6Div3   = sqrt(6.) / 3.;
-recSqrt6   = 1. / sqrt(6.);
-
 // Setting memory locations for 4x4 matrix as 1D array
 matrixDSP       = 1000;
 
