@@ -1359,12 +1359,19 @@ local (decibel, deltaX, hideSectionWidth, i, left,
   stripTotalHeight = gfx_h - 20;
   drawBackgroundImage(661, 1, left, top, stripWidth, stripTotalHeight);
 
-  // Set up geometry for channel strips
-  stripHeight          = (stripTotalHeight-(numChannels*0.5)) / (numChannels+1);
-  stripSeparatorHeight = (stripTotalHeight-(numChannels*0.5)) / ((numChannels+1) * (numChannels*0.5 - 1));
-  stripLeft            = 10.;                               // Same for all strips
-  stripRight           = gfx_w - 10.;                       // Same for all strips
-
+  // Geometry for channel strips - if more than 4 channels they are grouped as pairs
+  numChannels > 4 ? (
+    stripHeight          = (stripTotalHeight-(numChannels*0.5)) / (numChannels+1);
+    stripSeparatorHeight = (stripTotalHeight-(numChannels*0.5)) / ((numChannels+1) * (numChannels*0.5 - 1));
+    stripLeft            = 10.;                               // Same for all strips
+    stripRight           = gfx_w - 10.;                       // Same for all strips
+  ) : (
+    stripHeight          = (stripTotalHeight-(numChannels-1.)) / numChannels;
+    stripSeparatorHeight = 1.;
+    stripLeft            = 10.;                               // Same for all strips
+    stripRight           = gfx_w - 10.;                       // Same for all strips
+  );
+  
 
   // Calculate borders for each section of the multichannel meter
   i = 0;
