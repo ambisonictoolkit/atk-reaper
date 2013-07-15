@@ -70,6 +70,16 @@ recSqrt2   = 1. / sqrt(2.);
   Mathematical functions
 ---------------------------------------------------------------------*/
 
+
+/********************************************************************
+Maths: Round to nearest integer
+********************************************************************/
+function round(value)
+(
+  (value >= 0.) ? ceil(value + 0.5) : ceil(value - 0.5);
+);
+
+
 /********************************************************************
 Maths: Convert linear gain to decibel
 ********************************************************************/
@@ -88,6 +98,22 @@ function amp2db(gain)
 );
 
 
+/********************************************************************
+Maths: Clip value
+********************************************************************/
+function clipValue(value, min, max) local(temp, test)
+(
+  temp = value;
+  
+  temp < min ? (
+    temp = min;
+  ) : (
+    temp > max ? (
+      temp = max;
+    );
+  );
+  temp      // return temp
+);
 
 /*---------------------------------------------------------------------
   Matrix section
@@ -1015,12 +1041,6 @@ function drawBackgroundImage(sourceWidth, sourceHeight, dstLeft, dstTop, dstWidt
   coordinatelist[1] = 0;                  //top-most pixel location for source
   coordinatelist[2] = sourceWidth;        //width of source
   coordinatelist[3] = sourceHeight;       //height of source
-  
-  //coordinatelist[4] = centerX - radius;   //left-most pixel location of destination
-  //coordinatelist[5] = centerY - radius;   //top-most pixel location of destination
-  //coordinatelist[6] = 2 * radius;         //width of destination to fill
-  //coordinatelist[7] = 2 * radius;         //height of destination to fill
-  
   coordinatelist[4] = dstLeft;            //left-most pixel location of destination
   coordinatelist[5] = dstTop;             //top-most pixel location of destination
   coordinatelist[6] = dstWidth;           //width of destination to fill
@@ -1059,6 +1079,16 @@ function drawQuadrangleOutline(position1x, position1y, position2x, position2y, p
 
 
 /********************************************************************
+Graphics: Draw outline of polygon with four sides and four corners
+********************************************************************/
+function drawRectangle(left, top, right, bottom)
+(
+  gfx_x = left;
+  gfx_y = top;
+  gfx_rectto(right, bottom);
+);
+
+/********************************************************************
 Graphics: Draw centered filled-in square
 ********************************************************************/
 function drawCenteredSquare(centerX, centerY, squareSize) local(halfSize)
@@ -1067,8 +1097,8 @@ function drawCenteredSquare(centerX, centerY, squareSize) local(halfSize)
   gfx_x = centerX - halfSize;
   gfx_y = centerY - halfSize;
   gfx_rectto(centerX + halfSize, centerY + halfSize);
-
 );
+
 
 
 /********************************************************************
