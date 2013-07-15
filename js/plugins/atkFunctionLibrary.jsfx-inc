@@ -44,9 +44,24 @@ http://www.mesa3d.org/
 
 
 ---------------------------------------------------------------------
-  Class: atk-function-library.jsfx-inc
-  Library of shared functions
+Support for Gerzon's Diametric Decoder Theorem (DDT) decoding algorithm is derived
+from Aaron Heller's Octave code available at: http://www.ai.sri.com/ajh/ambisonics/
+
+Benjamin, et al., "Localization in Horizontal-Only Ambisonic Systems"
+Preprint from AES-121, 10/2006, San Francisco
+
+Implementation in the SuperCollider3 version of the ATK is by
+Joseph Anderson <j.anderson[at]ambisonictoolkit.net>
 ---------------------------------------------------------------------
+
+---------------------------------------------------------------------
+Irregular array decoding coefficients (5.0, 7.0) are kindly provided by
+Bruce Wiggins: http://www.brucewiggins.co.uk/
+
+B. Wiggins, "An Investigation into the Real-time Manipulation and Control of
+Three-dimensional Sound Fields," PhD Thesis, University of Derby, Derby, 2004.
+---------------------------------------------------------------------
+
 */
 
 
@@ -121,7 +136,181 @@ function clipValue(value, min, max) local(temp, test)
 
 
 /********************************************************************
-Matrix: Generate 4x8 matrix with 8 source signals for display purposes
+Matrix: Generate 4 x 8 matrix for equal 5.0 decoding. 
+  Channel configuration: L - R - C - LFE - SL - SR - SBL - SBR
+  LFE, SBL and SBR are not being used by this decoder
+Decoding makes use of Wigging's matricies (credit at top)
+********************************************************************/
+function generateDecode50EqualMatrix(matrix)
+(
+  // Left
+  matrix[0]  =  0.3650;
+  matrix[1]  =  0.4350;
+  matrix[2]  =  0.3400;
+  matrix[3]  =  0.0;
+  
+  // Right
+  matrix[4]  =  0.3650;
+  matrix[5]  =  0.4350;
+  matrix[6]  = -0.3400;
+  matrix[7]  =  0.0;
+  
+  // Center
+  matrix[8]  =  0.0000;
+  matrix[9]  =  0.0850;
+  matrix[10] =  0.0000;
+  matrix[11] =  0.0;
+  
+  // LFE - no signal
+  matrix[12] =  0.0;
+  matrix[13] =  0.0;
+  matrix[14] =  0.0;
+  matrix[15] =  0.0;
+  
+  // Surround left (SL)
+  matrix[16] =  0.5550;
+  matrix[17] = -0.2850;
+  matrix[18] =  0.4050;
+  matrix[19] =  0.0;
+  
+  // Surround right (SR)
+  matrix[20] =  0.5550;
+  matrix[21] = -0.2850;
+  matrix[22] = -0.4050;
+  matrix[23] =  0.0;
+  
+  // Surround back left (SBL) - no signal
+  matrix[24] =  0.0;
+  matrix[25] =  0.0;
+  matrix[26] =  0.0;
+  matrix[27] =  0.0;
+  
+  // Surround back right (SBR) - no signal
+  matrix[28] =  0.0;
+  matrix[29] =  0.0;
+  matrix[30] =  0.0;
+  matrix[31] =  0.0;
+);
+
+
+/********************************************************************
+Matrix: Generate 4 x 8 matrix for focused 5.0 decoding. 
+  Channel configuration: L - R - C - LFE - SL - SR - SBL - SBR
+  LFE, Lsb and Rsb are not being used by this decoder
+Decoding makes use of Wigging's matricies (credit at top)
+********************************************************************/
+function generateDecode50FocusedMatrix(matrix)
+(
+  // Left
+  matrix[0]  =  0.4250;
+  matrix[8]  =  0.3600;
+  matrix[16] =  0.4050;
+  matrix[24] =  0.0;
+  
+  // Right
+  matrix[1]  =  0.4250;
+  matrix[9]  =  0.3600;
+  matrix[17] = -0.4050;
+  matrix[25] =  0.0;
+  
+  // Center
+  matrix[2]  =  0.2000;
+  matrix[10] =  0.1600;
+  matrix[18] =  0.0000;
+  matrix[26] =  0.0;
+  
+  // LFE - no signal
+  matrix[3]  =  0.0;
+  matrix[11] =  0.0;
+  matrix[19] =  0.0;
+  matrix[27] =  0.0;
+  
+  // Surround left (SL)
+  matrix[4]  =  0.4700;
+  matrix[12] = -0.3300;
+  matrix[20] =  0.4150;
+  matrix[28] =  0.0;
+  
+  // Surround right (SR)
+  matrix[5]  =  0.4700;
+  matrix[13] = -0.3300;
+  matrix[21] = -0.4150;
+  matrix[29] =  0.0;
+  
+  // Surround back left (SBL) - no signal
+  matrix[6]  =  0.0;
+  matrix[14] =  0.0;
+  matrix[22] =  0.0;
+  matrix[30] =  0.0;
+  
+  // Surround back right (SBR) - no signal
+  matrix[7]  =  0.0;
+  matrix[15] =  0.0;
+  matrix[23] =  0.0;
+  matrix[31] =  0.0;
+);
+
+
+/********************************************************************
+Matrix: Generate 4 x 8 matrix for four channel 5.0 decoding.
+  Channel configuration: L - R - C - LFE - Ls - Rs - LsB - RsB
+  C, LFE, SBL and SBR are not being used by this decoder
+Decoding makes use of Wigging's matricies (credit at top)
+********************************************************************/
+function generateDecode50FourlMatrix(matrix)
+(
+  // Left
+  matrix[0]  =  0.4250;
+  matrix[8]  =  0.3850;
+  matrix[16] =  0.3300;
+  matrix[24] =  0.0;
+  
+  // Right
+  matrix[1]  =  0.4250;
+  matrix[9]  =  0.3850;
+  matrix[17] = -0.3300;
+  matrix[25] =  0.0;
+  
+  // Center
+  matrix[2]  =  0.0000;
+  matrix[10] =  0.0000;
+  matrix[18] =  0.0000;
+  matrix[26] =  0.0;
+  
+  // LFE - no signal
+  matrix[3]  =  0.0;
+  matrix[11] =  0.0;
+  matrix[19] =  0.0;
+  matrix[27] =  0.0;
+  
+  // Surround left (SL)
+  matrix[4]  =  0.6300;
+  matrix[12] = -0.2750;
+  matrix[20] =  0.2850;
+  matrix[28] =  0.0;
+  
+  // Surround right (SR)
+  matrix[5]  =  0.6300;
+  matrix[13] = -0.2750;
+  matrix[21] = -0.2850;
+  matrix[29] =  0.0;
+  
+  // Surround back left (SBL) - no signal
+  matrix[6]  =  0.0;
+  matrix[14] =  0.0;
+  matrix[22] =  0.0;
+  matrix[30] =  0.0;
+  
+  // Surround back right (SBR) - no signal
+  matrix[7]  =  0.0;
+  matrix[15] =  0.0;
+  matrix[23] =  0.0;
+  matrix[31] =  0.0;  
+);
+
+
+/********************************************************************
+Matrix: Generate 4x8 matrix with equally distributed source signals for display purposes
 ********************************************************************/
 function generateDisplaySignalMatrix(matrix, numPoints) local(i, angle, inc)
 (
@@ -1149,4 +1338,112 @@ function displayTransformedPoints(matrix, numPoints) local(i, posX, posY, posZ, 
     drawCenteredSquare(posX, posY, squareSize);
     i += 1;
   );
+);
+
+
+/********************************************************************
+Graphics: Draw multi-channel level meter
+********************************************************************/
+function drawMultichannelLevelMeterInterface(gain, displaydDbGain, numChannels)
+local (decibel, deltaX, hideSectionWidth, i, left, 
+  stripHeight, stripLeft, stripRight, stripSeparatorHeight, stripTotalHeight, stripWidth, 
+  top, xPos, yPos2)
+(
+  // Set colors
+  gxColorSet(1, 1, 1, 1);
+
+  // Draw background image providing gain color indication
+  left             = 10;
+  top              = 10;
+  stripWidth       = gfx_w - 20;
+  stripTotalHeight = gfx_h - 20;
+  drawBackgroundImage(661, 1, left, top, stripWidth, stripTotalHeight);
+
+  // Set up geometry for channel strips
+  stripHeight          = (stripTotalHeight-(numChannels*0.5)) / (numChannels+1);
+  stripSeparatorHeight = (stripTotalHeight-(numChannels*0.5)) / ((numChannels+1) * (numChannels*0.5 - 1));
+  stripLeft            = 10.;                               // Same for all strips
+  stripRight           = gfx_w - 10.;                       // Same for all strips
+
+
+  // Calculate borders for each section of the multichannel meter
+  i = 0;
+  top = 10;
+  loop(numChannels,
+    stripTop[i]    = top;
+    stripBottom[i] = top + stripHeight;
+    top += stripHeight + 1.;
+    i += 1.;
+  
+    stripTop[i]    = top;
+    stripBottom[i] = top + stripHeight;
+    top += stripHeight + stripSeparatorHeight;
+  
+    i += 1.;
+  );
+
+  // Draw separators:
+  gxColorSet(1., 0, 0, 0);
+  i = 0;
+  loop(numChannels-1,
+    drawRectangle(stripLeft, stripBottom[i], stripRight, stripTop[i+1]);
+    i += 1.;
+  );
+
+  // Draw black square in front of background to display gain
+  i = 0;
+  top = 10;
+  loop(numChannels,  
+    // Determine max absolute sample value in dB:
+    decibel = amp2db( sqrt(gain[i]) );
+    decibel = clipValue(decibel, -60. , 6);
+    decibel > displaydDbGain[i] ?
+    displaydDbGain[i] = decibel;
+  
+    // Mask parts of background
+    hideSectionWidth = (6. - displaydDbGain[i]) / 66.;
+    drawRectangle(stripLeft + round((1. - hideSectionWidth) * stripWidth), stripTop[i]-1, stripRight, stripBottom[i]+1);
+  
+    // Reset gain:
+    gain[i] = 0.;
+    displaydDbGain[i] -= 2.;
+  
+    i += 1;
+  );
+
+  // Drawing vertical red line at 0 dB. This will be partly masked later
+  xPos = 10. + 10*deltaX;
+  yPos2 = gfx_h-10.;
+  gxColorSet(1., 1., 0., 0.);
+  drawLineSegment(xPos, 10., xPos, yPos2, 1.);
+
+  // Draw vertical db lines for every 6 dB:
+  gxColorSet(0.75, 1., 1., 1.);
+  i = 0;
+  xPos = 10.;
+  yPos2 = gfx_h-10.;
+  deltaX = stripWidth / 11.;
+  loop(12,
+    drawLineSegment(xPos, 10., xPos, yPos2, 1.);
+    xPos += deltaX;
+    i += 1;
+  );
+
+  // Write dB values. Don't need to do so at 0 db as it already stands out colorwise
+  yPos2 = gfx_h-20.;
+
+  gxPositionSet(13., yPos2);
+  gfx_drawnumber(-60,0);
+
+  gxPositionSet(13. + 2*deltaX, yPos2);
+  gfx_drawnumber(-48,0);
+
+  gxPositionSet(13. + 4*deltaX, yPos2);
+  gfx_drawnumber(-36,0);
+
+  gxPositionSet(13. + 6*deltaX, yPos2);
+  gfx_drawnumber(-24,0);
+
+  gxPositionSet(13. + 8*deltaX, yPos2);
+  gfx_drawnumber(-12,0);
 );
