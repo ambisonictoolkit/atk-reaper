@@ -1,0 +1,170 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: meter8
+  Display instant sound level for 8 channel surround signal
+*/
+
+desc: Instant level meter for 8 channel surround signal
+
+// Graphics file
+filename:0,GainSlider.png
+//filename:0,HorizontalBackground.png
+
+// Import library with shared functions for matrix and graphics processing
+import atkFunctionLibrary.jsfx-inc
+
+in_pin:1
+in_pin:2
+in_pin:3
+in_pin:4
+in_pin:5
+in_pin:6
+in_pin:7
+in_pin:8
+
+out_pin:1
+out_pin:2
+out_pin:3
+out_pin:4
+out_pin:5
+out_pin:6
+out_pin:7
+out_pin:8
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Setting pointer addresses for a few arrays:
+gain         = 100;
+stripTop     = 120;
+stripBottom  = 140;
+
+
+/**********************************************************
+Graphics
+**********************************************************/
+@gfx 500 65
+
+// Set colors
+gxColorSet(1, 1, 1, 1);
+
+// Draw background image providing gain color indication
+left             = 10;
+top              = 10;
+stripWidth       = gfx_w - 20;
+stripTotalHeight = gfx_h - 20;
+drawBackgroundImage(661, 1, left, top, stripWidth, stripTotalHeight);
+
+// Set up geometry for channel strips
+stripHeight          = stripTotalHeight / 9.;
+stripSeparatorHeight = (stripTotalHeight-4) / (9. * 3.);  // Because there are seven of them
+stripLeft            = 10.;                           // Same for all strips
+stripRight           = gfx_w - 10.;                   // Same for all strips
+
+
+// Calculate borders for each section of the multichannel meter
+i = 0;
+top = 10;
+loop(8,
+  stripTop[i]    = top;
+  stripBottom[i] = top + stripHeight;
+  top += stripHeight + 1.;
+  i += 1.;
+  
+  stripTop[i]    = top;
+  stripBottom[i] = top + stripHeight;
+  top += stripHeight + stripSeparatorHeight;
+  
+  i += 1.;
+);
+
+// Draw separators:
+gxColorSet(1., 0, 0, 0);
+i = 0;
+loop(7,
+  drawRectangle(stripLeft, stripBottom[i], stripRight, stripTop[i+1]);
+  i += 1.;
+);
+
+// Draw black square in front of background to display gain
+i = 0;
+top = 10;
+loop(8,  
+  // Determine max absolute sample value in dB:
+  decibel = amp2db( sqrt(gain[i]) );
+  decibel = clipValue(decibel, -60. , 6);
+  
+  // Mask parts of background
+  hideSectionWidth = (6. - decibel) / 66.;
+  drawRectangle(stripLeft + round((1. - hideSectionWidth) * stripWidth), stripTop[i]-1, stripRight, stripBottom[i]+1);
+  
+  // Reset gain:
+  gain[i] = 0.;
+  
+  i += 1;
+);
+
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+temp = spl0 * spl0;
+test = temp > gain[0];
+gain[0] = test * temp + (1. - test) * gain[0];
+
+temp = spl1 * spl1;
+test = temp > gain[1];
+gain[1] = test * temp + (1. - test) * gain[1];
+
+temp = spl2 * spl2;
+test = temp > gain[2];
+gain[2] = test * temp + (1. - test) * gain[2];
+
+temp = spl3 * spl3;
+test = temp > gain[3];
+gain[3] = test * temp + (1. - test) * gain[3];
+
+temp = spl4 * spl4;
+test = temp > gain[4];
+gain[4] = test * temp + (1. - test) * gain[4];
+
+temp = spl5 * spl5;
+test = temp > gain[5];
+gain[5] = test * temp + (1. - test) * gain[5];
+
+temp = spl6 * spl6;
+test = temp > gain[6];
+gain[6] = test * temp + (1. - test) * gain[6];
+
+temp = spl7 * spl7;
+test = temp > gain[7];
+gain[7] = test * temp + (1. - test) * gain[7];
+
+// All channels are passed on unprocessed, and this do not need to be stated
