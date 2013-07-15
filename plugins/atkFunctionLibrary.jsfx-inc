@@ -73,13 +73,6 @@ file, encouraging DRY (don't repeat yourself)
 @init
 
 
-/*---------------------------------------------------------------------
-  Constants
----------------------------------------------------------------------*/
-recSqrt2   = 1. / sqrt(2.);
-
-
-
 
 /*---------------------------------------------------------------------
   Mathematical functions
@@ -203,50 +196,50 @@ function generateDecode50FocusedMatrix(matrix)
 (
   // Left
   matrix[0]  =  0.4250;
-  matrix[8]  =  0.3600;
-  matrix[16] =  0.4050;
-  matrix[24] =  0.0;
+  matrix[1]  =  0.3600;
+  matrix[2]  =  0.4050;
+  matrix[3]  =  0.0;
   
   // Right
-  matrix[1]  =  0.4250;
-  matrix[9]  =  0.3600;
-  matrix[17] = -0.4050;
-  matrix[25] =  0.0;
+  matrix[4]  =  0.4250;
+  matrix[5]  =  0.3600;
+  matrix[6]  = -0.4050;
+  matrix[7]  =  0.0;
   
   // Center
-  matrix[2]  =  0.2000;
-  matrix[10] =  0.1600;
-  matrix[18] =  0.0000;
-  matrix[26] =  0.0;
+  matrix[8]  =  0.2000;
+  matrix[9]  =  0.1600;
+  matrix[10] =  0.0000;
+  matrix[11] =  0.0;
   
   // LFE - no signal
-  matrix[3]  =  0.0;
-  matrix[11] =  0.0;
-  matrix[19] =  0.0;
-  matrix[27] =  0.0;
+  matrix[12] =  0.0;
+  matrix[13] =  0.0;
+  matrix[14] =  0.0;
+  matrix[15] =  0.0;
   
   // Surround left (SL)
-  matrix[4]  =  0.4700;
-  matrix[12] = -0.3300;
-  matrix[20] =  0.4150;
-  matrix[28] =  0.0;
+  matrix[16] =  0.4700;
+  matrix[17] = -0.3300;
+  matrix[18] =  0.4150;
+  matrix[19] =  0.0;
   
   // Surround right (SR)
-  matrix[5]  =  0.4700;
-  matrix[13] = -0.3300;
-  matrix[21] = -0.4150;
-  matrix[29] =  0.0;
+  matrix[20] =  0.4700;
+  matrix[21] = -0.3300;
+  matrix[22] = -0.4150;
+  matrix[23] =  0.0;
   
   // Surround back left (SBL) - no signal
-  matrix[6]  =  0.0;
-  matrix[14] =  0.0;
-  matrix[22] =  0.0;
-  matrix[30] =  0.0;
+  matrix[24] =  0.0;
+  matrix[25] =  0.0;
+  matrix[26] =  0.0;
+  matrix[27] =  0.0;
   
   // Surround back right (SBR) - no signal
-  matrix[7]  =  0.0;
-  matrix[15] =  0.0;
-  matrix[23] =  0.0;
+  matrix[28] =  0.0;
+  matrix[29] =  0.0;
+  matrix[30] =  0.0;
   matrix[31] =  0.0;
 );
 
@@ -261,50 +254,50 @@ function generateDecode50FourlMatrix(matrix)
 (
   // Left
   matrix[0]  =  0.4250;
-  matrix[8]  =  0.3850;
-  matrix[16] =  0.3300;
-  matrix[24] =  0.0;
+  matrix[1]  =  0.3850;
+  matrix[2]  =  0.3300;
+  matrix[3]  =  0.0;
   
   // Right
-  matrix[1]  =  0.4250;
-  matrix[9]  =  0.3850;
-  matrix[17] = -0.3300;
-  matrix[25] =  0.0;
+  matrix[4]  =  0.4250;
+  matrix[5]  =  0.3850;
+  matrix[6]  = -0.3300;
+  matrix[7]  =  0.0;
   
   // Center
-  matrix[2]  =  0.0000;
+  matrix[8]  =  0.0000;
+  matrix[9]  =  0.0000;
   matrix[10] =  0.0000;
-  matrix[18] =  0.0000;
-  matrix[26] =  0.0;
+  matrix[11] =  0.0;
   
   // LFE - no signal
-  matrix[3]  =  0.0;
-  matrix[11] =  0.0;
-  matrix[19] =  0.0;
-  matrix[27] =  0.0;
+  matrix[12] =  0.0;
+  matrix[13] =  0.0;
+  matrix[14] =  0.0;
+  matrix[15] =  0.0;
   
   // Surround left (SL)
-  matrix[4]  =  0.6300;
-  matrix[12] = -0.2750;
-  matrix[20] =  0.2850;
-  matrix[28] =  0.0;
+  matrix[16] =  0.6300;
+  matrix[17] = -0.2750;
+  matrix[18] =  0.2850;
+  matrix[19] =  0.0;
   
   // Surround right (SR)
-  matrix[5]  =  0.6300;
-  matrix[13] = -0.2750;
-  matrix[21] = -0.2850;
-  matrix[29] =  0.0;
+  matrix[20] =  0.6300;
+  matrix[21] = -0.2750;
+  matrix[22] = -0.2850;
+  matrix[23] =  0.0;
   
   // Surround back left (SBL) - no signal
-  matrix[6]  =  0.0;
-  matrix[14] =  0.0;
-  matrix[22] =  0.0;
-  matrix[30] =  0.0;
+  matrix[24] =  0.0;
+  matrix[25] =  0.0;
+  matrix[26] =  0.0;
+  matrix[27] =  0.0;
   
   // Surround back right (SBR) - no signal
-  matrix[7]  =  0.0;
-  matrix[15] =  0.0;
-  matrix[23] =  0.0;
+  matrix[28] =  0.0;
+  matrix[29] =  0.0;
+  matrix[30] =  0.0;
   matrix[31] =  0.0;  
 );
 
@@ -312,8 +305,10 @@ function generateDecode50FourlMatrix(matrix)
 /********************************************************************
 Matrix: Generate 4x8 matrix with equally distributed source signals for display purposes
 ********************************************************************/
-function generateDisplaySignalMatrix(matrix, numPoints) local(i, angle, inc)
+function generateDisplaySignalMatrix(matrix, numPoints) local(i, angle, inc, local recSqrt2)
 (
+  recSqrt2   = 1. / sqrt(2.);
+  
   // Encoding equally distributed points in the horisontal plane
   i = 0;
   angle = 0.;
@@ -952,8 +947,11 @@ function matrixMultiplication(resultMatrix, numRowsLeft, numColsLeft, leftMatrix
 /********************************************************************
 Matrix: Invert a 4x4 matrix
 ********************************************************************/
-function invertMatrix(matrix) local(determinant)
+function invertMatrix(matrix) local(determinant) local(inv)
 (
+  // Setting memory slot for local array
+  inv = 10000;
+  
   inv[0] =   matrix[5]  * matrix[10] * matrix[15] -
              matrix[5]  * matrix[11] * matrix[14] -
              matrix[9]  * matrix[6]  * matrix[15] +
@@ -1162,7 +1160,7 @@ function hls_value(n1, n2, hue)
 /********************************************************************
 Graphics: Express gain (in dB) as graphics color
 ********************************************************************/
-function gainToColor(gain, gainLowLimit, gainHighLimit, verticalOffset) local(saturation, lightness, m1, m2, red, green, blue)
+function gainToColor(gain, gainLowLimit, gainHighLimit, verticalOffset) local(hue, saturation, lightness, m1, m2, red, green, blue)
 (
   // Clip gain to prescribed range:
   gain < gainLowLimit ? (
@@ -1223,8 +1221,11 @@ function determineGeometry()
 /********************************************************************
 Graphics: Draw background image based on ICST ambimonitor
 ********************************************************************/
-function drawBackgroundImage(sourceWidth, sourceHeight, dstLeft, dstTop, dstWidth, dstHeight)
+function drawBackgroundImage(sourceWidth, sourceHeight, dstLeft, dstTop, dstWidth, dstHeight) local(coordinatelist)
 (
+  // Setting memory slot for local array
+  coordinatelist = 10000;
+  
   // Background graphics
   coordinatelist[0] = 0;                  //left-most pixel location for source
   coordinatelist[1] = 0;                  //top-most pixel location for source
@@ -1347,8 +1348,12 @@ Graphics: Draw multi-channel level meter
 function drawMultichannelLevelMeterInterface(gain, displaydDbGain, numChannels)
 local (decibel, deltaX, hideSectionWidth, i, left, 
   stripHeight, stripLeft, stripRight, stripSeparatorHeight, stripTotalHeight, stripWidth, 
-  top, xPos, yPos2)
+  top, xPos, yPos2, stripTop, stripBottom)
 (
+  // Setting memory slots for local arrays:
+  stripTop    = 10000;
+  stripBottom = 10100;
+  
   // Set colors
   gxColorSet(1, 1, 1, 1);
 
