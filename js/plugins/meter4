@@ -26,7 +26,7 @@ and GNU General Public License along with this program.  If not, see
   Display instant sound level for 4 channel surround signal
 */
 
-desc: Instant level meter for 8 channel surround signal
+desc: Instant level meter for 4 channel surround signal
 
 // Graphics file
 filename:0,GainSlider.png
@@ -94,4 +94,8 @@ temp = spl3 * spl3;
 test = temp > gain[3];
 gain[3] = test * temp + (1. - test) * gain[3];
 
-// All channels are passed on unprocessed, and this do not need to be stated
+// All channels are passed on unprocessed
+spl0 = spl0;
+spl1 = spl1;
+spl2 = spl2;
+spl3 = spl3;

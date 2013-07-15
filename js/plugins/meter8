@@ -118,4 +118,13 @@ temp = spl7 * spl7;
 test = temp > gain[7];
 gain[7] = test * temp + (1. - test) * gain[7];
 
-// All channels are passed on unprocessed, and this do not need to be stated
+// All channels are passed on unprocessed
+spl0 = spl0;
+spl1 = spl1;
+spl2 = spl2;
+spl3 = spl3;
+spl4 = spl4;
+spl5 = spl5;
+spl6 = spl6;
+spl7 = spl7;
+
