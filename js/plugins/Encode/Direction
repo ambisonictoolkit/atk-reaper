@@ -25,7 +25,7 @@ and GNU General Public License along with this program.  If not, see
   Class: Direction
   Standard 1st order planewave encoder
 
-  This operates on one mono source.
+  This operates on one or two mono sources.
 
   Reaper is treating mono files as stereo files with identical
   content for left and right channel. Hence this plugin is set to
@@ -48,7 +48,7 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Encode mono signal as directional (planewave) soundfield
+desc: Encode one or two signals as directional (planewave) soundfields
 
 // Graphics file
 filename:0,../lib/HorizontalBackground.png
@@ -56,8 +56,10 @@ filename:0,../lib/HorizontalBackground.png
 // Import library with shared functions for matrix and graphics processing
 import atkFunctionLibrary.jsfx-inc
 
-slider1:0<-180,180,1>Azimuth
-slider2:0<-90,90,1>Elevation
+slider1:0<0,3,1{Stereo, Mono (mix left and right), Mono (use left channel), Mono (use right channel)}>Mode
+slider2:0<-180,180,1>Azimuth Left (mouse)
+slider3:0<-90,90,1>Elevation Left
+slider4:90<0,180,1>Spread (mouse)
 
 in_pin:L
 in_pin:R
@@ -73,34 +75,90 @@ Initialisation
 **********************************************************/
 @init
 
-azimuth   = 0;
-elevation = 0.;
-
 // Constants
 recSqrt2 = 1./sqrt(2.);
+invPi   = 1. / $pi;
 rad2deg = 180. / $pi;
 deg2rad = $pi / 180.;
 
-posX = 200;
-posY = 200;
+// Allocation memory for matrixes used for DSP processing
+matrixDSP       = 1200;
+matrixNewDSP    = 1220;
+matrixInc       = 1240;
 
 // Flag indicating that the plugin has not been fully initialised yet
 initialised = 0;
 
 function calculateCoefficients()
 (
-  cosAzimuth   = cos(azimuth);
-  sinAzimuth   = sin(azimuth);
-  cosElevation = cos(elevation);
-  sinElevation = sin(elevation);
-
-  // Set coefficients if the plugin has not yet been initialised
+  // Interaction point:
+  cosAzi  = cos(azimuth);
+  sinAzi  = sin(azimuth);
+  cosEle  = cos(elevation);
+  sinEle  = sin(elevation);
+  
+  // Left and right channel:
+  aziL = azimuth - 0.5 * spread;
+  aziR = azimuth + 0.5 * spread;
+  
+  cosAziL = cos(aziL);
+  sinAziL = sin(aziL);
+  cosAziR = cos(aziR);
+  sinAziR = sin(aziR);
+  
+  // Stereo and Mono Mix modes - The latter can be processed as stereo, as we have ensured that spread = 0.
+  (mode == 0) || (mode==1) ? (
+    // W
+    matrixNewDSP[0] =  recSqrt2;
+    matrixNewDSP[1] =  recSqrt2;
+    // X
+    matrixNewDSP[2] =  cosAziL * cosEle;
+    matrixNewDSP[3] =  cosAziR * cosEle;
+    // Y
+    matrixNewDSP[4] = -sinAziL * cosEle;
+    matrixNewDSP[5] = -sinAziR * cosEle;
+    // Z
+    matrixNewDSP[6] =  sinEle;
+    matrixNewDSP[7] =  sinEle;
+  ) : (
+    // Mono mode: Left channel only
+    mode == 2 ? (
+      // W
+      matrixNewDSP[0] =  recSqrt2;
+      matrixNewDSP[1] =  0.;
+      // X
+      matrixNewDSP[2] =  cosAziL * cosEle;
+      matrixNewDSP[3] =  0.;
+      // Y
+      matrixNewDSP[4] = -sinAziL * cosEle;
+      matrixNewDSP[5] =  0.;
+      // Z
+      matrixNewDSP[6] =  sinEle;
+      matrixNewDSP[7] =  0.;
+    ) : (
+      // Mono mode: Right channel only
+      // W
+      matrixNewDSP[0] =  0.;
+      matrixNewDSP[1] =  recSqrt2;
+      // X
+      matrixNewDSP[2] =  0.;
+      matrixNewDSP[3] =  cosAziR * cosEle;
+      // Y
+      matrixNewDSP[4] =  0.;
+      matrixNewDSP[5] = -sinAziR * cosEle;
+      // Z
+      matrixNewDSP[6] =  0.;
+      matrixNewDSP[7] =  sinEle;
+    );
+  );
+  
+  // Set initial DSP processing coefficients if the plugin has not yet been initialised
   initialised == 0 ?
   (
-    coeff1 = cosAzimuth * cosElevation;
-    coeff2 = sinAzimuth * cosElevation;
-    coeff3 =              sinElevation;
-
+    i = 0;
+    loop(16,
+      matrixDSP[i] = matrixNewDSP[i];
+    );
     // Now we are fully initialised
     initialised = 1;
   );
@@ -112,8 +170,20 @@ Updated slider value:
 **********************************************************/
 @slider
 
-azimuth      = slider1 * deg2rad;
-elevation    = slider2 * deg2rad;
+mode = slider1;
+
+// If in one of the mono modes, force spread to 0:
+mode > 0 ? (
+  slider4 > 0. ? (
+    slider4 = 0.;
+    slider_automate(slider4);
+  );
+);
+
+// Both channels will have the same elevation, but azimuth might be spread out
+azimuth     = slider2 * deg2rad;
+elevation   = slider3 * deg2rad;
+spread      = slider4 * deg2rad;
 
 calculateCoefficients();
 
@@ -121,30 +191,73 @@ calculateCoefficients();
 /**********************************************************
 Custom graphic interface
 **********************************************************/
-@gfx 400 300
+@gfx 500 500
 
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
 drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
 
-// Reset azimuth on mouse click
+// Reset azimuth and spread on mouse click
 mouse_cap == 1 ?
 (
   mouseX = mouse_x - centerX;
   mouseY = mouse_y - centerY;
   azimuth = atan2(mouseX, -mouseY);
-  slider1 = azimuth * rad2deg;
+  slider2 = azimuth * rad2deg;
   // Notify GUI that azimuth has changed, and update coefficients
-  slider_automate(slider1);
+  slider_automate(slider2);
+  
+  mode == 0 ? (
+    // Update spread and slider4 and notify GUI of the change
+    // COMMENT: There is a risk of dividing by zero here (for elevation = 90), but Reaper seems to handle this grazefully.
+    // At 90 deg elevation the GUI has a dead lock and can't be used for changing the degree of transformation, but the slider is still available.
+    slider4 = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius / cos(elevation);
+    // Restrict the range to [0, 1]
+    slider4 < 0. ? slider4 = 0.;
+    slider4 = slider4 * 180.;
+  ) : (
+    slider4 = 0.;
+  );
+  spread = slider4 * deg2rad;
+  slider_automate(slider4);
+  
   calculateCoefficients();
 );
 
-// Draw red square as interactive direction indicator, color tint depends on elevation
-posX = centerX + radius*(sinAzimuth * cosElevation);
-posY = centerY - radius*(cosAzimuth * cosElevation);
-squareSize = 4. * sinElevation + 12.;
-gxColorSet(1, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
-drawCenteredSquare(posX, posY, squareSize);
+// Square size depends on elevation
+squareSize = 2. * sinEle + 8.;
+
+// Draw left channel as green point, but not in mode 3
+mode != 3 ? (
+  posX = centerX + radius*(sinAziL * cosEle);
+  posY = centerY - radius*(cosAziL * cosEle);
+  gxColorSet(0.75, 0.9, 0.9, 0.9);
+  drawLineSegment(centerX, centerY, posX, posY, 1.);
+  drawCenteredSquare(posX, posY, squareSize);
+  gxPositionSet(posX-16, posY);
+  gfx_drawchar($'L');
+);
+
+
+// Draw right channel as red point, but not in mode 2
+mode != 2 ? (
+  posX = centerX + radius*(sinAziR * cosEle);
+  posY = centerY - radius*(cosAziR * cosEle);
+  gxColorSet(0.75, 1., 0., 0.);
+  drawLineSegment(centerX, centerY, posX, posY, 1.);
+  drawCenteredSquare(posX, posY, squareSize);
+  gxPositionSet(posX+16, posY);
+  gfx_drawchar($'R');
+);
+
+squareSize = 4. * sinEle + 14.;
+
+// Draw interactive point as yellow square as interactive direction indicator, color tint depends on elevation
+posX = centerX + radius*(1. - spread*invPi)*(sinAzi * cosEle);
+posY = centerY - radius*(1. - spread*invPi)*(cosAzi * cosEle);
+gxColorSet(0.75, 0.5, 1.0, 0.75);
+drawLineSegment(centerX, centerY, posX, posY, 1.);
+drawInteractionSquare(posX, posY, squareSize);
 
 
 /**********************************************************
@@ -154,10 +267,12 @@ Preprocessing prior to audio vector processing.
 
 inverseSamplesblock = 1. / samplesblock;
 
-// Linear ramp to new coefficient values over the vector to prevent clicks
-inc1 = ( (cosAzimuth * cosElevation) - coeff1) * inverseSamplesblock;
-inc2 = ( (sinAzimuth * cosElevation) - coeff2) * inverseSamplesblock;
-inc3 = (               sinElevation  - coeff3) * inverseSamplesblock;
+// Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
+ii = 0;
+loop(8,
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  ii += 1;
+);
 
 
 /**********************************************************
@@ -165,14 +280,18 @@ Calculate audio sample
 **********************************************************/
 @sample
 
-// Mix left and right as mono signal
-input = 0.5 * (spl0 + spl1);
+ii = 0;
+loop(8,
+  matrixDSP[ii] += matrixInc[ii];
+  ii += 1;
+);
 
-coeff1 = coeff1 + inc1;
-coeff2 = coeff2 + inc2;
-coeff3 = coeff3 + inc3;
+l = spl0;
+r = spl1;
 
-spl0 =  input * recSqrt2;
-spl1 =  input * coeff1;
-spl2 = -input * coeff2;
-spl3 =  input * coeff3;
+// Matrix multiplication with input signal:
+spl0 = l * matrixDSP[0] + r * matrixDSP[1];
+spl1 = l * matrixDSP[2] + r * matrixDSP[3];
+spl2 = l * matrixDSP[4] + r * matrixDSP[5];
+spl3 = l * matrixDSP[6] + r * matrixDSP[7];
+
