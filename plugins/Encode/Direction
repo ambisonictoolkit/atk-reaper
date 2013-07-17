@@ -51,7 +51,7 @@ and GNU General Public License along with this program.  If not, see
 desc: Encode mono signal as directional (planewave) soundfield
 
 // Graphics file
-filename:0,HorizontalBackground.png
+filename:0,../lib/HorizontalBackground.png
 
 // Import library with shared functions for matrix and graphics processing
 import atkFunctionLibrary.jsfx-inc

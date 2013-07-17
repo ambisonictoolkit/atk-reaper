@@ -29,7 +29,7 @@ and GNU General Public License along with this program.  If not, see
 desc: Instant level meter for 8 channel surround signal
 
 // Graphics file
-filename:0,GainSlider.png
+filename:0,../lib/GainSlider.png
 //filename:0,HorizontalBackground.png
 
 // Import library with shared functions for matrix and graphics processing
