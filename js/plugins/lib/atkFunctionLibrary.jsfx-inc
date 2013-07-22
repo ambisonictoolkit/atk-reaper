@@ -344,7 +344,7 @@ function interpreteProcessedPoints(matrixOut, matrixIn, numPoints) local(i, g0sq
     z = matrixIn[numPoints*3 + i];
     
     azi  = atan2(y, x);
-    ele  = atan2(z, x*x + y*y);
+    ele  = atan2(z, sqrt(x*x + y*y));
     
     // Omni transform angle
     g0square        = w * w;
