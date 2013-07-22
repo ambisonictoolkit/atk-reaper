@@ -58,6 +58,9 @@ Initialisation
 // Constants
 rad2deg = 180. / $pi;
 deg2rad = $pi / 180.;
+sqrt2   = sqrt(2.);
+rsqrt2  = 1. / sqrt(2.);
+
 
 // Flag indicating that the plugin has not been fully initialised yet
 initialised = 0;
@@ -89,8 +92,8 @@ matrixDisplayTransformedInterpreted    = 1600;
 
 // Matrixes for display of mirror plane
 matrixMirrorNonRotated          = 1700;
-matrixMirrorRotateted           = 1720;
-matrixMirrorRotatedInterpreted  = 1740;
+matrixMirrorRotateted           = 1730;
+matrixMirrorRotatedInterpreted  = 1760;
 
 // Display points only needs to be generated once:
 numDisplayedPoints = 8;
@@ -106,26 +109,37 @@ loop(numDisplayedPoints,
   i += 1;
 );
 
-// These four points describes the non-rotated mirror plane
-matrixMirrorNonRotated[0]  = recSqrt2;
-matrixMirrorNonRotated[4]  = cos($pi*0.25) * cos($pi*0.5);
-matrixMirrorNonRotated[8]  = cos($pi*0.25) * sin($pi*0.5);
-matrixMirrorNonRotated[12] = sin($pi*0.25);
+// Six points on non-rotated mirror plane
+matrixMirrorNonRotated[0]  = rsqrt2;
+matrixMirrorNonRotated[6]  = cos($pi*0.25) * cos($pi*0.5);
+matrixMirrorNonRotated[12] = cos($pi*0.25) * sin($pi*0.5);
+matrixMirrorNonRotated[18] = sin($pi*0.25);
 
-matrixMirrorNonRotated[1]  = recSqrt2;
-matrixMirrorNonRotated[5]  = cos(-$pi*0.25) * cos($pi*0.5);
-matrixMirrorNonRotated[9]  = cos(-$pi*0.25) * sin($pi*0.5);
-matrixMirrorNonRotated[13] = sin(-$pi*0.25);
+matrixMirrorNonRotated[1]  = rsqrt2;
+matrixMirrorNonRotated[7]  = cos(-$pi*0.25) * cos($pi*0.5);
+matrixMirrorNonRotated[13] = cos(-$pi*0.25) * sin($pi*0.5);
+matrixMirrorNonRotated[19] = sin(-$pi*0.25);
 
-matrixMirrorNonRotated[2]  = recSqrt2;
-matrixMirrorNonRotated[6]  = cos($pi*0.25) * cos(-$pi*0.5);
-matrixMirrorNonRotated[10] = cos($pi*0.25) * sin(-$pi*0.5);
-matrixMirrorNonRotated[14] = sin($pi*0.25);
+matrixMirrorNonRotated[2]  = rsqrt2;
+matrixMirrorNonRotated[8]  = cos(-$pi*0.25) * cos(-$pi*0.5);
+matrixMirrorNonRotated[14] = cos(-$pi*0.25) * sin(-$pi*0.5);
+matrixMirrorNonRotated[20] = sin(-$pi*0.25);
 
-matrixMirrorNonRotated[3]  = recSqrt2;
-matrixMirrorNonRotated[7]  = cos(-$pi*0.25) * cos(-$pi*0.5);
-matrixMirrorNonRotated[11] = cos(-$pi*0.25) * sin(-$pi*0.5);
-matrixMirrorNonRotated[15] = sin(-$pi*0.25);
+matrixMirrorNonRotated[3]  = rsqrt2;
+matrixMirrorNonRotated[9]  = cos($pi*0.25) * cos(-$pi*0.5);
+matrixMirrorNonRotated[15] = cos($pi*0.25) * sin(-$pi*0.5);
+matrixMirrorNonRotated[21] = sin($pi*0.25);
+
+matrixMirrorNonRotated[4]  = rsqrt2;
+matrixMirrorNonRotated[10] = cos($pi*0.5);
+matrixMirrorNonRotated[16] = sin($pi*0.5);
+matrixMirrorNonRotated[22] = 0.;
+
+matrixMirrorNonRotated[5]  = rsqrt2;
+matrixMirrorNonRotated[11] = cos(-$pi*0.5);
+matrixMirrorNonRotated[17] = sin(-$pi*0.5);
+matrixMirrorNonRotated[23] = 0;
+
 
 
 function calculateMatrix()
@@ -157,8 +171,8 @@ function calculateMatrix()
   
   // Rotation and interpretation of mirror plane
   matrixMultiplication  (matrixTemp1,              4, 4, matrixRotate2, 4, 4, matrixTumble2);
-  matrixMultiplication  (matrixMirrorRotateted,    4, 4, matrixTemp1,   4, 4, matrixMirrorNonRotated);
-  interpreteProcessedPoints(matrixMirrorRotatedInterpreted, matrixMirrorRotateted, 4);
+  matrixMultiplication  (matrixMirrorRotateted,    4, 4, matrixTemp1,   4, 6, matrixMirrorNonRotated);
+  interpreteProcessedPoints(matrixMirrorRotatedInterpreted, matrixMirrorRotateted, 6);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   initialised == 0 ?
@@ -186,9 +200,9 @@ calculateMatrix();
 /**********************************************************
 Graphics
 **********************************************************/
-@gfx 500 500
+@gfx 600 500
 
-function printBefore()
+function postBefore()
 (
   gxPositionSet(20., 20.);
   gfx_drawchar($'B');
@@ -199,13 +213,24 @@ function printBefore()
   gfx_drawchar($'e');
 );
 
-function printAfter()
+function postAfter()
 (
-  gxPositionSet(20., 40.);
+  gxPositionSet(20., 60.);
   gfx_drawchar($'A');
   gfx_drawchar($'f');
   gfx_drawchar($'t');
   gfx_drawchar($'e');
+  gfx_drawchar($'r');
+);
+
+function postMirror()
+(
+  gxPositionSet(20., 40.);
+  gfx_drawchar($'M');
+  gfx_drawchar($'i');
+  gfx_drawchar($'r');
+  gfx_drawchar($'r');
+  gfx_drawchar($'o');
   gfx_drawchar($'r');
 );
 
@@ -228,39 +253,65 @@ mouse_cap == 1 ?
   calculateMatrix();
 );
 
+// Draw mirror plane
+gxColorSet(1, 0.5, 1., 0.75);
+
+// Outline of mirror plane:
+pos1x = centerX - matrixMirrorRotatedInterpreted[6] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * radius * sqrt2;
+pos1y = centerY - matrixMirrorRotatedInterpreted[0] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * radius * sqrt2;
+
+pos2x = centerX - matrixMirrorRotatedInterpreted[7] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * radius * sqrt2;
+pos2y = centerY - matrixMirrorRotatedInterpreted[1] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * radius * sqrt2;
+
+pos3x = centerX - matrixMirrorRotatedInterpreted[8] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * radius * sqrt2;
+pos3y = centerY - matrixMirrorRotatedInterpreted[2] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * radius * sqrt2;
+
+pos4x = centerX - matrixMirrorRotatedInterpreted[9] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * radius * sqrt2;
+pos4y = centerY - matrixMirrorRotatedInterpreted[3] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * radius * sqrt2;
+
+drawQuadrangleOutline(pos1x, pos1y, pos2x, pos2y, pos3x, pos3y, pos4x, pos4y, 1.);
+
+// Draw line at intersection between horisontal plane and mirror plane
+pos1x = centerX - matrixMirrorRotatedInterpreted[10] * radius;
+pos1y = centerY - matrixMirrorRotatedInterpreted[4]  * radius;
+
+pos2x = centerX - matrixMirrorRotatedInterpreted[11] * radius;
+pos2y = centerY - matrixMirrorRotatedInterpreted[5]  * radius;
+drawLineSegment(pos1x, pos1y, pos2x, pos2y, 1.);
+postMirror();
+
 // Draw lines illustrating how each point has been mirrored
-gxColorSet(0.6, 1.0, 0.75, 0.5);
 i = 0;
 loop(numDisplayedPoints,
-  posX1 = centerX - radius * matrixDisplayNonTransformedInterpreted[numDisplayedPoints + i];
-  posY1 = centerY - radius * matrixDisplayNonTransformedInterpreted[i];
-  posX2 = centerX - radius * matrixDisplayTransformedInterpreted[numDisplayedPoints + i];
-  posY2 = centerY - radius * matrixDisplayTransformedInterpreted[i];
-  drawLineSegment(posX1, posY1, posX2, posY2, 1.);
+  gxColorSet(0.8, 0.5, 0.75, 1.);
+  pos1x = centerX - radius * matrixDisplayNonTransformedInterpreted[numDisplayedPoints + i];
+  pos1y = centerY - radius * matrixDisplayNonTransformedInterpreted[i];
+  pos3x = centerX - radius * matrixDisplayTransformedInterpreted[numDisplayedPoints + i];
+  pos3y = centerY - radius * matrixDisplayTransformedInterpreted[i];
+  pos2x = (pos1x + pos3x) * 0.5;
+  pos2y = (pos1y + pos3y) * 0.5;
+  
+  // Draw first part of line in "before" color
+  drawLineSegment(pos1x, pos1y, pos2x, pos2y, 1.);
+  
+  // Draw small point where beam intersects mirror
+  gxColorSet(1, 0.5, 1., 0.75);
+  drawCenteredSquare(pos2x, pos2y, 4);
+  
+  // Draw second part of line using "after" coler
+  gxColorSet(0.8, 1.0, 0.75, 0.5);
+  drawLineSegment(pos2x, pos2y, pos3x, pos3y, 1.);
+  
   i += 1;
 );
 
-// Draw mirror plane
-gxColorSet(1, 1., 1., 1.);
-mirrorAngle1 = azimuth + $pi/2.;
-mirrorAngle2 = azimuth - $pi/2.;
-
-mirrorPosX1 = centerX + radius * sin(mirrorAngle1);
-mirrorPosY1 = centerY - radius * cos(mirrorAngle1);
-mirrorPosX2 = centerX + radius * sin(mirrorAngle2);
-mirrorPosY2 = centerY - radius * cos(mirrorAngle2);
-drawLineSegment(mirrorPosX1, mirrorPosY1, mirrorPosX2, mirrorPosY2, 1.);
-
-// Draw points illustrating mirror plane
-displayTransformedPoints(matrixMirrorRotatedInterpreted, 4);
-
 // Draw non-transformed points:
 displayTransformedPoints(matrixDisplayNonTransformedInterpreted, numDisplayedPoints);
-printBefore();
+postBefore();
 
 // Draw points illustrating the effect of the transform
 displayTransformedPoints(matrixDisplayTransformedInterpreted, numDisplayedPoints);
-printAfter();
+postAfter();
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
 gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
@@ -268,7 +319,6 @@ posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
 posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
 squareSize = 4. * sinElevation + 14.;
 drawInteractionSquare(posX, posY, squareSize);
-    
 
 /**********************************************************
 Preprocessing prior to audio vector processing.
