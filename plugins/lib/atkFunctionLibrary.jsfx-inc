@@ -1513,3 +1513,32 @@ local (decibel, deltaX, hideSectionWidth, i, left,
   gxPositionSet(13. + 8*deltaX, yPos2);
   gfx_drawnumber(-12,0);
 );
+
+
+/********************************************************************
+Graphics: Post matrix content to GUI, can be used for debugging
+********************************************************************/
+function postMatrixForDebugging(matrix, numRows, numCols) local(i, j, a, r, g, b)
+(
+  // Temporarily store gx color, and set color to white
+	a = gfx_a;
+	r = gfx_r;
+	g = gfx_g;
+	b = gfx_b;
+  gxColorSet(1., 1., 1., 1.);
+  
+  // Iterate over columns:
+  i = 0;
+  loop(numCols,
+    // Iterate over rows
+    j = 0;
+    loop(numRows,
+      gxPositionSet(i*80 + 40, j*20 + 20);
+      gfx_drawnumber( matrix[i + numCols*j],5);
+      j += 1;
+    );
+    i += 1;
+  );
+  // Return color to what it used to be
+  gxColorSet(a, r, g, b);
+);
