@@ -359,8 +359,8 @@ function interpreteProcessedPoints(matrixOut, matrixIn, numPoints) local(i, g0sq
     omni = 1. - omni;
     
     // From this we calculate relative xyz position of the transformed point
-    matrixOut[i]    = omni * cos(azi) * cos(ele);
-    matrixOut[numPoints + i]  = omni * sin(azi) * cos(ele);
+    matrixOut[i]               = omni * cos(azi) * cos(ele);
+    matrixOut[numPoints + i]   = omni * sin(azi) * cos(ele);
     matrixOut[numPoints*2 + i] = omni * sin(ele);
     matrixOut[numPoints*3 + i] = amp2db(gain);
     
@@ -735,6 +735,60 @@ function generateFocusMatrix(matrix, angle) local(g0, g1, g2)
   matrix[13] = 0.;
   matrix[14] = 0.;
   matrix[15] = g2;
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for mirrorX transformation
+********************************************************************/
+function generateMirrorMatrix(matrix)
+(  
+  matrix[0]  =  1.;
+  matrix[1]  =  0.;
+  matrix[2]  =  0.;
+  matrix[3]  =  0.;
+
+  matrix[4]  =  0.; 
+  matrix[5]  = -1.;
+  matrix[6]  =  0.;
+  matrix[7]  =  0.;
+  
+  matrix[8]  =  0.;
+  matrix[9]  =  0.;
+  matrix[10] =  1.;
+  matrix[11] =  0.;
+  
+  matrix[12] =  0.;
+  matrix[13] =  0.;
+  matrix[14] =  0.;
+  matrix[15] =  1.;
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for mirrorO transformation
+********************************************************************/
+function generateMirrorOMatrix(matrix)
+(  
+  matrix[0]  =  1.;
+  matrix[1]  =  0.;
+  matrix[2]  =  0.;
+  matrix[3]  =  0.;
+
+  matrix[4]  =  0.; 
+  matrix[5]  = -1.;
+  matrix[6]  =  0.;
+  matrix[7]  =  0.;
+  
+  matrix[8]  =  0.;
+  matrix[9]  =  0.;
+  matrix[10] = -1.;
+  matrix[11] =  0.;
+  
+  matrix[12] =  0.;
+  matrix[13] =  0.;
+  matrix[14] =  0.;
+  matrix[15] = -1.;
 );
 
 
