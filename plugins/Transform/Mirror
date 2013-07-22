@@ -28,7 +28,7 @@ and GNU General Public License along with this program.  If not, see
 */
 
 
-desc: First Order Ambisonic focus, press, push and zoom transformer
+desc: Mirror sound field across an arbitrary plane.
 
 // Graphics file
 filename:0,../lib/HorizontalBackground.png
