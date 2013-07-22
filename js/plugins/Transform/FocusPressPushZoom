@@ -317,24 +317,9 @@ debugMode == 0 ?
     
 /* --- DEBUG STUFF ---  */
 ) : (
-  
   // Debug mode can be used to inspect the content of the various matrixes
-  gxColorSet(1., 1., 1., 1.);
-
   (slider6 > 7) && (slider6 < 13) ? numCols = numDisplayedPoints. : numCols = 4.;
-  
-  // Iterate over columns:
-  iii = 0;
-  loop(numCols,
-    // Iterate over rows
-    jjj = 0;
-    loop(4,
-      gxPositionSet(iii*80 + 40, jjj*20 + 20);
-      gfx_drawnumber( viewMatrix[iii + numCols*jjj],5);
-      jjj = jjj + 1;
-    );
-    iii = iii + 1;
-  );
+  postMatrixForDebugging(viewMatrix, 4, numCols);
 );
 /*--- DEBUG STUFF --- */
     
