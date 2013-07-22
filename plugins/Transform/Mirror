@@ -296,7 +296,7 @@ loop(numDisplayedPoints,
   
   // Draw small point where beam intersects mirror
   gxColorSet(1, 0.5, 1., 0.75);
-  drawCenteredSquare(pos2x, pos2y, 4);
+  drawCenteredSquare(pos2x, pos2y, 3);
   
   // Draw second part of line using "after" coler
   gxColorSet(0.8, 1.0, 0.75, 0.5);
