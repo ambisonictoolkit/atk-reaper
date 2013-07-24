@@ -59,13 +59,18 @@ Initialisation
 **********************************************************/
 @init
 
+function clearFilter()
+(
+  y1x = 0.0;
+  y1y = 0.0;
+  y1z = 0.0;  
+);
+
 // Flag indicasting that we are not fully initialised yet
 initialised = 0;
+paused = 1.;
 
-// Clear filters
-y1x = 0.0;
-y1y = 0.0;
-y1z = 0.0;
+clearFilter();
 
 
 /**********************************************************
@@ -73,10 +78,10 @@ Updated slider value:
 **********************************************************/
 @slider
 
-newDistance = slider1;
+distanceNew = slider1;
 
 initialised == 0 ? (
-  distanceDSP = newDistance;
+  distanceDSP = distanceNew;
   initialised = 1;
 );
 
@@ -108,7 +113,7 @@ spl0 = spl0;
 // Filter all 1st order components
 y0x = spl1 + y1x;
 spl1 = a0 * y0x - y1x;
-y1x = y0x;
+y1x = y0x; 
 
 y0y = spl2 + y1y;
 spl2 = a0 * y0y - y1y;

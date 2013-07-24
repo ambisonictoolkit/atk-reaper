@@ -79,10 +79,10 @@ Updated slider value:
 **********************************************************/
 @slider
 
-newDistance = slider1;
+distanceNew = slider1;
 
 initialised == 0 ? (
-  distanceDSP = newDistance;
+  distanceDSP = distanceNew;
   initialised = 1;
 );
 
