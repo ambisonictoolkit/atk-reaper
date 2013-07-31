@@ -75,12 +75,6 @@ Initialisation
 **********************************************************/
 @init
 
-// Constants
-recSqrt2 = 1./sqrt(2.);
-invPi   = 1. / $pi;
-rad2deg = 180. / $pi;
-deg2rad = $pi / 180.;
-
 // Allocation memory for matrixes used for DSP processing
 matrixDSP       = 1200;
 matrixNewDSP    = 1220;
@@ -109,8 +103,8 @@ function calculateCoefficients()
   // Stereo and Mono Mix modes - The latter can be processed as stereo, as we have ensured that spread = 0.
   (mode == 0) || (mode==1) ? (
     // W
-    matrixNewDSP[0] =  recSqrt2;
-    matrixNewDSP[1] =  recSqrt2;
+    matrixNewDSP[0] =  kInvSqrt2;
+    matrixNewDSP[1] =  kInvSqrt2;
     // X
     matrixNewDSP[2] =  cosAziL * cosEle;
     matrixNewDSP[3] =  cosAziR * cosEle;
@@ -124,7 +118,7 @@ function calculateCoefficients()
     // Mono mode: Left channel only
     mode == 2 ? (
       // W
-      matrixNewDSP[0] =  recSqrt2;
+      matrixNewDSP[0] =  kInvSqrt2;
       matrixNewDSP[1] =  0.;
       // X
       matrixNewDSP[2] =  cosAziL * cosEle;
@@ -139,7 +133,7 @@ function calculateCoefficients()
       // Mono mode: Right channel only
       // W
       matrixNewDSP[0] =  0.;
-      matrixNewDSP[1] =  recSqrt2;
+      matrixNewDSP[1] =  kInvSqrt2;
       // X
       matrixNewDSP[2] =  0.;
       matrixNewDSP[3] =  cosAziR * cosEle;
@@ -181,9 +175,9 @@ mode > 0 ? (
 );
 
 // Both channels will have the same elevation, but azimuth might be spread out
-azimuth     = slider2 * deg2rad;
-elevation   = slider3 * deg2rad;
-spread      = slider4 * deg2rad;
+azimuth     = slider2 * kDeg2Rad;
+elevation   = slider3 * kDeg2Rad;
+spread      = slider4 * kDeg2Rad;
 
 calculateCoefficients();
 
@@ -203,7 +197,7 @@ mouse_cap == 1 ?
   mouseX = mouse_x - centerX;
   mouseY = mouse_y - centerY;
   azimuth = atan2(mouseX, -mouseY);
-  slider2 = azimuth * rad2deg;
+  slider2 = azimuth * kRad2Deg;
   // Notify GUI that azimuth has changed, and update coefficients
   slider_automate(slider2);
   
@@ -218,7 +212,7 @@ mouse_cap == 1 ?
   ) : (
     slider4 = 0.;
   );
-  spread = slider4 * deg2rad;
+  spread = slider4 * kDeg2Rad;
   slider_automate(slider4);
   
   calculateCoefficients();
@@ -253,8 +247,8 @@ mode != 2 ? (
 squareSize = 4. * sinEle + 14.;
 
 // Draw interactive point as yellow square as interactive direction indicator, color tint depends on elevation
-posX = centerX + radius*(1. - spread*invPi)*(sinAzi * cosEle);
-posY = centerY - radius*(1. - spread*invPi)*(cosAzi * cosEle);
+posX = centerX + radius*(1. - spread*kInvPi)*(sinAzi * cosEle);
+posY = centerY - radius*(1. - spread*kInvPi)*(cosAzi * cosEle);
 gxColorSet(0.75, 0.5, 1.0, 0.75);
 drawLineSegment(centerX, centerY, posX, posY, 1.);
 drawInteractionSquare(posX, posY, squareSize);

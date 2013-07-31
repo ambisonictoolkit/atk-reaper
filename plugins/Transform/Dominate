@@ -63,11 +63,7 @@ azimuth   = 0;
 elevation = 0.;
 
 // Constants
-rad2deg = 180. / $pi;
-deg2rad = $pi / 180.;
-sqrt2   = sqrt(2.);
-rsqrt2  = 1. / sqrt2;
-inv24   = 1. / 24.;
+kInv24   = 1. / 24.;
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
@@ -140,8 +136,8 @@ Updated slider value:
 **********************************************************/
 @slider
 
-azimuth         = slider1 * deg2rad;
-elevation       = slider2 * deg2rad;
+azimuth         = slider1 * kDeg2Rad;
+elevation       = slider2 * kDeg2Rad;
 gain            = slider3;
 
 calculateMatrix();
@@ -164,7 +160,7 @@ mouse_cap == 1 ?
   
   // Update azimuth and slider1 and notify GUI of the change
   azimuth = atan2(mouseX, -mouseY);
-  slider1 = azimuth * rad2deg;
+  slider1 = azimuth * kRad2Deg;
   slider_automate(slider1);
   
   // Update transformAngle and slider3 and notify GUI of the change
@@ -182,8 +178,8 @@ displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
 gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
-posX = centerX + radius * slider3 * inv24 * (sinAzimuth * cosElevation);
-posY = centerY - radius * slider3 * inv24 * (cosAzimuth * cosElevation);
+posX = centerX + radius * slider3 * kInv24 * (sinAzimuth * cosElevation);
+posY = centerY - radius * slider3 * kInv24 * (cosAzimuth * cosElevation);
 squareSize = 4. * sinElevation + 12.;
 drawInteractionSquare(posX, posY, squareSize);
     

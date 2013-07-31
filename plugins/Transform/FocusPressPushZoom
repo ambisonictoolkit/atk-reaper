@@ -79,12 +79,6 @@ initialised = 0;
 azimuth   = 0;
 elevation = 0.;
 
-// Constants
-rad2deg = 180. / $pi;
-deg2rad = $pi / 180.;
-sqrt2   = sqrt(2.);
-rsqrt2  = 1. / sqrt2;
-
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
 matrixTumble1   = 1020;
@@ -197,8 +191,8 @@ Updated slider value:
 @slider
 
 mode            = slider1;
-azimuth         = slider2 * deg2rad;
-elevation       = slider3 * deg2rad;
+azimuth         = slider2 * kDeg2Rad;
+elevation       = slider3 * kDeg2Rad;
 transformAngle  = slider4 * $pi * 0.5;
 
 /* --- DEBUG STUFF ---*/
@@ -290,7 +284,7 @@ debugMode == 0 ?
     
     // Update azimuth and slider2 and notify GUI of the change
     azimuth = atan2(mouseX, -mouseY);
-    slider2 = azimuth * rad2deg;
+    slider2 = azimuth * kRad2Deg;
     slider_automate(slider2);
     
     // Update transformAngle and slider4 and notify GUI of the change
