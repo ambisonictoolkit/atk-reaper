@@ -64,12 +64,6 @@ initialised = 0;
 azimuth   = 0;
 elevation = 0.;
 
-// Constants
-rad2deg = 180. / $pi;
-deg2rad = $pi / 180.;
-sqrt2   = sqrt(2.);
-rsqrt2  = 1. / sqrt2;
-
 // Graphics constant
 squareSize = 14.;
 
@@ -144,8 +138,8 @@ Updated slider value:
 **********************************************************/
 @slider
 
-azimuth         = slider1 * deg2rad;
-elevation       = slider2 * deg2rad;
+azimuth         = slider1 * kDeg2Rad;
+elevation       = slider2 * kDeg2Rad;
 transformAngle  = slider3 * $pi * 0.5;
 
 calculateMatrix();
@@ -168,7 +162,7 @@ mouse_cap == 1 ?
   azimuth = atan2(mouseX, -mouseY);
 
   // Update slider2 and notify GUI of the change  
-  slider1 = azimuth * rad2deg;
+  slider1 = azimuth * kRad2Deg;
   slider_automate(slider1);
   
   slider3 = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;

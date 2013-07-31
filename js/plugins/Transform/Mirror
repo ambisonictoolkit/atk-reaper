@@ -55,13 +55,6 @@ Initialisation
 **********************************************************/
 @init
 
-// Constants
-rad2deg = 180. / $pi;
-deg2rad = $pi / 180.;
-sqrt2   = sqrt(2.);
-rsqrt2  = 1. / sqrt(2.);
-
-
 // Flag indicating that the plugin has not been fully initialised yet
 initialised = 0;
 
@@ -110,32 +103,32 @@ loop(numDisplayedPoints,
 );
 
 // Six points on non-rotated mirror plane
-matrixMirrorNonRotated[0]  = rsqrt2;
+matrixMirrorNonRotated[0]  = kInvSqrt2;
 matrixMirrorNonRotated[6]  = cos($pi*0.25) * cos($pi*0.5);
 matrixMirrorNonRotated[12] = cos($pi*0.25) * sin($pi*0.5);
 matrixMirrorNonRotated[18] = sin($pi*0.25);
 
-matrixMirrorNonRotated[1]  = rsqrt2;
+matrixMirrorNonRotated[1]  = kInvSqrt2;
 matrixMirrorNonRotated[7]  = cos(-$pi*0.25) * cos($pi*0.5);
 matrixMirrorNonRotated[13] = cos(-$pi*0.25) * sin($pi*0.5);
 matrixMirrorNonRotated[19] = sin(-$pi*0.25);
 
-matrixMirrorNonRotated[2]  = rsqrt2;
+matrixMirrorNonRotated[2]  = kInvSqrt2;
 matrixMirrorNonRotated[8]  = cos(-$pi*0.25) * cos(-$pi*0.5);
 matrixMirrorNonRotated[14] = cos(-$pi*0.25) * sin(-$pi*0.5);
 matrixMirrorNonRotated[20] = sin(-$pi*0.25);
 
-matrixMirrorNonRotated[3]  = rsqrt2;
+matrixMirrorNonRotated[3]  = kInvSqrt2;
 matrixMirrorNonRotated[9]  = cos($pi*0.25) * cos(-$pi*0.5);
 matrixMirrorNonRotated[15] = cos($pi*0.25) * sin(-$pi*0.5);
 matrixMirrorNonRotated[21] = sin($pi*0.25);
 
-matrixMirrorNonRotated[4]  = rsqrt2;
+matrixMirrorNonRotated[4]  = kInvSqrt2;
 matrixMirrorNonRotated[10] = cos($pi*0.5);
 matrixMirrorNonRotated[16] = sin($pi*0.5);
 matrixMirrorNonRotated[22] = 0.;
 
-matrixMirrorNonRotated[5]  = rsqrt2;
+matrixMirrorNonRotated[5]  = kInvSqrt2;
 matrixMirrorNonRotated[11] = cos(-$pi*0.5);
 matrixMirrorNonRotated[17] = sin(-$pi*0.5);
 matrixMirrorNonRotated[23] = 0;
@@ -192,8 +185,8 @@ Updated slider value:
 **********************************************************/
 @slider
 
-azimuth         = slider1 * deg2rad;
-elevation       = slider2 * deg2rad;
+azimuth         = slider1 * kDeg2Rad;
+elevation       = slider2 * kDeg2Rad;
 calculateMatrix();
 
 
@@ -247,7 +240,7 @@ mouse_cap == 1 ?
   
   // Update azimuth and slider2 and notify GUI of the change
   azimuth = atan2(mouseX, -mouseY);
-  slider1 = azimuth * rad2deg;
+  slider1 = azimuth * kRad2Deg;
   slider_automate(slider1);
     
   calculateMatrix();
@@ -257,17 +250,17 @@ mouse_cap == 1 ?
 gxColorSet(1, 0.5, 1., 0.75);
 
 // Outline of mirror plane:
-pos1x = centerX - matrixMirrorRotatedInterpreted[6] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * radius * sqrt2;
-pos1y = centerY - matrixMirrorRotatedInterpreted[0] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * radius * sqrt2;
+pos1x = centerX - matrixMirrorRotatedInterpreted[6] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * radius * kSqrt2;
+pos1y = centerY - matrixMirrorRotatedInterpreted[0] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * radius * kSqrt2;
 
-pos2x = centerX - matrixMirrorRotatedInterpreted[7] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * radius * sqrt2;
-pos2y = centerY - matrixMirrorRotatedInterpreted[1] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * radius * sqrt2;
+pos2x = centerX - matrixMirrorRotatedInterpreted[7] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * radius * kSqrt2;
+pos2y = centerY - matrixMirrorRotatedInterpreted[1] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * radius * kSqrt2;
 
-pos3x = centerX - matrixMirrorRotatedInterpreted[8] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * radius * sqrt2;
-pos3y = centerY - matrixMirrorRotatedInterpreted[2] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * radius * sqrt2;
+pos3x = centerX - matrixMirrorRotatedInterpreted[8] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * radius * kSqrt2;
+pos3y = centerY - matrixMirrorRotatedInterpreted[2] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * radius * kSqrt2;
 
-pos4x = centerX - matrixMirrorRotatedInterpreted[9] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * radius * sqrt2;
-pos4y = centerY - matrixMirrorRotatedInterpreted[3] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * radius * sqrt2;
+pos4x = centerX - matrixMirrorRotatedInterpreted[9] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * radius * kSqrt2;
+pos4y = centerY - matrixMirrorRotatedInterpreted[3] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * radius * kSqrt2;
 
 drawQuadrangleOutline(pos1x, pos1y, pos2x, pos2y, pos3x, pos3y, pos4x, pos4y, 1.);
 

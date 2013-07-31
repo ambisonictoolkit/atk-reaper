@@ -57,11 +57,6 @@ Initialisation
 **********************************************************/
 @init
 
-// Constants
-rad2deg  = 180. / $pi;
-deg2rad  = $pi / 180.;
-rad2norm = 1. / $pi;
-
 // Graphics constants:
 squareSize = 14.;
 
@@ -132,9 +127,9 @@ Updated slider value:
 **********************************************************/
 @slider
 
-rotateAngle = slider1 * deg2rad;
-tiltAngle   = slider2 * deg2rad;
-tumbleAngle = slider3 * deg2rad;
+rotateAngle = slider1 * kDeg2Rad;
+tiltAngle   = slider2 * kDeg2Rad;
+tumbleAngle = slider3 * kDeg2Rad;
 
 calculateCoefficients();
 
@@ -152,7 +147,7 @@ mouse_cap == 1 ?
   mouseX = mouse_x - centerX;
   mouseY = mouse_y - centerY;
   rotateAngle = atan2(mouseX, -mouseY);
-  slider1 = rotateAngle * rad2deg;
+  slider1 = rotateAngle * kRad2Deg;
   
   // Notify GUI that rotation has changed, and update coefficients
   slider_automate(slider1);
@@ -173,7 +168,7 @@ mouse_cap == 9 ?
   );
   
   tiltAngle = mouseX  * $pi / radius;
-  slider2 = tiltAngle * rad2deg;
+  slider2 = tiltAngle * kRad2Deg;
   
   // Notify GUI/automation that tilt has changed, and update coefficients
   slider_automate(slider2);
@@ -192,7 +187,7 @@ mouse_cap == 5 ?
   );
   mouseY = mouseY * $pi / radius;
   tumbleAngle = mouseY;
-  slider3 = tumbleAngle * rad2deg;
+  slider3 = tumbleAngle * kRad2Deg;
   
   // Notify GUI/automation that tumble has changed, and update coefficients
   slider_automate(slider3);
@@ -217,7 +212,7 @@ drawInteractionSquare(centerX + radius* sinRotation, centerY - radius*cosRotatio
 
 // Draw tilt indicator. This is shiftes slightly upwards in order to avoid intial overlap with tumble indicator
 gxColorSet(0.75, 0.5, 0.75, 1.);
-drawInteractionSquare(centerX + tiltAngle * rad2norm * radius, centerY-20., squareSize);
+drawInteractionSquare(centerX + tiltAngle * kRad2Norm * radius, centerY-20., squareSize);
 
 // Draw tilt plane. Color is gray when upside down
 cosTilt < 0 ?
@@ -238,7 +233,7 @@ drawQuadrangleOutline(centerX - tiltDeltaX, centerY - radiusFraction - tiltDelta
 
 // Draw tumble indicator
 gxColorSet(0.75, 0.5, 1., 0.75);
-drawInteractionSquare(centerX, centerY - tumbleAngle * rad2norm * radius, squareSize);
+drawInteractionSquare(centerX, centerY - tumbleAngle * kRad2Norm * radius, squareSize);
 
 // Draw tumble plane. Color is gray when upside down
 cosTumble < 0 ?
