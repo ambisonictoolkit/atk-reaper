@@ -1582,6 +1582,78 @@ def convfilt(x, kernel, mode = 'z', kind = 'fft', zi = None):
 #         return y
 
 
+# --------------------------------------
+# resampling: decimate / interpolate
+# --------------------------------------
+
+
+def decimate(x, M, N, width=pi):
+    """decimate(x, M, N, width=pi)
+
+    Downsample a signal by using an FIR filter.
+        
+    Inputs:
+    
+      x         -- input signal (mono or multi-channel)
+      M         -- decimation factor
+      N         -- order of the FIR filter
+      width     -- beta for Kaiser window FIR design.
+                  pi = minimum ripple for steepest cutoff.
+    
+    Outputs:
+    
+      y         -- downsampled signal
+      
+    Notes: choose N = 2**x - 1 for paring 1/2-band decimation with interpolation
+    """
+    kernel= fir_lp(N, 1./M, width)
+
+    y = convfilt(x, kernel, 'full')
+
+    mask = zeros(nframes(y), dtype = bool)
+    mask[range(0, nframes(y), M)] = True
+
+    res = y[mask]
+
+    return res
+
+
+# interpolator (by L)
+def interpolate(x, L, N, width=pi):
+    """interpolate(x, L, N, width=pi)
+
+    Upsample a signal by using an FIR filter.
+        
+    Inputs:
+    
+      x         -- input signal (mono or multi-channel)
+      L         -- interpolation factor
+      N         -- order of the FIR filter
+      width     -- beta for Kaiser window FIR design.
+                  pi = minimum ripple for steepest cutoff.
+    
+    Outputs:
+    
+      y         -- upsampled signal
+      
+    Notes: choose N = 2**x - 1 for paring 1/2-band interpolation with decimation
+    """
+    kernel= L * fir_lp(N, 1./L, width)
+
+    mask = zeros(nframes(x) * L, dtype = bool)
+    mask[range(0, nframes(x) * L, L)] = True
+
+    if nchannels(x) is not 1:
+        mask = interleave(mask)
+
+    y = repeat(x, L, 0) * mask
+        
+    res = convfilt(y, kernel, 'full')
+    
+    return res
+
+
+
 #=========================
 # IIR Filter Functions
 #=========================
