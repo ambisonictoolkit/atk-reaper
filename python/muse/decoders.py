@@ -1363,7 +1363,7 @@ def panto_dbr(a, num_speakers = 4, orientation = 'flat', Wn = None, zi = None):
         b = psycho_shelf(a, Wn, C.k_2D)
 
         # decode here!
-        res = inner(b, array(decoder))
+        res = inner(b[:, 0:-1], array(decoder))
         return res
 
     else:
