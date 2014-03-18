@@ -144,8 +144,8 @@ Custom graphic interface
 // Mouse drag: Update rotateAngle
 mouse_cap == 1 ?
 (
-  mouseX = mouse_x - centerX;
-  mouseY = mouse_y - centerY;
+  mouseX = mouse_x - gCenterX;
+  mouseY = mouse_y - gCenterY;
   rotateAngle = atan2(mouseX, -mouseY);
   slider1 = rotateAngle * kRad2Deg;
   
@@ -157,17 +157,17 @@ mouse_cap == 1 ?
 // SHIFT + mouse drag: Update tiltAngle
 mouse_cap == 9 ?
 (
-  mouseX = mouse_x - centerX;
+  mouseX = mouse_x - gCenterX;
   
-  mouseX > radius ? (
-    mouseX = radius
+  mouseX > gRadius ? (
+    mouseX = gRadius
   ) : (
-    mouseX < -radius ? (
-      mouseX = -radius
+    mouseX < -gRadius ? (
+      mouseX = -gRadius
     );
   );
   
-  tiltAngle = mouseX  * $pi / radius;
+  tiltAngle = mouseX  * $pi / gRadius;
   slider2 = tiltAngle * kRad2Deg;
   
   // Notify GUI/automation that tilt has changed, and update coefficients
@@ -179,13 +179,13 @@ mouse_cap == 9 ?
 // CMD + mouse: Update tumbleAngle
 mouse_cap == 5 ?
 (
-  mouseY = centerY - mouse_y;
-  mouseY > radius ? (
-    mouseY = radius
+  mouseY = gCenterY - mouse_y;
+  mouseY > gRadius ? (
+    mouseY = gRadius
   ) : (
-    mouseY < -radius ? mouseY = -radius;
+    mouseY < -gRadius ? mouseY = -gRadius;
   );
-  mouseY = mouseY * $pi / radius;
+  mouseY = mouseY * $pi / gRadius;
   tumbleAngle = mouseY;
   slider3 = tumbleAngle * kRad2Deg;
   
@@ -198,7 +198,7 @@ mouse_cap == 5 ?
 // Track geometry and draw background
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
-drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
 
 // Draw points illustrating the effect of the transform
@@ -207,12 +207,12 @@ displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
 
 // Draw rotation indicator
 gxColorSet(0.75, 1, 0.5, 0.75);
-drawInteractionSquare(centerX + radius* sinRotation, centerY - radius*cosRotation, squareSize);
+drawInteractionSquare(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, squareSize);
 
 
 // Draw tilt indicator. This is shiftes slightly upwards in order to avoid intial overlap with tumble indicator
 gxColorSet(0.75, 0.5, 0.75, 1.);
-drawInteractionSquare(centerX + tiltAngle * kRad2Norm * radius, centerY-20., squareSize);
+drawInteractionSquare(gCenterX + tiltAngle * kRad2Norm * gRadius, gCenterY-20., squareSize);
 
 // Draw tilt plane. Color is gray when upside down
 cosTilt < 0 ?
@@ -220,20 +220,20 @@ cosTilt < 0 ?
   gxColorSet(1, 0.7, 0.7, 0.7);
 );
 
-tiltDeltaX = radius * cosTilt;
-tiltDeltaY = radius * sinTilt * 0.1;
-radiusFraction = 0.2 * radius;
+tiltDeltaX = gRadius * cosTilt;
+tiltDeltaY = gRadius * sinTilt * 0.1;
+radiusFraction = 0.2 * gRadius;
 
-drawQuadrangleOutline(centerX - tiltDeltaX, centerY - radiusFraction - tiltDeltaY,
-                      centerX + tiltDeltaX, centerY - radiusFraction + tiltDeltaY,
-                      centerX + tiltDeltaX, centerY + radiusFraction - tiltDeltaY,
-                      centerX - tiltDeltaX, centerY + radiusFraction + tiltDeltaY, 
+drawQuadrangleOutline(gCenterX - tiltDeltaX, gCenterY - radiusFraction - tiltDeltaY,
+                      gCenterX + tiltDeltaX, gCenterY - radiusFraction + tiltDeltaY,
+                      gCenterX + tiltDeltaX, gCenterY + radiusFraction - tiltDeltaY,
+                      gCenterX - tiltDeltaX, gCenterY + radiusFraction + tiltDeltaY, 
                       1.);
 
 
 // Draw tumble indicator
 gxColorSet(0.75, 0.5, 1., 0.75);
-drawInteractionSquare(centerX, centerY - tumbleAngle * kRad2Norm * radius, squareSize);
+drawInteractionSquare(gCenterX, gCenterY - tumbleAngle * kRad2Norm * gRadius, squareSize);
 
 // Draw tumble plane. Color is gray when upside down
 cosTumble < 0 ?
@@ -241,13 +241,13 @@ cosTumble < 0 ?
   gxColorSet(1, 0.7, 0.7, 0.7);
 );
 
-tumbleDeltaX = radius * sinTumble * 0.1;
-tumbleDeltaY = radius * cosTumble;
+tumbleDeltaX = gRadius * sinTumble * 0.1;
+tumbleDeltaY = gRadius * cosTumble;
 
-drawQuadrangleOutline(centerX - radiusFraction - tumbleDeltaX, centerY - tumbleDeltaY,
-                      centerX - radiusFraction + tumbleDeltaX, centerY + tumbleDeltaY,
-                      centerX + radiusFraction - tumbleDeltaX, centerY + tumbleDeltaY,
-                      centerX + radiusFraction + tumbleDeltaX, centerY - tumbleDeltaY,
+drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX, gCenterY - tumbleDeltaY,
+                      gCenterX - radiusFraction + tumbleDeltaX, gCenterY + tumbleDeltaY,
+                      gCenterX + radiusFraction - tumbleDeltaX, gCenterY + tumbleDeltaY,
+                      gCenterX + radiusFraction + tumbleDeltaX, gCenterY - tumbleDeltaY,
                       1.);
 
 

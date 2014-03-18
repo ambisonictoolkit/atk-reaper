@@ -150,13 +150,13 @@ Graphics
 
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
-drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
 // Reset azimuth and transformAngle on mouse click
 mouse_cap == 1 ?
 (
-  mouseX = mouse_x - centerX;
-  mouseY = mouse_y - centerY;
+  mouseX = mouse_x - gCenterX;
+  mouseY = mouse_y - gCenterY;
   
   // Update azimuth and slider1 and notify GUI of the change
   azimuth = atan2(mouseX, -mouseY);
@@ -164,7 +164,7 @@ mouse_cap == 1 ?
   slider_automate(slider1);
   
   // Update transformAngle and slider3 and notify GUI of the change
-  slider3 = 24. * sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
+  slider3 = 24. * sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius;
   // Restrict the range to [0, 24]
   slider3 > 24. ? slider3 = 24.;
   gain    = slider3;
@@ -178,8 +178,8 @@ displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
 gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
-posX = centerX + radius * slider3 * kInv24 * (sinAzimuth * cosElevation);
-posY = centerY - radius * slider3 * kInv24 * (cosAzimuth * cosElevation);
+posX = gCenterX + gRadius * slider3 * kInv24 * (sinAzimuth * cosElevation);
+posY = gCenterY - gRadius * slider3 * kInv24 * (cosAzimuth * cosElevation);
 squareSize = 4. * sinElevation + 12.;
 drawInteractionSquare(posX, posY, squareSize);
     
