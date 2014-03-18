@@ -116,7 +116,7 @@ mouseX = mouse_x - gCenterX;
 mouseY = mouse_y - gCenterY;
 azimuth = atan2(mouseX, -mouseY);
 
-tentativeNewTransformationAngle = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
+tentativeNewTransformationAngle = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius;
 // Restrict the range to [0, 1]
 tentativeNewTransformationAngle < 0. ? tentativeNewTransformationAngle = 0.;
 
