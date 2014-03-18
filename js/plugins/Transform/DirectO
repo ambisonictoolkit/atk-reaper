@@ -31,9 +31,6 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Adjust soundfield directivity of first order ambisonic signal across the origin
 
-// Graphics file
-filename:0,../lib/HorizontalBackground.png
-
 // Import library with shared functions for matrix and graphics processing
 import atkFunctionLibrary.jsfx-inc
 

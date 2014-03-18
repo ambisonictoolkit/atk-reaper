@@ -1315,32 +1315,6 @@ function determineGeometry()
 
 
 /********************************************************************
-Graphics: Draw background image based on ICST ambimonitor
-********************************************************************/
-// TODO: Look into some of these variables and their scope
-function drawBackgroundImage(aSourceWidth, aSourceHeight, aDstLeft, aDstTop, aDstWidth, aDstHeight) local(lCoordinatelist)
-(
-  // Setting memory slot for local array
-  lCoordinatelist = 10000;
-  
-  // Background graphics
-  lCoordinatelist[0] = 0;                  //left-most pixel location for source
-  lCoordinatelist[1] = 0;                  //top-most pixel location for source
-  lCoordinatelist[2] = aSourceWidth;       //width of source
-  lCoordinatelist[3] = aSourceHeight;      //height of source
-  lCoordinatelist[4] = aDstLeft;           //left-most pixel location of destination
-  lCoordinatelist[5] = aDstTop;            //top-most pixel location of destination
-  lCoordinatelist[6] = aDstWidth;          //width of destination to fill
-  lCoordinatelist[7] = aDstHeight;         //height of destination to fill
-  lCoordinatelist[8] =0;                   //represents offset from center of image
-  lCoordinatelist[9] =0;                   //represents offset from center of image
-  gfx_blitext(0,lCoordinatelist,0);
-
-);
-
-
-
-/********************************************************************
 Graphics: Draw line segment
 ********************************************************************/
 function drawLineSegment(aPosition1x, aPosition1y, aPosition2x, aPosition2y, anAntiAliasing)
@@ -1349,6 +1323,40 @@ function drawLineSegment(aPosition1x, aPosition1y, aPosition2x, aPosition2y, anA
   gfx_y = aPosition1y;
   gfx_lineto(aPosition2x, aPosition2y, anAntiAliasing);
 );
+
+
+/********************************************************************
+Graphics: Draw background image based on ICST ambimonitor
+********************************************************************/
+function drawBackgroundImage(aSourceWidth, aSourceHeight, aDstLeft, aDstTop, aDstWidth, aDstHeight) local(lCoordinatelist, i, lDeltaX, lDeltaY)
+(
+  // Setting memory slot for local array
+  lCoordinatelist = 10000;
+  
+  // Draw background circle
+  gxColorSet(1.0, 0.2, 0.2, 0.2);
+  gfx_circle(gCenterX, gCenterY, gRadius, 1, 1);
+  
+  gxColorSet(1.0, 0.5, 0.5, 0.5);
+  // Draw circles
+  i = 1;
+  loop(10,
+    gfx_circle(gCenterX, gCenterY, 0.1*i*gRadius, 0, 1);
+    i += 1;
+  );
+  
+  // Draw lines for every 30 degrees
+  i = 0;
+  loop(6,
+    lDeltaX = gRadius * cos($pi*i/6);
+    lDeltaY = gRadius * sin($pi*i/6);
+    drawLineSegment(gCenterX - lDeltaX, gCenterY - lDeltaY, gCenterX + lDeltaX, gCenterY + lDeltaY, 1);
+    i += 1;
+  );
+);
+
+
+
 
 
 /********************************************************************
