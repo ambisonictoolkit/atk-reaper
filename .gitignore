@@ -3,3 +3,13 @@
 # Temporary Reaper files
 *.RPP-UNDO
 *.RPP-bak
+
+# Generated LaTeX files, but not pdf
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.log
+*.out
+*.ps
+*.gz

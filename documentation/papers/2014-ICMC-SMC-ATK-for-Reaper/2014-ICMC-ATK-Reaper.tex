@@ -1,0 +1,444 @@
+% -----------------------------------------------
+% Template for ICMC SMC 2014
+% adapted and corrected from the template for SMC 2013,  which was adapted from that of  SMC 2012, which was adapted from that of SMC 2011
+% -----------------------------------------------
+
+\documentclass{article}
+\usepackage{icmcsmc2014}
+\usepackage{times}
+\usepackage{ifpdf}
+\usepackage[english]{babel}
+%\usepackage{cite}
+
+% Multipart figures
+%\usepackage{subfigure}
+
+% Surround parts of graphics with box
+%\usepackage{boxedminipage}
+
+%%%%%%%%%%%%%%%%%%%%%%%% Some useful packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% See related documentation %%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{amsmath} % popular packages from Am. Math. Soc. Please use the 
+%\usepackage{amssymb} % related math environments (split, subequation, cases,
+%\usepackage{amsfonts}% multline, etc.)
+%\usepackage{bm}      % Bold Math package, defines the command \bf{}
+%\usepackage{paralist}% extended list environments
+%%subfig.sty is the modern replacement for subfigure.sty. However, subfig.sty 
+%%requires and automatically loads caption.sty which overrides class handling 
+%%of captions. To prevent this problem, preload caption.sty with caption=false 
+%\usepackage[caption=false]{caption}
+%\usepackage[font=footnotesize]{subfig}
+
+
+%user defined variables
+\def\papertitle{ATK Reaper: Ambisonic Tool Kit as JSFX plugins}
+\def\firstauthor{Trond Lossius}
+\def\secondauthor{Joseph Anderson}
+%\def\thirdauthor{Third author}
+
+% adds the automatic
+% Saves a lot of ouptut space in PDF... after conversion with the distiller
+% Delete if you cannot get PS fonts working on your system.
+
+% pdf-tex settings: detect automatically if run by latex or pdflatex
+\newif\ifpdf
+\ifx\pdfoutput\relax
+\else
+   \ifcase\pdfoutput
+      \pdffalse
+   \else
+      \pdftrue
+\fi
+
+\ifpdf % compiling with pdflatex
+  \usepackage[pdftex,
+    pdftitle={\papertitle},
+    pdfauthor={\firstauthor, \secondauthor},
+    % pdfauthor={\firstauthor, , \thirdauthor},
+    bookmarksnumbered, % use section numbers with bookmarks
+    pdfstartview=XYZ % start with zoom=100% instead of full screen; 
+                     % especially useful if working with a big screen :-)
+   ]{hyperref}
+  %\pdfcompresslevel=9
+
+  \usepackage[pdftex]{graphicx}
+  % declare the path(s) where your graphic files are and their extensions so 
+  %you won't have to specify these with every instance of \includegraphics
+  \graphicspath{{./figures/}}
+  \DeclareGraphicsExtensions{.pdf, .jpeg, .png}
+
+
+  \usepackage[figure,table]{hypcap}
+
+\else % compiling with latex
+  \usepackage[dvips,
+    bookmarksnumbered, % use section numbers with bookmarks
+    pdfstartview=XYZ % start with zoom=100% instead of full screen
+  ]{hyperref}  % hyperrefs are active in the pdf file after conversion
+
+  \usepackage[dvips]{epsfig,graphicx}
+  % declare the path(s) where your graphic files are and their extensions so 
+  %you won't have to specify these with every instance of \includegraphics
+  \graphicspath{{./figures/}}
+  \DeclareGraphicsExtensions{.eps}
+
+  \usepackage[figure,table]{hypcap}
+\fi
+
+%setup the hyperref package - make the links black without a surrounding frame
+\hypersetup{
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black
+}
+
+
+% Title.
+% ------
+\title{\papertitle}
+
+% Authors
+% Please note that submissions are NOT anonymous, therefore 
+% authors' names have to be VISIBLE in your manuscript. 
+%
+% Single address
+% To use with only one author or several with the same address
+% ---------------
+% \oneauthor
+%    {\firstauthor} {BEK - Bergen Centre for Electronic Arts \\ %
+%      {\tt \href{mailto:trond.lossius@bek.no}{trond.lossius@bek.no}}}
+
+%Two addresses
+%--------------
+\twoauthors
+  	{\firstauthor} {BEK - Bergen Centre for Electronic Arts\\ %
+	  {\tt \href{mailto:trond.lossius@bek.no}{trond.lossius@bek.no}}}
+    {\secondauthor} {DXARTS, University of Washington \\ %
+      {\tt \href{joanders@uw.edu}{joanders@uw.edu}}}
+
+% Three addresses
+% --------------
+% \threeauthors
+%   {\firstauthor} {Affiliation1 \\ %
+%     {\tt \href{mailto:author1@smcnetwork.org}{author1@smcnetwork.org}}}
+%   {\secondauthor} {Affiliation2 \\ %
+%     {\tt \href{mailto:author2@smcnetwork.org}{author2@smcnetwork.org}}}
+%   {\thirdauthor} { Affiliation3 \\ %
+%     {\tt \href{mailto:author3@smcnetwork.org}{author3@smcnetwork.org}}}
+
+
+% ***************************************** the document starts here ***************
+
+\begin{document}
+%
+\capstartfalse
+\maketitle
+\capstarttrue
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+The abstract should be placed at the top left column and should contain about 150–-200 words.
+\end{abstract}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}\label{sec:introduction}
+
+\subsection{Spatial sound representations}
+
+Spatial sound is generally represented in one of three ways.
+ITU 5.1 and ITU 7.1 are examples of fixed-channel distribution formats \cite{ITU:1993_surround_5:1}.
+This approach becomes less practical as the number of channels increases, and also has clear limitations due to the lack of flexibility in loudspeaker positioning.
+Object-oriented spatial scene descriptions instead stores the sound sources with meta-information on their location or direction, so that the auditory scene can be described independently of loudspeaker setup.
+This is the approach used for e.g., Dolby Atmos and Wave Field Synthesis \cite{dolby:2014atmos},
+and SpatDIF, the Spatial Sound Description Interchange Format, is a collaborative effort offering a semantic and syntactic specification for storing and transmitting such spatial audio scene descriptions \cite{Peters:2013spatdif}.
+% TODO: Reference for WFS
+
+Ambisonics encodes the audio signals into a speaker-in\-dependent representation of the sound field called B-format.
+The encoding is separated from the decoding resulting in a system where decoders can be designed for different speak\-er arrays \cite{Wiggins:2004PhDThesis}.
+Ambisonics is based on spherical harmonic decomposition of the sound field, and depending on truncation of the spherical harmonic decomposition the B-for\-mat signal might be first or higher order.
+Spatial resolution improves with increasing order, but so does the number of channels required for the encoded signal.
+There are several commercial microphones available for recording 1st order ambisonic, and free or commercial B-format recordings are being offered as sound effects libraries \cite{deleflie2014:ambisonia,darcourt:2014surlib}.
+
+
+
+
+\subsection{Spatial sound processing in DAWs}
+
+Encoding, processing and decoding of B-format signals requires support for multi-channel signals.
+Real-time programming environments are well-suited in this respect as they offer flexible configuration and routing of channels, and ambisonic is supported in all major real-time audio programming environments such as Csound, Max, Pd and SuperCollider, often as 3rd party extensions to the programs.
+
+The support for surround sound is more limited in most Digital Audio Workstation (DAW) programs.
+Ableton Live is primarily geared towards stereo, although Max 4 Live devices can be used for spatialisation by routing signals to several buses.
+Most DAWs that support surround sound, such as Adobe Audition, Cubase, Logic Pro X and Pro Tools are oriented towards fixed-channel distribution formats, with an upper limit of 6 (5.1) or 8 (7.1) channels.
+% TODO: Very difficult to figure out what Ardour is capable of or not. On my Mac t's just crashing, but that's not very informative. I see some web sites claiming you can do quite a bit surround-sound-wise in Ardour, and others that says that it's mostly broken.
+% Reference Adobe Audition: https://helpx.adobe.com/audition/using/5-1-surround-sound.html
+Digital Performer also supports 10.2, and Nuendo supports up to 13 channels in various fixed-channel distribution formats.
+
+Nuendo and Pro Tools can be extended to support object-oriented spatial scene descriptions.
+The Iosono Spatial Audio Workstation program plug-in for Nuendo extends the capabilities of this program by adding abilities for object-based manipulation of sound sources \cite{iosono2012:workstation}, and can be used with Iosono Core hardware systems for wave-field synthesis.
+% DISCUSS: Do we need to add references to the manuals for each of these programs, or is it sufficient to do it for the more specialised ones, such as Nueundo and IOSONO?
+Dolby Atmos authoring is achieved using ProTools and the Dolby Rendering and Mastering Unit (RMU).
+RMU provides the rendering engine for the mix stage, and integrates with Pro Tools through the Dolby Atmos Panner plug-in over Ethernet for metadata communication and monitoring. 
+The metadata is stored in the Pro Tools session as plug-in automation \cite{dolby:2013authoring}.
+
+The DAWs discussed so far are either limited with respect to surround sound abilities, or expensive and proprietary software and hardware systems for object-ori\-ented spatial scene authoring and rendering.
+In contrast Reaper is a reasonably priced and flexible DAW for spatial sound \cite{cockos:2014reaper}.
+Reaper supports tracks of up to 64 channels, and is exceptionally open-ended with respect to routing of channels and tracks.
+Reaper supports all standard fixed-channel surround sound configurations, and the ReaSurround panning plugin that is integrated with Reaper also caters for non-standard speaker configurations, using a spatialisation algorithm based on principles resembling VBAP \cite{Pulkki:1997vbap} as well as DBAP \cite{Lossius:2009dbap}.
+Reaper is well-suited for ambisonic as well, and is a preferred DAW for many composers within the ambisonic  community \cite{wiggins:2012reaperhowto}.
+
+% TODO: ** FX processing chains in DAWs - as a motivation for why we want to be able to work the same way with ambisonics, and make ambisonic sound field recordings a malleable material in acousmatic mucis composition and sound design. Maybe this should be at the very start?
+
+
+
+
+\subsection{Plugin technologies}
+
+Several plugin specifications enable development of 3rd party audio instruments and effects that can be used with multiple hosts.
+Virtual Studio Technology (VST) is a plugin interface specification and SDK for Windows, Mac OSX and Linux by Steinberg \cite{steinberg:2014vst}.
+It is a popular format for commercial and freeware VST plugins, mostly using the VST 2 SDK, and a large number of audio applications support VST under license from its creator.
+AudioUnits (AU) is a Mac OSX-specific plugin architecture provided by Apple as part of CoreAudio \cite{apple2014:au}.
+In a similar way DirextX can be used for development of Windows-only plugins \cite{microsoft2014:directX}.
+Linux Audio Developers Simple Plugin API (LADSPA) is a GNU LGPL plugin architecture mostly used on the Linux platform \cite{furse:2007ladspa}, and is gradually superseded by LADSPA version 2 (LV2) \cite{lv2:2014}.
+
+While the above formats can be used to develop plugins for use with multiple hosts, there are also a number of specifications that permits 3rd part development of plugins for one hosting environment only.
+Avid has developed plugins format that work with their software and hardware exclusively, as both Real-Time AudioSuite (RTAS) and TDM have been discontinued and replaced by Avid Audio eXtension (AAX).
+Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patches as devices in Ableton Live \cite{ableton:2014maxforlive}. JSFX is a text-based scripting language for programming audio-oriented effects compiled on the fly for Cockos Reaper \cite{cockos:2014jsfx,cockos:2014reaper}.
+
+% TODO: Cross-platform plugin development frameworks
+* Juce
+* wdl-ol
+* OpenFrameworks
+* SonicBirth
+* SynthEdit (for Windows)
+* Faust
+
+
+\subsection{Plugins for ambisonic processing}\label{sec:ambi-plugins}
+
+* Bruce Wiggins
+* Danielle Courville
+* Flux Spat
+* ambit 1st, 3rd and 5th order (have been temporarily withdrawn for licensing reasons)
+* Hoalibrary for Faust
+* Harpex
+* Blue Ripple TOA plugins
+** BlueRipple Harpex 1st to 3rd order spatial upsampler
+* (Wikipedia overview of software)
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Design considerations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ambisonic Toolkit}
+
+The Ambisonic Tool Kit (ATK) brings together a number of tools and transforms for working with ambisonic surround sound.
+Rather than focusing on the needs and concerns of the classical music sound recordist or the popular music mix-engineer/producer or the acoustician/engineer, use is targeted towards the composer of acousmatic music.
+The intention is for the toolset to be both ergonomic and comprehensive, providing algorithms to creatively manipulate and synthesize ambisonic sound fields.
+
+The tools are framed for the user to `think ambisonically'.
+By this, it is meant the ATK is not focused on the problem of auralization and/or room modelling.
+Auralization is a complex problem beyond the scope of the fundamental algorithms of the ATK.
+It is worth noting, however, with the toolset provided, successful room modelling may be implemented.
+Interestingly enough, many composers of acousmatic music often do not move beyond the problem of auralization or room modelling.
+The ATK, by addressing the holistic problem of creatively controlling a complete soundfield, allows and encourages the composer to think beyond the placement of sounds in a sound-space and instead attend to the impression and image of a soundfield, therefore taking advantage of the model the ambisonic technology presents.
+This is viewed to be the {\em idiomatic} approach for working with the ambisonic technique.
+Restated, the model of the ATK is a sound-field sound-image model rather than a sound-object sound-scene model.
+
+Since 1998 the ATK has existed in a variety of forms.
+In its very first implementation, the ATK was deployed as a collection of Csound orchestras, and a collection of VST plugins have previously been distributed using the now discontinued SonicBirth.
+% TODO: Should this be added?
+% From 2007, an implementation for the Common Lisp Music(external link) synthesis and signal processing package has been under development.
+Development of the real-time ATK library for SuperCollider2 began in 2000, and in recent years ATK has primarily been distributed as a version for SuperCollider3 \cite{Anderson:2009introducingATK}.
+Some of the underlying ideas of ATK has also been incorporated into the Blue Ripple Sound third order ambisonic plugins \cite{blueripple:2014TOA}.
+% TODO: Mention the adaptation of B<->A in Blue Ripple TOA
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Design considerations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ATK Reaper: Design considerations}
+
+\subsection{Coordinate system conventions and encoding formats}
+
+Within the spatial audio community several coordinate system conventions are being used in parallel.
+Theory on ambisonic generally assume the same coordinate system conventions as acoustics, with the $x$-axis pointing forward and $y$-axis to the left in the horizontal plane, and the $z$-axis pointing upwards. 
+Spherical coordinates also follows standard mathematical conventions, with $0^{\circ}$ azimuth being forward, and angles increasing in the anti-clockwise direction so that $90^{\circ}$ azimuth is to the left.
+Positive elevation is upwards.
+This is the coordinate system convention used by ATK for SuperCollider
+
+% TODO: Add figure
+% TODO: Add reference
+
+SpatDIF use a navigation-based coordinate system with $x$-axis to the right and $y$-axis forward in the horizontal plane, and $z$-axis in the upwards direction.
+Azimuth is $0^{\circ}$ in the forward direction, and angles increase clockwise so that $90^{\circ}$ azimuth is to the right.
+Positive elevation is upwards.
+
+There are also several conventions for how encoded ambisonic signals are represented.
+B-format recordings made with one type of encoding and played back using another will have severe mismatches in amplitude levels and channel order.
+
+Classical Furse-Malham encoding can be used for up to third-order signals, and seem to be the preferred representation in musical applications.
+First order Furse-Mulham encoded signals adhere to acoustics coordinate conventions.
+The $W$ component is the pressure (omni or mono) component of the signal, $W$ is the pressure gradient component in the forward-backwards direction, $Y$ is the pressure gradient component in the left-right direction (the stereo component of an MS signal) and $Z$ is the up-down pressure gradient component.
+Furse-Malham encoding is the preferred format for all of the ambisonic plugins discussed is section \ref{sec:ambi-plugins}, and ambisonic recordings done using SoundField microphones also use this format.
+
+Normalised 3D formulas (N3D) and semi-normalised 3D formulas (SN3D) can be used for higher order encoding and decoding  \cite{daniel:2001phd}, and as an example the ICST ambisonic externals for Max supports up to 11th order using N3D and SN3D \cite{schacher2010:seven}.
+N3D component signals go beyond unity $(-1, 1)$ and can only be properly stored in sound file formats that supports floating-points, whereas SN3D component signals stay within unity. 
+
+ATK for Reaper uses first order Furse-Malham encoded signals throughout.
+Sources are encoded as first order Furse-Malham B-format, all processing of encoded signals assumes Furse-Malham B-format signals, and this is also the assumed encoded incoming signal for decoding plugins.
+This ensures interoperability between ATK for Reaper and other sources and processors of ambisonic signals such as ATK for SuperCollider or recorded ambisonic signals, as well as most other available plugins.
+
+ATK for Reaper strives to provide a consistent and intuitive interface towards scene description parameters such as direction of sources, speakers and spatial transforms, regardless of whether the user is used to acoustics or navigational coordinate systems.
+For this reason Cartesian coordinates are avoided throughout the plugin suite, and whenever possible the plugins offers graphical user interfaces.
+When describing azimuths, the navigational coordination system is used, as it is considered to give a more consistent user interaction with the interface.
+In Reaper, when using the faders provided as a standard interface for JSFX plugins, moving the slider to the right increases the associated value.
+Azimuth angles are generally in the $(-180^{\circ}, 180^{\circ})$ range, and defaults to $0^{\circ}$. 
+Within the $(-90^{\circ}, 90^{\circ})$ range and using acoustics anti-clockwise conventions, an increase of azimuth value would cause the direction to move to the left while the slider would move to the right.
+With a navigational coordinate system these inconsistencies can be avoided.
+Another important motivation for the choice of clock-wise positive azimuths, is that description is more consistent with other 
+such as the standard stereo panner, surround sound panners in most DAWs, including the ReaSurround plugin, 
+rotation of the virtual microphone in the SoundField SPS200 Surround Zone plugin, 
+Flux Spat
+
+Exceptions: TOA and Harpex
+but even in these automation data values increase in the clockwise direction.
+
+
+WigWare - strictly ambisonic
+
+\subsection{Graphical user interfaces}
+
+When a mono source is encoded using a matrix encoder, four coefficients are required. This can be interpreted as four degrees of freedom. gain, azimuth, elevation and directness.
+
+
+The text for sliders also indicate which parameters can be controlled from the custom part of the GUI.
+
+
+
+\subsection{Working with mono and stereo sources in Reaper}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Implementation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ATK Reaper: Implementation}
+
+TODO: The shared library file
+
+TODO: Plugins for development and testing
+
+DISCUSS: What is the best order for the following subsections. Currently it is organised according to what a typical ambisonic effects chain might look like, so that there can be a narrative in terms of starting with sources to be encoded, various processing's of the encoded sound field, and then the decoding.
+
+
+
+
+
+\subsection{Encoders}
+
+DISCUSS: I would like to integrate the omni and directional encoders into one and the same plugin, where there would be three parameters to control: azimuth, elevation and degree of omniness (probably want a better name for that).
+
+DISCUSS: I've previously (in Max) had an additional formula for encoding stereo sound files that first depended on a XY to MS conversion. Are there additional ways of encoding stereo that should be considered?
+
+DISCUSS: Theory behind Spreader and Diffuser encoders
+
+DISCUSS: Do we have a file recorded using ZoomH2 that I could use for testing purposes?
+
+
+
+
+\subsection{Transformation between A-format and B-format}
+
+DISCUSS: Can Joseph help with with this subsection, so that the philosophy of it can be communicated clearly?
+
+
+
+
+\subsection{Spatial transforms}
+
+DISCUSS: Get feedback on GUI and interaction for these plugins.
+
+
+
+
+\subsection{Near-field corrections}
+
+DISCUSS: I'd like to fuse these two into one plugin, with an additional pop-up menu parameter to choose which one to use. Alternatively, we could find a way of using only one slider, and use the "negative range" to draw the source nearer, and the "positive range" for moving the source away.
+
+
+
+
+\subsection{Monitoring}
+
+
+
+
+\subsection{Decoders}
+
+DISCUSS: I need to get a more firm understanding of what speaker layout etc. each of the encoders works with.
+
+DISCUSS: Can all of the matrix decoders (mono - stereo - quad - pantophonic - periphonic - diametric) be wrapped into one plugin, with a parameter for choosing between them? If so, would it be useful to have some kind of visualisation of the speaker layout in a GUI in order to make it more intuitive to understand what the different layouts are?
+
+DISCUSS: IMHO the best thing would be to implement the shelf filter as a separate plugin, that is unless all of the decoders can be catered for in the same plugin. It's more DRY (don't repeat yourself) and also implies that the shelf filter is available for use in other contexts as well.
+
+DISCUSS: The tickets in tracker says "There is also a question as to whether NFC should be included for user convenience.". IMHO it's better to keep that a separate plugin.
+
+DISCUSS: I need more details on how HRTF and UHJ decoders work in order to implement them properly
+
+
+
+
+\subsection{Licensing and distribution}
+
+ATK for SuperCollider3 is distributed as open-source using the GNU General Public License Version 3 (GNU GPL). This license is incompatible for use with proprietary software such as Reaper, and for this reason ATK for Reaper is distributed using the GNU Lesser Public License Version 3 (GNU LGPL). ATK for Reaper will be made available for download from the Ambisonic Toolkit web site in the near future \cite{ambisonictoolkit.net:2014}.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Discussion
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion}
+
+* Maintenance overhead when developing C/C++ plugins: Compiling for multiple processors and platforms
+* Future of several plugin standards can be questioned, e.g. AU
+* If doing this, it seems beneficial to use a intermediate library such as Faust, Juce or wdl-ol.
+* JSFX: 
+** Pro:
+*** No compiling required, works with all platforms and processors supported by Reaper
+*** Less vulnerable to changes in the plugin specifications themselves. At the end of 2013 Steinberg stopped maintenance and distribution of the VST 2 SDK, instead requiring future developers to use VST 3. The future of AU is somewhat uncertain, as the SDK has not been updated since 2007, and AU plugins can not be distributed via AppStore.
+*** Can focus only on the specific processing and interfacing 
+** Con:
+*** Only work with Reaper, but then again it is establishing itself as a preferred DAW within the ambisonic community.
+*** Graphics seems very slow, big CPU overhead when plugin GUIs are open
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Aknowledgments
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{acknowledgments}
+At the end of the Conclusions, acknowledgements to people, projects, funding agencies, etc. can be included after the second-level heading ``Acknowledgments'' (with no numbering).
+\end{acknowledgments} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%bibliography here
+\bibliography{2014-ICMC-ATK-Reaper}
+
+\end{document}
