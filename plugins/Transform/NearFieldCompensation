@@ -41,10 +41,7 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Apply nearfield compensation filtering to a first order ambisonic signal (B-format).
 
-// This plugin has no graphic interface
-//filename:0,../lib/HorizontalBackground.png
-
-// This plugin isa not using any shared library functions
+// This plugin is not using any shared library functions
 //import atkFunctionLibrary.jsfx-inc
 
 in_pin:W

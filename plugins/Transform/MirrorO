@@ -30,9 +30,6 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Mirror sound field across origo . NOTE: This plugin has no parameters.
 
-// No graphics files required
-//filename:0,../lib/HorizontalBackground.png
-
 // No need to import library with shared functions
 //import atkFunctionLibrary.jsfx-inc
 
