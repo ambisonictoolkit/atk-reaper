@@ -363,11 +363,11 @@ function generateDisplaySignalMatrix(aMatrix, aNumPoints) local(i, lAngle, lInc)
   lInc = 2. * $pi / aNumPoints;
   loop(aNumPoints,
     aMatrix[i]                 = kInvSqrt2;
-    aMatrix[i + aNumPoints]    = cos(anAngle);
-    aMatrix[i + 2*aNumPoints]  = sin(anAngle);
+    aMatrix[i + aNumPoints]    = cos(lAngle);
+    aMatrix[i + 2*aNumPoints]  = sin(lAngle);
     aMatrix[i + 3*aNumPoints]  = 0.;
     
-    anAngle += lInc;
+    lAngle += lInc;
     i += 1;
   );
 );
@@ -407,10 +407,10 @@ function interpreteProcessedPoints(aMatrixOut, aMatrixIn, aNumPoints) local(i, l
     lOmni = 1. - lOmni;
     
     // From this we calculate relative xyz position of the transformed point
-    aMatrixOut[i]               = lOmni * cos(lAzi) * cos(lEle);
-    aMatrixOut[numPoints + i]   = lOmni * sin(lAzi) * cos(lEle);
-    aMatrixOut[numPoints*2 + i] = lOmni * sin(lEle);
-    aMatrixOut[numPoints*3 + i] = amp2db(lGain);
+    aMatrixOut[i]                = lOmni * cos(lAzi) * cos(lEle);
+    aMatrixOut[aNumPoints   + i] = lOmni * sin(lAzi) * cos(lEle);
+    aMatrixOut[aNumPoints*2 + i] = lOmni * sin(lEle);
+    aMatrixOut[aNumPoints*3 + i] = amp2db(lGain);
     
     i += 1;
   );
@@ -1296,14 +1296,13 @@ function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) loca
   	lBlue = hls_value(lM1, lM2, lHue-120.0);
   );
 
-  gxColorSet(1., aRed, aGreen, aBlue)
+  gxColorSet(1., lRed, lGreen, lBlue)
 );
 
 
 /********************************************************************
 Graphics: Determine geometry
 ********************************************************************/
-// TODO: Ensure that radius => gRadius and inverseRadius => gInverseRadius in plugins
 function determineGeometry()
 (
   gCenterX = gfx_w  * 0.5;
@@ -1379,12 +1378,12 @@ function drawRectangle(aLeft, aTop, aRight, aBottom)
 /********************************************************************
 Graphics: Draw centered filled-in square
 ********************************************************************/
-function drawCenteredSquare(aCenterX, aCenterY, aSquareSize) local(lRadius)
+function drawCenteredSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRadius)
 (
-  lRadius = aSquareSize * 0.5;
-  gfx_x = aCenterX - lRadius;
-  gfx_y = aCenterY - lRadius;
-  gfx_rectto(aCenterX + lRadius, aCenterY + lRadius);
+  lSquareRadius = aSquareSize * 0.5;
+  gfx_x = aCenterX - lSquareRadius;
+  gfx_y = aCenterY - lSquareRadius;
+  gfx_rectto(aCenterX + lSquareRadius, aCenterY + lSquareRadius);
 );
 
 
@@ -1392,7 +1391,7 @@ function drawCenteredSquare(aCenterX, aCenterY, aSquareSize) local(lRadius)
 /********************************************************************
 Graphics: Draw interactive square
 ********************************************************************/
-function drawInteractionSquare(aCenterX, aCenterY, aSquareSize) local(lRadius, lAlpha, lRed, lGreen, lBlue)
+function drawInteractionSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRadius, lAlpha, lRed, lGreen, lBlue)
 (
   // Temporarily store incoming color
 	lAlpha = gfx_a;
@@ -1403,11 +1402,11 @@ function drawInteractionSquare(aCenterX, aCenterY, aSquareSize) local(lRadius, l
   // Draw square with white frame:
   drawCenteredSquare(aCenterX, aCenterY, aSquareSize);
   gxColorSet(1., 1., 1., 1.);
-  lRadius = aSquareSize * 0.5;
-  drawQuadrangleOutline(aCenterX - lRadius, aCenterY - lRadius, 
-                        aCenterX + lRadius, aCenterY - lRadius,
-                        aCenterX + lRadius, aCenterY + lRadius,
-                        aCenterX - lRadius, aCenterY + lRadius,
+  lSquareRadius = aSquareSize * 0.5;
+  drawQuadrangleOutline(aCenterX - lSquareRadius, aCenterY - lSquareRadius, 
+                        aCenterX + lSquareRadius, aCenterY - lSquareRadius,
+                        aCenterX + lSquareRadius, aCenterY + lSquareRadius,
+                        aCenterX - lSquareRadius, aCenterY + lSquareRadius,
                         1.
                       );
                       
@@ -1421,15 +1420,13 @@ Graphics: Draw points illustrating the effect of various transforms
 ********************************************************************/
 function displayTransformedPoints(aMatrix, aNumPoints) local(i, lPosX, lPosY, lPosZ, lSquareSize)
 (
-  // TODO: Check out the scope of the radius valiable
-  
   // Draw eight points indicating the effect of the transform
   // TODO: Also take z value into account in this visualisation?
   i = 0;
   loop(
     aNumPoints,
-    lPosX = gCenterX - radius * aMatrix[aNumPoints+i];
-    lPosY = gCenterY - radius * aMatrix[i];
+    lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
+    lPosY = gCenterY - gRadius * aMatrix[i];
     lPosZ = aMatrix[2 * aNumPoints + i];
     
     // Size, saturation and luminocity depends on posZ
