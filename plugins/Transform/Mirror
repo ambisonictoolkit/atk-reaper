@@ -230,13 +230,13 @@ function postMirror()
 // Set colors
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
-drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
 // Mouse interaction: Reset azimuth and transformAngle
 mouse_cap == 1 ?
 (
-  mouseX = mouse_x - centerX;
-  mouseY = mouse_y - centerY;
+  mouseX = mouse_x - gCenterX;
+  mouseY = mouse_y - gCenterY;
   
   // Update azimuth and slider2 and notify GUI of the change
   azimuth = atan2(mouseX, -mouseY);
@@ -250,26 +250,26 @@ mouse_cap == 1 ?
 gxColorSet(1, 0.5, 1., 0.75);
 
 // Outline of mirror plane:
-pos1x = centerX - matrixMirrorRotatedInterpreted[6] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * radius * kSqrt2;
-pos1y = centerY - matrixMirrorRotatedInterpreted[0] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * radius * kSqrt2;
+pos1x = gCenterX - matrixMirrorRotatedInterpreted[6] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * gRadius * kSqrt2;
+pos1y = gCenterY - matrixMirrorRotatedInterpreted[0] * (1. + 0.1 * matrixMirrorRotatedInterpreted[12]) * gRadius * kSqrt2;
 
-pos2x = centerX - matrixMirrorRotatedInterpreted[7] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * radius * kSqrt2;
-pos2y = centerY - matrixMirrorRotatedInterpreted[1] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * radius * kSqrt2;
+pos2x = gCenterX - matrixMirrorRotatedInterpreted[7] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * gRadius * kSqrt2;
+pos2y = gCenterY - matrixMirrorRotatedInterpreted[1] * (1. + 0.1 * matrixMirrorRotatedInterpreted[13]) * gRadius * kSqrt2;
 
-pos3x = centerX - matrixMirrorRotatedInterpreted[8] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * radius * kSqrt2;
-pos3y = centerY - matrixMirrorRotatedInterpreted[2] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * radius * kSqrt2;
+pos3x = gCenterX - matrixMirrorRotatedInterpreted[8] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * gRadius * kSqrt2;
+pos3y = gCenterY - matrixMirrorRotatedInterpreted[2] * (1. + 0.1 * matrixMirrorRotatedInterpreted[14]) * gRadius * kSqrt2;
 
-pos4x = centerX - matrixMirrorRotatedInterpreted[9] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * radius * kSqrt2;
-pos4y = centerY - matrixMirrorRotatedInterpreted[3] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * radius * kSqrt2;
+pos4x = gCenterX - matrixMirrorRotatedInterpreted[9] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * gRadius * kSqrt2;
+pos4y = gCenterY - matrixMirrorRotatedInterpreted[3] * (1. + 0.1 * matrixMirrorRotatedInterpreted[15]) * gRadius * kSqrt2;
 
 drawQuadrangleOutline(pos1x, pos1y, pos2x, pos2y, pos3x, pos3y, pos4x, pos4y, 1.);
 
 // Draw line at intersection between horisontal plane and mirror plane
-pos1x = centerX - matrixMirrorRotatedInterpreted[10] * radius;
-pos1y = centerY - matrixMirrorRotatedInterpreted[4]  * radius;
+pos1x = gCenterX - matrixMirrorRotatedInterpreted[10] * gRadius;
+pos1y = gCenterY - matrixMirrorRotatedInterpreted[4]  * gRadius;
 
-pos2x = centerX - matrixMirrorRotatedInterpreted[11] * radius;
-pos2y = centerY - matrixMirrorRotatedInterpreted[5]  * radius;
+pos2x = gCenterX - matrixMirrorRotatedInterpreted[11] * gRadius;
+pos2y = gCenterY - matrixMirrorRotatedInterpreted[5]  * gRadius;
 drawLineSegment(pos1x, pos1y, pos2x, pos2y, 1.);
 postMirror();
 
@@ -277,10 +277,10 @@ postMirror();
 i = 0;
 loop(numDisplayedPoints,
   gxColorSet(0.8, 0.5, 0.75, 1.);
-  pos1x = centerX - radius * matrixDisplayNonTransformedInterpreted[numDisplayedPoints + i];
-  pos1y = centerY - radius * matrixDisplayNonTransformedInterpreted[i];
-  pos3x = centerX - radius * matrixDisplayTransformedInterpreted[numDisplayedPoints + i];
-  pos3y = centerY - radius * matrixDisplayTransformedInterpreted[i];
+  pos1x = gCenterX - gRadius * matrixDisplayNonTransformedInterpreted[numDisplayedPoints + i];
+  pos1y = gCenterY - gRadius * matrixDisplayNonTransformedInterpreted[i];
+  pos3x = gCenterX - gRadius * matrixDisplayTransformedInterpreted[numDisplayedPoints + i];
+  pos3y = gCenterY - gRadius * matrixDisplayTransformedInterpreted[i];
   pos2x = (pos1x + pos3x) * 0.5;
   pos2y = (pos1y + pos3y) * 0.5;
   
@@ -308,8 +308,8 @@ postAfter();
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
 gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
-posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
-posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
+posX = gCenterX + gRadius * slider4 * (sinAzimuth * cosElevation);
+posY = gCenterY - gRadius * slider4 * (cosAzimuth * cosElevation);
 squareSize = 4. * sinElevation + 14.;
 drawInteractionSquare(posX, posY, squareSize);
 

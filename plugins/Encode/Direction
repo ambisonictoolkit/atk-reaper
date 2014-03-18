@@ -189,13 +189,13 @@ Custom graphic interface
 
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
-drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
 // Reset azimuth and spread on mouse click
 mouse_cap == 1 ?
 (
-  mouseX = mouse_x - centerX;
-  mouseY = mouse_y - centerY;
+  mouseX = mouse_x - gCenterX;
+  mouseY = mouse_y - gCenterY;
   azimuth = atan2(mouseX, -mouseY);
   slider2 = azimuth * kRad2Deg;
   // Notify GUI that azimuth has changed, and update coefficients
@@ -205,7 +205,7 @@ mouse_cap == 1 ?
     // Update spread and slider4 and notify GUI of the change
     // COMMENT: There is a risk of dividing by zero here (for elevation = 90), but Reaper seems to handle this grazefully.
     // At 90 deg elevation the GUI has a dead lock and can't be used for changing the degree of transformation, but the slider is still available.
-    slider4 = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius / cos(elevation);
+    slider4 = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius / cos(elevation);
     // Restrict the range to [0, 1]
     slider4 < 0. ? slider4 = 0.;
     slider4 = slider4 * 180.;
@@ -223,10 +223,10 @@ squareSize = 2. * sinEle + 8.;
 
 // Draw left channel as green point, but not in mode 3
 mode != 3 ? (
-  posX = centerX + radius*(sinAziL * cosEle);
-  posY = centerY - radius*(cosAziL * cosEle);
+  posX = gCenterX + gRadius*(sinAziL * cosEle);
+  posY = gCenterY - gRadius*(cosAziL * cosEle);
   gxColorSet(0.75, 0.9, 0.9, 0.9);
-  drawLineSegment(centerX, centerY, posX, posY, 1.);
+  drawLineSegment(gCenterX, gCenterY, posX, posY, 1.);
   drawCenteredSquare(posX, posY, squareSize);
   gxPositionSet(posX-16, posY);
   gfx_drawchar($'L');
@@ -235,10 +235,10 @@ mode != 3 ? (
 
 // Draw right channel as red point, but not in mode 2
 mode != 2 ? (
-  posX = centerX + radius*(sinAziR * cosEle);
-  posY = centerY - radius*(cosAziR * cosEle);
+  posX = gCenterX + gRadius*(sinAziR * cosEle);
+  posY = gCenterY - gRadius*(cosAziR * cosEle);
   gxColorSet(0.75, 1., 0., 0.);
-  drawLineSegment(centerX, centerY, posX, posY, 1.);
+  drawLineSegment(gCenterX, gCenterY, posX, posY, 1.);
   drawCenteredSquare(posX, posY, squareSize);
   gxPositionSet(posX+16, posY);
   gfx_drawchar($'R');
@@ -247,10 +247,10 @@ mode != 2 ? (
 squareSize = 4. * sinEle + 14.;
 
 // Draw interactive point as yellow square as interactive direction indicator, color tint depends on elevation
-posX = centerX + radius*(1. - spread*kInvPi)*(sinAzi * cosEle);
-posY = centerY - radius*(1. - spread*kInvPi)*(cosAzi * cosEle);
+posX = gCenterX + gRadius*(1. - spread*kInvPi)*(sinAzi * cosEle);
+posY = gCenterY - gRadius*(1. - spread*kInvPi)*(cosAzi * cosEle);
 gxColorSet(0.75, 0.5, 1.0, 0.75);
-drawLineSegment(centerX, centerY, posX, posY, 1.);
+drawLineSegment(gCenterX, gCenterY, posX, posY, 1.);
 drawInteractionSquare(posX, posY, squareSize);
 
 

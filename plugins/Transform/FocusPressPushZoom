@@ -274,13 +274,13 @@ debugMode == 0 ?
   // Set colors
   gxColorSet(1, 1, 1, 1);
   determineGeometry();
-  drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
+  drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
   // Reset azimuth and transformAngle on mouse click
   mouse_cap == 1 ?
   (
-    mouseX = mouse_x - centerX;
-    mouseY = mouse_y - centerY;
+    mouseX = mouse_x - gCenterX;
+    mouseY = mouse_y - gCenterY;
     
     // Update azimuth and slider2 and notify GUI of the change
     azimuth = atan2(mouseX, -mouseY);
@@ -290,7 +290,7 @@ debugMode == 0 ?
     // Update transformAngle and slider4 and notify GUI of the change
     // COMMENT: There is a risk of dividing by zero here (for elevation = 90), but Reaper seems to handle this grazefully.
     // At 90 deg elevation the GUI has a dead lock and can't be used for changing the degree of transformation, but the slider is still available.
-    slider4 = sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius / cos(elevation);
+    slider4 = sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius / cos(elevation);
     // Restrict the range to [0, 1]
     slider4 > 1. ? slider4 = 1.;
     transformAngle = slider4 * $pi * 0.5;
@@ -304,8 +304,8 @@ debugMode == 0 ?
 
   // Draw red square as interactive direction indicator, size and color tint depends on elevation
   gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
-  posX = centerX + radius * slider4 * (sinAzimuth * cosElevation);
-  posY = centerY - radius * slider4 * (cosAzimuth * cosElevation);
+  posX = gCenterX + gRadius * slider4 * (sinAzimuth * cosElevation);
+  posY = gCenterY - gRadius * slider4 * (cosAzimuth * cosElevation);
   squareSize = 4. * sinElevation + 14.;
   drawInteractionSquare(posX, posY, squareSize);
     

@@ -110,11 +110,11 @@ function calculateMatrix()
   generateTumblelMatrix(matrixTumble2, elevation);
   
   /* Build processing matrix by performing a series of matrix multiplications
-                        result =         left     X               right             */
-  matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1);
-  matrixMultiplication  (matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
-  matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
-  matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
+                       result =              left     X               right             */
+  matrixMultiplication(matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1);
+  matrixMultiplication(matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
+  matrixMultiplication(matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
+  matrixMultiplication(matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
   
   /* Transformation and interpretation of display points */
   matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
@@ -152,20 +152,20 @@ Graphics
 
 gxColorSet(1, 1, 1, 1);
 determineGeometry();
-drawBackgroundImage(800, 800, centerX - radius, centerY - radius, 2 * radius, 2 * radius);
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
 // Only update transformation settings at mouse drag
 mouse_cap == 1 ?
 (
-  mouseX = mouse_x - centerX;
-  mouseY = mouse_y - centerY;
+  mouseX = mouse_x - gCenterX;
+  mouseY = mouse_y - gCenterY;
   azimuth = atan2(mouseX, -mouseY);
 
   // Update slider2 and notify GUI of the change  
   slider1 = azimuth * kRad2Deg;
   slider_automate(slider1);
   
-  slider3 = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * inverseRadius;
+  slider3 = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius;
   // Restrict the range to [0, 1]
   slider3 < 0. ? slider3 = 0.;
   
@@ -182,11 +182,11 @@ displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
 // Drawing green line and square as interactive direction/transform indicator
 gxColorSet(0.5, 0.0 , 1.0, 0.5);
 
-drawLineSegment(centerX, centerY, posX, posY, 1.);
+drawLineSegment(gCenterX, gCenterY, posX, posY, 1.);
 
 gxColorSet(0.5, 0.0 , 1.0, 0.5);
-posX = centerX + radius * (1. - slider3) * sin(azimuth);
-posY = centerY - radius * (1. - slider3) * cos(azimuth);
+posX = gCenterX + gRadius * (1. - slider3) * sin(azimuth);
+posY = gCenterY - gRadius * (1. - slider3) * cos(azimuth);
 drawInteractionSquare(posX, posY, squareSize);
 
 
