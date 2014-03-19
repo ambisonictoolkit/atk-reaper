@@ -296,11 +296,11 @@ loop(numDisplayedPoints,
 );
 
 // Draw non-transformed points:
-displayTransformedPoints(matrixDisplayNonTransformedInterpreted, numDisplayedPoints);
+displayTransformedPoints(matrixDisplayNonTransformedInterpreted, numDisplayedPoints, 0);
 postBefore();
 
 // Draw points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayTransformedInterpreted, numDisplayedPoints);
+displayTransformedPoints(matrixDisplayTransformedInterpreted, numDisplayedPoints, 0);
 postAfter();
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation

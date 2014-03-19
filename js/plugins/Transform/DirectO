@@ -132,7 +132,7 @@ mouse_cap == 1 ?
 );
 
 // Draw points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
 
 // Draw red square as interactive direction indicator, size and color tint depends on elevation
 gxColorSet(alpha, 0., 1.0, 0.5);
