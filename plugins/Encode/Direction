@@ -55,7 +55,7 @@ import atkFunctionLibrary.jsfx-inc
 
 slider1:0<0,3,1{Stereo, Mono (mix left and right), Mono (use left channel), Mono (use right channel)}>Mode
 slider2:0<-180,180,1>Azimuth Left (mouse)
-slider3:0<-90,90,1>Elevation Left
+slider3:0<-90,90,1>Elevation
 slider4:90<0,180,1>Spread (mouse)
 
 in_pin:L
