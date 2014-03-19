@@ -1253,10 +1253,38 @@ function hls_value(aN1, aN2, aHue)
 );
 
 
+
+/********************************************************************
+Graphics: Set color based on hsl values
+********************************************************************/
+function gxColorSetHsl(anAlpha, aHue, aSaturation, aLightness) local(lRed, lGreen, lBlue, lM1, lM2)
+(
+  aLightness <= 0.5 ? (
+    lM2 = aLightness*(1.0+aSaturation);
+  ) : (
+    lM2 = aLightness + aSaturation - aLightness * aSaturation;
+  );
+  
+  lM1 = 2.0 * aLightness-lM2;
+  
+  aSaturation == 0.0 ? (
+    lRed = aLightness;
+  	lGreen = aLightness;
+  	lBlue = aLightness;
+  ) : (
+    lRed = hls_value(lM1, lM2, aHue+120.0);
+  	lGreen = hls_value(lM1, lM2, aHue);
+  	lBlue = hls_value(lM1, lM2, aHue-120.0);
+  );
+  
+  gxColorSet(anAlpha, lRed, lGreen, lBlue)
+);
+
+
 /********************************************************************
 Graphics: Express gain (in dB) as graphics color
 ********************************************************************/
-function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) local(lHue, lSaturation, lLightness, aM1, aM2, lRed, lGreen, lBlue)
+function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) local(lHue, lSaturation, lLightness)
 (
   // Clip gain to prescribed range:
   aGain < aGainLowLimit ? (
@@ -1267,9 +1295,10 @@ function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) loca
     );
   );
   
+  // Map gain to hue
   lHue = ((aGain - aGainHighLimit) / (aGainLowLimit - aGainHighLimit)) * 240.;
   
-  // Saturation and lightness depends on vertical position
+  // Map vertical position to saturation and lightness
   aVerticalOffset < 0 ? (
     lSaturation = 1. - 0.3*aVerticalOffset;
     lLightness = 0.5;
@@ -1278,25 +1307,8 @@ function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) loca
     lLightness = 0.5 + 0.3*aVerticalOffset;
   );
   
-  lLightness <= 0.5 ? (
-    lM2 = lLightness*(1.0+lSaturation);
-  ) : (
-    lM2 = lLightness + lSaturation - lLightness * lSaturation;
-  );
-  
-  lM1 = 2.0 * lLightness-lM2;
-  
-  lSaturation == 0.0 ? (
-    lRed = lLightness;
-  	lGreen = lLightness;
-  	lBlue = lLightness;
-  ) : (
-    lRed = hls_value(lM1, lM2, lHue+120.0);
-  	lGreen = hls_value(lM1, lM2, lHue);
-  	lBlue = hls_value(lM1, lM2, lHue-120.0);
-  );
-
-  gxColorSet(1., lRed, lGreen, lBlue)
+  // Set color as hsl
+  gxColorSetHsl(1., lHue, lSaturation, lLightness)
 );
 
 
@@ -1443,6 +1455,29 @@ function drawInteractionSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRad
                         aCenterX - lSquareRadius, aCenterY + lSquareRadius,
                         1.
                       );
+                      
+  // Return color to its prior value
+  gxColorSet(lAlpha, lRed, lGreen, lBlue);
+);
+
+
+/********************************************************************
+Graphics: Draw interactive square
+********************************************************************/
+function drawInteractionCircle(aCenterX, aCenterY, aRadius) local(lSquareRadius, lAlpha, lRed, lGreen, lBlue)
+(
+  // Temporarily store incoming color
+	lAlpha = gfx_a;
+	lRed   = gfx_r;
+	lGreen = gfx_g;
+	lBlue  = gfx_b;
+  
+  // Draw filled circle
+  gfx_circle(aCenterX,aCenterY,aRadius,1,1);
+  
+  // Draw white border
+  gxColorSet(1., 1., 1., 1.);
+  gfx_circle(aCenterX,aCenterY,aRadius,0,1);
                       
   // Return color to its prior value
   gxColorSet(lAlpha, lRed, lGreen, lBlue);

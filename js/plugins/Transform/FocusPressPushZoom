@@ -301,12 +301,20 @@ debugMode == 0 ?
   // Draw points illustrating the effect of the transform
   displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, mDrawCenterPoint);
   
-  // Draw red square as interactive direction indicator, size and color tint depends on elevation
-  gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
+  // Draw circle for interaction, map vertical position to saturation, lightness and radius
+    sinElevation < 0 ? (
+    mSaturation = 1. - 0.25*sinElevation;
+    mLightness = 0.4;
+  ) : (
+    mSaturation = 1.;
+    mLightness = 0.4 + 0.25*sinElevation;
+  );
+  gxColorSetHsl(1.0, 195., mSaturation, mLightness);
+  
   posX = gCenterX + gRadius * slider4 * (sinAzimuth * cosElevation);
   posY = gCenterY - gRadius * slider4 * (cosAzimuth * cosElevation);
-  squareSize = 4. * sinElevation + 14.;
-  drawInteractionSquare(posX, posY, squareSize);
+  mInteractionCircleRadius = 4. * sinElevation + 11.;
+  drawInteractionCircle(posX, posY, mInteractionCircleRadius);
     
 /* --- DEBUG STUFF ---  
 ) : (

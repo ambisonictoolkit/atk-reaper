@@ -55,7 +55,7 @@ Initialisation
 @init
 
 // Graphics constants:
-squareSize = 14.;
+mInteractionCircleRadius = 11.;
 
 // Flag indicating that the plugin has not been fully initialised yet
 initialised = 0;
@@ -202,21 +202,19 @@ drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadiu
 displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
 
 
-// Draw rotation indicator
-gxColorSet(0.75, 1, 0.5, 0.75);
-drawInteractionSquare(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, squareSize);
+// ROTATION: Draw indicator
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+drawInteractionCircle(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, mInteractionCircleRadius);
 
+// TILT: Draw indicator, it is shifted slightly upwards in order to avoid intial overlap with tumble indicator
+gxColorSetHsl(1.0, 208.., 1.0, 0.41);
+drawInteractionCircle(gCenterX + tiltAngle * kRad2Norm * gRadius, gCenterY-25., mInteractionCircleRadius);
 
-// Draw tilt indicator. This is shiftes slightly upwards in order to avoid intial overlap with tumble indicator
-gxColorSet(0.75, 0.5, 0.75, 1.);
-drawInteractionSquare(gCenterX + tiltAngle * kRad2Norm * gRadius, gCenterY-20., squareSize);
-
-// Draw tilt plane. Color is gray when upside down
+// TILT: Draw plane, the plane is darker when upside down
 cosTilt < 0 ?
 (
-  gxColorSet(1, 0.7, 0.7, 0.7);
+  gxColorSetHsl(1.0, 208., 1.0, 0.31);
 );
-
 tiltDeltaX = gRadius * cosTilt;
 tiltDeltaY = gRadius * sinTilt * 0.1;
 radiusFraction = 0.2 * gRadius;
@@ -227,15 +225,14 @@ drawQuadrangleOutline(gCenterX - tiltDeltaX, gCenterY - radiusFraction - tiltDel
                       gCenterX - tiltDeltaX, gCenterY + radiusFraction + tiltDeltaY, 
                       1.);
 
+// TUMBLE: Draw indicator
+gxColorSetHsl(1.0, 180., 1.0, 0.37);
+drawInteractionCircle(gCenterX, gCenterY - tumbleAngle * kRad2Norm * gRadius, mInteractionCircleRadius);
 
-// Draw tumble indicator
-gxColorSet(0.75, 0.5, 1., 0.75);
-drawInteractionSquare(gCenterX, gCenterY - tumbleAngle * kRad2Norm * gRadius, squareSize);
-
-// Draw tumble plane. Color is gray when upside down
+// TUMBLE: Draw plane, the plane is darker when upside down
 cosTumble < 0 ?
 (
-  gxColorSet(1, 0.7, 0.7, 0.7);
+  gxColorSetHsl(1.0, 180., 1.0, 0.27);
 );
 
 tumbleDeltaX = gRadius * sinTumble * 0.1;
