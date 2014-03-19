@@ -307,8 +307,8 @@ postAfter();
 gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
 posX = gCenterX + gRadius * slider4 * (sinAzimuth * cosElevation);
 posY = gCenterY - gRadius * slider4 * (cosAzimuth * cosElevation);
-squareSize = 4. * sinElevation + 14.;
-drawInteractionSquare(posX, posY, squareSize);
+mInteractionCircleRadius = 4. * sinElevation + 10.;
+drawInteractionCircle(posX, posY, mInteractionCircleRadius);
 
 /**********************************************************
 Preprocessing prior to audio vector processing.

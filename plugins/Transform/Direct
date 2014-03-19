@@ -61,9 +61,6 @@ initialised = 0;
 azimuth   = 0;
 elevation = 0.;
 
-// Graphics constant
-squareSize = 14.;
-
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
 matrixTumble1   = 1020;
@@ -176,15 +173,12 @@ mouse_cap == 1 ?
 // Draw points illustrating the effect of the transform
 displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
 
-// Drawing green line and square as interactive direction/transform indicator
-gxColorSet(0.5, 0.0 , 1.0, 0.5);
-
+// Drawing line and interactive circle
+gxColorSetHsl(1.0, 195., 1., 0.4);
 drawLineSegment(gCenterX, gCenterY, posX, posY, 1.);
-
-gxColorSet(0.5, 0.0 , 1.0, 0.5);
 posX = gCenterX + gRadius * (1. - slider3) * sin(azimuth);
 posY = gCenterY - gRadius * (1. - slider3) * cos(azimuth);
-drawInteractionSquare(posX, posY, squareSize);
+drawInteractionCircle(posX, posY, 10.);
 
 
 /**********************************************************

@@ -134,16 +134,18 @@ mouse_cap == 1 ?
 // Draw points illustrating the effect of the transform
 displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
 
-// Draw red square as interactive direction indicator, size and color tint depends on elevation
-gxColorSet(alpha, 0., 1.0, 0.5);
+// Draw circle for interaction, map vertical position to saturation, lightness and radius
 posX = gCenterX + gRadius * (1. - tentativeNewTransformationAngle) * sin(azimuth);
 posY = gCenterY - gRadius * (1. - tentativeNewTransformationAngle) * cos(azimuth);
-squareSize = 14;
 
+// Only draw the white outline around interaction circle when mouse is active
+mInteractionCircleRadius = 11;
 mouse_cap == 1 ? (
-  drawInteractionSquare(posX, posY, squareSize);
+  gxColorSetHsl(1.0, 195., 1., 0.4);
+  drawInteractionCircle(posX, posY, mInteractionCircleRadius);
 ) : (
-  drawCenteredSquare(posX, posY, squareSize);
+  gxColorSetHsl(0.5, 195., 1., 0.4);
+  gfx_circle(posX, posY, mInteractionCircleRadius, 1, 1);
 );
 
 
