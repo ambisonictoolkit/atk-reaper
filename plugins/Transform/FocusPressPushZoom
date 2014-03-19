@@ -59,8 +59,8 @@ slider4:0<0,1,0.01>Degree of transformation (mouse)
 
 /* --- DEBUG STUFF ---*/
 // Debug sliders:
-slider5:0<0,1,1{GUI, Debug}>Display mode
-slider6:0<0,13,1{matrixRotate1, matrixTumble1, matrixTransform, matrixTumble2, matrixRotate2, matrixDSP, matrixNewDSP, matrixInc, matrixDisplayPoints, matrixDisplayTransformed, matrixDisplayInterpreted, matrixCounter, matrixTest, matrixUnity}>Matrix to display
+//slider5:0<0,1,1{GUI, Debug}>Displ ay mode
+//slider6:0<0,13,1{matrixRotate1, matrixTumble1, matrixTransform, matrixTumble2, matrixRotate2, matrixDSP, matrixNewDSP, matrixInc, matrixDisplayPoints, matrixDisplayTransformed, matrixDisplayInterpreted, matrixCounter, matrixTest, matrixUnity}>Matrix to display
 /*--- DEBUG STUFF --- */
 
 
@@ -75,6 +75,7 @@ initialised = 0;
 
 azimuth   = 0;
 elevation = 0.;
+mDrawCenterPoint = 0;   // This depends on whether transform mode affects directioness or not
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
@@ -142,16 +143,20 @@ function calculateMatrix()
   generateTumblelMatrix(matrixTumble1, -elevation);
   
   // Determine what transform to do
-  mode == 0 ? (
+  mode == 0 ? (         // Focus
     generateFocusMatrix(matrixTransform, transformAngle);
+    mDrawCenterPoint = 0;
   ) : (
-    mode == 1 ? (
-      generatePressMatrix(matrixTransform, transformAngle)
+    mode == 1 ? (       // Press
+      generatePressMatrix(matrixTransform, transformAngle);
+      mDrawCenterPoint = 1;
     ) : (
-      mode == 2? (
-        generatePushMatrix(matrixTransform, transformAngle)
-      ) : (
-        generateZoomMatrix(matrixTransform, transformAngle)
+      mode == 2? (      // Push
+        generatePushMatrix(matrixTransform, transformAngle);
+        mDrawCenterPoint = 1;
+      ) : (             // Zoom
+        generateZoomMatrix(matrixTransform, transformAngle);
+        mDrawCenterPoint = 0;
       );
     );
   );
@@ -192,7 +197,7 @@ azimuth         = slider2 * kDeg2Rad;
 elevation       = slider3 * kDeg2Rad;
 transformAngle  = slider4 * $pi * 0.5;
 
-/* --- DEBUG STUFF ---*/
+/* --- DEBUG STUFF ---
 debugMode       = slider5;
 
 slider6 == 0 ? (
@@ -248,9 +253,6 @@ slider6 == 0 ? (
     );
   );
 );
-
-
-
 /*--- DEBUG STUFF --- */
 
 calculateMatrix();
@@ -261,7 +263,7 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
-/* --- DEBUG STUFF ---*/
+/* --- DEBUG STUFF ---
 debugMode == 0 ?
 (
 /*--- DEBUG STUFF --- */
@@ -297,8 +299,8 @@ debugMode == 0 ?
   );
   
   // Draw points illustrating the effect of the transform
-  displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
-
+  displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, mDrawCenterPoint);
+  
   // Draw red square as interactive direction indicator, size and color tint depends on elevation
   gxColorSet(0.5, 1.0 + 0.3 * sinElevation, 0.5 * sinElevation, 0.5 * sinElevation);
   posX = gCenterX + gRadius * slider4 * (sinAzimuth * cosElevation);
@@ -306,7 +308,7 @@ debugMode == 0 ?
   squareSize = 4. * sinElevation + 14.;
   drawInteractionSquare(posX, posY, squareSize);
     
-/* --- DEBUG STUFF ---  */
+/* --- DEBUG STUFF ---  
 ) : (
   // Debug mode can be used to inspect the content of the various matrixes
   (slider6 > 7) && (slider6 < 13) ? numCols = numDisplayedPoints. : numCols = 4.;

@@ -1395,6 +1395,32 @@ function drawCenteredSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRadius
 );
 
 
+/********************************************************************
+Graphics: Draw centered filled-in square
+********************************************************************/
+function drawSourceLocation(aCenterX, aCenterY, aDirectedness) local(lRadius, lAlpha, lRed, lGreen, lBlue)
+(
+  // Calculate radius and transparency
+  lRadius = (1. - aDirectedness) * (gRadius-6.) + 6.;
+  // We use the square of lDirectedness for alpha so that it gets more rapidly transparent when the circle grows.
+  // This looks better in the GUIs, as it doesn't get completely clogged by many almost non-transparent circles.
+  gfx_a = (aDirectedness*aDirectedness*0.9) + 0.1;
+  
+  // Draw circle
+	lAlpha = gfx_a;
+  gfx_circle(aCenterX,aCenterY,lRadius,1,1);
+  gfx_a = lAlpha;
+);
+
+
+/********************************************************************
+Graphics: Draw centered filled-in square
+********************************************************************/
+function drawSourceLocationHairpin(aCenterX, aCenterY) local(lRadius)
+(
+  gfx_circle(aCenterX,aCenterY,3,1,1);
+);
+
 
 /********************************************************************
 Graphics: Draw interactive square
@@ -1426,9 +1452,9 @@ function drawInteractionSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRad
 /********************************************************************
 Graphics: Draw points illustrating the effect of various transforms
 ********************************************************************/
-function displayTransformedPoints(aMatrix, aNumPoints) local(i, lPosX, lPosY, lPosZ, lSquareSize)
+function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i, lPosX, lPosY, lPosZ, lDirectedness, lSquareSize)
 (
-  // Draw eight points indicating the effect of the transform
+  // Draw transparent circles indicating the location and directedness of each source after the transform
   // TODO: Also take z value into account in this visualisation?
   i = 0;
   loop(
@@ -1437,12 +1463,31 @@ function displayTransformedPoints(aMatrix, aNumPoints) local(i, lPosX, lPosY, lP
     lPosY = gCenterY - gRadius * aMatrix[i];
     lPosZ = aMatrix[2 * aNumPoints + i];
     
+    // Calculate degree of directedness
+    lDirectedness = sqrt(aMatrix[i]*aMatrix[i] + aMatrix[aNumPoints+i]*aMatrix[aNumPoints+i] + aMatrix[2*aNumPoints+i]*aMatrix[2*aNumPoints+i]);
+    
     // Size, saturation and luminocity depends on posZ
     lSquareSize = 2. * lPosZ + 8.;
     gainToColor(aMatrix[3 * aNumPoints + i], -24., 6., lPosZ);
     
-    drawCenteredSquare(lPosX, lPosY, lSquareSize);
+    //drawCenteredSquare(lPosX, lPosY, lSquareSize);
+    drawSourceLocation(lPosX, lPosY, lDirectedness);
     i += 1;
+  );
+  
+  // Draw darker circles at the azi/ele/directedness center location of each source after the transform
+  ( aDrawCenterPoint ?
+    (
+      i = 0;
+      loop(
+        aNumPoints,
+        lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
+        lPosY = gCenterY - gRadius * aMatrix[i];
+        gxColorSet(0.25, 0., 0., 0.);
+        drawSourceLocationHairpin(lPosX, lPosY);
+        i += 1;
+      );
+    );
   );
 );
 

@@ -199,7 +199,7 @@ drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadiu
 
 
 // Draw points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints);
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
 
 
 // Draw rotation indicator
