@@ -195,34 +195,24 @@ Graphics
 function postBefore()
 (
   gxPositionSet(20., 20.);
-  gfx_drawchar($'B');
-  gfx_drawchar($'e');
-  gfx_drawchar($'f');
-  gfx_drawchar($'o');
-  gfx_drawchar($'r');
-  gfx_drawchar($'e');
+  gfx_drawstr("Before");
 );
 
 function postAfter()
 (
   gxPositionSet(20., 60.);
-  gfx_drawchar($'A');
-  gfx_drawchar($'f');
-  gfx_drawchar($'t');
-  gfx_drawchar($'e');
-  gfx_drawchar($'r');
+  gfx_drawstr("After");
 );
 
 function postMirror()
 (
   gxPositionSet(20., 40.);
-  gfx_drawchar($'M');
-  gfx_drawchar($'i');
-  gfx_drawchar($'r');
-  gfx_drawchar($'r');
-  gfx_drawchar($'o');
-  gfx_drawchar($'r');
+  gfx_drawstr("Mirror");
 );
+
+
+// Set font
+gfx_setfont(1,"Verdana", 14, flags);
 
 // Set colors
 gxColorSet(1, 1, 1, 1);
