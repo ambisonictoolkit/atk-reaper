@@ -55,7 +55,7 @@ out_pin:Z
 slider1:0<0,3,1{Focus, Press, Push, Zoom}>Transformation mode
 slider2:0<-180,180,1>Azimuth (mouse)
 slider3:0<-90,90,1>Elevation
-slider4:0<0,1,0.01>Degree of transformation (mouse)
+slider4:0<0,90,1>Degree of transformation (mouse)
 
 /* --- DEBUG STUFF ---*/
 // Debug sliders:
@@ -192,10 +192,11 @@ Updated slider value:
 **********************************************************/
 @slider
 
-mode            = slider1;
-azimuth         = slider2 * kDeg2Rad;
-elevation       = slider3 * kDeg2Rad;
-transformAngle  = slider4 * $pi * 0.5;
+mode                = slider1;
+azimuth             = slider2 * kDeg2Rad;
+elevation           = slider3 * kDeg2Rad;
+mNormTransformAngle = slider4 / 90.;
+transformAngle      = slider4 * kDeg2Rad;
 
 /* --- DEBUG STUFF ---
 debugMode       = slider5;
@@ -289,10 +290,12 @@ debugMode == 0 ?
     // Update transformAngle and slider4 and notify GUI of the change
     // COMMENT: There is a risk of dividing by zero here (for elevation = 90), but Reaper seems to handle this grazefully.
     // At 90 deg elevation the GUI has a dead lock and can't be used for changing the degree of transformation, but the slider is still available.
-    slider4 = sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius / cos(elevation);
+    mNormTransformAngle = sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius / cos(elevation);
     // Restrict the range to [0, 1]
-    slider4 > 1. ? slider4 = 1.;
-    transformAngle = slider4 * $pi * 0.5;
+    mNormTransformAngle > 1. ? mNormTransformAngle = 1.;
+    
+    transformAngle = mNormTransformAngle * $pi * 0.5;
+    slider4 = mNormTransformAngle * 90.;
     slider_automate(slider4);
     
     calculateMatrix();
@@ -311,8 +314,8 @@ debugMode == 0 ?
   );
   gxColorSetHsl(1.0, 195., mSaturation, mLightness);
   
-  posX = gCenterX + gRadius * slider4 * (sinAzimuth * cosElevation);
-  posY = gCenterY - gRadius * slider4 * (cosAzimuth * cosElevation);
+  posX = gCenterX + gRadius * mNormTransformAngle * (sinAzimuth * cosElevation);
+  posY = gCenterY - gRadius * mNormTransformAngle * (cosAzimuth * cosElevation);
   mInteractionCircleRadius = 4. * sinElevation + 11.;
   drawInteractionCircle(posX, posY, mInteractionCircleRadius);
     

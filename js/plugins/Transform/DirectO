@@ -44,7 +44,7 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
-slider1:0<0,1,0.01>Degree of transformation
+slider1:0<0,90,1>Degree of transformation
 
 
 /**********************************************************
@@ -94,7 +94,7 @@ Updated slider value:
 **********************************************************/
 @slider
 
-transformAngle  = slider1 * $pi * 0.5;
+transformAngle  = slider1 * kDeg2Rad;
 calculateMatrix();
 
 
@@ -120,7 +120,7 @@ tentativeNewTransformationAngle < 0. ? tentativeNewTransformationAngle = 0.;
 // Only update transformation settings at mouse drag
 mouse_cap == 1 ?
 (  
-  slider1 = tentativeNewTransformationAngle;
+  slider1 = tentativeNewTransformationAngle * 90.;
   transformAngle = tentativeNewTransformationAngle * $pi * 0.5;
   slider_automate(slider1);
   calculateMatrix();
