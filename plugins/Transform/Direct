@@ -47,7 +47,7 @@ out_pin:Z
 
 slider1:0<-180,180,1>Azimuth (mouse)
 slider2:0<-90,90,1>Elevation
-slider3:0<0,1,0.01>Degree of transformation (mouse)
+slider3:0<0,90,1>Degree of transformation (mouse)
 
 
 /**********************************************************
@@ -134,7 +134,7 @@ Updated slider value:
 
 azimuth         = slider1 * kDeg2Rad;
 elevation       = slider2 * kDeg2Rad;
-transformAngle  = slider3 * $pi * 0.5;
+transformAngle  = slider3 * kDeg2Rad;
 
 calculateMatrix();
 
@@ -159,12 +159,13 @@ mouse_cap == 1 ?
   slider1 = azimuth * kRad2Deg;
   slider_automate(slider1);
   
-  slider3 = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius;
-  // Restrict the range to [0, 1]
-  slider3 < 0. ? slider3 = 0.;
-  
-  // Update transformAngle and notify GUI of the change
-  transformAngle = slider3 * $pi * 0.5;
+  mNormTransformAngle = (1. - sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius);
+  // Restrict the range to [0, 1.]
+  mNormTransformAngle < 0. ? mNormTransformAngle = 0.;
+
+  // Update transformAngle and slider, and notify GUI of the change
+  transformAngle = mNormTransformAngle * $pi*0.5;
+  slider3 = mNormTransformAngle*90.;
   slider_automate(slider3);
   
   calculateMatrix();
@@ -176,8 +177,8 @@ displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
 // Drawing line and interactive circle
 gxColorSetHsl(1.0, 195., 1., 0.4);
 drawLineSegment(gCenterX, gCenterY, posX, posY, 1.);
-posX = gCenterX + gRadius * (1. - slider3) * sin(azimuth);
-posY = gCenterY - gRadius * (1. - slider3) * cos(azimuth);
+posX = gCenterX + gRadius * (1. - mNormTransformAngle) * sin(azimuth);
+posY = gCenterY - gRadius * (1. - mNormTransformAngle) * cos(azimuth);
 drawInteractionCircle(posX, posY, 10.);
 
 
