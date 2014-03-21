@@ -8,6 +8,13 @@
 \usepackage{times}
 \usepackage{ifpdf}
 \usepackage[english]{babel}
+
+% TL: Custom package so that multi-line maths equations can be properly aligned
+\usepackage{amsmath}
+
+% TL: Custom package so that distance between figures and captions can be reduced when needed.
+\usepackage{caption}
+
 %\usepackage{cite}
 
 % Multipart figures
@@ -155,7 +162,7 @@ The abstract should be placed at the top left column and should contain about 15
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}\label{sec:introduction}
 
-\subsection{Spatial sound representations}
+\subsection{Spatial sound representations}\label{sec:spatial-sound}
 
 Spatial sound is generally represented in one of three ways.
 ITU 5.1 and ITU 7.1 are examples of fixed-channel distribution formats \cite{ITU:1993_surround_5:1}.
@@ -174,7 +181,7 @@ There are several commercial microphones available for recording 1st order ambis
 
 
 
-\subsection{Spatial sound processing in DAWs}
+\subsection{Spatial sound processing in DAWs}\label{sec:daws}
 
 Encoding, processing and decoding of B-format signals requires support for multi-channel signals.
 Real-time programming environments are well-suited in this respect as they offer flexible configuration and routing of channels, and ambisonic is supported in all major real-time audio programming environments such as Csound, Max, Pd and SuperCollider, often as 3rd party extensions to the programs.
@@ -204,7 +211,7 @@ Reaper is well-suited for ambisonic as well, and is a preferred DAW for many com
 
 
 
-\subsection{Plugin technologies}
+\subsection{Plugin technologies}\label{sec:plugin-technologies}
 
 Several plugin specifications enable development of 3rd party audio instruments and effects that can be used with multiple hosts.
 Virtual Studio Technology (VST) is a plugin interface specification and SDK for Windows, Mac OSX and Linux by Steinberg \cite{steinberg:2014vst}.
@@ -244,7 +251,7 @@ Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patch
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Design considerations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Ambisonic Toolkit}
+\section{Ambisonic Toolkit}\label{sec:atk}
 
 The Ambisonic Tool Kit (ATK) brings together a number of tools and transforms for working with ambisonic surround sound.
 Rather than focusing on the needs and concerns of the classical music sound recordist or the popular music mix-engineer/producer or the acoustician/engineer, use is targeted towards the composer of acousmatic music.
@@ -273,18 +280,15 @@ Some of the underlying ideas of ATK has also been incorporated into the Blue Rip
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Design considerations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{ATK Reaper: Design considerations}
+\section{ATK Reaper: Design considerations}\label{sec:design}
 
-\subsection{Coordinate system conventions and encoding formats}
+\subsection{Coordinate system conventions and encoding formats}\label{coordinate-systems}
 
 Within the spatial audio community several coordinate system conventions are being used in parallel.
 Theory on ambisonic generally assume the same coordinate system conventions as acoustics, with the $x$-axis pointing forward and $y$-axis to the left in the horizontal plane, and the $z$-axis pointing upwards. 
 Spherical coordinates also follows standard mathematical conventions, with $0^{\circ}$ azimuth being forward, and angles increasing in the anti-clockwise direction so that $90^{\circ}$ azimuth is to the left.
 Positive elevation is upwards.
 This is the coordinate system convention used by ATK for SuperCollider
-
-% TODO: Add figure
-% TODO: Add reference
 
 SpatDIF use a navigation-based coordinate system with $x$-axis to the right and $y$-axis forward in the horizontal plane, and $z$-axis in the upwards direction.
 Azimuth is $0^{\circ}$ in the forward direction, and angles increase clockwise so that $90^{\circ}$ azimuth is to the right.
@@ -323,12 +327,55 @@ but even in these automation data values increase in the clockwise direction.
 
 WigWare - strictly ambisonic
 
-\subsection{Graphical user interfaces}
+\subsection{Graphical user interfaces}\label{sec:gui}
 
-When a mono source is encoded using a matrix encoder, four coefficients are required. This can be interpreted as four degrees of freedom. gain, azimuth, elevation and directness.
+When a mono source is encoded and the resulting B-format signal is exposed to subsequent matrix-based spatial transforms as discussed in section \ref{sec:transforms}, the resulting B-format signal $W, X, Y, Z$ relates to the original mono signal $s(t)$ as:
 
+\begin{equation} \label{eq:encoded}
+\begin{split}W(t) & = k_w s(t) \\
+X(t) & = k_x s(t) \\
+Y(t) & = k_y s(t) \\
+Z(t) & = k_z s(t) \\
+\end{split}
+\end{equation}
 
-The text for sliders also indicate which parameters can be controlled from the custom part of the GUI.
+The four coefficients $k_{w, x, y, z}$ indicates four degrees of freedom, and relates to gain $g$, azimuth $\phi$, elevation $\theta$ and the degree of directness $\gamma$ (versus omniness, as discussed in section \ref{sec:direct}) as:
+
+\begin{equation} \label{eq:encodedCoefficients}
+\begin{split}k_w & = g \sqrt{ \frac{1 + sin(\gamma)} {2} } \\
+k_x & = g \sqrt{ 1 - sin(\gamma) } \cos{\phi} \cos{\theta} \\
+k_y & = g \sqrt{ 1 - sin(\gamma) } \cos{\phi} \sin{\theta} \\
+k_z & = g \sqrt{ 1 - sin(\gamma) } \sin{\phi}               \\
+\end{split}
+\end{equation}
+
+It follows that if the coefficients $k_{w, x, y, z}$ of the transformed signal are known, gain, azimuth, elevation and directness can be calculated as:
+
+\begin{equation} \label{eq:interpreteCoefficients}
+\begin{split}
+\phi   & = atan2(k_y, k_x) \\
+\theta & = atan2(k_z, \sqrt{{k_x}^2 + {k_y}^2}) \\
+g      & = k_w \sqrt{ \frac{2}{1 + sin \gamma} } \\
+\gamma & = asin( \frac{2 {k_w}^2 - ({k_x}^2 + {k_y}^2 +{k_z}^2)} {2 {k_w}^2 + ({k_x}^2 + {k_y}^2 +{k_z}^2 )})
+\end{split}
+\end{equation}
+
+This is used in the graphical user interface (GUI) of several plugins to illustrate the effect of the spatial transforms. 
+The initial $k_{w, x, y, z}$ coefficients are calculated independently for an array of points distributed at equidistant angles in the horizontal plane, and then exposed to the same transform as the audio signal will be. 
+The transformed coefficients are analysed according to eq. \ref{eq:interpreteCoefficients} and displayed as a series of monochrome circles in the GUI against a dark circle indicating the sound field hemisphere as seen from above.
+Colour hue depends on gain with $0\: db$ being orange, signals with increased gain becoming red, and signals with reduced gain venturing towards green and blue, as illustrated in figure \ref{fig:zoomTransform}.
+Elevation is indicated by adjustments to lightness and saturation, so that the circle gets brighter in the upper and darker in the lower hemisphere.
+Additionally the radius of the circle increases slightly with increasing elevation.
+Azimuth is indicated by angular direction of the centre of the circle relative to the display hemisphere.
+The distance from the centre of the hemisphere depends on elevation and directness combined, so that a transformed source that is fully directional and with $0^{\circ}$ elevation displays as a small non-transparent circle located at the outer edge of the hemisphere.
+With decreasing directness, or increasing absolute elevation the centre of the circle moves inwards, and a transformed source with an elevation of $\pm 90^{\circ}$ and/or no directness (an omnipresent signal) will be located in the centre of the displayed hemisphere.
+Degree of directness affects the radius of the circle, but in a much more radical way than elevation. A fully directional transformed source will be indicated as a small non-trannsparent circle, and as directness decrease, the radius increase so that it equals that of the display hemisphere for a omnipresent source with now directness.
+Additionally the circle becomes more transparent with decreasing directness.
+This way the visualisation helps convey that an omni-present source does not sound as if it is a focused source located at the centre, rather the sound will appear to be arriving from all directions.
+Examples of less directional sources can be found in figures \ref{fig:directTransform} and \ref{fig:pushTransform}.
+
+Depending on the plugin, one or more bright blue knots in the GUI can be used to control azimuth and degree of transformation.
+% The text for sliders also indicate which parameters can be controlled from the custom part of the GUI.
 
 
 
@@ -338,19 +385,15 @@ The text for sliders also indicate which parameters can be controlled from the c
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Implementation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{ATK Reaper: Implementation}
+\section{ATK Reaper: Implementation}\label{sec:implementation}
 
 TODO: The shared library file
 
 TODO: Plugins for development and testing
 
-DISCUSS: What is the best order for the following subsections. Currently it is organised according to what a typical ambisonic effects chain might look like, so that there can be a narrative in terms of starting with sources to be encoded, various processing's of the encoded sound field, and then the decoding.
+\subsection{Encoders}\label{sec:encoders}
 
 
-
-
-
-\subsection{Encoders}
 
 DISCUSS: I would like to integrate the omni and directional encoders into one and the same plugin, where there would be three parameters to control: azimuth, elevation and degree of omniness (probably want a better name for that).
 
@@ -363,18 +406,21 @@ DISCUSS: Do we have a file recorded using ZoomH2 that I could use for testing pu
 
 
 
-\subsection{Transformation between A-format and B-format}
+\subsection{Transformation between A-format and B-format}\label{sec:a-format}
 
 DISCUSS: Can Joseph help with with this subsection, so that the philosophy of it can be communicated clearly?
 
 
 
 
-\subsection{Spatial transforms}
+\subsection{Spatial transforms}\label{sec:transforms}
 
-DISCUSS: Get feedback on GUI and interaction for these plugins.
+\subsubsection{Rotate, Tilt and Tumble}\label{sec:rotate}
+
+\subsubsection{Direct and DirectO}\label{sec:direct}
 
 \begin{figure}[h]
+\captionsetup{aboveskip=-6pt}
 \centering
 \includegraphics[width=0.9\columnwidth]{figures/directOTransform.png}
 \caption{DirectO transform plugin interface.\label{fig:directOTransform}}
@@ -382,36 +428,51 @@ DISCUSS: Get feedback on GUI and interaction for these plugins.
 
 
 \begin{figure}[h]
+\captionsetup{aboveskip=-6pt}
 \centering
 \includegraphics[width=0.9\columnwidth]{figures/directTransform.png}
 \caption{Direct transform plugin interface.\label{fig:directTransform}}
 \end{figure}
 
+
+
+\subsubsection{Focus, Pull, Push, Zoom and Dominate}\label{sec:focus}
+
 \begin{figure}[h]
+\captionsetup{aboveskip=-6pt}
 \centering
 \includegraphics[width=0.9\columnwidth]{figures/pushTransform.png}
+\setlength{\abovecaptionskip}{0pt plus 3pt minus 2pt} % Decrease distance, as the figure itself has lots of empty space below
 \caption{Push transform plugin interface.\label{fig:pushTransform}}
 \end{figure}
 
 \begin{figure}[h]
+\captionsetup{aboveskip=-6pt}
 \centering
 \includegraphics[width=0.9\columnwidth]{figures/zoomTransform.png}
 \caption{Zoom transform interface.\label{fig:zoomTransform}}
 \end{figure}
 
-\subsection{Near-field corrections}
+\subsubsection{Mirroring}\label{sec:mirror}
+
+
+
+
+
+\subsection{Near-field corrections}\label{sec:near-field}
 
 DISCUSS: I'd like to fuse these two into one plugin, with an additional pop-up menu parameter to choose which one to use. Alternatively, we could find a way of using only one slider, and use the "negative range" to draw the source nearer, and the "positive range" for moving the source away.
 
 
 
 
-\subsection{Monitoring}
+\subsection{Monitoring}\label{sec:monitors}
 
 
 
 
-\subsection{Decoders}
+
+\subsection{Decoders}\label{sec:decoders}
 
 DISCUSS: I need to get a more firm understanding of what speaker layout etc. each of the encoders works with.
 
@@ -426,7 +487,7 @@ DISCUSS: I need more details on how HRTF and UHJ decoders work in order to imple
 
 
 
-\subsection{Licensing and distribution}
+\subsection{Licensing and distribution}\label{sec:license}
 
 ATK for SuperCollider3 is distributed as open-source using the GNU General Public License Version 3 (GNU GPL). This license is incompatible for use with proprietary software such as Reaper, and for this reason ATK for Reaper is distributed using the GNU Lesser Public License Version 3 (GNU LGPL).
 ATK for Reaper requires Reaper 4.60 or newer, and will be available for download from the Ambisonic Toolkit web site in the near future \cite{ambisonictoolkit.net:2014}.
@@ -436,7 +497,7 @@ ATK for Reaper requires Reaper 4.60 or newer, and will be available for download
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Discussion
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Discussion}
+\section{Discussion}\label{sec:discussion}
 
 * Maintenance overhead when developing C/C++ plugins: Compiling for multiple processors and platforms
 * Future of several plugin standards can be questioned, e.g. AU
@@ -457,7 +518,8 @@ ATK for Reaper requires Reaper 4.60 or newer, and will be available for download
 % Aknowledgments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{acknowledgments}
-At the end of the Conclusions, acknowledgements to people, projects, funding agencies, etc. can be included after the second-level heading ``Acknowledgments'' (with no numbering).
+The porting of ATK to reaper started in 2013 as part of the process of developing new artistic works for an exhibition carried out within the framework of the artistic research project Re:place at Bergen Academy of Arts and Design, funded by the Norwegian Artistic Research Programme.
+Stian Remvik has provided valuable feedback on user interface design.
 \end{acknowledgments} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
