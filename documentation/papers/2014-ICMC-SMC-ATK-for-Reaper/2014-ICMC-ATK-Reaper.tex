@@ -282,7 +282,7 @@ Some of the underlying ideas of ATK has also been incorporated into the Blue Rip
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{ATK Reaper: Design considerations}\label{sec:design}
 
-\subsection{Coordinate system conventions and encoding formats}\label{coordinate-systems}
+\subsection{Coordinate systems and encoding conventions}\label{coordinate-systems}
 
 Within the spatial audio community several coordinate system conventions are being used in parallel.
 Theory on ambisonic generally assume the same coordinate system conventions as acoustics, with the $x$-axis pointing forward and $y$-axis to the left in the horizontal plane, and the $z$-axis pointing upwards. 
@@ -327,7 +327,7 @@ but even in these automation data values increase in the clockwise direction.
 
 WigWare - strictly ambisonic
 
-\subsection{Graphical user interfaces}\label{sec:gui}
+\subsection{Graphical user interfaces in spatial transforms}\label{sec:gui}
 
 When a mono source is encoded and the resulting B-format signal is exposed to subsequent matrix-based spatial transforms as discussed in section \ref{sec:transforms}, the resulting B-format signal $W, X, Y, Z$ relates to the original mono signal $s(t)$ as:
 
@@ -339,7 +339,7 @@ Z(t) & = k_z s(t) \\
 \end{split}
 \end{equation}
 
-The four coefficients $k_{w, x, y, z}$ indicates four degrees of freedom, and relates to gain $g$, azimuth $\phi$, elevation $\theta$ and the degree of directness $\gamma$ (versus omniness, as discussed in section \ref{sec:direct}) as:
+The four coefficients $k_{w, x, y, z}$ indicates four degrees of freedom, and relates to gain $g$, azimuth $\phi$, elevation $\theta$ and the degree of directness $\gamma$ (versus omnipresence, as discussed in section \ref{sec:direct}) as:
 
 \begin{equation} \label{eq:encodedCoefficients}
 \begin{split}k_w & = g \sqrt{ \frac{1 + sin(\gamma)} {2} } \\
@@ -353,25 +353,25 @@ It follows that if the coefficients $k_{w, x, y, z}$ of the transformed signal a
 
 \begin{equation} \label{eq:interpreteCoefficients}
 \begin{split}
-\phi   & = atan2(k_y, k_x) \\
-\theta & = atan2(k_z, \sqrt{{k_x}^2 + {k_y}^2}) \\
-g      & = k_w \sqrt{ \frac{2}{1 + sin \gamma} } \\
-\gamma & = asin( \frac{2 {k_w}^2 - ({k_x}^2 + {k_y}^2 +{k_z}^2)} {2 {k_w}^2 + ({k_x}^2 + {k_y}^2 +{k_z}^2 )})
+\phi   & = \textnormal{atan2}(k_y, k_x) \\
+\theta & = \textnormal{atan2}(k_z, \sqrt{{k_x}^2 + {k_y}^2}) \\
+g      & = k_w \sqrt{ \frac{2}{1 + \sin{\gamma} } }\\
+\gamma & = \textnormal{arcsin} \Big( \frac{2 {k_w}^2 - ({k_x}^2 + {k_y}^2 +{k_z}^2)} {2 {k_w}^2 + ({k_x}^2 + {k_y}^2 +{k_z}^2 )} \Big)
 \end{split}
 \end{equation}
 
-This is used in the graphical user interface (GUI) of several plugins to illustrate the effect of the spatial transforms. 
+This is used in the graphical user interface (GUI) of several of the plugins discussed in section \ref{sec:transforms} to illustrate the effect of the spatial transforms. 
 The initial $k_{w, x, y, z}$ coefficients are calculated independently for an array of points distributed at equidistant angles in the horizontal plane, and then exposed to the same transform as the audio signal will be. 
-The transformed coefficients are analysed according to eq. \ref{eq:interpreteCoefficients} and displayed as a series of monochrome circles in the GUI against a dark circle indicating the sound field hemisphere as seen from above.
-Colour hue depends on gain with $0\: db$ being orange, signals with increased gain becoming red, and signals with reduced gain venturing towards green and blue, as illustrated in figure \ref{fig:zoomTransform}.
+The transformed coefficients are analysed according to equation \ref{eq:interpreteCoefficients} and displayed as a series of monochrome circles in the GUI against a dark circle indicating the sound field hemisphere as seen from above.
+Colour hue depends on gain with $0\: db$ being orange, signals with increased gain becoming red, and signals with reduced gain venturing towards green and blue, as can be seen in figure \ref{fig:zoomTransform}.
 Elevation is indicated by adjustments to lightness and saturation, so that the circle gets brighter in the upper and darker in the lower hemisphere.
-Additionally the radius of the circle increases slightly with increasing elevation.
+Additionally the radius of the circle increases slightly with increasing elevation, as seen in figure \ref{fig:rotateTransform}.
 Azimuth is indicated by angular direction of the centre of the circle relative to the display hemisphere.
 The distance from the centre of the hemisphere depends on elevation and directness combined, so that a transformed source that is fully directional and with $0^{\circ}$ elevation displays as a small non-transparent circle located at the outer edge of the hemisphere.
 With decreasing directness, or increasing absolute elevation the centre of the circle moves inwards, and a transformed source with an elevation of $\pm 90^{\circ}$ and/or no directness (an omnipresent signal) will be located in the centre of the displayed hemisphere.
-Degree of directness affects the radius of the circle, but in a much more radical way than elevation. A fully directional transformed source will be indicated as a small non-trannsparent circle, and as directness decrease, the radius increase so that it equals that of the display hemisphere for a omnipresent source with now directness.
+Degree of directness affects the radius of the circle as well, but in a more radical way than elevation. A fully directional transformed source will be indicated as a small non-transparent circle, and with decreasing directness radius increase so that it equals that of the display hemisphere for a omnipresent source.
 Additionally the circle becomes more transparent with decreasing directness.
-This way the visualisation helps convey that an omni-present source does not sound as if it is a focused source located at the centre, rather the sound will appear to be arriving from all directions.
+This way the visualisation helps communicate that an omni-present source does not sound as if it is a focused source located at the centre, rather the sound will appear to be arriving from all directions.
 Examples of less directional sources can be found in figures \ref{fig:directTransform} and \ref{fig:pushTransform}.
 
 Depending on the plugin, one or more bright blue knots in the GUI can be used to control azimuth and degree of transformation.
@@ -387,35 +387,45 @@ Depending on the plugin, one or more bright blue knots in the GUI can be used to
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{ATK Reaper: Implementation}\label{sec:implementation}
 
-TODO: The shared library file
+The source code for ATK for Reaper is implemented as a set of Reaper JSFX source files, one for each plugin, and a shared library file containing mathematical constants and conversions, matrix operators and graphics calls used by several of the plugins, ensuring a DRY (Don't Repeat Yourself) programming approach.
+The various plugins are sorted into subfolders by categories \emph{Encode}, \emph{Transform} and \emph{Decode}, making it easy for the user to understand the scope of each of the plugins. 
+The following sections present the available plugins.
 
-TODO: Plugins for development and testing
+% TODO: Plugins for development and testing
 
 \subsection{Encoders}\label{sec:encoders}
 
+\emph{Omni} encodes a mono signal as an omnidirectional soundfield.
+An omnidirectional soundfield can be regarded in two ways:
+A soundfield with an infinite number of plane\-waves arriving in all directions, or a soundfield with no directions. In a well aligned, dampend studio environment, this usually sounds "in the head", while in concert hall listening it usually appears as omnipresent.
+To control the soundfield, spatial transforms can be applied using the \emph{FocusPressPushZoom} plugin (see section \ref{sec:focus}) to either "push" or "focus" an omnidirectional soundfield into a plane\-wave, giving the sound field an angle of arrival.
+
+\emph{PlanarWave} encodes a mono source as a directional plane\-wave, where the direction (azimuth and elevation) of the planwave can be set.
+
+The \emph{Stereo} plugin encodes the left and right channels as two planewaves coming from left and right direction. The angular spread between the two waves is parameterised.
+Spatial transforms such as \emph{RotateTiltTumb} (section \ref{sec:rotate}) may be used to alter the direction of the planewaves.
 
 
-DISCUSS: I would like to integrate the omni and directional encoders into one and the same plugin, where there would be three parameters to control: azimuth, elevation and degree of omniness (probably want a better name for that).
-
-DISCUSS: I've previously (in Max) had an additional formula for encoding stereo sound files that first depended on a XY to MS conversion. Are there additional ways of encoding stereo that should be considered?
-
-DISCUSS: Theory behind Spreader and Diffuser encoders
-
-DISCUSS: Do we have a file recorded using ZoomH2 that I could use for testing purposes?
-
-
-
-
-\subsection{Transformation between A-format and B-format}\label{sec:a-format}
-
-DISCUSS: Can Joseph help with with this subsection, so that the philosophy of it can be communicated clearly?
-
-
+% DISCUSS: I've previously (in Max) had an additional formula for encoding stereo sound files that first depended on a XY to MS conversion. Are there additional ways of encoding stereo that should be considered?
 
 
 \subsection{Spatial transforms}\label{sec:transforms}
 
 \subsubsection{Rotate, Tilt and Tumble}\label{sec:rotate}
+
+\begin{figure}[h]
+\captionsetup{aboveskip=-6pt}
+\centering
+\includegraphics[width=0.9\columnwidth]{figures/rotateTiltTumble.png}
+\setlength{\abovecaptionskip}{0pt plus 3pt minus 2pt} % Decrease distance, as the figure itself has lots of empty space below
+\caption{Rotate, Tilt and Tumble transform.\label{fig:rotateTransform}}
+\end{figure}
+
+The \emph{RotateTiltTumble} plugin is a first order ambisonic multi-axes rotation transformer, with rotation, tilt and tumble transforms provided in the sequence indicated by the plugin name.
+If the user wants to change the order of transformations, it is possible to daisy-chain two or more instances of the plugin.
+This transform does not affect directness of the signal, and the screenshot in figure \ref{fig:rotateTransform} demonstrates how variations in saturation, lightness and radius of the displayed transformed sources serve to illustrate their vertical position. The separate effect of the Tilt and Tumble transformations is indicated by the two blue planes in the interface.
+
+
 
 \subsubsection{Direct and DirectO}\label{sec:direct}
 
@@ -426,7 +436,9 @@ DISCUSS: Can Joseph help with with this subsection, so that the philosophy of it
 \caption{DirectO transform plugin interface.\label{fig:directOTransform}}
 \end{figure}
 
-
+The \emph{DirectO} plugin (figure \ref{fig:directOTransform}) adjusts the sound field directivity of a first order ambisonic signal across the origin.
+It is a spatial low-pass filter; with increasing degree of transform, the signal becomes less directional, and with a transform of $90^{\circ}$ the signal becomes omnipresent.
+  
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
@@ -434,8 +446,10 @@ DISCUSS: Can Joseph help with with this subsection, so that the philosophy of it
 \caption{Direct transform plugin interface.\label{fig:directTransform}}
 \end{figure}
 
+Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts the sound field directivity of a first order ambisonic signal (B-format) across an arbitrary plane.
 
 
+ 
 \subsubsection{Focus, Pull, Push, Zoom and Dominate}\label{sec:focus}
 
 \begin{figure}[h]
@@ -453,6 +467,23 @@ DISCUSS: Can Joseph help with with this subsection, so that the philosophy of it
 \caption{Zoom transform interface.\label{fig:zoomTransform}}
 \end{figure}
 
+The \emph{FocusPushPressZoom} plugin provides a unified interface to four different 
+  First Order Ambisonic (FOA) focus, press, push and zoom transformer
+
+Apply focus to a first order ambisonic signal (B-format) along an arbitrary axis.
+
+Apply press to a first order ambisonic signal (B-format) along an arbitrary axis.
+
+Apply dominance to a first order ambisonic signal (B-format) along an arbitrary axis.
+Apply zoom to a first order ambisonic signal (B-format) along an arbitrary axis.
+
+
+Description: the \emph{Dominance} gain, in dB, applied on the x-axis. Positive values increase the gain at front center to +gain, while decreasing the gain at back center to -gain, simultaneously distorting the image towards front center. Negative values of gain invert this distortion, distorting the image towards back center. The default, 0, results in no change.
+
+Description: the angle of distortion in radians. Positive values focus on the front center of the image, and at pi/2 collapse the soundfield to mono, reducing the gain at back center to -inf dB. Negative values focus on back center. The default, 0, results in no change.
+
+Description: the angle of distortion in radians, from -pi/2 to pi/2. Positive values push to the front center of the image, and at pi/2 collapse the soundfield to mono. Negative values push to back center. The default, 0, results in no change.
+
 \subsubsection{Mirroring}\label{sec:mirror}
 
 
@@ -464,6 +495,9 @@ DISCUSS: Can Joseph help with with this subsection, so that the philosophy of it
 DISCUSS: I'd like to fuse these two into one plugin, with an additional pop-up menu parameter to choose which one to use. Alternatively, we could find a way of using only one slider, and use the "negative range" to draw the source nearer, and the "positive range" for moving the source away.
 
 
+\subsection{Transformation between A-format and B-format}\label{sec:a-format}
+
+DISCUSS: Can Joseph help with with this subsection, so that the philosophy of it can be communicated clearly?
 
 
 \subsection{Monitoring}\label{sec:monitors}
@@ -518,7 +552,7 @@ ATK for Reaper requires Reaper 4.60 or newer, and will be available for download
 % Aknowledgments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{acknowledgments}
-The porting of ATK to reaper started in 2013 as part of the process of developing new artistic works for an exhibition carried out within the framework of the artistic research project Re:place at Bergen Academy of Arts and Design, funded by the Norwegian Artistic Research Programme.
+The porting of ATK to Reaper started in 2013 as part of the process of developing new artistic works for an exhibition carried out within the framework of the artistic research project Re:place at Bergen Academy of Arts and Design, funded by the Norwegian Artistic Research Programme.
 Stian Remvik has provided valuable feedback on user interface design.
 \end{acknowledgments} 
 
