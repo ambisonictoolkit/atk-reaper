@@ -1300,11 +1300,11 @@ function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) loca
   
   // Map vertical position to saturation and lightness
   aVerticalOffset < 0 ? (
-    lSaturation = 1. - 0.3*aVerticalOffset;
+    lSaturation = 1. - 0.4*aVerticalOffset;
     lLightness = 0.5;
   ) : (
     lSaturation = 1.;
-    lLightness = 0.5 + 0.3*aVerticalOffset;
+    lLightness = 0.5 + 0.4*aVerticalOffset;
   );
   
   // Set color as hsl
@@ -1410,10 +1410,10 @@ function drawCenteredSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRadius
 /********************************************************************
 Graphics: Draw centered filled-in square
 ********************************************************************/
-function drawSourceLocation(aCenterX, aCenterY, aDirectedness) local(lRadius, lAlpha, lRed, lGreen, lBlue)
+function drawSourceLocation(aCenterX, aCenterY, aPosZ, aDirectedness) local(lRadius, lAlpha, lRed, lGreen, lBlue)
 (
   // Calculate radius and transparency
-  lRadius = (1. - aDirectedness) * (gRadius-6.) + 6.;
+  lRadius = (1. - aDirectedness) * (gRadius-6.) + + 2.5*aPosZ + 6.;
   // We use the square of lDirectedness for alpha so that it gets more rapidly transparent when the circle grows.
   // This looks better in the GUIs, as it doesn't get completely clogged by many almost non-transparent circles.
   gfx_a = (aDirectedness*aDirectedness*0.9) + 0.1;
@@ -1428,7 +1428,7 @@ function drawSourceLocation(aCenterX, aCenterY, aDirectedness) local(lRadius, lA
 /********************************************************************
 Graphics: Draw centered filled-in square
 ********************************************************************/
-function drawSourceLocationHairpin(aCenterX, aCenterY) local(lRadius)
+function drawSourceLocationCenter(aCenterX, aCenterY) local(lRadius)
 (
   gfx_circle(aCenterX,aCenterY,3,1,1);
 );
@@ -1506,7 +1506,7 @@ function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i
     gainToColor(aMatrix[3 * aNumPoints + i], -24., 6., lPosZ);
     
     //drawCenteredSquare(lPosX, lPosY, lSquareSize);
-    drawSourceLocation(lPosX, lPosY, lDirectedness);
+    drawSourceLocation(lPosX, lPosY, lPosZ, lDirectedness);
     i += 1;
   );
   
@@ -1519,7 +1519,7 @@ function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i
         lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
         lPosY = gCenterY - gRadius * aMatrix[i];
         gxColorSet(0.25, 0., 0., 0.);
-        drawSourceLocationHairpin(lPosX, lPosY);
+        drawSourceLocationCenter(lPosX, lPosY);
         i += 1;
       );
     );

@@ -198,45 +198,60 @@ determineGeometry();
 drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
 
-// Draw points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
-
-
-// ROTATION: Draw indicator
-gxColorSetHsl(1.0, 195., 1.0, 0.4);
-drawInteractionCircle(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, mInteractionCircleRadius);
-
-// TILT: Draw indicator, it is shifted slightly upwards in order to avoid intial overlap with tumble indicator
-gxColorSetHsl(1.0, 208.., 1.0, 0.41);
-drawInteractionCircle(gCenterX + tiltAngle * kRad2Norm * gRadius, gCenterY-25., mInteractionCircleRadius);
-
-// TILT: Draw plane, the plane is darker when upside down
+// TILT: Draw plane illustrating the effect of the tilt transform, the plane is darker when upside down
 cosTilt < 0 ?
 (
-  gxColorSetHsl(1.0, 208., 1.0, 0.31);
+  gxColorSetHsl(1.0, 195, 1.0, 0.25);
+) :
+( 
+  gxColorSetHsl(1.0, 195., 1.0, 0.4);
 );
 tiltDeltaX = gRadius * cosTilt;
 tiltDeltaY = gRadius * sinTilt * 0.1;
 radiusFraction = 0.2 * gRadius;
 
+drawQuadrangleOutline(gCenterX - tiltDeltaX - 0.5, gCenterY - radiusFraction - tiltDeltaY - 0.5,
+                      gCenterX + tiltDeltaX - 0.5, gCenterY - radiusFraction + tiltDeltaY - 0.5,
+                      gCenterX + tiltDeltaX - 0.5, gCenterY + radiusFraction - tiltDeltaY - 0.5,
+                      gCenterX - tiltDeltaX - 0.5, gCenterY + radiusFraction + tiltDeltaY - 0.5, 
+                      1.);
+
+drawQuadrangleOutline(gCenterX - tiltDeltaX + 0.5, gCenterY - radiusFraction - tiltDeltaY + 0.5,
+                      gCenterX + tiltDeltaX + 0.5, gCenterY - radiusFraction + tiltDeltaY + 0.5,
+                      gCenterX + tiltDeltaX + 0.5, gCenterY + radiusFraction - tiltDeltaY + 0.5,
+                      gCenterX - tiltDeltaX + 0.5, gCenterY + radiusFraction + tiltDeltaY + 0.5, 
+                      1.);
+                      
 drawQuadrangleOutline(gCenterX - tiltDeltaX, gCenterY - radiusFraction - tiltDeltaY,
                       gCenterX + tiltDeltaX, gCenterY - radiusFraction + tiltDeltaY,
                       gCenterX + tiltDeltaX, gCenterY + radiusFraction - tiltDeltaY,
                       gCenterX - tiltDeltaX, gCenterY + radiusFraction + tiltDeltaY, 
-                      1.);
+                      1.); 
 
-// TUMBLE: Draw indicator
-gxColorSetHsl(1.0, 180., 1.0, 0.37);
-drawInteractionCircle(gCenterX, gCenterY - tumbleAngle * kRad2Norm * gRadius, mInteractionCircleRadius);
-
-// TUMBLE: Draw plane, the plane is darker when upside down
+// TUMBLE: Draw plane illustrating the effect of the tumble transform, the plane is darker when upside down
 cosTumble < 0 ?
 (
-  gxColorSetHsl(1.0, 180., 1.0, 0.27);
+  gxColorSetHsl(1.0, 195, 1.0, 0.25);
+) : 
+(
+  gxColorSetHsl(1.0, 195., 1.0, 0.4);
+  
 );
 
 tumbleDeltaX = gRadius * sinTumble * 0.1;
 tumbleDeltaY = gRadius * cosTumble;
+
+drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX-0.5, gCenterY - tumbleDeltaY-0.5,
+                      gCenterX - radiusFraction + tumbleDeltaX-0.5, gCenterY + tumbleDeltaY-0.5,
+                      gCenterX + radiusFraction - tumbleDeltaX-0.5, gCenterY + tumbleDeltaY-0.5,
+                      gCenterX + radiusFraction + tumbleDeltaX-0.5, gCenterY - tumbleDeltaY-0.5,
+                      1.);
+
+drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX+0.5, gCenterY - tumbleDeltaY+0.5,
+                      gCenterX - radiusFraction + tumbleDeltaX+0.5, gCenterY + tumbleDeltaY+0.5,
+                      gCenterX + radiusFraction - tumbleDeltaX+0.5, gCenterY + tumbleDeltaY+0.5,
+                      gCenterX + radiusFraction + tumbleDeltaX+0.5, gCenterY - tumbleDeltaY+0.5,
+                      1.);
 
 drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX, gCenterY - tumbleDeltaY,
                       gCenterX - radiusFraction + tumbleDeltaX, gCenterY + tumbleDeltaY,
@@ -244,7 +259,41 @@ drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX, gCenterY - tumbl
                       gCenterX + radiusFraction + tumbleDeltaX, gCenterY - tumbleDeltaY,
                       1.);
 
+// Draw points illustrating the combined effect of the transforms
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
 
+
+// ROTATION: Draw indicator with grey inner circle
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+drawInteractionCircle(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, mInteractionCircleRadius);
+gxColorSet(1.0, 0.8, 0.8, 0.8);
+drawInteractionCircle(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, mInteractionCircleRadius-7);
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+
+// TILT: Draw indicator with gray horisontal inner line, it is shifted slightly upwards in order to avoid intial overlap with tumble indicator
+drawInteractionCircle(gCenterX + tiltAngle * kRad2Norm * gRadius, gCenterY-25., mInteractionCircleRadius);
+
+gxColorSet(1.0, 0.8, 0.8, 0.8);
+drawLineSegment(gCenterX + tiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. - 1,
+                gCenterX + tiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. - 1, 1);
+drawLineSegment(gCenterX + tiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. + 1,
+                gCenterX + tiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. + 1, 1);
+drawLineSegment(gCenterX + tiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25.,
+                gCenterX + tiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25., 1);
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+
+// TUMBLE: Draw indicator with grey inner vertical line
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+drawInteractionCircle(gCenterX, gCenterY - tumbleAngle * kRad2Norm * gRadius, mInteractionCircleRadius);
+
+gxColorSet(1.0, 0.8, 0.8, 0.8);
+drawLineSegment(gCenterX,       gCenterY - tumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
+                gCenterX,       gCenterY - tumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
+drawLineSegment(gCenterX - 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
+                gCenterX - 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
+drawLineSegment(gCenterX + 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
+                gCenterX + 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
 
 
 /**********************************************************
