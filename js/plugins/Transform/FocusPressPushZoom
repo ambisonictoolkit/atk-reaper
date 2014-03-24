@@ -305,7 +305,7 @@ debugMode == 0 ?
   displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, mDrawCenterPoint);
   
   // Draw circle for interaction, map vertical position to saturation, lightness and radius
-    sinElevation < 0 ? (
+  (sinElevation < 0) ? (
     mSaturation = 1. - 0.25*sinElevation;
     mLightness = 0.4;
   ) : (

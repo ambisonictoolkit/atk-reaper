@@ -35,17 +35,12 @@ and GNU General Public License along with this program.  If not, see
   either "push" or "focus" an omnidirectional soundfield into a
   planewave, giving the soundfield an angle of arrival.
 
-  Reaper is treating mono files as stereo files with identical
-  content for left and right channel. Hence this plugin is set to
-  expect a stereo signal in. The stereo signal will be mixed to mono
-  before encoding.
 ---------------------------------------------------------------------
 */
 
 desc: Encode mono signal as omnidirectional soundfield
 
-in_pin:L
-in_pin:R
+in_pin:M
 
 out_pin:W
 out_pin:X
@@ -61,7 +56,8 @@ Initialisation
 Calculate audio sample
 **********************************************************/
 @sample
-spl0 = (spl0+spl1)*kHalfInvSqrt2;
+spl0 = spl0*kHalfInvSqrt2;
 spl1 = 0.;
-spl2 = 0.;
+spl2 = 
+0.;
 spl3 = 0.;
