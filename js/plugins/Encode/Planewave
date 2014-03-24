@@ -120,9 +120,6 @@ mouse_cap == 1 ?
   calculateCoefficients();
 );
 
-// Draw points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, mDrawCenterPoint);
-
 // Draw circle for interaction, map vertical position to saturation, lightness and radius
 (mSinEle < 0) ? (
   mSaturation = 1. - 0.25*mSinEle;
