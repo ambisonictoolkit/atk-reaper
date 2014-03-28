@@ -38,7 +38,7 @@
 
 
 %user defined variables
-\def\papertitle{ATK Reaper: Ambisonic Tool Kit as JSFX plugins}
+\def\papertitle{ATK Reaper: Ambisonic Toolkit as JSFX plugins}
 \def\firstauthor{Trond Lossius}
 \def\secondauthor{Joseph Anderson}
 %\def\thirdauthor{Third author}
@@ -164,19 +164,18 @@ The abstract should be placed at the top left column and should contain about 15
 
 \subsection{Spatial sound representations}\label{sec:spatial-sound}
 
-Spatial sound is generally represented in one of three ways.
+Spatial sound is usually represented in one of three ways: as channel feeds, as spatial scene descriptions, or as sound field encodings.
 ITU 5.1 and ITU 7.1 are examples of fixed-channel distribution formats \cite{ITU:1993_surround_5:1}.
 This approach becomes less practical as the number of channels increases, and also has clear limitations due to the lack of flexibility in loudspeaker positioning.
-Object-oriented spatial scene descriptions instead stores the sound sources with meta-information on their location or direction, so that the auditory scene can be described independently of loudspeaker setup.
-This is the approach used for e.g., Dolby Atmos and Wave Field Synthesis \cite{dolby:2014atmos},
-and SpatDIF, the Spatial Sound Description Interchange Format, is a collaborative effort offering a semantic and syntactic specification for storing and transmitting such spatial audio scene descriptions \cite{Peters:2013spatdif}.
+Object-oriented spatial scene descriptions instead associate sound sources with meta-information describing location or direction. In this way an auditory scene can be described independently of loudspeaker setup, and rendered appropriately for a chosen playback system.
+This is the approach used for e.g., Dolby Atmos and Wave Field Synthesis \cite{dolby:2014atmos}.
+SpatDIF, the Spatial Sound Description Interchange Format, is an important example offering a semantic and syntactic specification for storing and transmitting such spatial audio scene descriptions \cite{Peters:2013spatdif}.
 % TODO: Reference for WFS
 
-Ambisonics encodes the audio signals into a speaker-in\-dependent representation of the sound field called B-format.
-The encoding is separated from the decoding resulting in a system where decoders can be designed for different speak\-er arrays \cite{Wiggins:2004PhDThesis}.
-Ambisonics is based on spherical harmonic decomposition of the sound field, and depending on truncation of the spherical harmonic decomposition the B-for\-mat signal might be first or higher order.
+Ambisonics encodes audio sources into a speaker-inde\-pendent representation of the sound field called B-format  \cite{gerzon:1985JAES}. Decoding is the process where an encoded sound field is translated to individual speaker channel feeds; an advantage being,  decoders can be designed for different speak\-er arrays.
+Ambisonics is based on spherical harmonic decomposition of the sound field, and depending on truncation of the spherical harmonic decomposition the B-for\-mat signal might be first or higher order \cite{daniel:2001phd}.
 Spatial resolution improves with increasing order, but so does the number of channels required for the encoded signal.
-There are several commercial microphones available for recording 1st order ambisonic, and free or commercial B-format recordings are being offered as sound effects libraries \cite{deleflie2014:ambisonia,darcourt:2014surlib}.
+A number of commercial microphones are available for recording in first order, and free or commercial B-format recordings are available as sound effects libraries \cite{farrar:1979soundfield,deleflie2014:ambisonia,darcourt:2014surlib}.
 
 
 
@@ -235,6 +234,8 @@ Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patch
 
 \subsection{Plugins for ambisonic processing}\label{sec:ambi-plugins}
 
+
+% TODO: update / reference...
 * Bruce Wiggins
 * Danielle Courville
 * Flux Spat
@@ -253,18 +254,22 @@ Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patch
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Ambisonic Toolkit}\label{sec:atk}
 
-The Ambisonic Tool Kit (ATK) brings together a number of tools and transforms for working with ambisonic surround sound.
-Rather than focusing on the needs and concerns of the classical music sound recordist or the popular music mix-engineer/producer or the acoustician/engineer, use is targeted towards the composer of acousmatic music.
-The intention is for the toolset to be both ergonomic and comprehensive, providing algorithms to creatively manipulate and synthesize ambisonic sound fields.
+The Ambisonic Toolkit (ATK) brings together a number of tools and transforms for working with ambisonic surround sound  \cite{Anderson:2009introducingATK, anderson:ambisonic_2011}.
+Use is targeted towards the composer of acousmatic and experimental music. The intention is for the toolset to be both ergonomic and comprehensive, providing algorithms to creatively manipulate and synthesize ambisonic sound fields.
 
-The tools are framed for the user to `think ambisonically'.
-By this, it is meant the ATK is not focused on the problem of auralization and/or room modelling.
-Auralization is a complex problem beyond the scope of the fundamental algorithms of the ATK.
-It is worth noting, however, with the toolset provided, successful room modelling may be implemented.
-Interestingly enough, many composers of acousmatic music often do not move beyond the problem of auralization or room modelling.
+The tools are framed for the user to `think ambisonically'. By this, it is meant the ATK is focused on the problem of synthesising and processing sound fields. And, the model of the ATK is a sound-field sound-image model rather than a sound-object sound-scene model. 
+
+
+%By this, it is meant the ATK is not focused on the problem of auralization and/or room modelling.
+%Auralization is a complex problem beyond the scope of the fundamental algorithms of the ATK.
+%It is worth noting, however, with the toolset provided, successful room modelling may be implemented.
+%Interestingly enough, many composers of acousmatic music often do not move beyond the problem of auralization or room modelling.
+
+
 The ATK, by addressing the holistic problem of creatively controlling a complete soundfield, allows and encourages the composer to think beyond the placement of sounds in a sound-space and instead attend to the impression and image of a soundfield, therefore taking advantage of the model the ambisonic technology presents.
 This is viewed to be the {\em idiomatic} approach for working with the ambisonic technique.
-Restated, the model of the ATK is a sound-field sound-image model rather than a sound-object sound-scene model.
+
+
 
 Since 1998 the ATK has existed in a variety of forms.
 In its very first implementation, the ATK was deployed as a collection of Csound orchestras, and a collection of VST plugins have previously been distributed using the now discontinued SonicBirth.
@@ -332,7 +337,8 @@ WigWare - strictly ambisonic
 When a mono source is encoded and the resulting B-format signal is exposed to subsequent matrix-based spatial transforms as discussed in section \ref{sec:transforms}, the resulting B-format signal $W, X, Y, Z$ relates to the original mono signal $s(t)$ as:
 
 \begin{equation} \label{eq:encoded}
-\begin{split}W(t) & = k_w s(t) \\
+\begin{split}
+W(t) & = k_w s(t) \\
 X(t) & = k_x s(t) \\
 Y(t) & = k_y s(t) \\
 Z(t) & = k_z s(t) \\
@@ -342,7 +348,8 @@ Z(t) & = k_z s(t) \\
 The four coefficients $k_{w, x, y, z}$ indicates four degrees of freedom, and relates to gain $g$, azimuth $\phi$, elevation $\theta$ and the degree of directness $\gamma$ (versus omnipresence, as discussed in section \ref{sec:direct}) as:
 
 \begin{equation} \label{eq:encodedCoefficients}
-\begin{split}k_w & = g \sqrt{ \frac{1 + sin(\gamma)} {2} } \\
+\begin{split}
+k_w & = g \sqrt{ \frac{1 + sin(\gamma)} {2} } \\
 k_x & = g \sqrt{ 1 - sin(\gamma) } \cos{\phi} \cos{\theta} \\
 k_y & = g \sqrt{ 1 - sin(\gamma) } \cos{\phi} \sin{\theta} \\
 k_z & = g \sqrt{ 1 - sin(\gamma) } \sin{\phi}               \\
@@ -480,9 +487,11 @@ Apply zoom to a first order ambisonic signal (B-format) along an arbitrary axis.
 
 Description: the \emph{Dominance} gain, in dB, applied on the x-axis. Positive values increase the gain at front center to +gain, while decreasing the gain at back center to -gain, simultaneously distorting the image towards front center. Negative values of gain invert this distortion, distorting the image towards back center. The default, 0, results in no change.
 
-Description: the angle of distortion in radians. Positive values focus on the front center of the image, and at pi/2 collapse the soundfield to mono, reducing the gain at back center to -inf dB. Negative values focus on back center. The default, 0, results in no change.
 
-Description: the angle of distortion in radians, from -pi/2 to pi/2. Positive values push to the front center of the image, and at pi/2 collapse the soundfield to mono. Negative values push to back center. The default, 0, results in no change.
+Description: the angle of distortion in radians. Positive values focus on the front center of the image, and at pi/2 collapse the soundfield to mono, reducing the gain at back center to -inf dB. Negative values focus on back center. The default, 0, results in no change.
+
+
+Description: the angle of distortion in radians, from -pi/2 to pi/2. Positive values push to the front center of the image, and at pi/2 collapse the soundfield to mono. Negative values push to back center. The default, 0, results in no change.
 
 \subsubsection{Mirroring}\label{sec:mirror}
 
