@@ -31,7 +31,7 @@ and GNU General Public License along with this program.  If not, see
 desc: Psychoacoustic shelf filter
 
 // Import library with shared functions for matrix and graphics processing
-import atkFunctionLibrary.jsfx-inc
+// import atkFunctionLibrary.jsfx-inc
 
 in_pin:W
 in_pin:X
@@ -43,10 +43,8 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
-slider1:400<200,700,1>Shelf filter corner frequency (Hz)
-slider2:1<0.5,2,0.01>High frequency scale for 0-order harmonic: W.
-slider3:1<0.5,2,0.01>High frequency scale for 1st-order harmonics: X, Y, Z
-
+slider1:0<0,1,1{2D Decoder, 3D Decoder}>Decoding Mode
+slider2:400<200,700,1>Shelf filter corner frequency (Hz)
 
 
 /**********************************************************
@@ -64,76 +62,84 @@ m_UY2y = 0.0;
 m_UY1z = 0.0;
 m_UY2z = 0.0;
 
-
-
 /**********************************************************
 Updated slider value:
 **********************************************************/
 @slider
 
-m_freq = slider1;
-m_k0   = slider2;
-m_k1   = slider3;
+mode     = slider1; 
+mFreq = slider2;
+
+(mode == 0) ?
+(
+  // 2D decoding
+  mK0   = sqrt(3./2.);
+  mK1   = sqrt(3.);
+) :
+(
+  // 3D decoding
+  mK0   = sqrt(2.);
+  mK1   = sqrt(2/3);
+);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+We do not expect parameters to be changed dynamically 
+in performance, so code can be optimised by not
+implementing linear interpolation to new values.
+**********************************************************/
+@block
+
+inverseSamplesblock = 1. / samplesblock;
+
+wc = tan(pi * mFreq * inverseSamplesblock);
+c = (wc - 1.0) / (wc + 1.0);
+
+// 0 order coefficients
+a0w = (((1.0 - mK0) * 0.25) * (1.0 + (c*c))) + (((1.0 + mK0) * 0.5) * c);
+a1w = ((1.0 - mK0) * c) + (((1.0 + mK0) * 0.5) * (1.0 + (c*c)));
+a2w = a0w;
+b1w = -2.0 * c;
+b2w = -c * c;
+
+// 1st order coefficients
+a0xyz = (((1.0 - mK1) * 0.25) * (1.0 + (c*c))) + (((1.0 + mK1) * 0.5) * c);
+a1xyz = ((1.0 - mK1) * c) + (((1.0 + mK1) * 0.5) * (1.0 + (c*c)));
+a2xyz = a0xyz;
+b1xyz = -2.0 * c;
+b2xyz = -c * c;
+
+
 
 /**********************************************************
 Calculate audio sample
 **********************************************************/
 @sample
 
-// We don't envisage angle or pattern being changed dynamically, and hence there is no need for interpolations
 wIn = spl0;
 xIn = spl1;
 yIn = spl2;
 zIn = spl3;
-  
-for(int i = 0; i<inNumSamples; i++)(
-	// wc = (pi * frequency / Server.default.sampleRate).tan
-	// c = (wc - 1) / (wc + 1)
-	wc = tan(pi * freq[i] * SAMPLEDUR);
-	c = (wc - 1.0) / (wc + 1.0);
-	
-	// a0 = (((1 - k2)/4) * (1 + (c**2))) + (((1 + k2)/2) * c);
-	// a1 = ((1 - k2) * c) + (((1 + k2)/2) * (1 + (c**2)));
-	// a2 = a0;
-	//
-	// b1 = Array.fill( k2.size, { (2*c).neg } );
-	// b2 = Array.fill( k2.size, { (c**2).neg } );
-	
-	// 0 order coefficients
-	a0w = (((1.0 - k0[i]) * 0.25) * (1.0 + (c*c))) + (((1.0 + k0[i]) * 0.5) * c);
-	a1w = ((1.0 - k0[i]) * c) + (((1.0 + k0[i]) * 0.5) * (1.0 + (c*c)));
-	a2w = a0w;
-	b1w = -2.0 * c;
-	b2w = -c * c;
-	
-	// 1st order coefficients
-	a0xyz = (((1.0 - k1[i]) * 0.25) * (1.0 + (c*c))) + (((1.0 + k1[i]) * 0.5) * c);
-	a1xyz = ((1.0 - k1[i]) * c) + (((1.0 + k1[i]) * 0.5) * (1.0 + (c*c)));
-	a2xyz = a0xyz;
-	b1xyz = -2.0 * c;
-	b2xyz = -c * c;
-	
-	
-	// filter 0 order
-	y0w = wIn + b1w * y1w + b2w * y2w;
-	spl0 = a0w * y0w + a1w * y1w + a2w * y2w;
-	y2w = y1w;
-	y1w = y0w;
-	
-	
-	// filter 1st order
-	y0x = xIn + b1xyz * y1x + b2xyz * y2x;
-	spl1 = a0xyz * y0x + a1xyz * y1x + a2xyz * y2x;
-	y2x = y1x;
-	y1x = y0x;
-	
-	y0y = yIn + b1xyz * y1y + b2xyz * y2y;
-	spl2 = a0xyz * y0y + a1xyz * y1y + a2xyz * y2y;
-	y2y = y1y;
-	y1y = y0y;
-	
-	y0z = zIn + b1xyz * y1z + b2xyz * y2z;
-	spl3 = a0xyz * y0z + a1xyz * y1z + a2xyz * y2z;
-	y2z = y1z;
-	y1z = y0z;
-);
+
+// filter 0 order
+y0w = wIn + b1w * y1w + b2w * y2w;
+spl0 = a0w * y0w + a1w * y1w + a2w * y2w;
+y2w = y1w;
+y1w = y0w;
+
+// filter 1st order
+y0x = xIn + b1xyz * y1x + b2xyz * y2x;
+spl1 = a0xyz * y0x + a1xyz * y1x + a2xyz * y2x;
+y2x = y1x;
+y1x = y0x;
+
+y0y = yIn + b1xyz * y1y + b2xyz * y2y;
+spl2 = a0xyz * y0y + a1xyz * y1y + a2xyz * y2y;
+y2y = y1y;
+y1y = y0y;
+
+y0z = zIn + b1xyz * y1z + b2xyz * y2z;
+spl3 = a0xyz * y0z + a1xyz * y1z + a2xyz * y2z;
+y2z = y1z;
+y1z = y0z;
