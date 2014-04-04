@@ -82,3 +82,6 @@ zIn = spl3;
 // Front (left and right)
 spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
 spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+// Channel 3 and 4 need to be muted to prevent signal in to leak through
+spl2 = 0.;
+spl3 = 0.;
