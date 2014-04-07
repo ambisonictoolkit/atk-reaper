@@ -1,0 +1,97 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: quad
+  A quadrophonic decoder
+  
+  An optimised quadraphonic decoder with variable loudspeaker angle.
+  
+---------------------------------------------------------------------
+*/
+
+desc: Quadrophonic decoder
+
+// Import library with shared functions for matrix and graphics processing
+import atkFunctionLibrary.jsfx-inc
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:L
+out_pin:R
+out_pin:C
+out_pin:LFE
+out_pin:SL
+out_pin:SR
+out_pin:SBL
+out_pin:SBR
+
+slider1:30<0,90,1>Angle
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Setting memory locations for 4x4 matrix as 1D array
+matrixDSP       = 1000;
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+mAngle   = slider1 * kDeg2Rad;
+
+// Generate 2 x 4 decoding matrix
+generateDecodeQuadMatrix(matrixDSP, mAngle);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+// We don't envisage angle or pattern being changed dynamically, and hence there is no need for interpolations
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+
+// Matrix multiplication with input signal.
+
+// Front (left and right), z signal is ignored
+spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2];
+spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6];
+// Center and LFE are muted
+spl2 = 0.;
+spl3 = 0.;
+// SL and SR, , z signal is ignored
+spl4 = wIn * matrixDSP[16]  + xIn * matrixDSP[17]  + yIn * matrixDSP[18];
+spl5 = wIn * matrixDSP[20]  + xIn * matrixDSP[21]  + yIn * matrixDSP[22];
+// SBL and SBR are muted.
+spl6 = 0.;
+spl7 = 0.;

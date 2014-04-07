@@ -353,6 +353,70 @@ function generateDecodeStereoMatrix(aMatrix, anAngle, aPattern) local(lG0, lG1, 
 
 
 /********************************************************************
+Matrix: Generate 4 x 8 matrix for optimised quadrophonic decoding.
+  Channel configuration: L - R - C - LFE - Ls - Rs - LsB - RsB
+  C, LFE, SBL and SBR are not being used by this decoder
+********************************************************************/
+function generateDecodeQuadMatrix(aMatrix, anAngle) local(lG0, lG1, lG2, lAngle)
+(
+	// In Reaper the shelf filter is implemented as a separate plugin
+  
+  // calculate g1, g2
+	lG0	= kSqrt2 / 4.;
+	lG1	= cos(anAngle) / 4.;
+	lG2	= sin(anAngle) / 4.;
+  
+  // Left
+  aMatrix[0]  =  lG0;
+  aMatrix[1]  =  lG1;
+  aMatrix[2]  =  lG2;
+  aMatrix[3]  =  0.0;
+  
+  // Right
+  aMatrix[4]  =  lG0;
+  aMatrix[5]  =  lG1;
+  aMatrix[6]  = -lG2;
+  aMatrix[7]  =  0.0;
+  
+  // Center - no signal
+  aMatrix[8]  =  0.0;
+  aMatrix[9]  =  0.0;
+  aMatrix[10] =  0.0;
+  aMatrix[11] =  0.0;
+  
+  // LFE - no signal
+  aMatrix[12] =  0.0;
+  aMatrix[13] =  0.0;
+  aMatrix[14] =  0.0;
+  aMatrix[15] =  0.0;
+  
+  // Surround left (SL)
+  aMatrix[16] =  lG0;
+  aMatrix[17] = -lG1;
+  aMatrix[18] =  lG2;
+  aMatrix[19] =  0.0;
+  
+  // Surround right (SR)
+  aMatrix[20] =  lG0;
+  aMatrix[21] = -lG1;
+  aMatrix[22] = -lG2;
+  aMatrix[23] =  0.0;
+  
+  // Surround back left (SBL) - no signal
+  aMatrix[24] =  0.0;
+  aMatrix[25] =  0.0;
+  aMatrix[26] =  0.0;
+  aMatrix[27] =  0.0;
+  
+  // Surround back right (SBR) - no signal
+  aMatrix[28] =  0.0;
+  aMatrix[29] =  0.0;
+  aMatrix[30] =  0.0;
+  aMatrix[31] =  0.0;
+);
+
+
+/********************************************************************
 Matrix: Generate 8x4 matrix with equally distributed source signals for display purposes
 ********************************************************************/
 function generateDisplaySignalMatrix(aMatrix, aNumPoints) local(i, lAngle, lInc)
