@@ -49,7 +49,7 @@ out_pin:SR
 out_pin:SBL
 out_pin:SBR
 
-slider1:30<0,90,1>Angle
+slider1:45<0,90,1>Angle
 
 /**********************************************************
 Initialisation
