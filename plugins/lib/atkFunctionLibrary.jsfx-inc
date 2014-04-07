@@ -417,6 +417,42 @@ function generateDecodeQuadMatrix(aMatrix, anAngle) local(lG0, lG1, lG2, lAngle)
 
 
 /********************************************************************
+Matrix: Generate 4 x 16 matrix for optimised quadrophonic decoding.
+  Channel configuration: L - R - C - LFE - Ls - Rs - LsB - RsB
+********************************************************************/
+function generateDecodePantoMatrix(aMatrix, aNumSpeakers, aSpeakerLayout) local(lG0, lAngle, lDeltaAngle)
+(
+	lG0 = kInvSqrt2;
+  lDeltaAngle = 2.0 * $pi / aNumSpeakers;
+  
+  (aSpeakerLayout == 0) ? (
+    lAngle = $pi / aNumSpeakers;
+  ) :
+  (
+    lAngle = 0.;
+  );
+  
+  // Clear the whole matrix:
+  i = 0;
+  loop(64,
+    aMatrix[i] = 0.0;
+    i += 1;
+  );
+  
+  // Set the appropriate number of channels:
+  i = 0;
+  loop(aNumSpeakers,
+    aMatrix[4*i    ]  =  lG0;
+    aMatrix[4*i + 1]  =  cos(lAngle);
+    aMatrix[4*i + 2]  =  sin(lAngle);
+    // aMatrix[4*i + 3]  =  0.0; // This is already cleared
+    lAngle += lDeltaAngle;
+    i += 1;
+  );
+);
+
+
+/********************************************************************
 Matrix: Generate 8x4 matrix with equally distributed source signals for display purposes
 ********************************************************************/
 function generateDisplaySignalMatrix(aMatrix, aNumPoints) local(i, lAngle, lInc)
