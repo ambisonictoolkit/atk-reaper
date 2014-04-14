@@ -239,16 +239,23 @@ Plugins are designed by connecting objects in a graphical programming environmen
 
 \subsection{Plugins for ambisonic processing}\label{sec:ambi-plugins}
 
+In recent years a number of plugins have emerged for ambisonic processing.
+\emph{WigWare} is a set of VST plguins for Mac and Windows that includes first and higher order panner and decoders for regular and irregular speaker layouts, as well as a first order 3D reverb \cite{Wiggins:2010wigware}.
+Danielle Courville has developed a number of OSX ambisonic first order VST plugins in SonicBirth for encoding mono and multichannel signals, correct misaligned B-Format streams, rotations, mixing of several ambisonic signals, ambisonic reverb, and decoding, as well as encoders and decoders for 2nd order and planar 5th order ambisonic \cite{courville:2012b2x}.
+Due to the long halt in development of SonicBirth, these plugins do not necessarily work reliable in newer versions of DAW programs.
+\emph{ambiX} are cross-platform 1st, 3rd and 5th order ambisonic processors as VST/LV2 plug-ins or standalone application under Windows, Mac OSX and Linux, offering encoding and decoding, including binaural decoding, as well as a number of spatial transforms \cite{Kronlachner2013:ambix,Kronlachner:2014ambi-transforms}.
+These plugins use the ambiX encoded signal convention; full 3D, ACN channel ordering and SN3D normalization \cite{Nachbar:2011ambix} as discussed in section~\ref{sec:coordinate-systems}, but also provides a plugin for conversions to other formats.
+They are accompanied by \emph{mcfx}, a number of more general multichannel plugins for equalising, delay, gain adjustment and level metering \cite{kronlachner2014:mcfx}.
+\emph{Flux Ircam Spat} wraps the Ircam Spatialisateur multiformat room acoustics simulation and localization software as AU and VST plugins for Mac and Windows \cite{flux:2010spat}.
+Although this plugin mainly provides object-based scene descriptions, it can render the auralization as B-format.
+The \emph{HARPEX} plugin for decoding first order ambisonic uses an algorithm based on high angular resolution planewave expansion (HARPEX) in order to address issues with low angular resolution and small sweet spot that first-order ambisonics suffers from \cite{Berge:2010harpex}.
+Blue Ripple Sound offers a wide range of OSX and Windows VST plugins for third order ambisonic (TOA), including encoders and upmixers, decoders, and a rich set of plugins for spatial and filter-based manipulations of the encoded signal \cite{blueripple:2014TOA}.
+The TOA Harpex Upsampler converts first order ambisonic material to third order ambisonic using the Harpex algorithm.
 
-% TODO: update / reference...
-* Bruce Wiggins
-* Danielle Courville
-* Flux Spat
-* ambit 1st, 3rd and 5th order (have been temporarily withdrawn for licensing reasons)
-* Hoalibrary for Faust
-* Harpex
-* Blue Ripple TOA plugins
-** BlueRipple Harpex 1st to 3rd order spatial upsampler
+
+
+
+
 * (Wikipedia overview of software)
 
 
@@ -292,7 +299,7 @@ Some of the underlying ideas of ATK has also been incorporated into the Blue Rip
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{ATK Reaper: Design considerations}\label{sec:design}
 
-\subsection{Coordinate systems and encoding conventions}\label{coordinate-systems}
+\subsection{Coordinate systems and encoding conventions}\label{sec:coordinate-systems}
 
 Within the spatial audio community several coordinate system conventions are being used in parallel.
 Theory on ambisonic generally assume the same coordinate system conventions as acoustics, with the $x$-axis pointing forward and $y$-axis to the left in the horizontal plane, and the $z$-axis pointing upwards. 
