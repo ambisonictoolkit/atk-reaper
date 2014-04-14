@@ -167,13 +167,15 @@ The abstract should be placed at the top left column and should contain about 15
 Spatial sound is usually represented in one of three ways: as channel feeds, as spatial scene descriptions, or as sound field encodings.
 ITU 5.1 and ITU 7.1 are examples of fixed-channel distribution formats \cite{ITU:1993_surround_5:1}.
 This approach becomes less practical as the number of channels increases, and also has clear limitations due to the lack of flexibility in loudspeaker positioning.
-Object-oriented spatial scene descriptions instead associate sound sources with meta-information describing location or direction. In this way an auditory scene can be described independently of loudspeaker setup, and rendered appropriately for a chosen playback system.
+Object-based spatial scene descriptions instead associate sound sources with meta-information describing location or direction. In this way an auditory scene can be described independently of loudspeaker setup, and rendered appropriately for a chosen playback system.
 This is the approach used for e.g., Dolby Atmos and Wave Field Synthesis \cite{dolby:2014atmos}.
-SpatDIF, the Spatial Sound Description Interchange Format, is an important example offering a semantic and syntactic specification for storing and transmitting such spatial audio scene descriptions \cite{Peters:2013spatdif}.
+SpatDIF, the Spatial Sound Description Interchange Format, is an open format offering a semantic and syntactic specification for storing and transmitting such spatial audio scene descriptions \cite{Peters:2013spatdif}.
 % TODO: Reference for WFS
 
-Ambisonics encodes audio sources into a speaker-inde\-pendent representation of the sound field called B-format  \cite{gerzon:1985JAES}. Decoding is the process where an encoded sound field is translated to individual speaker channel feeds; an advantage being,  decoders can be designed for different speak\-er arrays.
-Ambisonics is based on spherical harmonic decomposition of the sound field, and depending on truncation of the spherical harmonic decomposition the B-for\-mat signal might be first or higher order \cite{daniel:2001phd}.
+Ambisonics encodes audio sources into a speaker-inde\-pendent representation of the sound field called B-format  \cite{gerzon:1985JAES}.
+Decoding is the process where an encoded sound field is translated to individual speaker channel feeds; an advantage being,  decoders can be designed for different speak\-er arrays.
+Ambisonics is based on spherical harmonic decomposition of the sound field, and depending on truncation of the spherical harmonic decomposition
+The B-for\-mat signal might be first or higher order \cite{daniel:2001phd}.
 Spatial resolution improves with increasing order, but so does the number of channels required for the encoded signal.
 A number of commercial microphones are available for recording in first order, and free or commercial B-format recordings are available as sound effects libraries \cite{farrar:1979soundfield,deleflie2014:ambisonia,darcourt:2014surlib}.
 
@@ -192,17 +194,17 @@ Most DAWs that support surround sound, such as Adobe Audition, Cubase, Logic Pro
 % Reference Adobe Audition: https://helpx.adobe.com/audition/using/5-1-surround-sound.html
 Digital Performer also supports 10.2, and Nuendo supports up to 13 channels in various fixed-channel distribution formats.
 
-Nuendo and Pro Tools can be extended to support object-oriented spatial scene descriptions.
+Nuendo and Pro Tools can be extended to support object-based spatial scene descriptions.
 The Iosono Spatial Audio Workstation program plug-in for Nuendo extends the capabilities of this program by adding abilities for object-based manipulation of sound sources \cite{iosono2012:workstation}, and can be used with Iosono Core hardware systems for wave-field synthesis.
 % DISCUSS: Do we need to add references to the manuals for each of these programs, or is it sufficient to do it for the more specialised ones, such as Nueundo and IOSONO?
 Dolby Atmos authoring is achieved using ProTools and the Dolby Rendering and Mastering Unit (RMU).
 RMU provides the rendering engine for the mix stage, and integrates with Pro Tools through the Dolby Atmos Panner plug-in over Ethernet for metadata communication and monitoring. 
 The metadata is stored in the Pro Tools session as plug-in automation \cite{dolby:2013authoring}.
 
-The DAWs discussed so far are either limited with respect to surround sound abilities, or expensive and proprietary software and hardware systems for object-ori\-ented spatial scene authoring and rendering.
+The DAWs discussed so far are either limited with respect to surround sound abilities, or expensive and proprietary software and hardware systems for object-based spatial scene authoring and rendering.
 In contrast Reaper is a reasonably priced and flexible DAW for spatial sound \cite{cockos:2014reaper}.
 Reaper supports tracks of up to 64 channels, and is exceptionally open-ended with respect to routing of channels and tracks.
-Reaper supports all standard fixed-channel surround sound configurations, and the ReaSurround panning plugin that is integrated with Reaper also caters for non-standard speaker configurations, using a spatialisation algorithm based on principles resembling VBAP \cite{Pulkki:1997vbap} as well as DBAP \cite{Lossius:2009dbap}.
+Reaper supports all standard fixed-channel surround sound configurations, and the ReaSurround panning plugin that is integrated with Reaper also caters for non-standard speaker configurations \cite{francis:2014_reaper}, using a spatialisation algorithm based on principles resembling VBAP \cite{Pulkki:1997vbap} as well as DBAP \cite{Lossius:2009dbap}.
 Reaper is well-suited for ambisonic as well, and is a preferred DAW for many composers within the ambisonic  community \cite{wiggins:2012reaperhowto}.
 
 % TODO: ** FX processing chains in DAWs - as a motivation for why we want to be able to work the same way with ambisonics, and make ambisonic sound field recordings a malleable material in acousmatic mucis composition and sound design. Maybe this should be at the very start?
@@ -220,16 +222,19 @@ In a similar way DirextX can be used for development of Windows-only plugins \ci
 Linux Audio Developers Simple Plugin API (LADSPA) is a GNU LGPL plugin architecture mostly used on the Linux platform \cite{furse:2007ladspa}, and is gradually superseded by LADSPA version 2 (LV2) \cite{lv2:2014}.
 
 While the above formats can be used to develop plugins for use with multiple hosts, there are also a number of specifications that permits 3rd part development of plugins for one hosting environment only.
-Avid has developed plugins format that work with their software and hardware exclusively, as both Real-Time AudioSuite (RTAS) and TDM have been discontinued and replaced by Avid Audio eXtension (AAX).
+Avid has developed plugins format that work with their software and hardware exclusively; Real-Time AudioSuite (RTAS); TDM and the more recent Avid Audio eXtension (AAX).
 Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patches as devices in Ableton Live \cite{ableton:2014maxforlive}. JSFX is a text-based scripting language for programming audio-oriented effects compiled on the fly for Cockos Reaper \cite{cockos:2014jsfx,cockos:2014reaper}.
 
-% TODO: Cross-platform plugin development frameworks
-* Juce
-* wdl-ol
-* OpenFrameworks
-* SonicBirth
-* SynthEdit (for Windows)
-* Faust
+The multiple operation systems and plugin architectures are a challenge to plugin developers, that ideally have to ensure that their software work with all plugin architectures and hosts in all operation systems.
+Developing, compiling and maintaining plugins for many parallel platforms can introduce substantial workload overhead, and several cross-platform plugin development frameworks have been developed to address this.
+\emph{JUCE} is an all-encompassing C++ class library for developing cross-platform software, and is suited for building customised GUIs, and for handling graphics and sound \cite{juce2014}.
+\emph{wdl-ol} is an enhanced version of Cockos' IPlug C++ framework for developing cross platform audio plugins and targeting multiple plugin APIs with the same code, including VST, VST3, AudioUnit, RTAS and AAX (Native) \cite{larkin2014wdl-ol}.
+\emph{FAUST (Functional Audio Stream)} is a functional programming language for real-time signal processing and synthesis.
+The FAUST compiler translates DSP specifications into very efficient C++ code that works at sample level.
+A FAUST specification can be used to generate native implementations for most OS (Linux, OSX, Android, iOS) or platforms, including the AudioUnit, LV2, Ladspa and VST plugin platforms \cite{smithFaust:2012}.
+\emph{SonicBirth} is an application for creating AudioUnit and VST plugins for OSX and Windows.
+Plugins are designed by connecting objects in a graphical programming environment. Development stalled in 2007, but recent renewed efforts have resulted in a version 2 public alpha being available \cite{sonicbirth2014}.
+\emph{SynthEdit} is a similar technology for VST plugin development on the Windows platform \cite{synthedit2011}.
 
 
 \subsection{Plugins for ambisonic processing}\label{sec:ambi-plugins}
@@ -367,7 +372,7 @@ g      & = k_w \sqrt{ \frac{2}{1 + \sin{\gamma} } }\\
 \end{split}
 \end{equation}
 
-This is used in the graphical user interface (GUI) of several of the plugins discussed in section \ref{sec:transforms} to illustrate the effect of the spatial transforms. 
+This is used in the graphical user interface (GUI) of several of the plugins discussed in section \ref{sec:transforms} to analyse and illustrate the effect of the spatial transforms. 
 The initial $k_{w, x, y, z}$ coefficients are calculated independently for an array of points distributed at equidistant angles in the horizontal plane, and then exposed to the same transform as the audio signal will be. 
 The transformed coefficients are analysed according to equation \ref{eq:interpreteCoefficients} and displayed as a series of monochrome circles in the GUI against a dark circle indicating the sound field hemisphere as seen from above.
 Colour hue depends on gain with $0\: db$ being orange, signals with increased gain becoming red, and signals with reduced gain venturing towards green and blue, as can be seen in figure \ref{fig:zoomTransform}.
