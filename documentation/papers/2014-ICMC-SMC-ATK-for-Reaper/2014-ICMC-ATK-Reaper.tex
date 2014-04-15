@@ -420,9 +420,9 @@ Spatial transforms such as \emph{RotateTiltTumble} (section \ref{sec:rotate}) ma
 \caption{Rotate, Tilt and Tumble transform.\label{fig:rotateTransform}}
 \end{figure}
 
-The \emph{RotateTiltTumble} plugin is a first order ambisonic multi-axes rotation transformer, with rotation, tilt and tumble transforms provided in the sequence indicated by the plugin name.
+The \emph{RotateTiltTumble} plugin is a FOA multi-axes rotation transformer, with \emph{Rotation}, \emph{Tilt} and \emph{Tumble} transforms provided in the sequence indicated by the plugin name.
 If the user wants to change the order of transformations, it is possible to daisy-chain two or more instances of the plugin.
-This transform does not affect directness of the signal, and the screenshot in figure \ref{fig:rotateTransform} demonstrates how variations in saturation, lightness and radius of the displayed transformed sources serve to illustrate their vertical position. The separate effect of the Tilt and Tumble transformations is indicated by the two blue planes in the interface.
+This transform does not affect directness of the signal, and the screenshot in figure \ref{fig:rotateTransform} demonstrates how variations in saturation, lightness and radius of the displayed transformed sources serve to illustrate their vertical position. The separate effect of the \emph{Tilt} and \emph{Tumble} transformations is indicated by the two blue planes in the interface.
 
 
 
@@ -445,7 +445,7 @@ It is a spatial low-pass filter; with increasing degree of transform, the signal
 \caption{Direct transform plugin interface.\label{fig:directTransform}}
 \end{figure}
 
-Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts the sound field directivity of a first order ambisonic signal (B-format) across an arbitrary plane.
+Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts the sound field directivity of a FOA signal across an arbitrary plane.
 
 
  
@@ -466,34 +466,39 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 \caption{Zoom transform interface.\label{fig:zoomTransform}}
 \end{figure}
 
-The \emph{FocusPushPressZoom} plugin provides a unified interface to the four different spatial transforms \emph{focus}, \emph{press}, \emph{push} and \emph{zoom}.
+The \emph{FocusPushPressZoom} plugin provides a unified interface to the four different spatial transforms \emph{Focus}, \emph{Press}, \emph{Push} and \emph{Zoom}.
 The degree of spatial transform is expressed as angles in the range from $0^\circ$ to $90^\circ$. 
-At $0^\circ$ no transform is applied, while at $90^\circ$ all four transforms produce a single planewave originating from the specified direction.
-If the unprocessed sound field is composed of multiple sources originating from many directions, these transforms do not tend to change the overall sound level of the signal, but the composition in space can be sculpted.
+At $0^\circ$ no transform is applied, while at $90^\circ$ all four transforms cause the soundfield to collapse to a single mono planewave.
 All four transforms shift the sound field in a preferred direction by altering directness, gain and direction of the incoming signals depending on their original directions, but the four transforms differ in terms of what mathematical transform is applied.
 The results will differ subtly or more distinctly depending on which of the transforms is applied.
 Having all four transforms available in the same plugin makes this an expressive quality that can be explored in the creative process.
 Two of the transforms can be seen in figures~\ref{fig:pushTransform} and \ref{fig:zoomTransform}.
 
+The \emph{Dominance} plugin increase the gain of signals coming from the preferred direction while decreasing the gain of signals originating from the opposite side.
+In the Reaper plugin gain in the preferred direction can be boosted by up to 24 dB.
+While the \emph{Focus}, \emph{Pull}, \emph{Push}, and \emph{Zoom} transforms do not generally have any major impact on the overall sound level of the soundfield, \emph{Dominance} can result in major alterations to sound levels.
+For this reason, as well as due to the difference in how the degree of transform is expressed (decibels rather than angles) the \emph{Dominance} transform has not been integrated into the same plugin as the other four transforms.
 
-
-Description: the \emph{Dominance} gain, in dB, applied on the x-axis. Positive values increase the gain at front center to +gain, while decreasing the gain at back center to -gain, simultaneously distorting the image towards front center. Negative values of gain invert this distortion, distorting the image towards back center. The default, 0, results in no change.
-
-
-Description: the angle of distortion in radians. Positive values focus on the front center of the image, and at pi/2 collapse the soundfield to mono, reducing the gain at back center to -inf dB. Negative values focus on back center. The default, 0, results in no change.
-
-
-Description: the angle of distortion in radians, from -pi/2 to pi/2. Positive values push to the front center of the image, and at pi/2 collapse the soundfield to mono. Negative values push to back center. The default, 0, results in no change.
 
 \subsubsection{Mirroring}\label{sec:mirror}
 
-
+The \emph{Mirror} plugin mirrors the soundfield across an arbitrary plane, while the \emph{MirrorO} plugin mirrors the sound field across Origo.
 
 
 
 \subsection{Near-field corrections}\label{sec:near-field}
 
-DISCUSS: I'd like to fuse these two into one plugin, with an additional pop-up menu parameter to choose which one to use. Alternatively, we could find a way of using only one slider, and use the "negative range" to draw the source nearer, and the "positive range" for moving the source away.
+\emph{Proximity} facilitates the introduction of the proximity effect to encoded signals.
+At extremes, the proximity effect introduces a strong bass boost, as well as phase differences.
+The proximity effect can be an important contributor to perceptions of nearness.
+Distance is described in meter, and to prevent bass boost from getting out of hand, the lower limit is set to 10 cm (0.1 m).
+
+\emph{NearFieldCompensation} facilitates the reduction or removal of the proximity effect from encoded signals.
+Near\-field compensation is usually used in conjunction with decoders to compensate for the distance of loudspeakers on playback in loudspeaker rigs with smaller diameter.
+Additionally, NearFieldCompensation can also be used to reduce the proximity effect found in nearfield recordings.
+
+\emph{Proximity} and \emph{NearFieldCompensation} apply a low shelf filter to the first order components of the encoded signal.
+The \emph{Proximity} filter undoes \emph{NearFieldCompensation} given the same distance argument.
 
 
 \subsection{Transformation between A-format and B-format}\label{sec:a-format}
@@ -501,7 +506,6 @@ DISCUSS: I'd like to fuse these two into one plugin, with an additional pop-up m
 DISCUSS: Can Joseph help with with this subsection, so that the philosophy of it can be communicated clearly?
 
 
-\subsection{Monitoring}\label{sec:monitors}
 
 
 
