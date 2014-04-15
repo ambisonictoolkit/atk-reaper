@@ -251,7 +251,7 @@ The TOA Harpex Upsampler converts FOA material to TOA using the Harpex algorithm
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Design considerations
+% ATK
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Ambisonic Toolkit}\label{sec:atk}
 
@@ -287,12 +287,12 @@ Some of the underlying ideas of ATK has also been incorporated into the Blue Rip
 \subsection{Coordinate systems and encoding conventions}\label{sec:coordinate-systems}
 
 Within the spatial audio community several coordinate system conventions are being used in parallel.
-Theory on ambisonic generally assume the same coordinate system conventions as acoustics, with the $x$-axis pointing forward and $y$-axis to the left in the horizontal plane, and the $z$-axis pointing upwards. 
+Theory on ambisonic generally assume the same coordinate system conventions as acoustics, with the $x$-axis pointing forward, $y$-axis to the left, and the $z$-axis pointing upwards. 
 Spherical coordinates also follows standard mathematical conventions, with $0^{\circ}$ azimuth being forward, and angles increasing in the anti-clockwise direction so that $90^{\circ}$ azimuth is to the left.
 Positive elevation is upwards.
 This is the coordinate system convention used by ATK for SuperCollider
 
-SpatDIF use a navigation-based coordinate system with $x$-axis to the right and $y$-axis forward in the horizontal plane, and $z$-axis in the upwards direction.
+SpatDIF use a navigation-based coordinate system with $x$-axis to the right and, $y$-axis pointing forward, and $z$-axis pointing upwards.
 Azimuth is $0^{\circ}$ in the forward direction, and angles increase clockwise so that $90^{\circ}$ azimuth is to the right.
 Positive elevation is upwards \cite{Peters:2013spatdif}.
 
@@ -304,20 +304,22 @@ First order Furse-Mulham encoded signals adhere to acoustics coordinate conventi
 The $W$ component is the pressure (omni or mono) component of the signal, $W$ is the pressure gradient component in the forward-backwards direction, $Y$ is the pressure gradient component in the left-right direction (the stereo component of an MS signal) and $Z$ is the up-down pressure gradient component.
 Furse-Malham encoding is the preferred format for all of the ambisonic plugins discussed is section \ref{sec:ambi-plugins} except ambiX, and ambisonic recordings done using SoundField microphones also use this format.
 
-\emph{Normalised 3D formulas (N3D)} and \emph{semi-normalised 3D formulas (SN3D)} can be used for higher order encoding and decoding  \cite{daniel:2001phd}, and e.g., the ICST ambisonic externals for Max supports up to 11th order using N3D and SN3D \cite{schacher2010:seven}.
+\emph{Normalised 3D formulas (N3D)} and \emph{semi-normalised 3D formulas (SN3D)} can be used for higher order encoding and decoding  \cite{daniel:2001phd}, also beyond TOA.
 N3D component signals go beyond unity $(-1, 1)$ and can only be properly stored in sound file formats that supports floating-points, whereas SN3D component signals stay within unity. 
 
 ATK for Reaper uses first order Furse-Malham encoded signals throughout.
 This ensures interoperability between ATK for Reaper and other sources and processors of ambisonic signals such as ATK for SuperCollider or recorded ambisonic signals, as well as most other available plugins.
 
-ATK for Reaper strives to provide a consistent and intuitive interface towards scene description parameters such as direction of sources, speakers and spatial transforms, regardless of whether the user is used to acoustics or navigational coordinate systems.
-For this reason Cartesian coordinates are avoided throughout the plugin suite, and whenever possible the plugins offers graphical user interfaces.
-With respect to azimuths, it would be preferable to be able to use horizontal sliders with positive values to the left and negative values to the right, ensuring consistency with the SuperCollider implementation of ATK.
-This way moving the slider to the right would also move the source direction to the right for angles in the $(-90^{\circ}, 90^{\circ})$ range.
-At the same time automation curve values would increasing with clockwise rotations, similar to what happens when moving a regular stereo pan pot to the right.
-Azimuths are implemented this way in most ambisonic plugins, with the exception of WigWare, where a clockwise change of azimuth angle results in a decreasing automation curve value.
-Unfortunately the Reaper JSFX API does not currently support horizontal sliders with increasing values to the left, and for this reason azimuths for the time being are described using a navigational coordination system.
-If Reaper in the future is updated to support sliders with increasing values to the left, this design decision will be revisited.
+ATK for Reaper strives to provide a consistent and intuitive interface towards scene description parameters such as direction of sources, speakers and spatial transforms, regardless of whether the user is accustomed with acoustics or navigational coordinate systems.
+For this reason Cartesian coordinates are avoided throughout the plugin suite, and whenever possible the plugins offers graphical user interfaces to avoid ambiguities.
+
+However, due to current limitations in the Reaper JSFX API, there are some considerations to be made with respect to description of azimuths.
+The desired behaviour is that azimuths increase anti-clockwise.
+At the same time it is also preferable that for sources coming from the front half circle, moving the azimuth slider to the right results in the direction of the sound also moving clockwise to the right, similar to what happens when moving a regular stereo pan pot.
+The Harpex and Blue Ripple plugins both functions this way.
+In order to achieve this, horizontal azimuth sliders will need to implemented with increasing values to the left.
+This is however currently not supported in Reaper JSFX, and for the time being ATK for Reaper uses azimuth values described according to a navigational coordinate system.
+If Reaper in the future is updated to support sliders with increasing values to the left, this design decision is likely to be reconsidered, and changed to use acoustic conventions.
 
 
 
@@ -385,7 +387,7 @@ Depending on the plugin, one or more bright blue knobs in the GUI can be used to
 \section{ATK Reaper: Implementation}\label{sec:implementation}
 
 The source code for ATK for Reaper is implemented as a set of Reaper JSFX source files, one for each plugin, and a shared library file containing mathematical constants and conversions, matrix operators and graphics calls used by several of the plugins, ensuring a DRY (Don't Repeat Yourself) programming approach.
-The various plugins are sorted into subfolders by categories \emph{Encode}, \emph{Transform} and \emph{Decode}, making it easy for the user to understand the scope of each of the plugins. 
+The various plugins are sorted into subfolders by categories \emph{Encode}, \emph{Transform} and \emph{Decode}, making it easy for the user to understand the scope of each of the plugins when selecting a new plugin in Reaper. 
 The following sections present the available plugins.
 
 % TODO: Plugins for development and testing
@@ -399,7 +401,7 @@ To control the soundfield, spatial transforms can be applied using the \emph{Foc
 
 \emph{PlanarWave} encodes a mono source as a directional plane\-wave, where the direction (azimuth and elevation) of the planwave can be set.
 
-The \emph{Stereo} plugin encodes the left and right channels as two planewaves coming from left and right direction. The angular spread between the two waves is parameterised.
+The \emph{Stereo} plugin encodes the left and right channels as two planewaves coming from left and right directions. The angular spread between the two waves is parameterised.
 Spatial transforms such as \emph{RotateTiltTumble} (section \ref{sec:rotate}) may be used to alter the direction of the planewaves.
 
 
@@ -465,14 +467,14 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 \end{figure}
 
 The \emph{FocusPushPressZoom} plugin provides a unified interface to the four different spatial transforms \emph{focus}, \emph{press}, \emph{push} and \emph{zoom}.
+The degree of spatial transform is expressed as angles in the range from $0^\circ$ to $90^\circ$. 
+At $0^\circ$ no transform is applied, while at $90^\circ$ all four transforms produce a single planewave originating from the specified direction.
+If the unprocessed sound field is composed of multiple sources originating from many directions, these transforms do not tend to change the overall sound level of the signal, but the composition in space can be sculpted.
+All four transforms shift the sound field in a preferred direction by altering directness, gain and direction of the incoming signals depending on their original directions, but the four transforms differ in terms of what mathematical transform is applied.
+The results will differ subtly or more distinctly depending on which of the transforms is applied.
+Having all four transforms available in the same plugin makes this an expressive quality that can be explored in the creative process.
+Two of the transforms can be seen in figures~\ref{fig:pushTransform} and \ref{fig:zoomTransform}.
 
-
-Apply focus to a first order ambisonic signal (B-format) along an arbitrary axis.
-
-Apply press to a first order ambisonic signal (B-format) along an arbitrary axis.
-
-Apply dominance to a first order ambisonic signal (B-format) along an arbitrary axis.
-Apply zoom to a first order ambisonic signal (B-format) along an arbitrary axis.
 
 
 Description: the \emph{Dominance} gain, in dB, applied on the x-axis. Positive values increase the gain at front center to +gain, while decreasing the gain at back center to -gain, simultaneously distorting the image towards front center. Negative values of gain invert this distortion, distorting the image towards back center. The default, 0, results in no change.
