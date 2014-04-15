@@ -175,9 +175,10 @@ SpatDIF, the Spatial Sound Description Interchange Format, is an open format off
 Ambisonics encodes audio sources into a speaker-inde\-pendent representation of the sound field called B-format  \cite{gerzon:1985JAES}.
 Decoding is the process where an encoded sound field is translated to individual speaker channel feeds; an advantage being,  decoders can be designed for different speak\-er arrays.
 Ambisonics is based on spherical harmonic decomposition of the sound field, and depending on truncation of the spherical harmonic decomposition
-The B-for\-mat signal might be first or higher order \cite{daniel:2001phd}.
+The B-for\-mat signal might be first order ambisonic (FOA) or higher order (HOA) \cite{daniel:2001phd}.
+Third order ambisonic is often abbreviated TOA.
 Spatial resolution improves with increasing order, but so does the number of channels required for the encoded signal.
-A number of commercial microphones are available for recording in first order, and free or commercial B-format recordings are available as sound effects libraries \cite{farrar:1979soundfield,deleflie2014:ambisonia,darcourt:2014surlib}.
+A number of commercial microphones are available for recording in FOA, and free or commercial B-format recordings are available as sound effects libraries \cite{farrar:1979soundfield,deleflie2014:ambisonia,darcourt:2014surlib}.
 
 
 
@@ -214,43 +215,37 @@ Reaper is well-suited for ambisonic as well, and is a preferred DAW for many com
 
 \subsection{Plugin technologies}\label{sec:plugin-technologies}
 
-Several plugin specifications enable development of 3rd party audio instruments and effects that can be used with multiple hosts.
-Virtual Studio Technology (VST) is a plugin interface specification and SDK for Windows, Mac OSX and Linux by Steinberg \cite{steinberg:2014vst}.
-It is a popular format for commercial and freeware VST plugins, mostly using the VST 2 SDK, and a large number of audio applications support VST under license from its creator.
+Several plugin specifications enable development of virtual instruments and effects that can be used with multiple hosts.
+VST is a plugin interface specification and SDK for Windows, Mac OSX and Linux by Steinberg \cite{steinberg:2014vst}.
+It is a popular format for commercial and freeware plugins, mostly using the VST 2 SDK, and a large number of audio applications support VST under license from its creator.
 AudioUnits (AU) is a Mac OSX-specific plugin architecture provided by Apple as part of CoreAudio \cite{apple2014:au}.
 In a similar way DirextX can be used for development of Windows-only plugins \cite{microsoft2014:directX}.
-Linux Audio Developers Simple Plugin API (LADSPA) is a GNU LGPL plugin architecture mostly used on the Linux platform \cite{furse:2007ladspa}, and is gradually superseded by LADSPA version 2 (LV2) \cite{lv2:2014}.
+LADSPA is a GNU LGPL plugin architecture mostly used on the Linux platform \cite{furse:2007ladspa}, and is gradually superseded by LADSPA version 2 (LV2) \cite{lv2:2014}.
 
 While the above formats can be used to develop plugins for use with multiple hosts, there are also a number of specifications that permits 3rd part development of plugins for one hosting environment only.
-Avid has developed plugins format that work with their software and hardware exclusively; Real-Time AudioSuite (RTAS); TDM and the more recent Avid Audio eXtension (AAX).
+Avid has developed the RTAS, TDM and more recently AAX plugin format that work with their software and hardware exclusively.
 Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patches as devices in Ableton Live \cite{ableton:2014maxforlive}. JSFX is a text-based scripting language for programming audio-oriented effects compiled on the fly for Cockos Reaper \cite{cockos:2014jsfx,cockos:2014reaper}.
 
-The multiple operation systems and plugin architectures are a challenge to plugin developers, that ideally have to ensure that their software work with all plugin architectures and hosts in all operation systems.
-Developing, compiling and maintaining plugins for many parallel platforms can introduce substantial workload overhead, and several cross-platform plugin development frameworks have been developed to address this.
-\emph{JUCE} is an all-encompassing C++ class library for developing cross-platform software, and is suited for building customised GUIs, and for handling graphics and sound \cite{juce2014}.
-\emph{wdl-ol} is an enhanced version of Cockos' IPlug C++ framework for developing cross platform audio plugins and targeting multiple plugin APIs with the same code, including VST, VST3, AudioUnit, RTAS and AAX (Native) \cite{larkin2014wdl-ol}.
-\emph{FAUST (Functional Audio Stream)} is a functional programming language for real-time signal processing and synthesis.
-The FAUST compiler translates DSP specifications into very efficient C++ code that works at sample level.
-A FAUST specification can be used to generate native implementations for most OS (Linux, OSX, Android, iOS) or platforms, including the AudioUnit, LV2, Ladspa and VST plugin platforms \cite{smithFaust:2012}.
-\emph{SonicBirth} is an application for creating AudioUnit and VST plugins for OSX and Windows.
-Plugins are designed by connecting objects in a graphical programming environment. Development stalled in 2007, but recent renewed efforts have resulted in a version 2 public alpha being available \cite{sonicbirth2014}.
+The multiple operation systems and plugin architectures poses challenges to plugin developers, that ideally might want to offer their software work with all plugin architectures and hosts in all operation systems.
+Developing, compiling and maintaining plugins for many parallel platforms can introduce substantial workload overhead, and several cross-platform plugin development frameworks have been developed to address this, e.g.,  JUCE \cite{juce2014}, wdl-ol \cite{larkin2014wdl-ol} and FAUST \cite{smithFaust:2012}. 
+\emph{SonicBirth} can be used to create AudioUnit and VST plugins for OSX and Windows by connecting objects in a graphical programming environment. Development stalled in 2007, but recent renewed efforts have resulted in a version 2 public alpha being available \cite{sonicbirth2014}.
 \emph{SynthEdit} is a similar technology for VST plugin development on the Windows platform \cite{synthedit2011}.
 
 
 \subsection{Plugins for ambisonic processing}\label{sec:ambi-plugins}
 
 In recent years a number of plugins have emerged for ambisonic processing.
-\emph{WigWare} is a set of VST plguins for Mac and Windows that includes first and higher order panner and decoders for regular and irregular speaker layouts, as well as a first order 3D reverb \cite{Wiggins:2010wigware}.
-Danielle Courville has developed a number of OSX ambisonic first order VST plugins in SonicBirth for encoding mono and multichannel signals, correct misaligned B-Format streams, rotations, mixing of several ambisonic signals, ambisonic reverb, and decoding, as well as encoders and decoders for 2nd order and planar 5th order ambisonic \cite{courville:2012b2x}.
-Due to the long halt in development of SonicBirth, these plugins do not necessarily work reliable in newer versions of DAW programs.
-\emph{ambiX} are cross-platform 1st, 3rd and 5th order ambisonic processors as VST/LV2 plug-ins or standalone application under Windows, Mac OSX and Linux, offering encoding and decoding, including binaural decoding, as well as a number of spatial transforms \cite{Kronlachner2013:ambix,Kronlachner:2014ambi-transforms}.
+\emph{WigWare} is a set of VST plugins for Mac and Windows that includes FOA and HOA panner and decoders for regular and irregular speaker layouts, as well as a FOA 3D reverb \cite{Wiggins:2010wigware}.
+Danielle Courville has developed a number of FOA plugins in SonicBirth for encoding and decoding, correcting misaligned B-Format streams, performing rotations, mixing, reverb, and decoding, as well as encoders and decoders for 2nd order and planar 5th order ambisonic \cite{courville:2012b2x}.
+Due to the long halt in development of SonicBirth, these plugins do not work reliable in all newer versions of DAW programs.
+\emph{ambiX} are cross-platform 1st, 3rd and 5th order ambisonic processors for encoding and decoding, including binaural decoding, as well as spatial transforms \cite{Kronlachner2013:ambix,Kronlachner:2014ambi-transforms}.
 These plugins use the ambiX encoded signal convention; full 3D, ACN channel ordering and SN3D normalization \cite{Nachbar:2011ambix} as discussed in section~\ref{sec:coordinate-systems}, but also provides a plugin for conversions to other formats.
 They are accompanied by \emph{mcfx}, a number of more general multichannel plugins for equalising, delay, gain adjustment and level metering \cite{kronlachner2014:mcfx}.
 \emph{Flux Ircam Spat} wraps the Ircam Spatialisateur multiformat room acoustics simulation and localization software as AU and VST plugins for Mac and Windows \cite{flux:2010spat}.
 Although this plugin mainly provides object-based scene descriptions, it can render the auralization as B-format.
-The \emph{HARPEX} plugin for decoding first order ambisonic uses an algorithm based on high angular resolution planewave expansion (HARPEX) in order to address issues with low angular resolution and small sweet spot that first-order ambisonics suffers from \cite{Berge:2010harpex}.
-Blue Ripple Sound offers a wide range of OSX and Windows VST plugins for third order ambisonic (TOA), including encoders and upmixers, decoders, and a rich set of plugins for spatial and filter-based manipulations of the encoded signal \cite{blueripple:2014TOA}.
-The TOA Harpex Upsampler converts first order ambisonic material to third order ambisonic using the Harpex algorithm.
+The \emph{HARPEX} plugin for decoding FOA uses an algorithm based on high angular resolution planewave expansion (HARPEX) in order to address issues with low angular resolution and small sweet spot that FOA suffers from \cite{Berge:2010harpex}.
+Blue Ripple Sound offers a wide range of OSX and Windows VST plugins for TOA, including encoders and upmixers, decoders, and a rich set of plugins for spatial and filter-based manipulations of the encoded signal.
+The TOA Harpex Upsampler converts FOA material to TOA using the Harpex algorithm \cite{blueripple:2014TOA}.
 
 
 
