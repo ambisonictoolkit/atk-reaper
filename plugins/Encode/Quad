@@ -118,12 +118,6 @@ Calculate audio sample
 **********************************************************/
 @sample
 
-ii = 0;
-loop(8,
-  matrixDSP[ii] += matrixInc[ii];
-  ii += 1;
-);
-
 inL  = spl0;
 inR  = spl1;
 inSL = spl2;
