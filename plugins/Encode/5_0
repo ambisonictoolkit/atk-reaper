@@ -1,0 +1,162 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: 5_0 encoder.
+  
+  The 5.0 signal is encoded as five planewaves arriving at [ -30, 30, 0, -110, -110 ] 
+  degrees (navigational). This encoding is equivalent to placing infinitely
+  distant loudspeakers around a soundfield microphone in an anechoic chamber.
+
+---------------------------------------------------------------------
+*/
+
+desc: 5_0 encoder (L - R - C - LFE - SL - SR)
+
+// Import library with shared functions for matrix and graphics processing
+import atkFunctionLibrary.jsfx-inc
+
+in_pin:L
+in_pin:R
+in_pin:C
+in_pin:LFE
+in_pin:SL
+in_pin:SR
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Allocation of memory for matrix used for DSP processing
+matrixDSP       = 1200;
+
+function calculateCoefficients()
+(  
+  mCosAzi0    = cos(0.*kDeg2Rad);
+  mSinAzi0    = sin(0.*kDeg2Rad);
+  
+  mCosAzi30   = cos(30.*kDeg2Rad);
+  mSinAzi30   = sin(30.*kDeg2Rad);
+  
+  mCosAzi110  = cos(110.*kDeg2Rad);
+  mSinAzi110  = sin(110.*kDeg2Rad);
+  
+  // W
+  matrixDSP[0]  =  kInvSqrt2;
+  matrixDSP[1]  =  kInvSqrt2;
+  matrixDSP[2]  =  kInvSqrt2;
+  matrixDSP[3]  =  0.;
+  matrixDSP[4]  =  kInvSqrt2;
+  matrixDSP[5]  =  kInvSqrt2;
+  // X
+  matrixDSP[6]  =  mCosAzi30;
+  matrixDSP[7]  =  mCosAzi30;
+  matrixDSP[8]  =  mCosAzi0;
+  matrixDSP[9]  =  0.;
+  matrixDSP[10] =  mCosAzi110;
+  matrixDSP[11] =  mCosAzi110;
+  // Y
+  matrixDSP[12] =  mSinAzi30;
+  matrixDSP[13] = -mSinAzi30;
+  matrixDSP[14] =  mSinAzi0;
+  matrixDSP[15] =  0.;
+  matrixDSP[16] =  mSinAzi110;
+  matrixDSP[17] = -mSinAzi110;
+  
+  // Z
+  matrixDSP[18] =  0.;
+  matrixDSP[19] =  0.;
+  matrixDSP[20] =  0.;
+  matrixDSP[21] =  0.; 
+  matrixDSP[22] =  0.;
+  matrixDSP[23] =  0.;
+);
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+mAzimuth     = 0.5 * slider1 * kDeg2Rad;
+calculateCoefficients();
+
+
+/**********************************************************
+Custom graphic interface
+**********************************************************/
+@gfx 500 500
+
+determineGeometry();
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
+
+mDeltaX0   = gRadius * mCosAzi0;
+mDeltaY0   = gRadius * mSinAzi0;
+
+mDeltaX30  = gRadius * mCosAzi30;
+mDeltaY30  = gRadius * mSinAzi30;
+
+mDeltaX110 = gRadius * mCosAzi110;
+mDeltaY110 = gRadius * mSinAzi110;
+
+// Size, saturation and luminocity depends on posZ
+gainToColor(0., -24., 6., 0.);
+
+drawSourceLocation(gCenterX-mDeltaY30,  gCenterY-mDeltaX30,  0., 1.);
+drawSourceLocation(gCenterX+mDeltaY30,  gCenterY-mDeltaX30,  0., 1.);
+
+drawSourceLocation(gCenterX+mDeltaY0,   gCenterY-mDeltaX0,   0., 1.);
+
+drawSourceLocation(gCenterX-mDeltaY110, gCenterY-mDeltaX110, 0., 1.);
+drawSourceLocation(gCenterX+mDeltaY110, gCenterY-mDeltaX110, 0., 1.);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+inL   = spl0;
+inR   = spl1;
+inC   = spl2;
+inLFE = spl3;
+inSL  = spl4;
+inSR  = spl5;
+
+// Matrix multiplication with input signal:
+spl0 = inL * matrixDSP[0]  + inR * matrixDSP[1]  + inC * matrixDSP[2]  + inSL * matrixDSP[4]  + inSR * matrixDSP[5];
+spl1 = inL * matrixDSP[6]  + inR * matrixDSP[7]  + inC * matrixDSP[8]  + inSL * matrixDSP[10] + inSR * matrixDSP[11];
+spl2 = inL * matrixDSP[12] + inR * matrixDSP[13] + inC * matrixDSP[14] + inSL * matrixDSP[16] + inSR * matrixDSP[17];
+spl3 = 0.;
+
+// Avoid input sound from leaking through on channel 5-6:
+spl4 = 0.;
+spl5 = 0.;
+
