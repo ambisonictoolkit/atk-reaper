@@ -47,9 +47,9 @@ in_pin:6
 in_pin:7
 in_pin:8
 in_pin:9
+in_pin:10
 in_pin:11
 in_pin:12
-in_pin:13
 in_pin:13
 in_pin:14
 in_pin:15
@@ -166,7 +166,7 @@ spl2 = 0.;
 
 ii = 0;
 loop(mNumSpeakers,
-  spl0 += sIn[ii] * matrixDSP[iii];   // W
+  spl0 += sIn[ii] * matrixDSP[ii];   // W
   spl1 += sIn[ii] * matrixDSP[ii+16]; // X
   spl2 += sIn[ii] * matrixDSP[ii+32]; // Y
   ii += 1;
