@@ -413,6 +413,12 @@ It is included for completeness, and because the inclusion of this plugin in the
 The \emph{Stereo} plugin encodes the left and right channels as two planewaves coming from left and right directions. The angular spread between the two waves is parameterised.
 Spatial transforms such as \emph{RotateTiltTumble} (section \ref{sec:rotate}) may be used to alter the direction of the planewaves.
 Additional upmixers are provided for a number of virtual spea\-ker arrays; \emph{Quad}, \emph{5.0} and \emph{7.0} for the standard ITU layouts, \emph{Pantophonic} for 2D and \emph{Periphonic} for 3D.
+% TODO: Add important points from the following email exchange on how to deal with 5_1: 
+% The LFE channel would need a gain scale so that gain can be adjusted appropriately.
+% Another thought, and this is why the ATK hasn't had a 5.1 encoder, and instead just uses 5.0... in practice it may be useful to send the LFE channel to a diffusion encoder rather than just to W. This would spread the LFE across the image, rather than making it "directionless" by assigning to W.
+% The way to deal with this notion would be to illustrate with a tool-chain and then explain why a separate encoder may be preferable.
+% So, I guess what I'm saying is that we don't necessarily need to supply a 5.0 encoder (SC3 version doesn't), but illustrate the options w/ a tool-chain. E.g., LFE goes to the W-only encoder, or routed to one a spreader / diffuser encoder.
+% I'm not necessarily opposed to the below idea in a big way, it is just that such an encoder immediately directs the user away from what may be more optimal solutions....
 
 A few encoders remain to be implemented:
 %pseudoinverse microphone array: encoding from discrete microphones or signals
