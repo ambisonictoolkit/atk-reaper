@@ -22,13 +22,13 @@ and GNU General Public License along with this program.  If not, see
 
 
 ---------------------------------------------------------------------
-  Class: stereo
-  A Matrix decoder synthesising a stereo pair.
+  Class: mono
+  A Matrix decoder synthesising a single microphone
   
 ---------------------------------------------------------------------
 */
 
-desc: Stereo decoder
+desc: Mono decoder - synthesises a single microphone
 
 // Import library with shared functions for matrix and graphics processing
 import atkFunctionLibrary.jsfx-inc
@@ -41,8 +41,11 @@ in_pin:Z
 out_pin:L
 out_pin:R
 
-slider1:30<0,180,1>Angle
-slider2:0.5<0,1.,0.01>Mic pattern (Omni - Cardoid - Figure 8)
+
+slider1:0<-180,180,1>Azimuth
+slider2:0<-90,90,1>Elevation
+slider3:0.5<0,1.,0.01>Mic pattern (Omni - Cardoid - Figure 8)
+slider4:0<0,1,1{Left channel only, Left and right channel}>Returned signal
 
 
 /**********************************************************
@@ -51,7 +54,7 @@ Initialisation
 @init
 
 // Setting memory locations for 4x4 matrix as 1D array
-matrixDSP       = 1000;
+mIsInitialised = 0;
 
 
 /**********************************************************
@@ -59,29 +62,58 @@ Updated slider value:
 **********************************************************/
 @slider
 
-angle   = slider1 * kDeg2Rad;
-pattern = slider2;
+mAzi        = slider1 * kDeg2Rad;
+mEle        = slider2 * kDeg2Rad;
+mPattern = slider3;
+mReturnMode = slider4;
 
-// Generate 2 x 4 decoding matrix
-generateDecodeStereoMatrix(matrixDSP, angle, pattern);
 
+mNewW = (1. - mPattern) * sqrt(2.);
+mNewX = mPattern * cos(mAzi) * cos(mEle);
+mNewY = mPattern * sin(mAzi) * cos(mEle);
+mNewZ = mPattern * sin(mEle);
+
+(mIsInitialised == 0) ?
+(
+  mW = mNewW;
+  mX = mNewX;
+  mY = mNewY;
+  mZ = mNewZ;
+);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+mInverseSamplesblock = 1. / samplesblock;
+
+// Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
+
+mIncW = (mNewW - mW) * mInverseSamplesblock;
+mIncX = (mNewX - mX) * mInverseSamplesblock;
+mIncY = (mNewY - mY) * mInverseSamplesblock;
+mIncZ = (mNewZ - mZ) * mInverseSamplesblock;
 
 /**********************************************************
 Calculate audio sample
 **********************************************************/
 @sample
 
-// We don't envisage angle or pattern being changed dynamically, and hence there is no need for interpolations
 wIn = spl0;
 xIn = spl1;
 yIn = spl2;
 zIn = spl3;
 
-// Matrix multiplication with input signal.
+// Linear interpolation to new coefficients:
+mW += mIncW;
+mX += mIncX;
+mY += mIncY;
+mZ += mIncZ;
 
-// Front (left and right)
-spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
-spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
-// Channel 3 and 4 need to be muted to prevent signal in to leak through
+spl0 = wIn * mW  + xIn * mX  + yIn * mY  + zIn * mZ;
+spl1 = spl0 * mReturnMode;
+// Channel 3 and 4 need to be silenced to prevent signals from leaking through
 spl2 = 0.;
 spl3 = 0.;

@@ -13,3 +13,6 @@
 *.out
 *.ps
 *.gz
+
+# User specific files in Xcode project
+xcuserdata
