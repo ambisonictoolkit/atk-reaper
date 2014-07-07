@@ -1,0 +1,70 @@
+% standard header from LaTeXiT
+\documentclass[10pt]{article}
+\usepackage[usenames]{color} %used for font color
+\usepackage{amssymb} %maths
+\usepackage{amsmath} %maths
+\usepackage[utf8]{inputenc} %useful to type directly diacritic characters
+% import pst-sigsys: signal processing package
+\usepackage{pst-sigsys}
+
+% DAFX network: B-format to A-format --> DAFX --> A-format to B-format
+%\begin{pspicture}[showgrid](0, -3)(12, 3)
+\begin{pspicture}(0, -3)(12, 3)
+	\psset{style = RoundCorners, style = Arrow}
+	%--- Defining blocks ---
+	%---> W, X, Y, Z
+	\pssignal(0.5,  1.5){W0}{$W$}
+	\pssignal(0.5,  0.5){X0}{$X$}
+	\pssignal(0.5, -0.5){Y0}{$Y$}
+	\pssignal(0.5, -1.5){Z0}{$Z$}
+	%---> B to A block
+	\psfblock[framesize=2 4.5](3.0, 0){B2A}{\parbox[c]{1.5\psunit}{\centering B-format to A-format}}
+	\pnode(2.0,  1.5){B2A_W}
+	\pnode(2.0,  0.5){B2A_X}
+	\pnode(2.0, -0.5){B2A_Y}
+	\pnode(2.0, -1.5){B2A_Z}
+	\pnode(4.0,  1.5){B2A_flu}
+	\pnode(4.0,  0.5){B2A_frd}
+	\pnode(4.0, -0.5){B2A_bld}
+	\pnode(4.0, -1.5){B2A_bru}
+	%--- Drawing dashed frame (DAFX) ---
+	\fnode[style=Dash,linecolor=purple,framesize=2.75 4.5](6.0, 0){box}
+	\nput{90}{box}{\textcolor{purple}{Audio Effect}}
+	%---> DAFX blocks
+	\psblock(6,  1.5){fx_flu}{DAFX$_{flu}$}
+	\psblock(6,  0.5){fx_frd}{DAFX$_{frd}$}
+	\psblock(6, -0.5){fx_bld}{DAFX$_{bld}$}
+	\psblock(6, -1.5){fx_bru}{DAFX$_{bru}$}
+	%---> A to B block
+	\psfblock[framesize=2 4.5](9.0, 0){A2B}{\parbox[c]{1.5\psunit}{\centering A-format to B-format}}
+	\pnode(8.0,  1.5){A2B_flu}
+	\pnode(8.0,  0.5){A2B_frd}
+	\pnode(8.0, -0.5){A2B_bld}
+	\pnode(8.0, -1.5){A2B_bru}
+	\pnode(10.0,  1.5){A2B_W}
+	\pnode(10.0,  0.5){A2B_X}
+	\pnode(10.0, -0.5){A2B_Y}
+	\pnode(10.0, -1.5){A2B_Z}
+	%---> W', X', Y', Z'
+	\pssignal(11.5,  1.5){W1}{$W'$}
+	\pssignal(11.5,  0.5){X1}{$X'$}
+	\pssignal(11.5, -0.5){Y1}{$Y'$}
+	\pssignal(11.5, -1.5){Z1}{$Z'$}
+	%--- Connecting blocks ---
+	%---> W
+	\nclist{ncline}{W0, B2A_W}
+	\nclist{ncline}{B2A_flu, fx_flu, A2B_flu}
+	\nclist{ncline}{A2B_W, W1}
+	%---> X
+	\nclist{ncline}{X0, B2A_X}
+	\nclist{ncline}{B2A_frd, fx_frd, A2B_frd}
+	\nclist{ncline}{A2B_X, X1}
+	%---> Y
+	\nclist{ncline}{Y0, B2A_Y}
+	\nclist{ncline}{B2A_bld, fx_bld, A2B_bld}
+	\nclist{ncline}{A2B_Y, Y1}
+	%---> Z
+	\nclist{ncline}{Z0, B2A_Z}
+	\nclist{ncline}{B2A_bru, fx_bru, A2B_bru}
+	\nclist{ncline}{A2B_Z, Z1}
+\end{pspicture}

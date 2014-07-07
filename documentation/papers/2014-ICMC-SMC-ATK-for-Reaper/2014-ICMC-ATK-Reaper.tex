@@ -15,6 +15,11 @@
 % TL: Custom package so that distance between figures and captions can be reduced when needed.
 \usepackage{caption}
 
+% JA: Custom packages for Wide figures in two column documents
+% See: http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
+\usepackage{dblfloatfix}
+\usepackage{fixltx2e}
+
 %\usepackage{cite}
 
 % Multipart figures
@@ -262,6 +267,15 @@ The TOA Harpex Upsampler converts FOA material to TOA using the Harpex algorithm
 % ATK
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Ambisonic Toolkit}\label{sec:atk}
+
+\begin{figure*}[t]
+\captionsetup{aboveskip=-6pt}
+\centering
+\includegraphics[width=2.0\columnwidth]{figures/atk-network.png}
+\setlength{\abovecaptionskip}{0pt plus 3pt minus 2pt} % Decrease distance, as the figure itself has lots of empty space below
+\caption{Ambisonic Toolkit Paradigm.\label{fig:atkParadigm}}
+\end{figure*}
+
 
 The Ambisonic Toolkit (ATK) brings together a number of tools and transforms for working with Ambisonic surround sound  \cite{Anderson:2009introducingATK, anderson:ambisonic_2011}.
 Use is targeted towards the composer of acousmatic and experimental music. The intention is for the toolset to be both ergonomic and comprehensive, providing algorithms to creatively manipulate and synthesize Ambisonic sound fields.
@@ -537,6 +551,16 @@ The \emph{Proximity} filter undoes \emph{NearFieldCompensation} given the same d
 
 Balance and phase relations between the four channels of the FOA signal are critical to the spatial information.
 If one or more encoded channels are being processed using filters, distortion, delays, or some other audio effect, the spatial information of the encoded signal most likely will be lost, resulting in strange spatial results.
+
+\begin{figure}[h]
+\captionsetup{aboveskip=-6pt}
+\centering
+\includegraphics[width=1.0\columnwidth]{figures/DAFXNetwork.png}
+\setlength{\abovecaptionskip}{0pt plus 3pt minus 2pt} % Decrease distance, as the figure itself has lots of empty space below
+\caption{Process effects in A-format.\label{fig:aToB}}
+\end{figure}
+
+
 
 The \emph{BtoA} plugin performs matrix-based decoding of the B-format signal to A-format, while \emph{AtoB} performs a similar encoding of A-format into B-format.
 When used in conjunction, the intermediate A-format signal is well-suited for effect processing which preserve the spatial encoding found in the original input B-format signal.
