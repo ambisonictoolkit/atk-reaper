@@ -157,7 +157,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
 While there is a well-established workflow for stereo in DAWs, options have been more limited when working with Ambisonics.
-The Ambisonic Toolkit (ATK) brings together a number of tools and transforms for working with first order Ambisonic surround sound, including intriguing possibilities for spatial transforms of soundfield image.
+The Ambisonic Toolkit (ATK) brings together a number of tools and transforms for working with First order Ambisonic surround sound, including intriguing possibilities for spatial transforms of soundfield image.
 Previously these tools have only been available in the real-time processing environment SuperCollider.
 
 Reaper is a reasonably priced and flexible DAW for spatial sound, popular among many composers and sonic art\-ists working with spatial sound.
@@ -182,15 +182,14 @@ Spatial sound is usually represented in one of three ways: as channel feeds, as 
 ITU 5.1 and ITU 7.1 are examples of fixed-channel distribution formats \cite{ITU:1993_surround_5:1}.
 This approach becomes less practical as the number of channels increases, and also has clear limitations due to the lack of flexibility in loudspeaker positioning.
 Object-based spatial scene descriptions instead associate sound sources with meta-information describing location or direction. In this way an auditory scene can be described independently of loudspeaker setup, and rendered appropriately for a chosen playback system.
-This is the approach used for e.g., Dolby Atmos and Wave Field Synthesis \cite{Berkhout:1993wfs,dolby:2014atmos}.
+This is the approach used for e.g., Dolby Atmos and Wave Field Synthesis \cite{dolby:2014atmos,Berkhout:1993wfs}.
 SpatDIF, the Spatial Sound Description Interchange Format, is an open format offering a semantic and syntactic specification for storing and transmitting such spatial audio scene descriptions \cite{Peters:2013spatdif}.
-% TODO: Reference for WFS
 
 Ambisonics encodes audio sources into a speaker-inde\-pendent representation of the sound field called B-format  \cite{gerzon:1985JAES}.
 Decoding is the process where an encoded sound field is translated to individual speaker channel feeds; an advantage being,  decoders can be designed for different speak\-er arrays.
 Ambisonics is based on spherical harmonic decomposition of the sound field, and depending on truncation of the spherical harmonic decomposition, 
-the B-for\-mat signal may be first order Ambisonic (FOA) or higher order (HOA) \cite{daniel:2001phd}.
-Third order Ambisonic is often abbreviated TOA.
+the B-for\-mat signal may be First order Ambisonic (FOA) or higher order (HOA)\footnote{Third order Ambisonic is often abbreviated TOA.} \cite{daniel:2001phd}.
+
 Spatial resolution improves with increasing order, but so does the number of channels required for the encoded signal.
 A number of commercial microphones are available for recording in FOA, and free or commercial B-format recordings are available as sound effects libraries \cite{farrar:1979soundfield,deleflie2014:ambisonia,darcourt:2014surlib}.
 
@@ -217,9 +216,9 @@ The metadata is stored in the Pro Tools session as plug-in automation \cite{dolb
 
 The DAWs discussed so far are either limited with respect to surround sound abilities, or expensive and proprietary software and hardware systems for object-based spatial scene authoring and rendering.
 In contrast Reaper is a reasonably priced and flexible DAW for spatial sound \cite{cockos:2014reaper}.
-Reaper supports tracks of up to 64 channels, and is exceptionally open-ended with respect to routing of channels and tracks.
+Reaper supports tracks of up to 64 channels\footnote{Suitable for 7\textsuperscript{th}-order HOA.}, and is exceptionally open-ended with respect to routing of channels and tracks.
 Reaper supports all standard fixed-channel surround sound configurations, and the ReaSurround panning plugin that is integrated with Reaper also caters for non-standard speaker configurations \cite{francis:2014_reaper}, using a spatialisation algorithm based on principles resembling VBAP \cite{Pulkki:1997vbap} as well as DBAP \cite{Lossius:2009dbap}.
-Reaper is well-suited for Ambisonic as well, and is a preferred DAW for many composers within the Ambisonic  community \cite{wiggins:2012reaperhowto}.
+Reaper is well-suited for Ambisonics as well, and is a preferred DAW for many composers within the Ambisonic  community \cite{wiggins:2012reaperhowto}.
 
 % TODO: ** FX processing chains in DAWs - as a motivation for why we want to be able to work the same way with Ambisonics, and make Ambisonic sound field recordings a malleable material in acousmatic mucis composition and sound design. Maybe this should be at the very start?
 
@@ -280,24 +279,25 @@ The TOA Harpex Upsampler converts FOA material to TOA using the Harpex algorithm
 The Ambisonic Toolkit (ATK) brings together a number of tools and transforms for working with Ambisonic surround sound  \cite{Anderson:2009introducingATK, anderson:ambisonic_2011}.
 Use is targeted towards the composer of acousmatic and experimental music. The intention is for the toolset to be both ergonomic and comprehensive, providing algorithms to creatively manipulate and synthesize Ambisonic sound fields.
 
-The tools are framed for the user to `think Ambisonically'. By this, it is meant the ATK is focused on the problem of synthesising and processing sound fields. And, the model of the ATK is a sound-field sound-image model rather than a sound-object sound-scene model. 
+The tools are framed for the user to `think Ambisonically'. By this, it is meant the ATK is focused on the problem of synthesising and processing sound fields. The model of the ATK is a sound-field sound-image model rather than a sound-object sound-scene model. By addressing the holistic problem of creatively controlling a complete soundfield, the ATK allows and encourages the composer to think beyond the placement of sounds in a sound-space and instead attend to the impression and image of a soundfield. This is viewed to be the {\em idiomatic} approach for working with the Ambisonic technique, and creatively leverages the model the Ambisonic technology presents.
+
 
 %By this, it is meant the ATK is not focused on the problem of auralization and/or room modelling.
 %Auralization is a complex problem beyond the scope of the fundamental algorithms of the ATK.
 %It is worth noting, however, with the toolset provided, successful room modelling may be implemented.
 %Interestingly enough, many composers of acousmatic music often do not move beyond the problem of auralization or room modelling.
 
-The ATK, by addressing the holistic problem of creatively controlling a complete soundfield, allows and encourages the composer to think beyond the placement of sounds in a sound-space and instead attend to the impression and image of a soundfield, therefore taking advantage of the model the Ambisonic technology presents.
-This is viewed to be the {\em idiomatic} approach for working with the Ambisonic technique.
 
 Since 1998 the ATK has existed in a variety of forms.
 In its very first implementation, the ATK was deployed as a collection of Csound orchestras, and a collection of VST plugins have previously been distributed using the now discontinued SonicBirth.
 % TODO: Should this be added?
 % From 2007, an implementation for the Common Lisp Music(external link) synthesis and signal processing package has been under development.
 Development of the real-time ATK library for SuperCollider2 began in 2000, and in recent years ATK has primarily been distributed as a version for SuperCollider3 \cite{Anderson:2009introducingATK}.
-Some of the underlying ideas of ATK has also been incorporated into the Blue Ripple Sound third order Ambisonic plugins \cite{blueripple:2014TOA}.
+Some of the underlying ideas of ATK has also been incorporated into the Blue Ripple Sound Third order Ambisonic plugins \cite{blueripple:2014TOA}.
 % TODO: Mention the adaptation of B<->A in Blue Ripple TOA
 
+%TODO: ADD ATK paradigm discussion -- break this into several labelled sections. Refer to illustration.
+%            Author --> Image --> Monitor
 
 
 
@@ -329,7 +329,7 @@ Furse-Malham encoding is the preferred format for all of the Ambisonic plugins d
 \emph{Normalised 3D formulas (N3D)} and \emph{semi-normalised 3D formulas (SN3D)} can be used for higher order encoding and decoding  \cite{daniel:2001phd}, also beyond TOA.
 N3D component signals go beyond unity $(-1, 1)$ and can only be properly stored in sound file formats that supports floating-points, whereas SN3D component signals stay within unity. 
 
-ATK for Reaper uses first order Furse-Malham encoded signals throughout.
+ATK for Reaper uses First order Furse-Malham encoded signals throughout.
 This ensures interoperability between ATK for Reaper and other sources and processors of Ambisonic signals such as ATK for SuperCollider or recorded Ambisonic signals, as well as most other available plugins.
 
 ATK for Reaper strives to provide a consistent and intuitive interface towards scene description parameters such as direction of sources, speakers and spatial transforms, regardless of whether the user is accustomed with acoustics or navigational coordinate systems.
@@ -441,6 +441,7 @@ In the absence of a Soundfield microphone, this feature gives the opportunity to
 With synthetic signals, pseudoinverse encoding is usually regarded as the method of choice to generate spatially complex synthetic Ambisonic images.
 In combination with the ATK's imaging tools these can then be compositionally controlled as required.
 \emph{Zoom\-H2} adapts \emph{PseudoInverse} for this popular portable recorder.
+
 The rest of the encoders that remain to be ported depend on kernel convolution.
 \emph{Super} is an Ambisonic super stereo encoder, the classic method for encoding stereophonic signals into B-format.
 The \emph{UHJ} encoder offers access to numerous published recordings for periphonic (2D) audition.
@@ -481,7 +482,7 @@ This transform does not affect directness of the signal, and the screenshot in f
 \caption{DirectO transform plugin interface.\label{fig:directOTransform}}
 \end{figure}
 
-The \emph{DirectO} plugin (figure \ref{fig:directOTransform}) adjusts the sound field directivity of a first order Ambisonic signal across the origin.
+The \emph{DirectO} plugin (figure \ref{fig:directOTransform}) adjusts the sound field directivity of a First order Ambisonic signal across the origin.
 It is a spatial low-pass filter; with increasing degree of transform, the signal becomes less directional, and with a transform of $90^{\circ}$ the signal becomes omnipresent.
   
 \begin{figure}[h]
@@ -495,7 +496,7 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 
 
  
-\subsubsection{FocusPullPushZoom and Dominate}\label{sec:focus}
+\subsubsection{FocusPushPressZoom and Dominate}\label{sec:focus}
 
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
@@ -522,7 +523,7 @@ Two of the transforms can be seen in figures~\ref{fig:pushTransform} and \ref{fi
 
 The \emph{Dominance} plugin increases the gain of signals coming from the preferred direction while decreasing the gain of signals originating from the opposite side.
 In the Reaper plugin gain in the preferred direction can be boosted by up to 24 dB.
-While the \emph{Focus}, \emph{Pull}, \emph{Push}, and \emph{Zoom} transforms do not generally have any major impact on the overall sound level of the soundfield, \emph{Dominance} can result in major alterations to sound levels.
+While the \emph{Focus}, \emph{Push}, \emph{Press}, and \emph{Zoom} transforms do not generally have any major impact on the overall sound level of the soundfield, \emph{Dominance} can result in major alterations to sound levels.
 For this reason, as well as due to the difference in how the degree of transform is expressed (decibels rather than angles) the \emph{Dominance} transform has not been integrated into the same plugin as the other four transforms.
 
 
@@ -537,20 +538,17 @@ The \emph{Mirror} plugin mirrors the soundfield across an arbitrary plane, while
 \emph{Proximity} facilitates the introduction of the proximity effect to encoded signals.
 At extremes, the proximity effect introduces a strong bass boost, as well as phase differences.
 The proximity effect can be an important contributor to perceptions of nearness.
-Distance is described in meter, and to prevent bass boost from getting out of hand, the lower limit is set to 10 cm (0.1 m).
+Distance is described in meters, and to prevent bass boost from getting out of hand, the lower limit is set to 10 cm (0.1 m).
 
 \emph{NearFieldCompensation} facilitates the reduction or removal of the proximity effect from encoded signals.
 Near\-field compensation is usually used in conjunction with decoders to compensate for the distance of loudspeakers on playback in loudspeaker rigs with smaller diameter.
 Additionally, NearFieldCompensation can also be used to reduce the proximity effect found in nearfield recordings.
 
-\emph{Proximity} and \emph{NearFieldCompensation} apply a low shelf filter to the first order components of the encoded signal.
+\emph{Proximity} and \emph{NearFieldCompensation} respectively apply an integrator or high pass filter\footnote{A 1\textsuperscript{th}-order high pass filter is the reciprocal of a 1\textsuperscript{th}-order integrator.} to the first order components of the encoded signal.
 The \emph{Proximity} filter undoes \emph{NearFieldCompensation} given the same distance argument.
 
 
 \subsection{Transformations between A-format and B-format}\label{sec:a-format}
-
-Balance and phase relations between the four channels of the FOA signal are critical to the spatial information.
-If one or more encoded channels are being processed using filters, distortion, delays, or some other audio effect, the spatial information of the encoded signal most likely will be lost, resulting in strange spatial results.
 
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
@@ -560,7 +558,8 @@ If one or more encoded channels are being processed using filters, distortion, d
 \caption{Process effects in A-format.\label{fig:aToB}}
 \end{figure}
 
-
+Balance and phase relations between the four channels of the FOA signal are critical for the spatial information.
+If one or more encoded B-format channels are processed using filters, distortion, delays, or some other audio effect, the spatial information of the encoded signal will most likely be distorted or otherwise lost, often resulting in distorted or unintended spatial results. This will tend to be the case if processing effects the individual B-format channels individually, i.e., if un-synced changes in gain or phase occur. 
 
 The \emph{BtoA} plugin performs matrix-based decoding of the B-format signal to A-format, while \emph{AtoB} performs a similar encoding of A-format into B-format.
 When used in conjunction, the intermediate A-format signal is well-suited for effect processing which preserve the spatial encoding found in the original input B-format signal.
@@ -581,13 +580,14 @@ The soundfield may be decoded to \emph{Stereo} using a pair of virtual microphon
 \emph{Diametric} is Gerzon's classic decoder suitable for varied periphonic and pantophonic loudspeaker arrays \cite{gerzon:1980sphere}.
 While the regular decoders will be suitable for many users, diametric decoding enables the greatest flexibility, and allows the user to design substantially varying semi-regular arrays suitable for a wide variety of playback situations.
 Meeting all the criteria outlined by Gerzon to qualify as Ambisonic, this decoder is a good choice for full 3D critical studio listening.
+
 The \emph{UHJ} decoder and binaural decoders, using measured and synthetic HRTFs, requires kernel convolution, and remains to be implemented.
 While the virtual microphone stereophonic decoder is very easy and convenient, for production work the authors advise using the \emph{UHJ} decoder, once the port has been accomplished.
 
 The relevant decoders supports several decoding modes: 
 The `dual' decoder is a dual-band psycho-acoustically optimised decoder, and the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
 `single' is suitable for larger, mid-scale environments.
-`velocity' returns `strict soundfield' (aka `basic') decoding, and is not preferred for first order Ambisonics in most circumstances.
+`velocity' returns `strict soundfield' (aka `basic') decoding, and is not preferred for First order Ambisonics in most circumstances.
 `controlled' returns `controlled opposites' decoding (aka `in phase'), which is often preferred in large-scale, concert environments.
 
 
