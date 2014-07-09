@@ -25,7 +25,8 @@ from muse import *
 from numpy.polynomial import Chebyshev as T
 from numpy.polynomial import Legendre as L
 from numpy import math
-from math import factorial
+#from math import factorial
+from scipy.misc import factorial
 
 
 
