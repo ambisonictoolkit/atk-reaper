@@ -398,17 +398,16 @@ g      & = k_w \sqrt{ \frac{2}{1 + \sin{\gamma} } }\\
 \end{split}
 \end{equation}
 
-This is used in the graphical user interface (GUI) of several of the plugins discussed in section \ref{sec:transforms} to analyse and illustrate the effect of the spatial transforms. 
-The initial $k_{w, x, y, z}$ coefficients are calculated independently for an array of points distributed at equidistant angles in the horizontal plane, and then exposed to the same transform as the audio signal will be. 
-The transformed coefficients are analysed according to equation \ref{eq:interpreteCoefficients} and displayed as a series of monochrome circles in the GUI against a dark circle indicating the sound field hemisphere as seen from above.
-Colour hue depends on gain with $0\: db$ being orange, signals with increased gain becoming red, and signals with reduced gain venturing towards green and blue, as can be seen in figure \ref{fig:zoomTransform}.
-Elevation is indicated by adjustments to lightness and saturation, so that the circle gets brighter in the upper and darker in the lower hemisphere.
-Additionally the radius of the circle increases slightly with increasing elevation, as seen in figure \ref{fig:rotateTransform}.
-Azimuth is indicated by angular direction of the centre of the circle relative to the display hemisphere.
-The distance from the centre of the hemisphere depends on elevation and directness combined, so that a transformed source that is fully directional and with $0^{\circ}$ elevation displays as a small non-transparent circle located at the outer edge of the hemisphere.
-With decreasing directness, or increasing absolute elevation the centre of the circle moves inwards, and a transformed source with an elevation of $\pm 90^{\circ}$ and/or no directness (an omnipresent signal) will be located in the centre of the displayed hemisphere.
-Degree of directness affects the radius of the circle as well, but in a more radical way than elevation. A fully directional transformed source will be indicated as a small non-transparent circle, and with decreasing directness radius increase so that it equals that of the display hemisphere for a omnipresent source.
-Additionally the circle becomes more transparent with decreasing directness.
+This is used in the graphical user interface (GUI) of several of the plugins discussed in section \ref{sec:transforms} to analyse and illustrate the effect of the spatial transforms for an array of sources that initially are distributed at equidistant angles in the horizontal plane.
+In the interface the sound field hemisphere is seen from above. 
+%The initial $k_{w, x, y, z}$ coefficients are calculated independently for an array of points distributed at equidistant angles in the horizontal plane, and then exposed to the same transform as the audio signal will be. 
+%The transformed coefficients are analysed according to equation \ref{eq:interpreteCoefficients} and displayed as a series of monochrome circles in the GUI against a dark circle indicating the sound field hemisphere as seen from above.
+\emph{Gain} level for the transformed sources is indicated by colour hue, with $0\: db$ being orange, signals with increased gain becoming red, and signals with reduced gain venturing towards green and blue, as can be seen in figure \ref{fig:zoomTransform}.
+The representation of \emph{azimuth} is straight-forward.
+\emph{Elevation} is indicated by adjustments to lightness and saturation, as well as slight alterations of radius.
+Additionally distance from the centre of the hemisphere is reduced with increasing elevation, as seen in figure \ref{fig:rotateTransform}.
+%Azimuth is indicated by angular direction of the centre of the circle relative to the display hemisphere.
+With decreasing \emph{directness} the circle grows in size, moves inwards, and becomes increasingly transparent.
 This way the visualisation helps communicate that an omni-present source does not sound as if it is a focused source located at the centre, rather the sound will appear to be arriving from all directions.
 Examples of less directional sources can be found in figures \ref{fig:directOTransform}-\ref{fig:pushTransform}.
 
