@@ -700,9 +700,9 @@ If doing this, it seems beneficial to use a intermediate library such as Faust, 
 At the same time the plugins are vulnerable to future changes in OS and plugin platforms.
 At the end of 2013 Steinberg stopped maintenance and distribution of the VST2 SDK, instead requiring future developers to use VST3. The future of AudioUnit currently is somewhat uncertain, as the SDK has not been updated since 2007, and AU plugins can not be distributed via AppStore.
 
-Reaper is a reasonably priced and flexible DAW for spatial sound, popular among many composers and sonic artists working with spatial sound, and provides the script-based language JSFX for plugins.
-Using JSFX there is no need to compile, and plugins immediately work with all platforms and processors supported by Reaper.
-As long as Reaper continues to be available, maintenance of the plugins are not expected to be demanding, as Reaper itself will take care of changes to e.g., operating systems.
+%Reaper is a reasonably priced and flexible DAW for spatial sound, popular among many composers and sonic artists working with spatial sound, and provides the script-based language JSFX for plugins.
+Using JSFX for Reaper there is no need to compile, and plugins immediately work with all platforms and processors supported by Reaper.
+Maintenance of the plugins are not expected to be demanding, as Reaper itself will take care of changes to underlaying architectures.
 Using JSFX has been speeding up the development process substantially, and development has been able to primarily focus only on the specific processing and interfacing.
 One disadvantage is that graphics in plugins with custom GUIs seem to be demanding on system resources, and the program indicate major CPU overhead when plugin GUIs are open.
 However, once the GUI window is closed, the plugins do not seem to require any extraneous processing resources.
