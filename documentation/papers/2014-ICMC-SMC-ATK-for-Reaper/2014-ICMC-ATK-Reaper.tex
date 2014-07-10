@@ -157,7 +157,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
 While there is a well-established workflow for stereo in DAWs, options have been more limited when working with Ambisonics.
-The Ambisonic Toolkit (ATK) brings together a number of tools and transforms for working with First order Ambisonic surround sound, including intriguing possibilities for spatial transforms of soundfield image.
+The Ambisonic Toolkit (ATK) brings together a number of tools and transforms for working with first order Ambisonic surround sound, including intriguing possibilities for spatial transforms of soundfield image.
 Previously these tools have only been available in the real-time processing environment SuperCollider.
 
 Reaper is a reasonably priced and flexible DAW for spatial sound, popular among many composers and sonic art\-ists working with spatial sound.
@@ -188,7 +188,7 @@ SpatDIF, the Spatial Sound Description Interchange Format, is an open format off
 Ambisonics encodes audio sources into a speaker-inde\-pendent representation of the sound field called B-format \cite{gerzon:1985JAES}.
 Decoding is the process where an encoded sound field is translated to individual speaker channel feeds; an advantage being,  decoders can be designed for different speak\-er arrays.
 Ambisonics is based on spherical harmonic decomposition of the sound field, and depending on truncation of the spherical harmonic decomposition, 
-the B-for\-mat signal may be First order Ambisonic (FOA) or higher order (HOA)\footnote{Third order Ambisonic is often abbreviated TOA.} \cite{daniel:2001phd}.
+the B-for\-mat signal may be first order (FOA) or higher order Ambisonic (HOA)\footnote{Third order Ambisonic is often abbreviated TOA.} \cite{daniel:2001phd}.
 
 Spatial resolution improves with increasing order, but so does the number of channels required for the encoded signal.
 A number of commercial microphones are available for recording in FOA \cite{farrar:1979soundfield}, and free or commercial B-format recordings are available as sound effects libraries\footnote{\href{http://ambisonia.com}{http://ambisonia.com}, \href{http://www.surround-library.com}{http://www.surround-library.com} and \href{http://www.spheric-collection.com}{http://www.spheric-collection.com}. (All URLs in this article were last accessed July 10th 2014.)}.
@@ -248,10 +248,10 @@ Developing, compiling and maintaining plugins for many parallel platforms can in
 
 In recent years a number of plugins have emerged for Ambisonic processing.
 \emph{WigWare} is a set of VST plugins for Mac and Windows that includes FOA and HOA panner and decoders for regular and irregular speaker layouts, as well as a FOA 3D reverb\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=78}{http://www.brucewiggins.co.uk/?page\_id=78}}.
-Danielle Courville has developed a number of FOA plugins in SonicBirth for encoding and decoding, correcting misaligned B-Format streams, performing rotations, mixing, reverb, and decoding, as well as encoders and decoders for 2nd order and planar 5th order Ambisonic\footnote{\href{http://www.radio.uqam.ca/ambisonic/b2x.html}{http://www.radio.uqam.ca/ambisonic/b2x.html}}.
+Danielle Courville has developed a number of FOA plugins in SonicBirth for encoding and decoding, correcting misaligned B-Format streams, performing rotations, mixing, reverb, and decoding, as well as encoders and decoders for second order and pantophonic\footnote{Horizontal only.} fifth order Ambisonic\footnote{\href{http://www.radio.uqam.ca/ambisonic/b2x.html}{http://www.radio.uqam.ca/ambisonic/b2x.html}}.
 Due to the long halt in development of SonicBirth, these plugins do not work reliable in all newer versions of DAW programs.
-\emph{ambiX} are cross-platform 1st, 3rd and 5th order Ambisonic processors for encoding and decoding, including binaural decoding, as well as spatial transforms \cite{Kronlachner2013:ambix,Kronlachner:2014ambi-transforms}.
-These plugins use the ambiX encoded signal convention; full 3D, ACN channel ordering and\linebreak SN3D normalization \cite{Nachbar:2011ambix} as discussed in section~\ref{sec:coordinate-systems}, but also provides a plugin for conversions to other formats.
+\emph{ambiX} are cross-platform 1\textsuperscript{st}, 3\textsuperscript{rd} and 5\textsuperscript{th} order Ambisonic processors for encoding and decoding, including binaural decoding, as well as spatial transforms \cite{Kronlachner2013:ambix,Kronlachner:2014ambi-transforms}.
+These plugins use the ambiX encoded signal convention; full 3D, ACN channel ordering and SN3D normalization \cite{Nachbar:2011ambix} as discussed in section~\ref{sec:coordinate-systems}, but also provides a plugin for conversions to other formats.
 They are accompanied by \emph{mcfx}, a number of more general multichannel plugins for equalising, delay, gain adjustment and level metering \cite{kronlachner2014:master}.
 \emph{Flux Ircam Spat} wraps the Ircam Spatialisateur multiformat room acoustics simulation and localization software as AU and VST plugins for Mac and Windows \cite{flux:2010spat}.
 Although this plugin mainly provides object-based scene descriptions, it can render the auralization as B-format.
@@ -296,7 +296,7 @@ In its very first implementation, the ATK was deployed as a collection of Csound
 % TODO: Should this be added?
 % From 2007, an implementation for the Common Lisp Music(external link) synthesis and signal processing package has been under development.
 Development of the real-time ATK library for SuperCollider2 began in 2000, and in recent years ATK has primarily been distributed as a version for SuperCollider3 \cite{Anderson:2009introducingATK}.
-Some of the underlying ideas of ATK has also been incorporated into the Blue Ripple Sound Third order Ambisonic plugins.
+Some of the underlying ideas of ATK has also been incorporated into the Blue Ripple Sound third order Ambisonic plugins.
 % TODO: Mention the adaptation of B<->A in Blue Ripple TOA
 
 %TODO: ADD ATK paradigm discussion -- break this into several labelled sections. Refer to illustration.
@@ -340,15 +340,15 @@ Positive elevation is upwards \cite{Peters:2013spatdif}.
 There are also several conventions for how encoded Ambisonic signals are represented.
 B-format recordings made with one type of encoding and played back using another will have severe mismatches in amplitude levels and channel order.
 
-Classical \emph{Furse-Malham} encoding can be used for up to third-order signals, and seem to be the preferred representation in musical applications.
-First order Furse-Malham encoded signals adhere to acoustics coordinate conventions.
+Classical \emph{Furse-Malham} encoding can be used for up to third order signals, and seem to be the preferred representation in musical applications.
+Furse-Malham encoded FOA signals adhere to acoustics coordinate conventions.
 The $W$ component is the pressure (omni or mono) component of the signal, $X$ is the pressure gradient component in the forward-backwards direction, $Y$ is the pressure gradient component in the left-right direction (the stereo component of an MS signal) and $Z$ is the up-down pressure gradient component.
 Furse-Malham encoding is the preferred format for all of the Ambisonic plugins discussed is section \ref{sec:ambi-plugins} except ambiX, and Ambisonic recordings done using SoundField microphones also use this format.
 
 \emph{Normalised 3D formulas (N3D)} and \emph{semi-normalised 3D formulas (SN3D)} can be used for higher order encoding and decoding  \cite{daniel:2001phd}, also beyond TOA.
 N3D component signals go beyond unity $(-1, 1)$ and can only be properly stored in sound file formats that supports floating-points, whereas SN3D component signals stay within unity. 
 
-ATK for Reaper uses First order Furse-Malham encoded signals throughout.
+ATK for Reaper uses Furse-Malham encoded FOA signals throughout.
 This ensures interoperability between ATK for Reaper and other sources and processors of Ambisonic signals such as ATK for SuperCollider or recorded Ambisonic signals, as well as most other available plugins.
 
 ATK for Reaper strives to provide a consistent and intuitive interface towards scene description parameters regardless of whether the user is accustomed with acoustics or navigational coordinate systems.
@@ -678,7 +678,7 @@ While the virtual microphone stereophonic decoder is very easy and convenient, f
 The relevant decoders supports several decoding modes: 
 The `dual' decoder is a dual-band psycho-acoustically optimised decoder, and the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
 `single' is suitable for larger, mid-scale environments.
-`velocity' returns `strict soundfield' (aka `basic') decoding, and is not preferred for First order Ambisonics in most circumstances.
+`velocity' returns `strict soundfield' (aka `basic') decoding, and is not preferred for FOA in most circumstances.
 `controlled' returns `controlled opposites' decoding (aka `in phase'), which is often preferred in large-scale, concert environments.
 
 
