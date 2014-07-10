@@ -217,7 +217,7 @@ In contrast Reaper is a reasonably priced and flexible DAW for spatial sound\foo
 Reaper supports tracks of up to 64 channels\footnote{Suitable for 7\textsuperscript{th}-order HOA.}, and is exceptionally open-ended with respect to routing of channels and tracks.
 Reaper supports all standard fixed-channel surround sound configurations, and the ReaSurround panning plugin that is integrated with Reaper also caters for non-standard speaker configurations \cite{francis:2014_reaper}.
 %, using a spatialisation algorithm based on principles resembling VBAP \cite{Pulkki:1997vbap} as well as DBAP \cite{Lossius:2009dbap}.
-Reaper is well-suited for Ambisonics as well, and is a preferred DAW for many composers within the Ambisonic  community\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=215}{http://www.brucewiggins.co.uk/?page\_id=215}}.
+Reaper is well-suited for Ambisonics as well, and is a preferred DAW for many composers within the Ambisonic community\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=215}{http://www.brucewiggins.co.uk/?page\_id=215}}.
 
 % TODO: ** FX processing chains in DAWs - as a motivation for why we want to be able to work the same way with Ambisonics, and make Ambisonic sound field recordings a malleable material in acousmatic mucis composition and sound design. Maybe this should be at the very start?
 
@@ -239,7 +239,7 @@ Avid has developed the RTAS, TDM and more recently AAX plugin format that work w
 Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patches as devices in Ableton Live\footnote{\href{https://www.ableton.com/en/live/max-for-live/}{https://www.ableton.com/en/live/max-for-live/}}. JSFX is a text-based scripting language for programming audio-oriented effects compiled on the fly for Cockos Reaper\footnote{\href{http://www.reaper.fm/sdk/js/js.php}{http://www.reaper.fm/sdk/js/js.php}}.
 
 The multiple operating systems and plugin architectures poses challenges to plugin developers, that ideally might want to offer their software work with all plugin architectures and hosts in all operating systems.
-Developing, compiling and maintaining plugins for many parallel platforms can introduce substantial workload overhead, and several cross-platform plugin development frameworks have been developed to address this, e.g., JUCE\footnote{\href{http://www.juce.com/about-juce}{http://www.juce.com/about-juce}}, wdl-ol\footnote{\href{https://github.com/olilarkin/wdl-ol}{https://github.com/olilarkin/wdl-ol}} and FA\-UST \cite{smithFaust:2012}. 
+Developing, compiling and maintaining plugins for many parallel platforms can introduce substantial workload overhead, and several cross-platform plugin development frameworks have been developed to address this, e.g., JUCE\footnote{\href{http://www.juce.com/about-juce}{http://www.juce.com/about-juce}}, wdl-ol\footnote{\href{https://github.com/olilarkin/wdl-ol}{https://github.com/olilarkin/wdl-ol}} and\linebreak FAUST \cite{smithFaust:2012}. 
 \emph{SonicBirth} can be used to create AudioUnit and VST plugins for OSX and Windows by connecting objects in a graphical programming environment. Development stalled in 2007, but recent renewed efforts have resulted in a version 2 public alpha being available\footnote{\href{http://sonicbirth.com/}{http://sonicbirth.com/}}.
 \emph{SynthEdit} is a similar technology for VST plugin development on the Windows platform\footnote{\href{http://www.synthedit.com}{http://www.synthedit.com}}.
 
@@ -251,7 +251,7 @@ In recent years a number of plugins have emerged for Ambisonic processing.
 Danielle Courville has developed a number of FOA plugins in SonicBirth for encoding and decoding, correcting misaligned B-Format streams, performing rotations, mixing, reverb, and decoding, as well as encoders and decoders for 2nd order and planar 5th order Ambisonic\footnote{\href{http://www.radio.uqam.ca/ambisonic/b2x.html}{http://www.radio.uqam.ca/ambisonic/b2x.html}}.
 Due to the long halt in development of SonicBirth, these plugins do not work reliable in all newer versions of DAW programs.
 \emph{ambiX} are cross-platform 1st, 3rd and 5th order Ambisonic processors for encoding and decoding, including binaural decoding, as well as spatial transforms \cite{Kronlachner2013:ambix,Kronlachner:2014ambi-transforms}.
-These plugins use the ambiX encoded signal convention; full 3D, ACN channel ordering and SN3D normalization \cite{Nachbar:2011ambix} as discussed in section~\ref{sec:coordinate-systems}, but also provides a plugin for conversions to other formats.
+These plugins use the ambiX encoded signal convention; full 3D, ACN channel ordering and\linebreak SN3D normalization \cite{Nachbar:2011ambix} as discussed in section~\ref{sec:coordinate-systems}, but also provides a plugin for conversions to other formats.
 They are accompanied by \emph{mcfx}, a number of more general multichannel plugins for equalising, delay, gain adjustment and level metering \cite{kronlachner2014:master}.
 \emph{Flux Ircam Spat} wraps the Ircam Spatialisateur multiformat room acoustics simulation and localization software as AU and VST plugins for Mac and Windows \cite{flux:2010spat}.
 Although this plugin mainly provides object-based scene descriptions, it can render the auralization as B-format.
@@ -631,7 +631,7 @@ Distance is described in meters, and to prevent bass boost from getting out of h
 Near\-field compensation (NFC) is implemented via the \emph{NearFieldCompensation} plugin, and facilitates the reduction or removal of the proximity effect from encoded signals.
 NFC is usually used in conjunction with decoders to compensate for the distance of loudspeakers on playback in loudspeaker rigs with smaller diameter. For the artist, NFC can also be used to reduce the proximity effect found in nearfield recordings.
 
-\emph{Proximity} and \emph{NearFieldCompensation} respectively apply an integrator or high pass filter to the first order components of the encoded signal.\footnote{A 1\textsuperscript{th}-order high pass filter is the reciprocal of a 1\textsuperscript{th}-order integrator.} The \emph{Proximity} filter undoes \emph{NearFieldCompensation} given the same distance argument.
+\emph{Proximity} and \emph{NearFieldCompensation} respectively apply an integrator or high pass filter to the first order components of the encoded signal\footnote{A 1\textsuperscript{th}-order high pass filter is the reciprocal of a 1\textsuperscript{th}-order integrator.}. The \emph{Proximity} filter undoes \emph{NearFieldCompensation} given the same distance argument.
 
 
 \subsection{Audio Effects and Ambisonics}\label{sec:a-format}
@@ -652,7 +652,7 @@ Figure~\ref{fig:aToB} illustrates the appropriate network. The \emph{BtoA} plugi
 When used in conjunction, the intermediate A-format signal is well-suited for effect processing. Spatial encoding is preserved (or modified) in a similar way as effects processing with two-channel stereo.
 
 The \emph{Omni} mono signal encoder in conjunction with the network illustrated in figure~\ref{fig:aToB} can also be used to synth\-esise interesting soundfields.
-Each of the effects units should be tuned with slightly different parameters to ensure an active soundfield.
+Each of the effects units \linebreak should be tuned with slightly different parameters to ensure an active soundfield.
 %On its own, \emph{AtoB} is often used to author immersive, periphonic (3D) decorrelated soundfields.
 
 
