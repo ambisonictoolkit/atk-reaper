@@ -191,7 +191,7 @@ Ambisonics is based on spherical harmonic decomposition of the sound field, and 
 the B-for\-mat signal may be first order (FOA) or higher order Ambisonic (HOA)\footnote{Third order Ambisonic is often abbreviated TOA.} \cite{daniel:2001phd}.
 
 Spatial resolution improves with increasing order, but so does the number of channels required for the encoded signal.
-A number of commercial microphones are available for recording in FOA \cite{farrar:1979soundfield}, and free or commercial B-format recordings are available as sound effects libraries\footnote{\href{http://ambisonia.com}{http://ambisonia.com}, \href{http://www.surround-library.com}{http://www.surround-library.com} and \href{http://www.spheric-collection.com}{http://www.spheric-collection.com}. (All URLs in this article were last accessed July 10th 2014.)}.
+A number of commercial microphones are available for recording in FOA \cite{farrar:1979soundfield}, and free or commercial B-format recordings are available as sound effects libraries.\footnote{\href{http://ambisonia.com}{http://ambisonia.com}, \href{http://www.surround-library.com}{http://www.surround-library.com} and \href{http://www.spheric-collection.com}{http://www.spheric-collection.com}. (All URLs in this article were last accessed July 10th 2014.)}
 
 
 \subsection{Spatial sound processing in DAWs}\label{sec:daws}
@@ -213,11 +213,11 @@ RMU provides the rendering engine for the mix stage, and integrates with Pro Too
 The metadata is stored in the Pro Tools session as plug-in automation \cite{dolby:2013authoring}.
 
 The DAWs discussed so far are either limited with respect to surround sound abilities, or expensive and proprietary software and hardware systems for object-based spatial scene authoring and rendering.
-In contrast Reaper is a reasonably priced and flexible DAW for spatial sound\footnote{\href{http://www.reaper.fm}{http://www.reaper.fm}}.
-Reaper supports tracks of up to 64 channels\footnote{Suitable for 7\textsuperscript{th}-order HOA.}, and is exceptionally open-ended with respect to routing of channels and tracks.
+In contrast Reaper is a reasonably priced and flexible DAW for spatial sound.\footnote{\href{http://www.reaper.fm}{http://www.reaper.fm}}
+Reaper supports tracks of up to 64 channels,\footnote{Suitable for 7\textsuperscript{th}-order HOA.} and is exceptionally open-ended with respect to routing of channels and tracks.
 Reaper supports all standard fixed-channel surround sound configurations, and the ReaSurround panning plugin that is integrated with Reaper also caters for non-standard speaker configurations \cite{francis:2014_reaper}.
 %, using a spatialisation algorithm based on principles resembling VBAP \cite{Pulkki:1997vbap} as well as DBAP \cite{Lossius:2009dbap}.
-Reaper is well-suited for Ambisonics as well, and is a preferred DAW for many composers within the Ambisonic community\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=215}{http://www.brucewiggins.co.uk/?page\_id=215}}.
+Reaper is well-suited for Ambisonics as well, and is a preferred DAW for many composers within the Ambisonic community.\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=215}{http://www.brucewiggins.co.uk/?page\_id=215}}
 
 % TODO: ** FX processing chains in DAWs - as a motivation for why we want to be able to work the same way with Ambisonics, and make Ambisonic sound field recordings a malleable material in acousmatic mucis composition and sound design. Maybe this should be at the very start?
 
@@ -227,28 +227,28 @@ Reaper is well-suited for Ambisonics as well, and is a preferred DAW for many co
 \subsection{Plugin technologies}\label{sec:plugin-technologies}
 
 Several plugin specifications enable development of virtual instruments and effects that can be used with multiple hosts.
-VST is a plugin interface specification and SDK for Windows, Mac OSX and Linux by Steinberg\footnote{\href{http://www.steinberg.net/en/company/developer.html}{http://www.steinberg.net/en/company/developer.html}}.
+VST is a plugin interface specification and SDK for Windows, Mac OSX and Linux by Steinberg.\footnote{\href{http://www.steinberg.net/en/company/developer.html}{http://www.steinberg.net/en/company/developer.html}}
 It is a popular format for commercial and freeware plugins, mostly using the VST 2 SDK.
 %, and a large number of audio applications support VST under license from its creator.
 AudioUnits (AU) is a Mac OSX-specific plugin architecture provided by Apple \cite{apple2014:au}.
-In a similar way DirectX can be used for development of Windows-only plugins\footnote{\href{http://www.microsoft.com/en-us/download/details.aspx?id=6812}{http://www.microsoft.com/en-us/download/details.aspx?id=6812}}.
-LADSPA is a GNU LGPL plugin architecture mostly used on the Linux platform\footnote{\href{http://www.ladspa.org}{http://www.ladspa.org}}, and is gradually superseded by LADSPA version 2 (LV2)\footnote{\href{http://lv2plug.in}{http://lv2plug.in}}.
+In a similar way DirectX can be used for development of Windows-only plugins.\footnote{\href{http://www.microsoft.com/en-us/download/details.aspx?id=6812}{http://www.microsoft.com/en-us/download/details.aspx?id=6812}}
+LADSPA is a GNU LGPL plugin architecture mostly used on the Linux platform,\footnote{\href{http://www.ladspa.org}{http://www.ladspa.org}} and is gradually superseded by LADSPA version 2 (LV2).\footnote{\href{http://lv2plug.in}{http://lv2plug.in}}
 
 While the above formats can be used to develop plugins for use with multiple hosts, there are also a number of specifications that permits 3rd part development of plugins for one hosting environment only.
 Avid has developed the RTAS, TDM and more recently AAX plugin format that work with their software and hardware exclusively.
-Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patches as devices in Ableton Live\footnote{\href{https://www.ableton.com/en/live/max-for-live/}{https://www.ableton.com/en/live/max-for-live/}}. JSFX is a text-based scripting language for programming audio-oriented effects compiled on the fly for Cockos Reaper\footnote{\href{http://www.reaper.fm/sdk/js/js.php}{http://www.reaper.fm/sdk/js/js.php}}.
+Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patches as devices in Ableton Live.\footnote{\href{https://www.ableton.com/en/live/max-for-live/}{https://www.ableton.com/en/live/max-for-live/}} JSFX is a text-based scripting language for programming audio-oriented effects compiled on the fly for Cockos Reaper.\footnote{\href{http://www.reaper.fm/sdk/js/js.php}{http://www.reaper.fm/sdk/js/js.php}}
 
 The multiple operating systems and plugin architectures poses challenges to plugin developers, that ideally might want to offer their software work with all plugin architectures and hosts in all operating systems.
-Developing, compiling and maintaining plugins for many parallel platforms can introduce substantial workload overhead, and several cross-platform plugin development frameworks have been developed to address this, e.g., JUCE\footnote{\href{http://www.juce.com/about-juce}{http://www.juce.com/about-juce}}, wdl-ol\footnote{\href{https://github.com/olilarkin/wdl-ol}{https://github.com/olilarkin/wdl-ol}} and\linebreak FAUST \cite{smithFaust:2012}. 
-\emph{SonicBirth} can be used to create AudioUnit and VST plugins for OSX and Windows by connecting objects in a graphical programming environment. Development stalled in 2007, but recent renewed efforts have resulted in a version 2 public alpha being available\footnote{\href{http://sonicbirth.com/}{http://sonicbirth.com/}}.
-\emph{SynthEdit} is a similar technology for VST plugin development on the Windows platform\footnote{\href{http://www.synthedit.com}{http://www.synthedit.com}}.
+Developing, compiling and maintaining plugins for many parallel platforms can introduce substantial workload overhead, and several cross-platform plugin development frameworks have been developed to address this, e.g., JUCE,\footnote{\href{http://www.juce.com/about-juce}{http://www.juce.com/about-juce}} wdl-ol\footnote{\href{https://github.com/olilarkin/wdl-ol}{https://github.com/olilarkin/wdl-ol}} and\linebreak FAUST \cite{smithFaust:2012}. 
+\emph{SonicBirth} can be used to create AudioUnit and VST plugins for OSX and Windows by connecting objects in a graphical programming environment. Development stalled in 2007, but recent renewed efforts have resulted in a version 2 public alpha being available.\footnote{\href{http://sonicbirth.com/}{http://sonicbirth.com/}}
+\emph{SynthEdit} is a similar technology for VST plugin development on the Windows platform.\footnote{\href{http://www.synthedit.com}{http://www.synthedit.com}}
 
 
 \subsection{Plugins for Ambisonic processing}\label{sec:ambi-plugins}
 
 In recent years a number of plugins have emerged for Ambisonic processing.
-\emph{WigWare} is a set of VST plugins for Mac and Windows that includes FOA and HOA panner and decoders for regular and irregular speaker layouts, as well as a FOA 3D reverb\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=78}{http://www.brucewiggins.co.uk/?page\_id=78}}.
-Danielle Courville has developed a number of FOA plugins in SonicBirth for encoding and decoding, correcting misaligned B-Format streams, performing rotations, mixing, reverb, and decoding, as well as encoders and decoders for second order and pantophonic\footnote{Horizontal only.} fifth order Ambisonic\footnote{\href{http://www.radio.uqam.ca/ambisonic/b2x.html}{http://www.radio.uqam.ca/ambisonic/b2x.html}}.
+\emph{WigWare} is a set of VST plugins for Mac and Windows that includes FOA and HOA panner and decoders for regular and irregular speaker layouts, as well as an FOA 3D reverb.\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=78}{http://www.brucewiggins.co.uk/?page\_id=78}}
+Danielle Courville has developed a number of FOA plugins in SonicBirth for encoding and decoding, correcting misaligned B-Format streams, performing rotations, mixing, reverb, and decoding, as well as encoders and decoders for second order and pantophonic\footnote{Horizontal only.} fifth order Ambisonic.\footnote{\href{http://www.radio.uqam.ca/ambisonic/b2x.html}{http://www.radio.uqam.ca/ambisonic/b2x.html}}
 Due to the long halt in development of SonicBirth, these plugins do not work reliable in all newer versions of DAW programs.
 \emph{ambiX} are cross-platform 1\textsuperscript{st}, 3\textsuperscript{rd} and 5\textsuperscript{th} order Ambisonic processors for encoding and decoding, including binaural decoding, as well as spatial transforms \cite{Kronlachner2013:ambix,Kronlachner:2014ambi-transforms}.
 These plugins use the ambiX encoded signal convention; full 3D, ACN channel ordering and SN3D normalization \cite{Nachbar:2011ambix} as discussed in section~\ref{sec:coordinate-systems}, but also provides a plugin for conversions to other formats.
@@ -257,7 +257,7 @@ They are accompanied by \emph{mcfx}, a number of more general multichannel plugi
 Although this plugin mainly provides object-based scene descriptions, it can render the auralization as B-format.
 The \emph{HARPEX} plugin for decoding FOA uses an algorithm based on high angular resolution planewave expansion (HARPEX) in order to address issues with low angular resolution and small sweet spot that FOA suffers from \cite{Berge:2010harpex}.
 Blue Ripple Sound offers a wide range of OSX and Windows VST plugins for TOA, including encoders and upmixers, decoders, and a rich set of plugins for spatial and filter-based manipulations of the encoded signal.
-The TOA Harpex Upsampler converts FOA material to TOA using the Harpex algorithm\footnote{\href{http://www.blueripplesound.com/product-listings/pro-audio}{http://www.blueripplesound.com/product-listings/pro-audio}}.
+The TOA HARPEX Upsampler converts FOA material to TOA using the HARPEX algorithm.\footnote{\href{http://www.blueripplesound.com/product-listings/pro-audio}{http://www.blueripplesound.com/product-listings/pro-audio}}
 
 
 
@@ -631,7 +631,7 @@ Distance is described in meters, and to prevent bass boost from getting out of h
 Near\-field compensation (NFC) is implemented via the \emph{NearFieldCompensation} plugin, and facilitates the reduction or removal of the proximity effect from encoded signals.
 NFC is usually used in conjunction with decoders to compensate for the distance of loudspeakers on playback in loudspeaker rigs with smaller diameter. For the artist, NFC can also be used to reduce the proximity effect found in nearfield recordings.
 
-\emph{Proximity} and \emph{NearFieldCompensation} respectively apply an integrator or high pass filter to the first order components of the encoded signal\footnote{A 1\textsuperscript{th}-order high pass filter is the reciprocal of a 1\textsuperscript{th}-order integrator.}. The \emph{Proximity} filter undoes \emph{NearFieldCompensation} given the same distance argument.
+\emph{Proximity} and \emph{NearFieldCompensation} respectively apply an integrator or high pass filter to the first order components of the encoded signal.\footnote{A 1\textsuperscript{th}-order high pass filter is the reciprocal of a 1\textsuperscript{th}-order integrator.} The \emph{Proximity} filter undoes \emph{NearFieldCompensation} given the same distance argument.
 
 
 \subsection{Audio Effects and Ambisonics}\label{sec:a-format}
@@ -711,7 +711,7 @@ However, once the GUI window is closed, the plugins do not seem to require any e
 
 ATK for SuperCollider3 is distributed as open-source using the GNU GPL General Public License Version 3.
 This license is incompatible for use with proprietary software such as Reaper, and for this reason ATK for Reaper is distributed using the GNU LGPL Lesser Public License Version 3.
-ATK for Reaper will be available for download from the Ambisonic Toolkit web site in the near future\footnote{\href{http://www.ambisonictoolkit.net}{http://www.ambisonictoolkit.net}}.
+ATK for Reaper will be available for download from the Ambisonic Toolkit web site in the near future.\footnote{\href{http://www.ambisonictoolkit.net}{http://www.ambisonictoolkit.net}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
