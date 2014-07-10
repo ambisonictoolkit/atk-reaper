@@ -231,14 +231,14 @@ Several plugin specifications enable development of virtual instruments and effe
 VST is a plugin interface specification and SDK for Windows, Mac OSX and Linux by Steinberg \cite{steinberg:2014vst}.
 It is a popular format for commercial and freeware plugins, mostly using the VST 2 SDK, and a large number of audio applications support VST under license from its creator.
 AudioUnits (AU) is a Mac OSX-specific plugin architecture provided by Apple as part of CoreAudio \cite{apple2014:au}.
-In a similar way DirextX can be used for development of Windows-only plugins \cite{microsoft2014:directX}.
+In a similar way DirectX can be used for development of Windows-only plugins \cite{microsoft2014:directX}.
 LADSPA is a GNU LGPL plugin architecture mostly used on the Linux platform \cite{furse:2007ladspa}, and is gradually superseded by LADSPA version 2 (LV2) \cite{lv2:2014}.
 
 While the above formats can be used to develop plugins for use with multiple hosts, there are also a number of specifications that permits 3rd part development of plugins for one hosting environment only.
 Avid has developed the RTAS, TDM and more recently AAX plugin format that work with their software and hardware exclusively.
 Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patches as devices in Ableton Live \cite{ableton:2014maxforlive}. JSFX is a text-based scripting language for programming audio-oriented effects compiled on the fly for Cockos Reaper \cite{cockos:2014jsfx,cockos:2014reaper}.
 
-The multiple operation systems and plugin architectures poses challenges to plugin developers, that ideally might want to offer their software work with all plugin architectures and hosts in all operation systems.
+The multiple operating systems and plugin architectures poses challenges to plugin developers, that ideally might want to offer their software work with all plugin architectures and hosts in all operating systems.
 Developing, compiling and maintaining plugins for many parallel platforms can introduce substantial workload overhead, and several cross-platform plugin development frameworks have been developed to address this, e.g.,  JUCE \cite{juce2014}, wdl-ol \cite{larkin2014wdl-ol} and FAUST \cite{smithFaust:2012}. 
 \emph{SonicBirth} can be used to create AudioUnit and VST plugins for OSX and Windows by connecting objects in a graphical programming environment. Development stalled in 2007, but recent renewed efforts have resulted in a version 2 public alpha being available \cite{sonicbirth2014}.
 \emph{SynthEdit} is a similar technology for VST plugin development on the Windows platform \cite{synthedit2011}.
@@ -278,7 +278,11 @@ The TOA Harpex Upsampler converts FOA material to TOA using the Harpex algorithm
 The Ambisonic Toolkit (ATK) brings together a number of tools and transforms for working with Ambisonic surround sound  \cite{Anderson:2009introducingATK, anderson:ambisonic_2011}.
 Use is targeted towards the composer of acousmatic and experimental music. The intention is for the toolset to be both ergonomic and comprehensive, providing algorithms to creatively manipulate and synthesize Ambisonic sound fields.
 
-The tools are framed for the user to `think Ambisonically'. By this, it is meant the ATK is focused on the problem of synthesising and processing sound fields. The model of the ATK is a sound-field sound-image model rather than a sound-object sound-scene model. By addressing the holistic problem of creatively controlling a complete soundfield, the ATK allows and encourages the composer to think beyond the placement of sounds in a sound-space and instead attend to the impression and image of a soundfield. This is viewed to be the {\em idiomatic} approach for working with the Ambisonic technique, and creatively leverages the model the Ambisonic technology presents.
+The tools are framed for the user to `think Ambisonically'.
+By this, it is meant the ATK is focused on the problem of synthesising and processing sound fields.
+The model of the ATK is a sound-field sound-image model rather than a sound-object sound-scene model.
+By addressing the holistic problem of creatively controlling a complete soundfield, the ATK allows and encourages the composer to think beyond the placement of sounds in a sound-space and instead attend to the impression and image of a soundfield.
+This is viewed to be the {\em idiomatic} approach for working with the Ambisonic technique, and creatively leverages the model the Ambisonic technology presents.
 
 
 %By this, it is meant the ATK is not focused on the problem of auralization and/or room modelling.
@@ -309,7 +313,9 @@ Figure \ref{fig:atkParadigm} illustrates how the ATK separates the task of produ
   \item[Monitor:] Playback or render an Ambisonic soundfield.
 \end{description}
 
-In its most simple form, Ambisonics can be regarded as splitting the panning law into two separate parts, {\em encoding} and {\em decoding}, where final panning ({\em decoding}) is deferred to an actual loudspeaker array at the time of playback. Many currently available implementations of Ambisonics take this approach. However, while giving much flexibility, especially for final playback, this view doesn't completely leverage the sound-field sound-image model made available in Ambisonics. The ATK considers intervention in {\em imaging} to be an critical step; this is where the artist shapes and processes the sound field in a coherent way which isn't easily available via the other models for working with spatial sound.
+In its most simple form, Ambisonics can be regarded as splitting the panning law into two separate parts, {\em encoding} and {\em decoding}, where final panning ({\em decoding}) is deferred to an actual loudspeaker array at the time of playback.
+Many currently available implementations of Ambisonics take this approach. However, while giving much flexibility, especially for final playback, this view doesn't completely leverage the sound-field sound-image model made available in Ambisonics.
+The ATK considers intervention in {\em imaging} to be an critical step; this is where the artist shapes and processes the sound field in a coherent way which isn't easily available via the other models for working with spatial sound.
 
 Further details are discussed in section~\ref{sec:implementation}, below.
 
@@ -336,7 +342,7 @@ B-format recordings made with one type of encoding and played back using another
 
 Classical \emph{Furse-Malham} encoding can be used for up to third-order signals, and seem to be the preferred representation in musical applications.
 First order Furse-Malham encoded signals adhere to acoustics coordinate conventions.
-The $W$ component is the pressure (omni or mono) component of the signal, $W$ is the pressure gradient component in the forward-backwards direction, $Y$ is the pressure gradient component in the left-right direction (the stereo component of an MS signal) and $Z$ is the up-down pressure gradient component.
+The $W$ component is the pressure (omni or mono) component of the signal, $X$ is the pressure gradient component in the forward-backwards direction, $Y$ is the pressure gradient component in the left-right direction (the stereo component of an MS signal) and $Z$ is the up-down pressure gradient component.
 Furse-Malham encoding is the preferred format for all of the Ambisonic plugins discussed is section \ref{sec:ambi-plugins} except ambiX, and Ambisonic recordings done using SoundField microphones also use this format.
 
 \emph{Normalised 3D formulas (N3D)} and \emph{semi-normalised 3D formulas (SN3D)} can be used for higher order encoding and decoding  \cite{daniel:2001phd}, also beyond TOA.
@@ -450,8 +456,7 @@ The following sections present the available plugins.
 %NOTE: All decoders presume loudspeakers are placed at equal radii from the origin of the array, and gain is normalised. Loudspeaker arrays with unequal radii may be realised if the resulting wavefront arrival times are compensated through the use of delay lines.
 %See FoaDecode, FoaDecoderMatrix and FoaDecoderKernel for more details about decoding.
 
-Most users approaching Ambisonics are usually presented with two avenues to author an Ambisonic soundfield: capture a natural soundfield directly with a Soundfield microphone, or author a planewave\footnote{Planewave encoding is the classic 
-Ambisonic panning technique.} from a monophonic signal.
+Most users approaching Ambisonics are usually presented with two avenues to author an Ambisonic soundfield: capture a natural soundfield directly with a Soundfield microphone, or author a planewave\footnote{Planewave encoding is the classic Ambisonic panning technique.} from a monophonic signal.
 The ATK provides a much wider palate of authoring tools.
 
 %Authoring
@@ -468,9 +473,14 @@ The ATK provides a much wider palate of authoring tools.
 \subsubsection{Basic Encoders}\label{sec:bas-encoders}
 The \emph{PlaneWave} plugin is the classic encoding of a mono source as a directional plane\-wave, where the direction (azimuth and elevation) of the planewave can be set.
 The \emph{Omni} plugin encodes a mono signal as an omnidirectional soundfield, which can be regarded in two ways:
-a soundfield with an infinite number of plane\-waves arriving in all directions, or a soundfield with no directions. In a well aligned, dampend studio environment, this usually sounds "in the head", while in concert hall listening it usually appears as omnipresent. The \emph{Stereo} plugin encodes the left and right channels as two planewaves coming from left and right directions, where the angular spread between the two waves is parameterised. Additional upmixers are provided for a number of virtual spea\-ker arrays; \emph{Quad}, \emph{5.0} and \emph{7.0} for the standard ITU layouts, and \emph{Pantophonic} for 2D and \emph{Periphonic} for 3D arrays. These are implemented as planewave encoders, as well. A number of tetrahedral orientations are made available.
+a soundfield with an infinite number of plane\-waves arriving in all directions, or a soundfield with no directions.
+In a well aligned, dampend studio environment, this usually sounds "in the head", while in concert hall listening it usually appears as omnipresent.
+The \emph{Stereo} plugin encodes the left and right channels as two planewaves coming from left and right directions, where the angular spread between the two waves is parameterised.
+Additional upmixers are provided for a number of virtual spea\-ker arrays; \emph{Quad}, \emph{5.0} and \emph{7.0} for the standard ITU layouts, and \emph{Pantophonic} for 2D and \emph{Periphonic} for 3D arrays.
+These are implemented as planewave encoders, as well. A number of tetrahedral orientations are made available.
 
-Additionally, the ATK includes \emph{AtoB}, a simple A-format encoder.\footnote{The A-format encoder is a simple matrix and does not apply the frequency dependent coincidence compensation filters found in the Soundfield microphone \cite{farrar:1979soundfield}.} The \emph{AtoB} encoder takes four inputs and places them at the vertices of a tetrahedron; this is usually the encoder of choice for constructing complex soundfields. These signals may either be synthesised or captured by microphones.
+Additionally, the ATK includes \emph{AtoB}, a simple A-format encoder.\footnote{The A-format encoder is a simple matrix and does not apply the frequency dependent coincidence compensation filters found in the Soundfield microphone \cite{farrar:1979soundfield}.}
+The \emph{AtoB} encoder takes four inputs and places them at the vertices of a tetrahedron; this is usually the encoder of choice for constructing complex soundfields. These signals may either be synthesised or captured by microphones.
 
 
 % TODO: The following sentence is wrong, as the incoming signal is multiplied by kInvSqrt2, so gain is adjusted. However, it's also an open question if the current equation for the Omni encoder is correct, or if it should be W(t) = s(t) rather than the current W(t) = s(t) / sqrt(2.). That's what we'd get if we first encode as planarwave, and then transform to an omnidirectional signal using the DirectO transform.
@@ -487,6 +497,7 @@ Additionally, the ATK includes \emph{AtoB}, a simple A-format encoder.\footnote{
 % I'm not necessarily opposed to the below idea in a big way, it is just that such an encoder immediately directs the user away from what may be more optimal solutions....
 
 \subsubsection{Advanced Encoders}\label{sec:impending-encoders}
+
 A few encoders remain to be implemented:
 %pseudoinverse microphone array: encoding from discrete microphones or signals
 The \emph{PseudoInverse} encoding technique provides the greatest flexibility, and can be used with both microphone arrays and synthetic signals. 
@@ -496,7 +507,8 @@ In the absence of a Soundfield microphone, this encoding technique gives the opp
 \emph{Zoom\-H2} adapts \emph{PseudoInverse} for this popular portable recorder.
 
 The final class of encoders that remain to be ported depend on convolution.
-\emph{Spread} encodes a monophonic signal by smoothly rotating the signal across the soundfield by frequency where \emph{Diffuse} randomises the phase of the incoming monophonic signal across the soundfield to create a diffuse field. Along with \emph{AtoB}, these two encoders are regarded as the primary `full field' authoring tools to be found in the ATK, and we look forward to adding these soon in the JSFX distribution.
+\emph{Spread} encodes a monophonic signal by smoothly rotating the signal across the soundfield by frequency where \emph{Diffuse} randomises the phase of the incoming monophonic signal across the soundfield to create a diffuse field.
+Along with \emph{AtoB}, these two encoders are regarded as the primary `full field' authoring tools to be found in the ATK, and we look forward to adding these soon in the JSFX distribution.
 
 Additionally, the ATK makes available \emph{Super}, the classic `super stereo' method for encoding stereophonic signals, and the \emph{UHJ} encoder offers access to numerous published recordings for periphonic (2D) audition.
 
@@ -508,7 +520,9 @@ These are spatial domain filters which reorient, reshape or otherwise spatially 
 As discussed in section~\ref{sec:ambi-plugins}, there are several other plugin libraries available for spatial transforms.
 The ATK provides a much wider and comprehensive toolset.
 
-As discussed earlier and illustrated in figure \ref{fig:atkParadigm}, it is expected that Authoring (\emph{encoders}), will be followed by Imaging (\emph{transformers}). One can regard this as augmenting the panning law of the initial encoding. For example, an omni\-directional or diffuse soundfield may be `pushed' into a planewave arriving from a single direction. Or, conversely, the directivity of a soundfield composed of planewaves arriving from many directions may be collapsed to a direct\-ionless (omnidirectional) field.
+As discussed earlier and illustrated in figure \ref{fig:atkParadigm}, it is expected that Authoring (\emph{encoders}), will be followed by Imaging (\emph{transformers}).
+One can regard this as augmenting the panning law of the initial encoding. For example, an omni\-directional or diffuse soundfield may be `pushed' into a planewave arriving from a single direction.
+Or, conversely, the directivity of a soundfield composed of planewaves arriving from many directions may be collapsed to a direct\-ionless (omnidirectional) field.
 
 
 %, and it is with imaging is where the encoded spatial information of the soundfield is further re-oriented as desired.
@@ -531,7 +545,8 @@ As discussed earlier and illustrated in figure \ref{fig:atkParadigm}, it is expe
 
 The \emph{RotateTiltTumble} plugin is a FOA multi-axes rotation transformer, with \emph{Rotation}, \emph{Tilt} and \emph{Tumble}\footnote{Yaw, Roll, and Pitch} transforms provided in the sequence indicated by the plugin name.
 If the user wishes to change the order of transformations, it is possible to daisy-chain two or more instances of the plugin.
-This transform does not affect directivity of the signal. The screenshot in figure \ref{fig:rotateTransform} demonstrates how variations in saturation, lightness and radius of the displayed transformed sources serve to illustrate their vertical position. The separate effect of the \emph{Tilt} and \emph{Tumble} transformations is indicated by the two blue planes in the interface.
+This transform does not affect directivity of the signal. The screenshot in figure \ref{fig:rotateTransform} demonstrates how variations in saturation, lightness and radius of the displayed transformed sources serve to illustrate their vertical position.
+The separate effect of the \emph{Tilt} and \emph{Tumble} transformations is indicated by the two blue planes in the interface.
 
 
 
@@ -558,7 +573,7 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 
 
  
-\subsubsection{FocusPushPressZoom and Dominate}\label{sec:focus}
+\subsubsection{FocusPressPushZoom and Dominate}\label{sec:focus}
 
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
@@ -575,15 +590,18 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 \caption{Zoom transform interface.\label{fig:zoomTransform}}
 \end{figure}
 
-The \emph{FocusPushPressZoom} plugin provides a unified interface to the four different spatial transforms \emph{Focus}, \emph{Press}, \emph{Push} and \emph{Zoom}.
+The \emph{FocusPressPushZoom} plugin provides a unified interface to the four different spatial transforms \emph{Focus}, \emph{Press}, \emph{Push} and \emph{Zoom}.
 The degree of spatial transform is expressed as angles in the range from $0^\circ$ to $90^\circ$. 
 At $0^\circ$ no transform is applied, while at $90^\circ$ all four transforms cause the soundfield to collapse to a single mono planewave.
 %All four transforms shift the sound field in a preferred direction by altering directness, gain and direction of the incoming signals depending on their original directions, but the four transforms differ in terms of what mathematical transform is applied.
 %The results will differ subtly or more distinctly depending on which of the transforms is applied.
 
-The \emph{Focus} and \emph{Zoom} transforms are dominance related transforms and can be thought of as either `focusing' on or `emphasising' the elements of a soundfield in a certain direction. \emph{Focus} normalises the gain in the direction of interest to $0\,\mathrm{dB}$, where \emph{Zoom} normalises $\pm90^\circ$. At $180^\circ$ to the direction of interest both \emph{Focus} and \emph{Zoom} reduce the gain to $-\infty\,\mathrm{dB}$ when the transform angle is set to $\pm90^\circ$.
+The \emph{Focus} and \emph{Zoom} transforms are dominance related transforms and can be thought of as either `focusing' on or `emphasising' the elements of a soundfield in a certain direction.
+\emph{Focus} normalises the gain in the direction of interest to $0\,\mathrm{dB}$, where \emph{Zoom} normalises $\pm90^\circ$.
+At $180^\circ$ to the direction of interest both \emph{Focus} and \emph{Zoom} reduce the gain to $-\infty\,\mathrm{dB}$ when the transform angle is set to $\pm90^\circ$.
 
-In contrast, \emph{Push} and \emph{Press} act differently, and rather than emphasising elements in a target direction, instead `push' all elements towards the direction of interest. When set to $\pm90^\circ$ the omnidirectional component of the soundfield (all elements) is transformed into a planewave arriving from the direction of interest.
+In contrast, \emph{Press} and \emph{Push} act differently, and rather than emphasising elements in a target direction, instead `press' or `push' all elements towards the direction of interest.
+When set to $\pm90^\circ$ the omnidirectional component of the soundfield (all elements) is transformed into a planewave arriving from the direction of interest.
 
 %All four transforms shift the sound field in a preferred direction by altering directness, gain and direction of the incoming signals depending on their original directions, but the four transforms differ in terms of what mathematical transform is applied.
 %The results will differ subtly or more distinctly depending on which of the transforms is applied.
@@ -594,7 +612,7 @@ Two of the transforms can be seen in figures~\ref{fig:pushTransform} and \ref{fi
 
 The \emph{Dominance} plugin increases the gain of signals coming from the preferred direction while decreasing the gain of signals originating from the opposite side.
 In the Reaper plugin gain in the preferred direction can be boosted by up to $24\,\mathrm{dB}$.
-While the \emph{Focus}, \emph{Push}, \emph{Press}, and \emph{Zoom} transforms do not generally have any major impact on the overall sound level of the soundfield, \emph{Dominance} can result in major alterations to sound levels.
+While the \emph{Focus}, \emph{Press}, \emph{Push}, and \emph{Zoom} transforms do not generally have any major impact on the overall sound level of the soundfield, \emph{Dominance} can result in major alterations to sound levels.
 For this reason, as well as due to the difference in how the degree of transform is expressed (decibels rather than angles) the \emph{Dominance} transform has not been integrated into the same plugin as the other four transforms.
 
 
@@ -630,9 +648,12 @@ Processing one or more of the channels using an audio effect which modifies gain
 \caption{Process effects in A-format.\label{fig:aToB}}
 \end{figure}
 
-The ATK provides a remedy through the use of a pair of plugins, \emph{BtoA} and \emph{AtoB}, allowing the artist to process B-format signals using familiar audio effects. Figure~\ref{fig:aToB} illustrates the appropriate network. The \emph{BtoA} plugin decodes to A-format, while \emph{AtoB} re-encodes into B-format. When used in conjunction, the intermediate A-format signal is well-suited for effect processing. Spatial encoding is preserved (or modified) in a similar way as effects processing with two-channel stereo.
+The ATK provides a remedy through the use of a pair of plugins, \emph{BtoA} and \emph{AtoB}, allowing the artist to process B-format signals using familiar audio effects.
+Figure~\ref{fig:aToB} illustrates the appropriate network. The \emph{BtoA} plugin decodes to A-format, while \emph{AtoB} re-encodes into B-format.
+When used in conjunction, the intermediate A-format signal is well-suited for effect processing. Spatial encoding is preserved (or modified) in a similar way as effects processing with two-channel stereo.
 
-The \emph{Omni} mono signal encoder in conjunction with the network illustrated in figure~\ref{fig:aToB} can also be used to synth\-esise interesting soundfields. Each of the effects units should be tuned with slightly different parameters to ensure an active soundfield.
+The \emph{Omni} mono signal encoder in conjunction with the network illustrated in figure~\ref{fig:aToB} can also be used to synth\-esise interesting soundfields.
+Each of the effects units should be tuned with slightly different parameters to ensure an active soundfield.
 %On its own, \emph{AtoB} is often used to author immersive, periphonic (3D) decorrelated soundfields.
 
 
@@ -672,7 +693,8 @@ The `dual' decoder is a dual-band psycho-acoustically optimised decoder, and the
 
 \subsection{Licensing and distribution}\label{sec:license}
 
-ATK for SuperCollider3 is distributed as open-source using the GNU General Public License Version 3 (GNU GPL). This license is incompatible for use with proprietary software such as Reaper, and for this reason ATK for Reaper is distributed using the GNU Lesser Public License Version 3 (GNU LGPL).
+ATK for SuperCollider3 is distributed as open-source using the GNU General Public License Version 3 (GNU GPL).
+This license is incompatible for use with proprietary software such as Reaper, and for this reason ATK for Reaper is distributed using the GNU Lesser Public License Version 3 (GNU LGPL).
 ATK for Reaper requires Reaper 4.61 or newer, and will be available for download from the Ambisonic Toolkit web site in the near future \cite{ambisonictoolkit.net:2014}.
 
 
@@ -692,9 +714,10 @@ At the end of 2013 Steinberg stopped maintenance and distribution of the VST2 SD
 
 Reaper is a reasonably priced and flexible DAW for spatial sound, popular among many composers and sonic artists working with spatial sound, and provides the script-based language JSFX for plugins.
 Using JSFX there is no need to compile, and plugins immediately work with all platforms and processors supported by Reaper.
-As long as Reaper continues to be available, maintenance of the plugins are not expected to be demanding, as Reaper itself will take care of changes to e.g., operation systems.
+As long as Reaper continues to be available, maintenance of the plugins are not expected to be demanding, as Reaper itself will take care of changes to e.g., operating systems.
 Using JSFX has been speeding up the development process substantially, and development has been able to primarily focus only on the specific processing and interfacing.
-One disadvantage is that graphics in plugins with custom GUIs seem to be demanding on system resources, and the program indicate major CPU overhead when plugin GUIs are open. However, once the GUI window is closed, the plugins do not seem to require any extraneous processing resources.
+One disadvantage is that graphics in plugins with custom GUIs seem to be demanding on system resources, and the program indicate major CPU overhead when plugin GUIs are open.
+However, once the GUI window is closed, the plugins do not seem to require any extraneous processing resources.
 
 
 
