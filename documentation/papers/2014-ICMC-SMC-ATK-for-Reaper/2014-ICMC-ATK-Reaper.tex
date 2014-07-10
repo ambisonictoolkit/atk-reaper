@@ -215,7 +215,8 @@ The metadata is stored in the Pro Tools session as plug-in automation \cite{dolb
 The DAWs discussed so far are either limited with respect to surround sound abilities, or expensive and proprietary software and hardware systems for object-based spatial scene authoring and rendering.
 In contrast Reaper is a reasonably priced and flexible DAW for spatial sound\footnote{\href{http://www.reaper.fm}{http://www.reaper.fm}}.
 Reaper supports tracks of up to 64 channels\footnote{Suitable for 7\textsuperscript{th}-order HOA.}, and is exceptionally open-ended with respect to routing of channels and tracks.
-Reaper supports all standard fixed-channel surround sound configurations, and the ReaSurround panning plugin that is integrated with Reaper also caters for non-standard speaker configurations \cite{francis:2014_reaper}, using a spatialisation algorithm based on principles resembling VBAP \cite{Pulkki:1997vbap} as well as DBAP \cite{Lossius:2009dbap}.
+Reaper supports all standard fixed-channel surround sound configurations, and the ReaSurround panning plugin that is integrated with Reaper also caters for non-standard speaker configurations \cite{francis:2014_reaper}.
+%, using a spatialisation algorithm based on principles resembling VBAP \cite{Pulkki:1997vbap} as well as DBAP \cite{Lossius:2009dbap}.
 Reaper is well-suited for Ambisonics as well, and is a preferred DAW for many composers within the Ambisonic  community\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=215}{http://www.brucewiggins.co.uk/?page\_id=215}}.
 
 % TODO: ** FX processing chains in DAWs - as a motivation for why we want to be able to work the same way with Ambisonics, and make Ambisonic sound field recordings a malleable material in acousmatic mucis composition and sound design. Maybe this should be at the very start?
@@ -227,8 +228,9 @@ Reaper is well-suited for Ambisonics as well, and is a preferred DAW for many co
 
 Several plugin specifications enable development of virtual instruments and effects that can be used with multiple hosts.
 VST is a plugin interface specification and SDK for Windows, Mac OSX and Linux by Steinberg\footnote{\href{http://www.steinberg.net/en/company/developer.html}{http://www.steinberg.net/en/company/developer.html}}.
-It is a popular format for commercial and freeware plugins, mostly using the VST 2 SDK, and a large number of audio applications support VST under license from its creator.
-AudioUnits (AU) is a Mac OSX-specific plugin architecture provided by Apple as part of CoreAudio \cite{apple2014:au}.
+It is a popular format for commercial and freeware plugins, mostly using the VST 2 SDK.
+%, and a large number of audio applications support VST under license from its creator.
+AudioUnits (AU) is a Mac OSX-specific plugin architecture provided by Apple \cite{apple2014:au}.
 In a similar way DirectX can be used for development of Windows-only plugins\footnote{\href{http://www.microsoft.com/en-us/download/details.aspx?id=6812}{http://www.microsoft.com/en-us/download/details.aspx?id=6812}}.
 LADSPA is a GNU LGPL plugin architecture mostly used on the Linux platform\footnote{\href{http://www.ladspa.org}{http://www.ladspa.org}}, and is gradually superseded by LADSPA version 2 (LV2)\footnote{\href{http://lv2plug.in}{http://lv2plug.in}}.
 
@@ -349,7 +351,7 @@ N3D component signals go beyond unity $(-1, 1)$ and can only be properly stored 
 ATK for Reaper uses First order Furse-Malham encoded signals throughout.
 This ensures interoperability between ATK for Reaper and other sources and processors of Ambisonic signals such as ATK for SuperCollider or recorded Ambisonic signals, as well as most other available plugins.
 
-ATK for Reaper strives to provide a consistent and intuitive interface towards scene description parameters such as direction of sources, speakers and spatial transforms, regardless of whether the user is accustomed with acoustics or navigational coordinate systems.
+ATK for Reaper strives to provide a consistent and intuitive interface towards scene description parameters regardless of whether the user is accustomed with acoustics or navigational coordinate systems.
 For this reason Cartesian coordinates are avoided throughout the plugin suite, and whenever possible the plugins offers graphical user interfaces to avoid ambiguities.
 
 However, due to current limitations in the Reaper JSFX API, there are some considerations to be made with respect to description of azimuths.
@@ -398,8 +400,8 @@ g      & = k_w \sqrt{ \frac{2}{1 + \sin{\gamma} } }\\
 \end{split}
 \end{equation}
 
-This is used in the graphical user interface (GUI) of several of the plugins discussed in section \ref{sec:transforms} to analyse and illustrate the effect of the spatial transforms for an array of sources that initially are distributed at equidistant angles in the horizontal plane.
-In the interface the sound field hemisphere is seen from above. 
+This is used in the graphical user interface (GUI) of several of the plugins discussed in section \ref{sec:transforms} to illustrate the effect of the spatial transforms for an array of sources that initially are distributed at equidistant angles in the horizontal plane.
+In the interfaces the sound field hemisphere is seen from above. 
 %The initial $k_{w, x, y, z}$ coefficients are calculated independently for an array of points distributed at equidistant angles in the horizontal plane, and then exposed to the same transform as the audio signal will be. 
 %The transformed coefficients are analysed according to equation \ref{eq:interpreteCoefficients} and displayed as a series of monochrome circles in the GUI against a dark circle indicating the sound field hemisphere as seen from above.
 \emph{Gain} level for the transformed sources is indicated by colour hue, with $0\: db$ being orange, signals with increased gain becoming red, and signals with reduced gain venturing towards green and blue, as can be seen in figure \ref{fig:zoomTransform}.
@@ -535,7 +537,7 @@ Or, conversely, the directivity of a soundfield composed of planewaves arriving 
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.9\columnwidth]{figures/rotateTiltTumble.png}
+\includegraphics[width=0.8\columnwidth]{figures/rotateTiltTumble.png}
 \setlength{\abovecaptionskip}{0pt plus 3pt minus 2pt} % Decrease distance, as the figure itself has lots of empty space below
 \caption{Rotate, Tilt and Tumble transform.\label{fig:rotateTransform}}
 \end{figure}
@@ -552,7 +554,7 @@ The separate effect of the \emph{Tilt} and \emph{Tumble} transformations is indi
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.9\columnwidth]{figures/directOTransform.png}
+\includegraphics[width=0.8\columnwidth]{figures/directOTransform.png}
 \caption{DirectO transform plugin interface.\label{fig:directOTransform}}
 \end{figure}
 
@@ -562,7 +564,7 @@ It is a spatial low-pass filter; with increasing degree of transform, the signal
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.9\columnwidth]{figures/directTransform.png}
+\includegraphics[width=0.8\columnwidth]{figures/directTransform.png}
 \caption{Direct transform plugin interface.\label{fig:directTransform}}
 \end{figure}
 
@@ -575,7 +577,7 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.9\columnwidth]{figures/pushTransform.png}
+\includegraphics[width=0.8\columnwidth]{figures/pushTransform.png}
 \setlength{\abovecaptionskip}{0pt plus 3pt minus 2pt} % Decrease distance, as the figure itself has lots of empty space below
 \caption{Push transform plugin interface.\label{fig:pushTransform}}
 \end{figure}
@@ -583,7 +585,7 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.9\columnwidth]{figures/zoomTransform.png}
+\includegraphics[width=0.8\columnwidth]{figures/zoomTransform.png}
 \caption{Zoom transform interface.\label{fig:zoomTransform}}
 \end{figure}
 
