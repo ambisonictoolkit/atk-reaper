@@ -449,7 +449,7 @@ The various plugins are sorted into subfolders by categories \emph{Encode}, \emp
 %See FoaDecode, FoaDecoderMatrix and FoaDecoderKernel for more details about decoding.
 
 Most users approaching Ambisonics are usually presented with two avenues to author an Ambisonic soundfield: capture a natural soundfield directly with a Soundfield microphone, or author a planewave\footnote{Planewave encoding is the classic Ambisonic panning technique.} from a monophonic signal.
-The ATK provides a much wider palate of authoring tools.
+The ATK provides a much wider palette of authoring tools.
 
 %Authoring
 %Most users approaching Ambisonics are usually presented with two avenues to author an Ambisonic soundfield: capture a natural soundfield directly with a Soundfield microphone, 1 or author a planewave from a monophonic signal.2 SuperCollider's inbuilt PanB provides the latter solution.
@@ -489,18 +489,17 @@ Perhaps the most \emph{idiomatic} Ambisonic encoder is the\linebreak ATK's \emph
 \subsubsection{Advanced Encoders}\label{sec:impending-encoders}
 
 A few encoders remain to be ported from ATK for SuperCollider:
-%pseudoinverse microphone array: encoding from discrete microphones or signals
 The \emph{PseudoInverse} encoding technique provides a great deal of flexibility, and can be used with both microphone arrays and synthetic signals. 
 In the absence of a Soundfield microphone, this encoding technique gives the opportunity to deploy real-world microphone arrays (omni, cardioid, etc.) to capture natural soundfields.
-%With synthetic signals, pseudoinverse encoding is usually regarded as the method of choice to generate spatially complex synthetic Ambisonic images.
-%In combination with the ATK's imaging tools these can then be compositionally controlled as required.
 \emph{Zoom\-H2} adapts \emph{PseudoInverse} for this popular portable recorder.
 
 The final class of encoders that remain to be ported depend on convolution.
-\emph{Spread} encodes a monophonic signal by smoothly rotating the signal across the soundfield by frequency where \emph{Diffuse} randomises the phase of the incoming monophonic signal across the soundfield to create a diffuse field.
-Along with \emph{AtoB}, these two encoders are regarded as the primary `full' soundfield authoring tools to be found in the ATK, and we look forward to adding these soon in the JSFX distribution.
+These include \emph{Super}, the classic `super stereo' method for encoding stereophonic signals. The \emph{UHJ} encoder offers access to numerous published recordings for periphonic (2D) audition. \emph{Spread} encodes a monophonic signal by smoothly rotating the signal across the soundfield by frequency where \emph{Diffuse} randomises the phase of the incoming monophonic signal to create a diffuse field.
+Along with \emph{AtoB}, these last two are regarded as the primary `full' soundfield encoding tools to be found in the ATK.
 
-Additionally, the ATK makes available \emph{Super}, the classic `super stereo' method for encoding stereophonic signals, and the \emph{UHJ} encoder offers access to numerous published recordings for periphonic (2D) audition.
+We look forward to adding all these encoders soon in the JSFX distribution.
+
+%In combination with the ATK's imaging tools these can then be compositionally controlled as required.
 
 
 \subsection{Imaging transforms}\label{sec:transforms}
@@ -581,21 +580,21 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 \end{figure}
 
 The \emph{FocusPressPushZoom} plugin provides a unified interface to the four different spatial transforms \emph{Focus}, \emph{Press}, \emph{Push} and \emph{Zoom}.
-The degree of spatial transform is expressed as a soundfield distortion angle in the range from $0^\circ$ to $90^\circ$.
-At $0^\circ$ no transform is applied, while at $90^\circ$ all four transforms cause the soundfield to collapse to a planewave arriving from the direction specified by \emph{azimuth} and \emph{elevation} parameters, the direction of interest. The difference between these four transforms primarily comes down to the directional response of the resulting planewave and how gain across the soundfield is scaled. These transforms fall into two groups.
+The amount of spatial transform is expressed as a soundfield distortion angle\footnote{Auditioned as a warping of the soundfield.} in the range from $0^\circ$ to $90^\circ$.
+At $0^\circ$ no distortion is applied. At $90^\circ$ all four transforms collapse the soundfield to a planewave arriving from the direction of interest specified by \emph{azimuth} and \emph{elevation}. These four transforms primarily differ in the directional response of the resulting planewave and the scaling of gain across the soundfield. They fall into two groups.
 %All four transforms shift the soundfield in a preferred direction by altering directness, gain and direction of the incoming signals depending on their original directions, but the four transforms differ in terms of what mathematical transform is applied.
 %The results will differ subtly or more distinctly depending on which of the transforms is applied.
 
-\emph{Focus} and \emph{Zoom} are dominance related transforms and can be thought of as `emphasising' the elements of a soundfield in a the direction of interest. The directional response of the planewave generated when the soundfield distortion angle reaches $90^\circ$ is a cardioid. This means that gain opposite the direction of interest is reduced. \emph{Focus} maintains the gain in the direction of interest at $0\,\mathrm{dB}$, where \emph{Zoom} maintains the gain to the sides.
+\emph{Focus} and \emph{Zoom} are dominance related transforms and can be described as `emphasising' elements in a the direction of interest. The directional response of the target planewave (distortion angle $90^\circ$) is a cardioid. This means that gain opposite the direction of interest is reduced. \emph{Focus} maintains the gain forward at $0\,\mathrm{dB}$, where \emph{Zoom} maintains gain to the sides.
 %, resulting in a boost in the direction of interest.
 %At $180^\circ$ to the direction of interest both \emph{Focus} and \emph{Zoom} reduce the gain to $-\infty\,\mathrm{dB}$ when the transform angle is set to $\pm90^\circ$.
 
-\emph{Press} and \emph{Push} act differently, and rather than emphasising elements in a target direction, instead `press' or `push' all elements towards the direction of interest. Where the target planewave for \emph{Focus} and \emph{Zoom} is derived from a cardioid, the final planewave for \emph{Press} and \emph{Push} is an omnidirectional response. This has the effect of maintaining the gain of all elements of the input soundfield to a similar level. With all four transforms available in the same plugin it becomes easy to explore spatial expressive quality as part of the creative process. Two of the transforms can be seen in figures~\ref{fig:pushTransform} and \ref{fig:zoomTransform}.
+\emph{Press} and \emph{Push}\footnote{Two novel spatial transforms, at present found only in the ATK.} act differently. Rather than emphasising elements in a target direction, all are `pressed' or `pushed' towards the direction of interest. Where the target for \emph{Focus} and \emph{Zoom} is a cardioid, the target for this second group is an omnidirectional response. As a result, the gains of all elements are maintained to a similar level. With all four transforms available in the same plugin it becomes easy to explore spatial expressive quality as part of the creative process. Two of the transforms can be seen in figures~\ref{fig:pushTransform} and \ref{fig:zoomTransform}.
 
-The \emph{Dominance} plugin increases the gain of signals coming from the preferred direction while decreasing the gain of signals originating from the opposite side.
-In the Reaper plugin gain in the preferred direction can be boosted by up to $24\,\mathrm{dB}$.
+The \emph{Dominance} plugin increases the gain of elements in the direction of interest while decreasing the gain from the rear.
+With the JSFX plugin directional gain can be boosted by up to $24\,\mathrm{dB}$.
 While the \emph{Focus}, \emph{Press}, \emph{Push}, and \emph{Zoom} transforms do not generally have a significant impact on the overall sound level of the soundfield, \emph{Dominance} can result in major alterations to sound levels.
-For this reason, as well as due to the difference in how the degree of transform is expressed (gain in $\mathrm{dB}$ rather than distortion angle in $\mathrm{degrees}$) the \emph{Dominance} transform is implemented in a separate plugin.
+For this reason, and the difference in specifying soundfield transformation (gain in $\mathrm{dB}$ vs. distortion angle in $\mathrm{degrees}$) the \emph{Dominance} transform is implemented as a separate plugin.
 
 
 \subsubsection{Mirroring}\label{sec:mirror}
@@ -646,23 +645,23 @@ Each of the effects units \linebreak should be tuned with slightly different par
 \subsection{Decoders}\label{sec:decoders}
 
 Perhaps one of the most celebrated aspects of the Ambisonic sound technique has been its design as a hierarchal reproduction system, able to target a number of varying loudspeaker arrays.
-The ATK provides a wide palate of optimised decoders.
+The ATK provides a wide palette of optimised decoders.
 
-The \emph{Mono} virtual microphone decoder returns a single monophonic channel, and can be used to "listen in" to the soundfield at the specified azimuth and elevation.
+The \emph{Mono} virtual microphone decoder returns a single monophonic channel, and can be used to `listen in' to the soundfield at the specified azimuth and elevation.
 The soundfield may be decoded to \emph{Stereo} using a pair of virtual microphones.
-\emph{Quad} is an optimised quadraphonic decoder with variable loudspeaker angle, \emph{5.0} uses Bruce Wiggins optimised ITU 5.0 recorders \cite{wiggins:2003optimised}, \emph{Pantophonic} is a regular 2D polygon decoder and \emph{Periphonic} is a regular cylindrical decoder for 3D dual ring.
+
+Surround array decoders are included in a number of forms. \emph{Quad} is an optimised quadraphonic decoder with variable loudspeaker angle, \emph{5.0} uses Wiggins optimised ITU 5.0 decoders \cite{wiggins:2003optimised}, \emph{Pantophonic} is a regular 2D polygon decoder and \emph{Periphonic} is a regular cylindrical decoder for 3D dual ring.
 \emph{Diametric} is Gerzon's classic decoder suitable for varied periphonic and pantophonic loudspeaker arrays \cite{gerzon:1980sphere}.
-While the regular decoders will be suitable for many users, diametric decoding enables the greatest flexibility, and allows the user to design substantially varying semi-regular arrays suitable for a wide variety of playback situations.
+While regular decoders are suitable for many users, diametric decoding enables the greatest flexibility, and allows the design of substantially varying semi-regular arrays suitable for a wide variety of playback situations.
 Meeting all the criteria outlined by Gerzon to qualify as Ambisonic, this decoder is a good choice for full 3D critical studio listening.
 
-The \emph{UHJ} decoder and binaural decoders, using measured and synthetic HRTFs, requires kernel convolution, and remains to be implemented.
-While the virtual microphone stereophonic decoder is very easy and convenient, for production work the authors advise using the \emph{UHJ} decoder, once the port has been accomplished.
+The above surround decoders supports several modes. 
+The \emph{dual} setting returns a two-band psycho-acoustically optimised decoder, and the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
+Suitable for larger, mid-scale environments is the \emph{single} decoder.
+The \emph{velocity} setting returns `strict soundfield' (aka `basic') decoding, and is usually not preferred for FOA in most cases.
+`Controlled opposites' decoding (aka `in phase') is returned by \emph{controlled}, which may be preferred in larger, concert environments.
 
-The relevant decoders supports several decoding modes: 
-The `dual' decoder is a dual-band psycho-acoustically optimised decoder, and the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
-`single' is suitable for larger, mid-scale environments.
-`velocity' returns `strict soundfield' (aka `basic') decoding, and is not preferred for FOA in most circumstances.
-`controlled' returns `controlled opposites' decoding (aka `in phase'), which is often preferred in large-scale, concert environments.
+The \emph{UHJ} decoder and binaural decoders, using measured and synthetic HRTFs, require kernel convolution. These remain to be ported. While the virtual microphone stereophonic decoder is very easy and convenient, for production work the authors advise using the \emph{UHJ} decoder, once the port has been accomplished.
 
 
 % DISCUSS: It would be useful to have some kind of visualisation of the speaker layout in a GUI in order to make it more intuitive to understand what the different layouts are?
