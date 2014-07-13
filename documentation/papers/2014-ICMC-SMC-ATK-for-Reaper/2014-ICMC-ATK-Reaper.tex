@@ -725,19 +725,37 @@ The \emph{UHJ} decoder and binaural decoders, using measured and synthetic HRTFs
 \section{Discussion}\label{sec:discussion}
 
 While there is a well-established workflow for stereo on DAWs, options have been more limited when working with Ambisonics.
-From a compositional viewpoint, Ambisonic field recordings sometimes can leave the sonic artist with an impression of `take it or leave it', as the sound image can be spectrally as well as spatially quite `full'.
-In addition to rich sets of encoders and decoders, Ambisonic Toolkit offers intriguing possibilities for spatial transforms of the soundfield image, and for this reason it has been attractive to port ATK to a plugin format making it available in DAW workflows in addition to SuperCollider.
-When porting ATK the prime question is whether to implement plugins in C++ using plugin architectures such as VST or AudioUnit.
-If doing this, it seems beneficial to use a intermediate library such as Faust, Juce or wdl-ol, but it will still require substantial overhead in terms of having to compile and test the plugins for multiple processors and platforms.
-At the same time the plugins are vulnerable to future changes in OS and plugin platforms.
-At the end of 2013 Steinberg stopped maintenance and distribution of the VST2 SDK, instead requiring future developers to use VST3. The future of AudioUnit currently is somewhat uncertain, as the SDK has not been updated since 2007, and AU plugins can not be distributed via AppStore.
+From a compositional viewpoint, Ambisonic field recordings sometimes can leave the sonic artist with an impression of `take it or leave it', as the sound image can be both spectrally and spatially quite `full'.
+ATK for Reaper brings both a comprehensive composition workflow model, the \emph{sound-field sound-image} paradigm, and a set of versatile tools for working with Ambisonics to the DAW environment. The imaging tools available allow soundfield imaging to become part of a compositional language: naturally recorded `too full' soundfields can be reduced and controlled to fit a creative context, `too small' synthetic generated material can be expanded. 
 
+%In addition to rich sets of encoders and decoders, Ambisonic Toolkit offers intriguing possibilities for spatial transforms of the soundfield image, and for this reason it has been attractive to port ATK to a plugin format making it available in DAW workflows in addition to SuperCollider.
+
+In addition to Reaper's flexible channel routing and signal flow, the \emph{FX Chains} preset plugin chain feature accommodates the ATK's design paradigm very well, and allows the user to assemble more complex Ambisonic signal processing by cascading a number of ATK plugins.
+These can then be saved as \emph{FX Chains} to be used again.
+A quadraphonic decoder with nearfield compensation is a simple example. The user would create an \emph{FX Chain} consisting of:  \emph{NearFieldCompensation}$\rightarrow$\emph{Quad}. A more complex example could be a `custom DAFX' mono encoder.
+Expanding on the network illustrated in figure~\ref{fig:aToB}: \emph{Omni}$\rightarrow$\emph{BtoA}$\rightarrow$DAFX$\rightarrow$\emph{AtoB}$\rightarrow$\emph{Push}$\rightarrow$\emph{Proximity}.
+As a\linebreak saved \emph{FX Chain}, this DAFX processor-panner then becomes available throughout a user workflow, and mirrors the method found in ATK for SuperCollider.
+Similarly, favourite DAFX processes used in stereo workflows can be adapted to B-format as discussed in section \ref{sec:a-format} and saved as \emph{FX Chains} for re-use.
+
+%\emph{FX Chains} feature conveniently allows plugin chains to be saved as presets
+
+
+%% NOTE: consider moving this to section 1
+%When porting ATK the prime question is whether to implement plugins in C++ using plugin architectures such as VST or AudioUnit.
+%If doing this, it seems beneficial to use a intermediate library such as Faust, Juce or wdl-ol, but it will still require substantial overhead in terms of having to compile and test the plugins for multiple processors and platforms.
+%At the same time the plugins are vulnerable to future changes in OS and plugin platforms.
+%At the end of 2013 Steinberg stopped maintenance and distribution of the VST2 SDK, instead requiring future developers to use VST3.
+%The future of AudioUnit currently is somewhat uncertain, as the SDK has not been updated since 2007, and AU plugins can not be distributed via AppStore.
+
+% NOTE: added the below line to the abstract
 %Reaper is a reasonably priced and flexible DAW for spatial sound, popular among many composers and sonic artists working with spatial sound, and provides the script-based language JSFX for plugins.
-Using JSFX for Reaper there is no need to compile, and plugins immediately work with all platforms and processors supported by Reaper.
-Maintenance of the plugins are not expected to be demanding, as Reaper itself will take care of changes to underlaying architectures.
-Using JSFX has been speeding up the development process substantially, and development has been able to primarily focus only on the specific processing and interfacing.
-One disadvantage is that graphics in plugins with custom GUIs seem to be demanding on system resources, and the program indicate major CPU overhead when plugin GUIs are open.
-However, once the GUI window is closed, the plugins do not seem to require any extraneous processing resources.
+
+%% NOTE: consider moving this to section 1
+%Using JSFX for Reaper there is no need to compile, and plugins immediately work with all platforms and processors supported by Reaper.
+%Maintenance of the plugins are not expected to be demanding, as Reaper itself will take care of changes to underlaying architectures.
+%Using JSFX has been speeding up the development process substantially, and development has been able to primarily focus only on the specific processing and interfacing.
+%One disadvantage is that graphics in plugins with custom GUIs seem to be demanding on system resources, and the program indicate major CPU overhead when plugin GUIs are open.
+%However, once the GUI window is closed, the plugins do not seem to require any extra processing resources.
 
 ATK for SuperCollider3 is distributed as open-source using the GNU GPL General Public License Version 3.
 This license is incompatible for use with proprietary software such as Reaper, and for this reason ATK for Reaper is distributed using the GNU LGPL Lesser Public License Version 3.
