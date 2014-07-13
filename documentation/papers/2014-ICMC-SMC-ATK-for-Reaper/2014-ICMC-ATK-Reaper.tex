@@ -492,7 +492,7 @@ Additional trans-coders are provided for a number of fixed-channel distribution 
 Perhaps the most \emph{idiomatic} Ambisonic encoder is the\linebreak ATK's \emph{AtoB}, which provides a powerful method for constructing full, complex soundfields via A-format encoding.\footnote{The A-format encoder is a simple matrix and does not apply the frequency dependent coincidence compensation filters found in the Soundfield microphone \cite{farrar:1979soundfield}.}
 The user supplies four separate but related signals to be distributed equally throughout the three dimensions of the soundfield.
 These signals may either be synthesised or captured by microphones.
-A-format is a tetrahedral arrangement, and is suitable for FOA as the tetrahedron evenly samples the soundfield sphere to the required degree.\footnote{Up to 3\textsuperscript{rd} order HOA various Platonic solids may be used to sample the soundfield.}
+In FOA, A-format can be visualised as a tetrahedral sampling of the soundfield.\footnote{Up to 3\textsuperscript{rd} order HOA various Platonic solids may be used to sample the soundfield.}
 A variety of tetrahedral orientations are made available.
 
 
@@ -659,7 +659,10 @@ NFC is usually used in conjunction with decoders to compensate for the distance 
 \subsection{Audio Effects and Ambisonics}\label{sec:a-format}
 
 Spatial information is encoded in balance and phase relations between the four channels of a B-format signal.
-Processing one or more of the B-format channels using an audio effect which modifies gain and phase relations will most likely disrupt or otherwise distort the encoded spatial information. In most cases this is un-desired.
+Processing one or more of the B-format channels using an audio effect which modifies gain and phase relations will most likely disrupt or otherwise distort the encoded spatial information.
+In most cases this is un-desired.
+The ATK provides a remedy through the use of a pair of plugins, \emph{BtoA} and \emph{AtoB}. 
+
 
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
@@ -669,12 +672,14 @@ Processing one or more of the B-format channels using an audio effect which modi
 \caption{Process effects in A-format.\label{fig:aToB}}
 \end{figure}
 
-The ATK provides a remedy through the use of a pair of plugins, \emph{BtoA} and \emph{AtoB}, allowing the artist to process B-format signals using familiar audio effects.
-Figure~\ref{fig:aToB} illustrates the appropriate network. The \emph{BtoA} plugin decodes to A-format, while \emph{AtoB} re-encodes into B-format.
-When used in conjunction, the intermediate A-format signal is well-suited for effect processing. Spatial encoding is preserved (or modified) in a similar way as effects processing with two-channel stereo.
+Native B-format signals are processed using familiar audio effects by first converting to A-format.
+Figure~\ref{fig:aToB} illustrates the appropriate network.
+The \emph{BtoA} plugin decodes to A-format, while \emph{AtoB} re-encodes into B-format.
+%When used in conjunction, the intermediate A-format signal is well-suited for effect processing.
+Spatial information is preserved (or modified) in a similar way as effects processing with two-channel stereo.
 
 The \emph{Omni} mono signal encoder in conjunction with the network illustrated in figure~\ref{fig:aToB} can also be used to synth\-esise interesting soundfields.
-Each of the effects units \linebreak should be tuned with slightly different parameters to ensure an active soundfield.
+Each of the effects units \linebreak should be tuned with slightly different parameters to ensure an active soundfield for this application.
 %On its own, \emph{AtoB} is often used to author immersive, periphonic (3D) decorrelated soundfields.
 
 
@@ -687,8 +692,9 @@ Each of the effects units \linebreak should be tuned with slightly different par
 Perhaps one of the most celebrated aspects of the Ambisonic sound technique has been its design as a hierarchal reproduction system, able to target a number of varying loudspeaker arrays.
 The ATK provides a wide palette of optimised decoders.
 
-The \emph{Mono} virtual microphone decoder returns a single monophonic channel, and can be used to `listen in' to the soundfield at the specified azimuth and elevation.
-The soundfield may be decoded to \emph{Stereo} using a pair of virtual microphones.
+The \emph{Mono} virtual microphone decoder returns a single channel, and can be used to `listen in' to the soundfield at the specified azimuth and elevation.\footnote{This can also be thought of as extracting a monophonic feed from a soundfield, e.g., a natural soundfield recording, in a direction of interest.}
+The \emph{Stereo} decoder returns a pair of virtual microphones.
+Virtual microphone polar patterns may be specified for both decoders.
 
 Surround array decoders are included in a number of forms. \emph{Quad} is an optimised quadraphonic decoder with variable loudspeaker angle, \emph{5.0} uses Wiggins optimised ITU 5.0 decoders \cite{wiggins:2003optimised}, \emph{Pantophonic} is a regular 2D polygon decoder and \emph{Periphonic} is a regular cylindrical decoder for 3D dual ring.
 \emph{Diametric} is Gerzon's classic decoder suitable for varied periphonic and pantophonic loudspeaker arrays \cite{gerzon:1980sphere}.
@@ -696,12 +702,13 @@ While regular decoders are suitable for many users, diametric decoding enables t
 Meeting all the criteria outlined by Gerzon to qualify as Ambisonic, this decoder is a good choice for full 3D critical studio listening.
 
 The above surround decoders supports several modes. 
-The \emph{dual} setting returns a two-band psycho-acoustically optimised decoder, and the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
-Suitable for larger, mid-scale environments is the \emph{single} decoder.
-The \emph{velocity} setting returns `strict soundfield' (aka `basic') decoding, and is usually not preferred for FOA in most cases.
-`Controlled opposites' decoding (aka `in phase') is returned by \emph{controlled}, which may be preferred in larger, concert environments.
+A two-band psycho-acoustically optimised decoder is returned by \emph{dual}, the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
+%The \emph{dual} setting returns a two-band psycho-acoustically optimised decoder, and the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
+Suitable for mid-scale arrays is the \emph{single} (aka `energy') decoder.
+`Controlled opposites' decoding (aka `in phase') is returned by \emph{controlled}, and may be preferred for large scale arrays.
+The \emph{velocity} setting returns `strict soundfield' (aka `basic') decoding.\footnote{Usually not preferred for FOA in most cases.}
 
-The \emph{UHJ} decoder and binaural decoders, using measured and synthetic HRTFs, require kernel convolution. These remain to be ported. While the virtual microphone stereophonic decoder is very easy and convenient, for production work the authors advise using the \emph{UHJ} decoder, once the port has been accomplished.
+The \emph{UHJ} decoder and binaural decoders, using measured and synthetic HRTFs, require kernel convolution. These remain to be ported. While the virtual microphone stereophonic decoder is very easy and convenient, for production work the authors advise using the \emph{UHJ} decoder once the port has been accomplished.
 
 
 % DISCUSS: It would be useful to have some kind of visualisation of the speaker layout in a GUI in order to make it more intuitive to understand what the different layouts are?
