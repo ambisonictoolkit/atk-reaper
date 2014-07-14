@@ -160,7 +160,8 @@ While there is a well-established workflow for stereo production in DAWs, option
 The Ambisonic Toolkit (ATK) brings together a number of tools and transforms for working with first order Ambisonic surround sound, and includes intriguing possibilities for spatial soundfield imaging.
 These tools have previously only been available for public release via the SuperCollider real-time processing environment.
 
-Cockos Reaper is a reasonably priced and flexible DAW, popular among many composers and sonic art\-ists working with spatial sound. Reaper's versatile design conveniently supports the ATK's Ambisonic workflow model. Using the JSFX text-based scripting language, the ATK has now been ported to plugins for Reaper; these include intuitive graphical user interfaces.
+Cockos Reaper is a reasonably priced and flexible DAW, popular among many composers and sonic art\-ists working with spatial sound.
+Reaper's versatile design conveniently supports the ATK's Ambisonic workflow model. Using the JSFX text-based scripting language, the ATK has now been ported to plugins for Reaper; these include intuitive graphical user interfaces.
 
 %The ATK has been ported to plugins for Reaper using the JSFX text-based scripting language, with intuitive graphical user interfaces.
 %As compared to development in C++, this has simplified the effort, and plugins are immediately available for all platforms supported by Reaper.
@@ -217,40 +218,21 @@ Supporting tracks of up to 64 channels,\footnote{Suitable for 7\textsuperscript{
 All standard fixed-channel surround sound configurations are supported, and the included \emph{ReaSurround} panning plugin caters for non-standard speaker configurations \cite{francis:2014_reaper}.
 %, using a spatialisation algorithm based on principles resembling VBAP \cite{Pulkki:1997vbap} as well as DBAP \cite{Lossius:2009dbap}.
 Flexible routing makes Reaper well-suited for Ambisonics; it is a preferred DAW for many composers within the Ambisonic community.\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=215}{http://www.brucewiggins.co.uk/?page\_id=215}}
-Additionally, Reaper's \emph{FX Chains} feature conveniently allows plugin chains to be saved as presets.
+Additionally, Reaper's \emph{FX Chains} feature conveniently allows plugin chains to be \linebreak saved as presets.
 
 % TODO: ** FX processing chains in DAWs - as a motivation for why we want to be able to work the same way with Ambisonics, and make Ambisonic soundfield recordings a malleable material in acousmatic mucis composition and sound design. Maybe this should be at the very start?
 
 
 
 
-\subsection{Plugin technologies}\label{sec:plugin-technologies}
-
-Several plugin specifications enable development of virtual instruments and effects that can be used with multiple hosts.
-VST is a plugin interface specification and SDK for Windows, Mac OSX and Linux by Steinberg.\footnote{\href{http://www.steinberg.net/en/company/developer.html}{http://www.steinberg.net/en/company/developer.html}}
-It is a popular format for commercial and freeware plugins, mostly using the VST 2 SDK.
-%, and a large number of audio applications support VST under license from its creator.
-AudioUnits (AU) is a Mac OSX-specific plugin architecture provided by Apple \cite{apple2014:au}.
-In a similar way DirectX can be used for development of Windows-only plugins.\footnote{\href{http://www.microsoft.com/en-us/download/details.aspx?id=6812}{http://www.microsoft.com/en-us/download/details.aspx?id=6812}}
-LADSPA is a GNU LGPL plugin architecture mostly used on the Linux platform,\footnote{\href{http://www.ladspa.org}{http://www.ladspa.org}} and is gradually superseded by LADSPA version 2 (LV2).\footnote{\href{http://lv2plug.in}{http://lv2plug.in}}
-
-While the above formats can be used to develop plugins for use with multiple hosts, there are also a number of specifications that permits third party development of plugins for one hosting environment only.
-Avid has developed the RTAS, TDM and more recently AAX plugin format that work with their software and hardware exclusively.
-Ableton and Cycling'74 jointly offer Max for Live, enabling the use of Max patches as devices in Ableton Live.\footnote{\href{https://www.ableton.com/en/live/max-for-live/}{https://www.ableton.com/en/live/max-for-live/}} JSFX is a text-based scripting language for programming audio-oriented effects compiled on the fly for Cockos Reaper.\footnote{\href{http://www.reaper.fm/sdk/js/js.php}{http://www.reaper.fm/sdk/js/js.php}}
-
-The multiple operating systems and plugin architectures poses challenges to plugin developers, that ideally might want to offer their software work with all plugin architectures and hosts in all operating systems.
-Developing, compiling and maintaining plugins for many parallel platforms can introduce substantial workload overhead, and several cross-platform plugin development frameworks have been developed to address this, e.g., JUCE,\footnote{\href{http://www.juce.com/about-juce}{http://www.juce.com/about-juce}} wdl-ol\footnote{\href{https://github.com/olilarkin/wdl-ol}{https://github.com/olilarkin/wdl-ol}} and\linebreak FAUST \cite{smithFaust:2012}. 
-\emph{SonicBirth} can be used to create AudioUnit and VST plugins for OSX and Windows by connecting objects in a graphical programming environment. Development stalled in 2007, but recent renewed efforts have resulted in a version 2 public alpha being available.\footnote{\href{http://sonicbirth.com/}{http://sonicbirth.com/}}
-\emph{SynthEdit} is a similar technology for VST plugin development on the Windows platform.\footnote{\href{http://www.synthedit.com}{http://www.synthedit.com}}
-
-
 \subsection{Plugins for Ambisonic processing}\label{sec:ambi-plugins}
 
 In recent years a number of plugins have emerged for Ambisonic processing.
 \emph{WigWare} is a set of VST plugins for Mac and Windows that includes FOA and HOA panners and decoders for regular and irregular speaker layouts, as well as an FOA 3D reverb.\footnote{\href{http://www.brucewiggins.co.uk/?page\_id=78}{http://www.brucewiggins.co.uk/?page\_id=78}}
-Courville has developed a suite of FOA, 2\textsuperscript{nd} order and TOA plugins\footnote{\href{http://www.radio.uqam.ca/ambisonic/b2x.html}{http://www.radio.uqam.ca/ambisonic/b2x.html}} in SonicBirth. These include encoding and decoding, rotations, reverb, and additional convenient utilities.
+Courville has developed a suite of FOA, 2\textsuperscript{nd} order and TOA plugins\footnote{\href{http://www.radio.uqam.ca/ambisonic/b2x.html}{http://www.radio.uqam.ca/ambisonic/b2x.html}}.
+These include encoding and decoding, rotations, reverb, and additional convenient utilities.
 Additionally encoders and decoders for 5\textsuperscript{th} order pantophonic\footnote{Horizontal only.} are also available.
-Unfortunately, due to the long halt in development of SonicBirth, these plugins do not work reliably in all newer DAW versions.
+Unfortunately, the plugins are developed using SonicBirth\footnote{\href{http://sonicbirth.com/}{http://sonicbirth.com/}}, and due to the long halt in development of this framework, these plugins do not work reliably in all newer DAW versions.
 \emph{ambiX} are cross-platform FOA, TOA and 5\textsuperscript{th} order Ambisonic processors for encoding and decoding, including binaural decoding, as well as spatial transforms \cite{Kronlachner2013:ambix,Kronlachner:2014ambi-transforms}.
 These plugins use the ambiX encoded signal convention, ACN channel ordering with SN3D normalization \cite{Nachbar:2011ambix}, but also provides a conversions utility for other formats.
 % as discussed in section~\ref{sec:coordinate-systems}
@@ -273,7 +255,7 @@ Moreover, TOA includes a HARPEX upsampler, facilitating FOA to TOA conversion vi
 \captionsetup{aboveskip=-6pt}
 \centering
 %\includegraphics[width=1.5\columnwidth]{figures/atk-network.png}
-\includegraphics[width=1.6\columnwidth]{figures/atk-network.png}
+\includegraphics[width=1.7\columnwidth]{figures/atk-network.png}
 %\includegraphics[width=1.65\columnwidth]{figures/atk-network.png}
 \setlength{\abovecaptionskip}{0pt plus 3pt minus 2pt} % Decrease distance, as the figure itself has lots of empty space below
 \caption{Ambisonic Toolkit Paradigm.\label{fig:atkParadigm}}
@@ -326,6 +308,22 @@ Many publicly distributed implementations of Ambisonics provide only \emph{encod
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{ATK Reaper: Design considerations}\label{sec:design}
 
+\subsection{Choice of plugin architecture}\label{sec:plugin-technologies}
+
+When porting ATK for use in a DAW environment the prime question is whether to implement plugins in C++ using plugin architectures such as VST\footnote{\href{http://www.steinberg.net/en/company/developer.html}{http://www.steinberg.net/en/company/developer.html}} or AudioUnit \cite{apple2014:au}.
+If doing this, it seems beneficial to use a intermediate library such as Faust \cite{smithFaust:2012}, Juce\footnote{\href{http://www.juce.com/about-juce}{http://www.juce.com/about-juce}} or wdl-ol\footnote{\href{https://github.com/olilarkin/wdl-ol}{https://github.com/olilarkin/wdl-ol}}, but it will still require substantial overhead in terms of having to compile and test the plugins for multiple processors and platforms.
+At the same time the plugins are vulnerable to future changes in OS and plugin platforms.
+% At the end of 2013 Steinberg stopped maintenance and distribution of the VST2 SDK, instead requiring future developers to use VST3.
+% The future of AudioUnit currently is somewhat uncertain, as the SDK has not been updated since 2007, and AU plugins can not be distributed via AppStore.
+
+JSFX is a text-based scripting language for programming audio-oriented effects compiled on the fly for Cockos Rea\-per.\footnote{\href{http://www.reaper.fm/sdk/js/js.php}{http://www.reaper.fm/sdk/js/js.php}}
+Using JSFX for Reaper there is no need to compile, and plugins immediately work with all platforms and processors supported by Reaper.
+Maintenance of the plugins are not expected to be demanding, as Reaper itself will take care of future changes to underlaying architectures.
+Using JSFX has been speeding up the development process substantially, and development has been able to primarily focus only on the specific processing and interfacing.
+One disadvantage is that graphics in plugins with custom GUIs seem to be demanding on system resources, and the program indicate major CPU overhead when plugin GUIs are open.
+However, once the GUI window is closed, the plugins do not seem to require any extra processing resources.
+
+
 \subsection{Coordinate systems and encoding conventions}\label{sec:coordinate-systems}
 
 Within the spatial audio community several coordinate system conventions are being used in parallel.
@@ -362,7 +360,7 @@ Due to current limitations in the Reaper JSFX API, there are some considerations
 The desired behaviour is that azimuths increase anti-clockwise.
 At the same time it is also preferable that for sources coming from the front half circle, moving the azimuth slider to the right results in the direction of the sound also moving clockwise to the right, similar to what happens when moving a regular stereo pan pot.
 The Harpex and Blue Ripple plugins both functions this way.
-In order to achieve this, horizontal azimuth sliders will need to implemented with increasing values to the left.
+In order to achieve this, horizontal azimuth sliders will need to be implemented with increasing values to the left.
 This is however currently not supported in Reaper JSFX, and for the time being ATK for Reaper uses azimuth values described according to a navigational coordinate system.
 If Reaper in the future is updated to support sliders with increasing values to the left, this design decision is likely to be reconsidered, and changed to use acoustic conventions.
 
@@ -519,7 +517,7 @@ In the absence of a Soundfield microphone, this encoding technique gives the opp
 
 The final class of encoders remaining to be ported require convolution.
 These include \emph{Super}, the classic `super stereo' method for encoding stereophonic signals.
-The \emph{UHJ} encoder offers access to numerous published recordings for periphonic (2D) audition. \emph{Spread} encodes a monophonic signal by smoothly rotating the signal across the soundfield by frequency where \emph{Diffuse} randomises the phase of the incoming monophonic signal to create a diffuse field.
+The \emph{UHJ} encoder offers access to numerous published recordings for periphonic (2D) audition. \emph{Spread} encodes a monophonic signal by smoothly rotating the signal across the soundfield by frequency where \emph{Diffuse} randomises the \linebreak phase of the incoming monophonic signal to create a diffuse field.
 Along with \emph{AtoB}, these last two are regarded as the primary `full' soundfield encoding tools to be found in the ATK.
 
 We look forward to adding all these encoders soon in the JSFX distribution.
@@ -552,7 +550,7 @@ Or, conversely, the directivity of a soundfield composed of planewaves arriving 
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.8\columnwidth]{figures/rotateTiltTumble.png}
+\includegraphics[width=0.9\columnwidth]{figures/rotateTiltTumble.png}
 \setlength{\abovecaptionskip}{0pt plus 3pt minus 2pt} % Decrease distance, as the figure itself has lots of empty space below
 \caption{Rotate, Tilt and Tumble transform.\label{fig:rotateTransform}}
 \end{figure}
@@ -569,7 +567,7 @@ The separate effect of the \emph{Tilt} and \emph{Tumble} transformations is indi
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.8\columnwidth]{figures/directOTransform.png}
+\includegraphics[width=0.9\columnwidth]{figures/directOTransform.png}
 \caption{DirectO transform plugin interface.\label{fig:directOTransform}}
 \end{figure}
 
@@ -579,7 +577,7 @@ It is a spatial low-pass filter; with with an increasing degree of transformatio
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.8\columnwidth]{figures/directTransform.png}
+\includegraphics[width=0.9\columnwidth]{figures/directTransform.png}
 \caption{Direct transform plugin interface.\label{fig:directTransform}}
 \end{figure}
 
@@ -592,7 +590,7 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.8\columnwidth]{figures/pushTransform.png}
+\includegraphics[width=0.9\columnwidth]{figures/pushTransform.png}
 \setlength{\abovecaptionskip}{0pt plus 3pt minus 2pt} % Decrease distance, as the figure itself has lots of empty space below
 \caption{Push transform plugin interface.\label{fig:pushTransform}}
 \end{figure}
@@ -600,7 +598,7 @@ Similarly, the \emph{Direct} plugin (figure \ref{fig:directTransform}) adjusts t
 \begin{figure}[h]
 \captionsetup{aboveskip=-6pt}
 \centering
-\includegraphics[width=0.8\columnwidth]{figures/zoomTransform.png}
+\includegraphics[width=0.9\columnwidth]{figures/zoomTransform.png}
 \caption{Zoom transform interface.\label{fig:zoomTransform}}
 \end{figure}
 
@@ -613,7 +611,7 @@ These transforms fall into two groups.
 %All four transforms shift the soundfield in a preferred direction by altering directness, gain and direction of the incoming signals depending on their original directions, but the four transforms differ in terms of what mathematical transform is applied.
 %The results will differ subtly or more distinctly depending on which of the transforms is applied.
 
-\emph{Focus} and \emph{Zoom} are dominance related transforms and can be described as `emphasising' elements in a the direction of interest.
+\emph{Focus} and \emph{Zoom} are dominance related transforms and can be described as `emphasising' elements in the direction of interest.
 The directional response of the target planewave (\emph{distortion angle} $90^\circ$) is a cardioid.
 This means that gain opposite the direction of interest is reduced.
 \emph{Focus} maintains the gain forward at $0\,\mathrm{dB}$.
@@ -703,7 +701,7 @@ While regular decoders are suitable for many users, diametric decoding enables t
 Meeting all the criteria outlined by Gerzon to qualify as Ambisonic, this decoder is a good choice for full 3D critical studio listening.
 
 The above surround decoders supports several modes. 
-A two-band psycho-acoustically optimised decoder is returned by \emph{dual}, the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
+A two-band psycho-acoustically optimised decoder is re\-turn\-ed by \emph{dual}, the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
 %The \emph{dual} setting returns a two-band psycho-acoustically optimised decoder, and the optimum choice for small scale studio or domestic settings \cite{heller:2008isAmbisonic}.
 Suitable for mid-scale arrays is the \emph{single} (aka `energy') decoder.
 `Controlled opposites' decoding (aka `in phase') is returned by \emph{controlled}, and may be preferred for large scale arrays.
@@ -734,7 +732,7 @@ In addition to Reaper's flexible channel routing and signal flow, the \emph{FX C
 These can then be saved as \emph{FX Chains} to be used again.
 A quadraphonic decoder with nearfield compensation is a simple example. The user would create an \emph{FX Chain} consisting of:  \emph{NearFieldCompensation}$\rightarrow$\emph{Quad}. A more complex example could be a `custom DAFX' mono encoder.
 Expanding on the network illustrated in figure~\ref{fig:aToB}: \emph{Omni}$\rightarrow$\emph{BtoA}$\rightarrow$DAFX$\rightarrow$\emph{AtoB}$\rightarrow$\emph{Push}$\rightarrow$\emph{Proximity}.
-As a\linebreak saved \emph{FX Chain}, this DAFX processor-panner then becomes available throughout a user workflow, and mirrors the method found in ATK for SuperCollider.
+As a\linebreak saved \emph{FX Chain}, this DAFX processor-panner then \linebreak be\-comes available throughout a user workflow, and mirrors the method found in ATK for SuperCollider.
 Similarly, favourite DAFX processes used in stereo workflows can be adapted to B-format as discussed in section \ref{sec:a-format} and saved as \emph{FX Chains} for re-use.
 
 %\emph{FX Chains} feature conveniently allows plugin chains to be saved as presets
