@@ -58,6 +58,10 @@ _fuma_MaxN_weights = concatenate((
 # Functions
 #=========================
 
+
+#=========================
+# Spherical Harmonics - Coefficients
+
 # Generate un-normalised spherical harmonic coefficients
 #
 # SEE: http://en.wikipedia.org/wiki/Ambisonic_data_exchange_formats
@@ -145,6 +149,9 @@ def spher_harm(lm = (0, 0), theta = 0, phi = 0):
     return res
 
 
+#=========================
+# Spherical Harmonics - Normalisation
+
 # Schmidt semi-normalisation (3D)
 def sn3d(lm = (0, 0), normalise_zero = True):
     """Args:
@@ -229,6 +236,9 @@ def maxN(lm = (0, 0), MaxN = True, normalise_zero = True):
     
     return res
 
+
+#=========================
+# Spherical Harmonics - Channel Order
 
 # ACN (Ambisonic Channel Number) Utilities
 def lm_to_acn(lm = (0, 0)):
@@ -354,65 +364,81 @@ def fuma_to_lm(fuma = 0):
     return res
 
 
-# NOTE: this may be renamed as planewave...
-#
-#def mono_to_b(a, azimuth = 0., elevation = 0.):
-#    """mono_to_b(a, azimuth = 0., elevation = 0.)
-#    
-#    Args:
-#        - a         : Input mono signal
-#        - azimuth   : counter-clockwise, in radians
-#        - elevation : upwards, in radian
-#
-#    Encode a mono signal into the B-format domain.
-#
-#    """
-#
-#    # compute cosines and sines
-#    cos_azim, sin_azim = cos(azimuth), sin(azimuth)
-#    cos_elev, sin_elev = cos(elevation), sin(elevation)
-#
-#    # compute scalars
-#    w_scale = C.rec_sqrt2
-#    x_scale = cos_elev * cos_azim
-#    y_scale = cos_elev * sin_azim
-#    z_scale = sin_elev
-#
-#    # for testing for and constructing vectors
-#    azim_scalar = isscalar(azimuth)
-#    elev_scalar = isscalar(elevation)
-#    n = len(a)
-#
-#    # construct appropriate encoder
-#    if not elev_scalar:         # case 2, 4: x, y, z vectors
-#        encoder = interleave(
-#            array([
-#                repeat(w_scale, n),
-#                x_scale,
-#                y_scale,
-#                z_scale
-#            ]))
-#    elif not azim_scalar:       # case 3: x, y vectors
-#        encoder = interleave(
-#            array([
-#                repeat(w_scale, n),
-#                x_scale,
-#                y_scale,
-#                repeat(z_scale, n)
-#            ]))
-#    else:                       # case 1: all scalars
-#        encoder = array([
-#            w_scale,
-#            x_scale,
-#            y_scale,
-#            z_scale
-#            ])
-#
-#    # copy input mono array into four channel array
-#    b = repeat(a, 4).reshape(-1,4)
-#
-#    # encode here!
-#    return b * encoder
+#=========================
+# Encoding - Matricies
+
+def planewave_matrix(direction = array([0, 0]), order = 1):
+    """
+    Args:
+        - direction : [azimuth, elevation]
+        - order     : HOA order
+    
+    Direction argument may take several forms:
+        
+        shape(direction) == (2,): 
+            encode one input as a TI, single planewave
+
+        shape(direction) == (nframes, 2):
+            encode one input as a TV, single planewave
+
+        shape(direction) == (1, npws, 2):
+            encode npws input as TI, multiple planewaves
+
+        shape(direction) == (nframes, npws, 2):
+            encode npws input as TV, multiple planewaves
+
+    
+    Generate a matrix to encode a signal (mono or multi-channel)
+    into the B-format domain (AmbiX).
+    
+    Use in conjunction with mmix() to encode a signal.
+    """
+    # case 1: one input TI, single planewave
+    #           - shape(dir) = (2,)
+    #
+    # case 2: one input TV, single planewave
+    #           - shape(dir) = (nframes, 2)
+    #
+    # case 3: npws input TI, multiple planewaves
+    #           - shape(dir) = (1, npws, 2)
+    #
+    # case 4: npws input TV, multiple planewaves
+    #           - shape(dir) = (nframes, npws, 2)
+
+    theta, phi = transpose(direction)
+
+    lm = hoa.acn_to_lm(arange((1+order)**2))
+    norm = hoa.sn3d(lm)
+    
+    # case 4
+    if len(shape(direction)) == 3 and shape(direction)[0] != 1:
+        
+        nframes, npws, dim = shape(direction)
+        res = zeros((npws, nframes, (order+1)**2))
+        
+        # itterate by planewave
+        for i in range(npws):
+            res[i] = norm * hoa.spher_harm(lm, theta[i], phi[i])
+    
+        # reshape to return (nframes, out, in)
+        res = transpose(res, (1, 2, 0))
+
+    # cases 1, 2, 3
+    else:
+        res = norm * hoa.spher_harm(lm, theta, phi)
+    
+        if len(shape(direction)) == 3 and shape(direction)[0] == 1:
+            # case 3
+            res = transpose(res)
+    
+        else:        
+            # case 1, 2
+            res = reshape(
+                res,
+                shape(res) + (1,)
+            )
+
+    return res
 
 
 #---------------------------------------------
