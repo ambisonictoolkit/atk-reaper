@@ -214,25 +214,38 @@ def n3d(lm = (0, 0), normalise_zero = True):
 # 8th-order. Solved via Mathematica.
 
 # maxN & MaxN normalisation
-def maxN(lm = (0, 0), MaxN = True, normalise_zero = True):
+def maxN(lm = (0, 0), normalise_zero = True):
     """Args:
         - l              : Associated Legendre degree (ambisonic 'order')
         - m              : Associated Legendre order (ambisonic 'index')
-        - MaxN           : 'MaxN', scale 0th harmonic (W) to 1./sqrt(2)
         - normalise_zero : normalise to 0th harmonic
 
-    maxN: returns 'maxN' or 'MaxN' normalisation weighting coefficients
+    maxN: returns 'maxN' normalisation weighting coefficients
     for spherical harmonics in the form required for Higher Order Ambisonics.
+    0th harmonic (W) scaled to 1.
     
     Normalises the maximum value for for each harmonic to 1. This is the
     normalisation scaling for the Furse-Malham convention.
     """
-    res = sn3d(lm, normalise_zero)
+    res = sn3d(lm, normalise_zero)  * _fuma_maxN_weights[lm_to_fuma(lm)]
     
-    if MaxN:
-        res = res  * _fuma_MaxN_weights[lm_to_fuma(lm)]
-    else: 
-        res = res  * _fuma_maxN_weights[lm_to_fuma(lm)]
+    return res
+
+
+def MaxN(lm = (0, 0), normalise_zero = True):
+    """Args:
+        - l              : Associated Legendre degree (ambisonic 'order')
+        - m              : Associated Legendre order (ambisonic 'index')
+        - normalise_zero : normalise to 0th harmonic
+
+    maxN: returns 'maxN' or 'MaxN' normalisation weighting coefficients
+    for spherical harmonics in the form required for Higher Order Ambisonics.
+    0th harmonic (W) scaled to 1./sqrt(2)
+    
+    Normalises the maximum value for for each harmonic to 1. This is the
+    normalisation scaling for the Furse-Malham convention.
+    """
+    res = sn3d(lm, normalise_zero)  * _fuma_MaxN_weights[lm_to_fuma(lm)]
     
     return res
 
@@ -367,6 +380,57 @@ def fuma_to_lm(fuma = 0):
 #=========================
 # Encoding - Matricies
 
+# NOTE: suitable for both encoding, transforming, decoding
+#       may want to move to 'utilities' 
+def encoding_convert_matrix(input_format, output_format, order = 1):
+    """Args:
+        - input_format  : (ordering, normalisation)
+        - output_format : (ordering, normalisation)
+        - order         : HOA order
+
+        ordering      : 'acn', 'sid', 'fuma'
+        normalisation : 'sn3d', 'n3d', 'maxN', 'MaxN'
+
+
+    Generate a matrix to encode / transcode an HOA signal.
+    NOTE: AmbiX format = ('acn', 'sn3d')
+    
+    Use in conjunction with mmix().
+    """
+
+    input_ordering, input_norm = input_format
+    output_ordering, output_norm = output_format
+
+    # ordering: acn, sid, fuma
+    ordering_to_lm_dict = {
+        'acn': acn_to_lm,
+        'sid': sid_to_lm,
+        'fuma': fuma_to_lm,
+    }
+
+    lm_to_ordering_dict = {
+        'acn': lm_to_acn,
+        'sid': lm_to_sid,
+        'fuma': lm_to_fuma,
+    }
+
+    # normalisation: sn3d, n3d, maxN, MaxN
+    lm_to_norma_dict = {
+        'sn3d': sn3d,
+        'n3d': n3d,
+        'maxN': maxN,
+        'MaxN': MaxN,
+    }
+    
+    nchans = (order+1)**2
+    lm = ordering_to_lm_dict[input_ordering](arange(nchans))
+    norm = lm_to_norma_dict[output_norm](lm) / lm_to_norma_dict[input_norm](lm)
+
+    res = identity(nchans)[:, lm_to_ordering_dict[output_ordering](lm)] * norm
+
+    return res
+    
+
 def planewave_matrix(direction = array([0, 0]), order = 1):
     """
     Args:
@@ -407,8 +471,8 @@ def planewave_matrix(direction = array([0, 0]), order = 1):
 
     theta, phi = transpose(direction)
 
-    lm = hoa.acn_to_lm(arange((1+order)**2))
-    norm = hoa.sn3d(lm)
+    lm = acn_to_lm(arange((1+order)**2))
+    norm = sn3d(lm)
     
     # case 4
     if len(shape(direction)) == 3 and shape(direction)[0] != 1:
@@ -418,14 +482,14 @@ def planewave_matrix(direction = array([0, 0]), order = 1):
         
         # itterate by planewave
         for i in range(npws):
-            res[i] = norm * hoa.spher_harm(lm, theta[i], phi[i])
+            res[i] = norm * spher_harm(lm, theta[i], phi[i])
     
         # reshape to return (nframes, out, in)
         res = transpose(res, (1, 2, 0))
 
     # cases 1, 2, 3
     else:
-        res = norm * hoa.spher_harm(lm, theta, phi)
+        res = norm * spher_harm(lm, theta, phi)
     
         if len(shape(direction)) == 3 and shape(direction)[0] == 1:
             # case 3
@@ -439,6 +503,11 @@ def planewave_matrix(direction = array([0, 0]), order = 1):
             )
 
     return res
+
+
+# NOTE: may want to include pressurewave_matrix (omni) encoder
+#       AND have a parameter to normalise according to:
+#           'amp', 'rms', 'energy' - see decoders
 
 
 #---------------------------------------------
