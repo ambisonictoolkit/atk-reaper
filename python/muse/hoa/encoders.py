@@ -19,6 +19,8 @@ from muse import *
 #from math import factorial
 from scipy.misc import factorial
 
+from muse.hoa import *
+
 # import muse defined constants
 import muse.constants as C
 
@@ -153,11 +155,10 @@ def spher_harm(lm = (0, 0), theta = 0, phi = 0):
 # Spherical Harmonics - Normalisation
 
 # Schmidt semi-normalisation (3D)
-def sn3d(lm = (0, 0), normalise_zero = True):
+def sn3d(lm = (0, 0)):
     """Args:
         - l              : Associated Legendre degree (ambisonic 'order')
         - m              : Associated Legendre order (ambisonic 'index')
-        - normalise_zero : normalise to 0th harmonic
 
     SN3D: returns Schmidt semi-normalisation (3D) weighting coefficients
     for spherical harmonics in the form required for Higher Order Ambisonics.
@@ -172,19 +173,15 @@ def sn3d(lm = (0, 0), normalise_zero = True):
         (2 - dm) * \
         (factorial(l - absolute(m)) / factorial(l + absolute(m)))
     )
-    
-    if not normalise_zero:
-        res = res * reciprocal(sqrt(4*pi))
-    
+        
     return res
 
 
 # full 3D normalisation
-def n3d(lm = (0, 0), normalise_zero = True):
+def n3d(lm = (0, 0)):
     """Args:
         - l              : Associated Legendre degree (ambisonic 'order')
         - m              : Associated Legendre order (ambisonic 'index')
-        - normalise_zero : normalise to 0th harmonic
 
     N3D: returns full 3D normalisation weighting coefficients
     for spherical harmonics in the form required for Higher Order Ambisonics.
@@ -197,7 +194,7 @@ def n3d(lm = (0, 0), normalise_zero = True):
     """
     l, m = lm
     
-    res = sqrt(2 * l + 1) * sn3d(lm, normalise_zero)
+    res = sqrt(2 * l + 1) * sn3d(lm)
     
     return res
 
@@ -214,11 +211,10 @@ def n3d(lm = (0, 0), normalise_zero = True):
 # 8th-order. Solved via Mathematica.
 
 # maxN & MaxN normalisation
-def maxN(lm = (0, 0), normalise_zero = True):
+def maxN(lm = (0, 0)):
     """Args:
         - l              : Associated Legendre degree (ambisonic 'order')
         - m              : Associated Legendre order (ambisonic 'index')
-        - normalise_zero : normalise to 0th harmonic
 
     maxN: returns 'maxN' normalisation weighting coefficients
     for spherical harmonics in the form required for Higher Order Ambisonics.
@@ -227,16 +223,15 @@ def maxN(lm = (0, 0), normalise_zero = True):
     Normalises the maximum value for for each harmonic to 1. This is the
     normalisation scaling for the Furse-Malham convention.
     """
-    res = sn3d(lm, normalise_zero)  * _fuma_maxN_weights[lm_to_fuma(lm)]
+    res = sn3d(lm)  * _fuma_maxN_weights[lm_to_fuma(lm)]
     
     return res
 
 
-def MaxN(lm = (0, 0), normalise_zero = True):
+def MaxN(lm = (0, 0)):
     """Args:
         - l              : Associated Legendre degree (ambisonic 'order')
         - m              : Associated Legendre order (ambisonic 'index')
-        - normalise_zero : normalise to 0th harmonic
 
     maxN: returns 'maxN' or 'MaxN' normalisation weighting coefficients
     for spherical harmonics in the form required for Higher Order Ambisonics.
@@ -245,7 +240,7 @@ def MaxN(lm = (0, 0), normalise_zero = True):
     Normalises the maximum value for for each harmonic to 1. This is the
     normalisation scaling for the Furse-Malham convention.
     """
-    res = sn3d(lm, normalise_zero)  * _fuma_MaxN_weights[lm_to_fuma(lm)]
+    res = sn3d(lm)  * _fuma_MaxN_weights[lm_to_fuma(lm)]
     
     return res
 
