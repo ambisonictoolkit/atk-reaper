@@ -8,7 +8,7 @@ var xFormDuples = [];
 var processPoints, updateMatrix, getXForm, chainXForms, creatXformLayout;
 
 // drawing vars
-var scrnB, winW, winH, uv, ctlv, pnts, arcH;
+var scrnB, winW, winH, uv, ctlv, codev, pnts, arcH;
 var degreeSpec, degreeSl, degreeNB, degreePiNB, xFormMenu, xForms;
 var rotSpec, rotSl, rotNB, rotPiNB;
 var selDex, adjustRhos, getColCount, layoutFunc, colors;
@@ -101,8 +101,11 @@ scrnB = Window.screenBounds;
 winW= 600;
 winH= 600;
 w = Window("soundfield transform", Rect(scrnB.center.x - (winW/2), scrnB.center.y - (winH/2), winW, winH), resizable: true).front;
+// w.layout_(VLayout(
 uv = UserView( w, Rect(0,0, w.view.bounds.width, w.view.bounds.height/2) ).resize_(5);
 ctlv = View( w, Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2) ).resize_(5);
+codev = View();
+// ));
 // uv = UserView();
 // ctlv = View();
 
@@ -212,8 +215,13 @@ creatXformLayout = {
 
 ctlv.layout_(
 	VLayout(
-		creatXformLayout.(),
-		TextView().enterInterpretsSelection_(true)
+		// creatXformLayout.(),
+		View().layout_(creatXformLayout.()),
+		View().layout_(creatXformLayout.()),
+		View().layout_(creatXformLayout.()),
+		View().layout_(creatXformLayout.()),
+		View().layout_(creatXformLayout.()),
+		codev.layout_(VLayout(TextView().enterInterpretsSelection_(true)))
 	)
 );
 
@@ -223,7 +231,7 @@ uv.drawFunc_({|view|
 
 	ctlv.bounds_(Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2));
 	uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
-	r = uv.bounds.height * 0.01;
+	r = uv.bounds.height * 0.02;
 	d = r*2;
 	arcH = uv.bounds.height/2.1;	// height of the "fan" arc
 
