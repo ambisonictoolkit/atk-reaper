@@ -199,6 +199,56 @@ def n3d(lm = (0, 0)):
     return res
 
 
+# full 2D normalisation
+def n2d(lm = (0, 0)):
+    """Args:
+        - l              : Associated Legendre degree (ambisonic 'order')
+        - m              : Associated Legendre order (ambisonic 'index')
+
+    N2D: returns full 2D normalisation weighting coefficients
+    for spherical harmonics in the form required for Higher Order Ambisonics.
+    
+    Daniel states: "2D-restricted formalism (cylindrical harmonics), but
+    may also apply to 3D spherical harmonics provided that clear extension
+    rules are given..."
+
+    Useful for solving decoding problems [..]
+    (2D reconstruction).
+    """
+    l, m = lm
+    
+    res = sqrt(
+        pow(2, 2 * l) * pow(factorial(l), 2) / factorial(2 * l + 1)
+    ) * n3d(lm)
+    
+    return res
+
+
+# Semi-normalisation (2D)
+def sn2d(lm = (0, 0)):
+    """Args:
+        - l              : Associated Legendre degree (ambisonic 'order')
+        - m              : Associated Legendre order (ambisonic 'index')
+
+    SN2D: returns Semi-normalisation (2D) weighting coefficients
+    for spherical harmonics in the form required for Higher Order Ambisonics.
+    
+    Daniel states: "2D-restricted formalism (cylindrical harmonics), but
+    may also apply to 3D spherical harmonics provided that clear extension
+    rules are given..."
+
+    Useful for solving decoding problems [..]
+    (2D reconstruction).
+    """
+    l, m = lm
+    
+    lne0 = not_equal(0, l).astype(int)
+    
+    res = pow(2, -1./2 * lne0) * n2d(lm)
+        
+    return res
+
+
 # Furse (29 June 2014) says:
 # For MaxN, you need the maxima of the underlying spherical harmonics you're
 # using. To find these, you can use the fact that the partial derivatives
@@ -384,7 +434,7 @@ def encoding_convert_matrix(input_format, output_format, order = 1):
         - order         : HOA order
 
         ordering      : 'acn', 'sid', 'fuma'
-        normalisation : 'sn3d', 'n3d', 'maxN', 'MaxN'
+        normalisation : 'sn3d', 'n3d', 'sn2d', 'n2d', 'maxN', 'MaxN'
 
 
     Generate a matrix to encode / transcode an HOA signal.
@@ -413,6 +463,8 @@ def encoding_convert_matrix(input_format, output_format, order = 1):
     lm_to_norma_dict = {
         'sn3d': sn3d,
         'n3d': n3d,
+        'sn2d': sn2d,
+        'n2d': n2d,
         'maxN': maxN,
         'MaxN': MaxN,
     }
