@@ -2,10 +2,11 @@
 // constants
 var kInvSqrt2 = 1/(2.sqrt);
 var numPoints = 8, initPointsMatrices, transformedPoints, aeds;
-var degreeOfTransform = 0, transform = 'push', rotation = 0;
-var xFormDuples = [];
+var controls;
+// var xFormDuples = [];
 // functions
-var processPoints, updateMatrix, getXForm, chainXForms, creatXformLayout;
+var processPoints, updateMatrix, getXForm, chainXForms, createXForm;
+var createNewXFormView, removeXForm;
 
 // drawing vars
 var scrnB, winW, winH, uv, ctlv, codev, pnts, arcH;
@@ -14,7 +15,7 @@ var rotSpec, rotSl, rotNB, rotPiNB;
 var selDex, adjustRhos, getColCount, layoutFunc, colors;
 
 // xFormDuples = [['push', pi/4],['focus', pi/4],['rotate', pi/3]];
-xFormDuples = [];
+// xFormDuples = [];
 
 processPoints = {|xFormedMatrix|
 	var w,x,y,z, az, el, g0square, g1square, omni, gain;
@@ -73,23 +74,28 @@ chainXForms = {|...xFormDegPrs|
 	mtx;
 };
 
-updateMatrix = { |newDegreeOfTransform|
-	newDegreeOfTransform !? {degreeOfTransform = newDegreeOfTransform}; // for introspection by gui when changing xform
-	// newRotation !? {rotation = newRotation};
+updateMatrix = {
+	var xFormDuples = [];
+	controls.do{|ctlDict|
+		ctlDict.xForm.notNil.if{
+			ctlDict.degree.isNil.if{"trasform degree is nil!".error};
+			xFormDuples = xFormDuples.add( [ctlDict.xform, ctlDict.degree] );
+		};
+	};
 
-	transformedPoints = if(xFormDuples.size > 0,
-		{
-			initPointsMatrices.collect{|pointMtx|
-				var xformMtx;
-				xformMtx = chainXForms.(*xFormDuples);
-				xformMtx * pointMtx;
-			};
-		},{ initPointsMatrices }
+	transformedPoints = (xFormDuples.size > 0).if({
+		initPointsMatrices.collect{|pointMtx|
+			var xformMtx;
+			xformMtx = chainXForms.(*xFormDuples);
+			xformMtx * pointMtx;
+		};
+		},{ initPointsMatrices } // no transform
 	);
 	// set aeds var for gui update
 	aeds = transformedPoints.collect{|ptMtx|
 		processPoints.(ptMtx);
 	};
+
 };
 
 updateMatrix.(); // initialize
@@ -119,9 +125,19 @@ xForms = IdentityDictionary(know: true).putPairs([
 	'rotate',	IdentityDictionary(know: true).putPairs([ 'min', -2pi,  'max', 2pi,	 'default', 0 ])
 ]);
 
-creatXformLayout = {
-	var updateSpecs, xFormMenu, degSpec, degSl, degNB, degPiNB;
-	var deg;
+// order determines sf processing chain
+// list can grow with inserted items and shrink when removed
+controls = List();
+
+createXForm = {
+	var updateSpecs, xFormMenu, degSpec, degSl, degNB, degPiNB, removeBut, addBut;
+	var dict, view, layout, deg;
+
+	"createXForm".postln;
+
+	view = View();
+	// store xform, degree, view, layout here
+	dict = IdentityDictionary(know: true);
 
 	updateSpecs = { |xf| // xf is a dict from xForms
 		var min, max;
@@ -132,9 +148,7 @@ creatXformLayout = {
 		degPiNB.clipHi_(max).clipLo_(min);
 		// initialize widgets
 		deg.notNil.if({
-			if( (deg<min) or: (deg>max),
-				{ "resetting DEG: ".post; deg. postln; deg = degSpec.default.postln; }
-			);
+			if( (deg<min) or: (deg>max), { deg = degSpec.default.postln; });
 			},{ deg = degSpec.default }
 		);
 		degSl.value   = degSpec.unmap(deg);
@@ -151,13 +165,9 @@ creatXformLayout = {
 			xf = mn.item;
 			xfd = xForms[xf];
 			updateSpecs.(xfd);
-			// update global xform Duple array
-			xFormDuples[0].isNil.if(
-				{ xFormDuples = xFormDuples.add([xf, deg]) },
-				{ xFormDuples[0] = [xf, deg] }
-			);
-			xFormDuples.postln;
-			updateMatrix.(deg);
+			// update control dict
+			dict.xform_(xf).degree_(deg);
+			updateMatrix.();
 			w.refresh;
 		});
 	}).maxWidth_(75).value_(0);
@@ -169,7 +179,7 @@ creatXformLayout = {
 			deg = val;
 			degNB.value_(val.round(0.001));
 			degPiNB.value_(val.round(0.001)/pi);
-			xFormDuples[0][1] = deg;
+			dict.degree_(deg);
 			updateMatrix.(deg);
 			w.refresh;
 		}
@@ -183,7 +193,7 @@ creatXformLayout = {
 			deg = val;
 			degSl.value_(degSpec.unmap(val));
 			degPiNB.value_(val / pi);
-			xFormDuples[0][1] = deg;
+			dict.degree_(deg);
 			updateMatrix.(deg);
 			w.refresh;
 		}
@@ -197,33 +207,80 @@ creatXformLayout = {
 			deg = val;
 			degSl.value_(degSpec.unmap(val));
 			degNB.value_(val);
-			xFormDuples[0][1] = deg;
+			dict.degree_(deg);
 			updateMatrix.(deg);
 			w.refresh;
 		}
 	)
 	.step_(0.01/pi).maxWidth_(60);
 
-	// return a layout
-	HLayout(
+	addBut = Button().states_([["+"]])
+	.action_({ |but|
+		createNewXFormView.(view);
+	})
+	.maxWidth_(20);
+
+	removeBut = Button().states_([["X"]])
+	.action_({ |but| removeXForm.(dict) })
+	.maxWidth_(20);
+
+	layout = HLayout(
 		xFormMenu, degNB,
 		VLayout( degSl, StaticText().string_("Degree of Tranform") ),
-		degPiNB, StaticText().string_("pi").align_('left')
+		degPiNB, StaticText().string_("pi").align_('left'),
+		removeBut, addBut
 	);
 
+	view.layout_(layout);
+
+	dict.view = view;
+	dict.layout = layout;
+	dict; // return
 };
 
-ctlv.layout_(
-	VLayout(
-		// creatXformLayout.(),
-		View().layout_(creatXformLayout.()),
-		View().layout_(creatXformLayout.()),
-		View().layout_(creatXformLayout.()),
-		View().layout_(creatXformLayout.()),
-		View().layout_(creatXformLayout.()),
-		codev.layout_(VLayout(TextView().enterInterpretsSelection_(true)))
-	)
-);
+createNewXFormView = { |behindThisView|
+	var behindDex, dict;
+	dict = createXForm.();
+	behindThisView !? {
+		controls.do{|ctldict, i|
+			behindDex = (ctldict.view === behindThisView).if{i};
+		};
+		behindDex.isNil.if{"preceeding view not found!".error};
+		controls.insert(behindDex+1, dict);
+		ctlv.layout.insert(dict.view, behindDex+1);
+	};
+	controls.insert(0, dict);
+	ctlv.layout.insert(dict.view, 0);
+	// return
+	dict.view;
+};
+
+removeXForm = {|dict| var rmvDex;
+	controls.do{|ctldict, i|
+		rmvDex = (ctldict === dict).if{i};
+	};
+	rmvDex.isNil.if{"view not found!".error};
+	dict.view.remove;
+	dict.layout.destroy;
+	controls.removeAt(rmvDex);
+};
+
+
+// ctlv.layout_(
+// 	VLayout(
+// 		createNewXFormView.(),
+// 		codev.layout_(VLayout(TextView().enterInterpretsSelection_(true)))
+// 	)
+// );
+
+ctlv.layout_( VLayout() );
+ctlv.layout.add(createNewXFormView.());
+ctlv.layout.add( codev.layout_(VLayout(TextView().enterInterpretsSelection_(true))) );
+
+
+/*******************
+Draw the soundfield
+*******************/
 
 uv.drawFunc_({|view|
 	var cen, getColor;
@@ -324,6 +381,7 @@ uv.drawFunc_({|view|
 	// };
 	// Pen.pop;
 });
+
 w.refresh;
 )
 
