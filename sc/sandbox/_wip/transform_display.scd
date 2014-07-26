@@ -1,7 +1,16 @@
 (
+// Todo:
+// --add gain labels on every other point
+// add makeup gain slider
+// add matrix subtraction
+// consider annular wedge representations
+// --add circle on original 0,0 point
+// post min/max gain
+
+
 // constants
 var kInvSqrt2 = 1/(2.sqrt);
-var numPoints = 8, initPointsMatrices, transformedPoints, aeds;
+var numPoints = 12, initPointsMatrices, transformedPoints, aeds;
 var controls;
 // var xFormDuples = [];
 // functions
@@ -49,18 +58,23 @@ initPointsMatrices = numPoints.collect{|i|
 
 getXForm = {|nameDegPr|
 	var name, deg;
+	"in gatXForm".postln;
 	#name, deg = nameDegPr;
-	switch( name,
-		'push',		{FoaXformerMatrix.newPushX(deg)},
-		'press',	{FoaXformerMatrix.newPressX(deg)},
-		'focus',	{FoaXformerMatrix.newFocusX(deg)},
-		'zoom',		{FoaXformerMatrix.newZoomX(deg)},
-		'rotate',	{FoaXformerMatrix.newRotate(deg)}
-	).matrix
+	xForms[name]['getMatrix'].(deg).matrix;
+
+	// switch( name,
+	// 	'push',		{FoaXformerMatrix.newPushX(deg)},
+	// 	'press',	{FoaXformerMatrix.newPressX(deg)},
+	// 	'focus',	{FoaXformerMatrix.newFocusX(deg)},
+	// 	'zoom',		{FoaXformerMatrix.newZoomX(deg)},
+	// 	'rotate',	{FoaXformerMatrix.newRotate(deg)}
+	// ).matrix
 };
 
 chainXForms = {|...xFormDegPrs|
 	var mtx;
+			"in chainXForms".postln;
+	xFormDegPrs.postln;
 	xFormDegPrs.do{ |xNameDeg|
 		var xMtx;
 		mtx.isNil.if(
@@ -76,13 +90,14 @@ chainXForms = {|...xFormDegPrs|
 
 updateMatrix = {
 	var xFormDuples = [];
+	"in updateMatrix".postln;
 	controls.do{|ctlDict|
-		ctlDict.xForm.notNil.if{
+		ctlDict.xform.notNil.if{
 			ctlDict.degree.isNil.if{"trasform degree is nil!".error};
 			xFormDuples = xFormDuples.add( [ctlDict.xform, ctlDict.degree] );
 		};
 	};
-
+	// "Duples: ".post; xFormDuples.postln; // debug
 	transformedPoints = (xFormDuples.size > 0).if({
 		initPointsMatrices.collect{|pointMtx|
 			var xformMtx;
@@ -118,11 +133,25 @@ codev = View();
 // controls
 // xForms = ['push', 'press', 'focus', 'zoom'];
 xForms = IdentityDictionary(know: true).putPairs([
-	'push',		IdentityDictionary(know: true).putPairs([ 'min', -pi/2, 'max', pi/2, 'default', 0 ]),
-	'press',	IdentityDictionary(know: true).putPairs([ 'min', -pi/2, 'max', pi/2, 'default', 0 ]),
-	'focus',	IdentityDictionary(know: true).putPairs([ 'min', -pi/2, 'max', pi/2, 'default', 0 ]),
-	'zoom',		IdentityDictionary(know: true).putPairs([ 'min', -pi/2, 'max', pi/2, 'default', 0 ]),
-	'rotate',	IdentityDictionary(know: true).putPairs([ 'min', -2pi,  'max', 2pi,	 'default', 0 ])
+	'push',		IdentityDictionary(know: true).putPairs(
+		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newPushX(deg)} ]
+	),
+	'press',	IdentityDictionary(know: true).putPairs(
+		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newPressX(deg)} ]),
+	'focus',	IdentityDictionary(know: true).putPairs(
+		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newFocusX(deg)} ]),
+	'zoom',		IdentityDictionary(know: true).putPairs(
+		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newZoomX(deg)} ]),
+	'dominate',		IdentityDictionary(know: true).putPairs(
+		[ 'min', -24, 'max', 24, 'default', 0, 'getMatrix', {|gain| FoaXformerMatrix.newDominateX(gain)} ]),
+	'direct',		IdentityDictionary(know: true).putPairs(
+		[ 'min', 0, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newDirectX(deg)} ]),
+	'rotate',	IdentityDictionary(know: true).putPairs(
+		[ 'min', 2pi,	'max', -2pi, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newRotate(deg)} ]),
+	'asymmetry',	IdentityDictionary(know: true).putPairs(
+		[ 'min', -pi/2,	'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newAsymmetry(deg)} ]),
+	'balance',	IdentityDictionary(know: true).putPairs(
+		[ 'min', -pi/2,	'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newBalance(deg)} ]),
 ]);
 
 // order determines sf processing chain
@@ -133,7 +162,7 @@ createXForm = {
 	var updateSpecs, xFormMenu, degSpec, degSl, degNB, degPiNB, removeBut, addBut;
 	var dict, view, layout, deg;
 
-	"createXForm".postln;
+	"in createXForm".postln;
 
 	view = View();
 	// store xform, degree, view, layout here
@@ -141,14 +170,16 @@ createXForm = {
 
 	updateSpecs = { |xf| // xf is a dict from xForms
 		var min, max;
-		min = xf.min;
-		max = xf.max;
-		degSpec = ControlSpec(min, max, default: xf.default);
+		"in updatespecs".postln;
+		degSpec = ControlSpec(xf.min, xf.max, default: xf.default);
+		// .min/maxItem to handle negative max on rotate
+		min = [xf.min, xf.max].minItem;
+		max = [xf.min, xf.max].maxItem;
 		degNB.clipHi_(max).clipLo_(min);
 		degPiNB.clipHi_(max).clipLo_(min);
 		// initialize widgets
 		deg.notNil.if({
-			if( (deg<min) or: (deg>max), { deg = degSpec.default.postln; });
+			if( (deg<min) or: (deg>max), { deg = degSpec.default });
 			},{ deg = degSpec.default }
 		);
 		degSl.value   = degSpec.unmap(deg);
@@ -161,12 +192,12 @@ createXForm = {
 	xFormMenu = PopUpMenu().items_(['-']++xForms.keys)
 	.action_({ |mn|
 		if( mn.item != '-', {
-			var xf, xfd;
-			xf = mn.item;
-			xfd = xForms[xf];
-			updateSpecs.(xfd);
+			var xfName, xfAttributes;
+			xfName = mn.item;
+			xfAttributes = xForms[xfName];
+			updateSpecs.(xfAttributes);
 			// update control dict
-			dict.xform_(xf).degree_(deg);
+			dict.xform_(xfName).degree_(deg);
 			updateMatrix.();
 			w.refresh;
 		});
@@ -241,23 +272,24 @@ createXForm = {
 createNewXFormView = { |behindThisView|
 	var behindDex, dict;
 	dict = createXForm.();
-	behindThisView !? {
+	behindThisView.notNil.if({
 		controls.do{|ctldict, i|
-			behindDex = (ctldict.view === behindThisView).if{i};
+			(ctldict.view === behindThisView).if{behindDex = i};
 		};
 		behindDex.isNil.if{"preceeding view not found!".error};
 		controls.insert(behindDex+1, dict);
 		ctlv.layout.insert(dict.view, behindDex+1);
-	};
-	controls.insert(0, dict);
-	ctlv.layout.insert(dict.view, 0);
+		},{
+			controls.insert(0, dict);
+			ctlv.layout.insert(dict.view, 0);
+	});
 	// return
 	dict.view;
 };
 
 removeXForm = {|dict| var rmvDex;
 	controls.do{|ctldict, i|
-		rmvDex = (ctldict === dict).if{i};
+		(ctldict === dict).if{rmvDex = i};
 	};
 	rmvDex.isNil.if{"view not found!".error};
 	dict.view.remove;
@@ -283,14 +315,15 @@ Draw the soundfield
 *******************/
 
 uv.drawFunc_({|view|
-	var cen, getColor;
+	var cen, getColor, circleViewRatio;
 	var alphaSpec, gainSpec, colorSpec;
 
 	ctlv.bounds_(Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2));
 	uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
 	r = uv.bounds.height * 0.02;
 	d = r*2;
-	arcH = uv.bounds.height/2.1;	// height of the "fan" arc
+	circleViewRatio = 0.8;
+	arcH = uv.bounds.height * circleViewRatio / 2;	// height of the "fan" arc
 
 	// center drawing origin
 	cen = view.bounds.center;
@@ -319,43 +352,52 @@ uv.drawFunc_({|view|
 		{i < 512} {Color.new255(0, 255, (i-384)*2)}
 		{i < 768} {Color.new255(0, 255 - (i-512), 255)};
 	};
-	/*767.do{|i|
-	var color;
-	color = case
-	{i < 256} {Color.new255(255, i, 0)}
-	{i < 384} {Color.new255(255 - (i-256), 255, 0)}
-	{i < 512} {Color.new255(0, 255, (i-384)*2)}
-	{i < 768} {Color.new255(0, 255 - (i-512), 255)}
-	;
-	Button(w.view, Rect(0,0, 10,10)).states_([["", color, color]])
-
-};*/
-
 
 	aeds.do{|pntGainArr, i|
-		var drawPnt, polar, gain, omniRad, omniDiam, fullOmni;
+		var drawPnt, polar, gain, omniRad, omniDiam, fullOmni, gainColor, gainLabelColor, gainPnt;
 		#polar, gain = pntGainArr;
 		fullOmni = 2 * arcH;
 		omniDiam = 1-polar.rho * fullOmni;
 		omniDiam = omniDiam.clip(d, fullOmni);
 		omniRad= omniDiam/2;
 
+		gainColor = getColor.(gain);
+		// gainLabelColor = getColor.(gain + 3);
 		// cartesian point in view coordinates
 		drawPnt = polar.asPoint
 		.rotate(pi/2)	// convert ambi to screen coords
 		* Point(1,-1)	// flip Y for drawing
 		* arcH;			// scale normalized points to arcH
-
+		// original 0deg azimuth point circle
+		if( i==0, {
+			Pen.strokeColor_(Color.fromHexString("#CC0000"));
+			Pen.strokeOval( Rect(drawPnt.x-r, drawPnt.y-r, d, d) );
+		});
 		// line fron center to point
 		Pen.strokeColor_(Color.gray.alpha_(0.5));
 		Pen.line(drawPnt, 0@0).stroke;
 		// directivity circle
-		Pen.fillColor_(getColor.(gain).alpha_(alphaSpec.map(polar.rho)));
+		Pen.fillColor_(gainColor.alpha_(alphaSpec.map(polar.rho)));
 		Pen.fillOval( Rect(drawPnt.x-omniRad, drawPnt.y-omniRad, omniDiam, omniDiam) );
-		// point circle
-		// Pen.fillColor_(Color.fromHexString("#CC0000"));
-		// Pen.fillOval( Rect(drawPnt.x-r, drawPnt.y-r, d, d) );
+		// gain labels
+		gainPnt = polar.rho = 1;
+		gainPnt = gainPnt.asPoint.rotate(pi/2)
+		// flip y for screen bounds and
+		// scale in/out toward/away from origin, >1 outside circle
+		// * Point(0.4,-0.4)
+		* Point(1.15,-1.15)
+		* arcH;
+		Pen.fillColor_(gainColor.alpha_(1));
+		QPen.stringCenteredIn(gain.round(0.1).asString, Rect(gainPnt.x-(r*10), gainPnt.y-(r*10), d*10, d*10));
 	};
+	// draw min/max gain
+	Pen.fillColor_(Color.black);
+	QPen.stringCenteredIn(
+		"max gain\n" ++ aeds.collect({|me| me[1]}).maxItem.round(0.1).asString,
+		Rect(ctlv.bounds.width/3.neg, ctlv.bounds.height/4, d*7.5, d*3) );
+	QPen.stringCenteredIn(
+		"min gain\n" ++ aeds.collect({|me| me[1]}).minItem.round(0.1).asString,
+		Rect(ctlv.bounds.width/3.neg, ctlv.bounds.height/2.9, d*7.5, d*3) );
 
 	// // draw transducer layout
 	// Pen.push;
