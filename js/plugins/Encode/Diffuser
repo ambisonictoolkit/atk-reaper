@@ -109,7 +109,7 @@ Prepare a new kernel from an impulse buffer
 ********************************************************************/
 function prepareKernel(anImpulseBuffer, aKernel, aKernelSize, anFftSize, aChannelOffset) local(i, i2, i4, lInvFftSize)
 (
-  // We do not need to resample, as IR in UHJ decoding does not depend on sample rate
+  // We do not need to resample, as IR in diffuser encoding does not depend on sample rate
   
   // Copy two channels from IR to the kernel buffer
   // Samples are inter-leaved (L,R,L,R, .... or 1,2,3,4,1,2,3,4,...)
