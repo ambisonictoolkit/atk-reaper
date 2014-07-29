@@ -5,12 +5,13 @@
 // add matrix subtraction
 // consider annular wedge representations
 // --add circle on original 0,0 point
-// post min/max gain
+// --post min/max gain
+// implement units for tranform (pi, db, receiver index)
 
 
 // constants
 var kInvSqrt2 = 1/(2.sqrt);
-var numPoints = 12, initPointsMatrices, transformedPoints, aeds;
+var numPoints = 24, initPointsMatrices, transformedPoints, aeds;
 var controls;
 // var xFormDuples = [];
 // functions
@@ -27,7 +28,7 @@ var selDex, adjustRhos, getColCount, layoutFunc, colors;
 // xFormDuples = [];
 
 processPoints = {|xFormedMatrix|
-	var w,x,y,z, az, el, g0square, g1square, omni, gain;
+	var w,x,y,z, az, el, g0square, g1square, term, omni, gain;
 	#w,x,y,z = xFormedMatrix.getCol(0);
     az  = atan2(y, x);
 	el  = atan2(z, sqrt(x.squared + y.squared));
@@ -35,18 +36,34 @@ processPoints = {|xFormedMatrix|
     // Omni transform angle
     g0square	= w.squared;
     g1square	= x.squared + y.squared + z.squared;
-	omni		= asin(( (2*g0square) - g1square) / ((2*g0square) + g1square));
+	term 		= ((2*g0square) + g1square);
+	(term == 0).if{term = 0.0000000001}; // protect from NaN
+	omni		= asin(( (2*g0square) - g1square) / term);
 
     // Gain
-    gain = w * sqrt(2 / (1 + sin(omni)));
+	term		= sin(omni);
+	(term == -1).if{term = -0.99999999}; // protect from NaN
+    gain		= w * sqrt(2 / (1 + term));
 
 	// Normalise omni to [0,1] range
 	omni = 2 * omni / pi;
 	omni = 1 - omni;
+	omni = omni.clip(0.0,1.0);
 
-	// ignore el for now, implement with Spherical to include el
+	// debug ---
+	[ Polar(omni, az), // gain.ampdb
+		[gain, 0.00000001].maxItem.ampdb // protect from -inf
+	].postln;
+	[w,x,y,z, az, el].postln;
+	omni.postln;
+	// --- debug
+
+	// ignore elev for now, implement with Spherical to include elev
 	// omni is normalized and scales rho (distance from center)
-	[Polar(omni, az), gain.ampdb];
+	[
+		Polar(omni, az), // gain.ampdb
+		[gain, 0.00000001].maxItem.ampdb // protect from -inf
+	];
 };
 
 initPointsMatrices = numPoints.collect{|i|
@@ -56,31 +73,17 @@ initPointsMatrices = numPoints.collect{|i|
 	FoaEncoderMatrix.newDirection(ang).matrix.addRow([0]); // need to add z manually
 };
 
-getXForm = {|nameDegPr|
-	var name, deg;
-	"in gatXForm".postln;
-	#name, deg = nameDegPr;
-	xForms[name]['getMatrix'].(deg).matrix;
-
-	// switch( name,
-	// 	'push',		{FoaXformerMatrix.newPushX(deg)},
-	// 	'press',	{FoaXformerMatrix.newPressX(deg)},
-	// 	'focus',	{FoaXformerMatrix.newFocusX(deg)},
-	// 	'zoom',		{FoaXformerMatrix.newZoomX(deg)},
-	// 	'rotate',	{FoaXformerMatrix.newRotate(deg)}
-	// ).matrix
-};
-
-chainXForms = {|...xFormDegPrs|
+/*chainXForms = {|...xFormDegPrs|
 	var mtx;
-			"in chainXForms".postln;
+	"in chainXForms".postln;
 	xFormDegPrs.postln;
 	xFormDegPrs.do{ |xNameDeg|
-		var xMtx;
+		var name, deg, xMtx;
+		#name, deg = xNameDeg;
 		mtx.isNil.if(
-			{ mtx = getXForm.(xNameDeg) }, // make last xform the first mtx
+			{ mtx = xForms[name]['getMatrix'].(deg).matrix; }, // make last xform the first mtx
 			{
-				xMtx = getXForm.(xNameDeg);
+				xMtx = xForms[name]['getMatrix'].(deg).matrix;
 				mtx = xMtx * mtx;
 			}
 		);
@@ -99,7 +102,7 @@ updateMatrix = {
 	};
 	// "Duples: ".post; xFormDuples.postln; // debug
 	transformedPoints = (xFormDuples.size > 0).if({
-		initPointsMatrices.collect{|pointMtx|
+		initPointsMatrices.collect{ |pointMtx|
 			var xformMtx;
 			xformMtx = chainXForms.(*xFormDuples);
 			xformMtx * pointMtx;
@@ -107,6 +110,54 @@ updateMatrix = {
 		},{ initPointsMatrices } // no transform
 	);
 	// set aeds var for gui update
+	aeds = transformedPoints.collect{|ptMtx|
+		processPoints.(ptMtx);
+	};
+
+};*/
+chainXForms = {|inputMtx...xFormDegPrs|
+	var mtx;
+	"in chainXForms".postln;
+	xFormDegPrs.postln;
+	xFormDegPrs.do{ |xNameDeg|
+		var name, deg;
+		#name, deg = xNameDeg;
+
+		(name != 'subtract').if({
+			// tranform via matrix multiplication
+			mtx.isNil.if(
+				{ mtx = xForms[name]['getMatrix'].(deg) }, // first mtx
+				{ mtx = xForms[name]['getMatrix'].(deg) * mtx; }
+			);
+			},{ // subtract
+				mtx = Matrix.newIdentity(4) - mtx;
+		});
+	};
+	mtx * inputMtx;
+};
+
+updateMatrix = {
+	var xFormDuples = [];
+
+	"in updateMatrix".postln;
+	controls.do{|ctlDict|
+		ctlDict.xform.notNil.if{
+			ctlDict.degree.isNil.if{"trasform degree is nil!".error};
+			xFormDuples = xFormDuples.add( [ctlDict.xform, ctlDict.degree] );
+		};
+	};
+
+	transformedPoints = (xFormDuples.size > 0).if({
+		initPointsMatrices.collect{ |pointMtx|
+			// var xformMtx;
+			// xformMtx = chainXForms.(pointMtx, *xFormDuples);
+			// xformMtx * pointMtx;
+			chainXForms.(pointMtx, *xFormDuples);
+		};
+		},{ initPointsMatrices } // no transform
+	);
+
+	// calculate and set aeds var for gui update
 	aeds = transformedPoints.collect{|ptMtx|
 		processPoints.(ptMtx);
 	};
@@ -134,24 +185,39 @@ codev = View();
 // xForms = ['push', 'press', 'focus', 'zoom'];
 xForms = IdentityDictionary(know: true).putPairs([
 	'push',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newPushX(deg)} ]
+		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
+			'getMatrix', {|deg| FoaXformerMatrix.newPushX(deg).matrix} ]
 	),
 	'press',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newPressX(deg)} ]),
+		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
+			'getMatrix', {|deg| FoaXformerMatrix.newPressX(deg).matrix} ]),
 	'focus',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newFocusX(deg)} ]),
+		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
+			'getMatrix', {|deg| FoaXformerMatrix.newFocusX(deg).matrix} ]),
 	'zoom',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newZoomX(deg)} ]),
+		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
+			'getMatrix', {|deg| FoaXformerMatrix.newZoomX(deg).matrix} ]),
 	'dominate',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -24, 'max', 24, 'default', 0, 'getMatrix', {|gain| FoaXformerMatrix.newDominateX(gain)} ]),
+		[ 'min', -24, 'max', 24, 'default', 0,
+			'getMatrix', {|gain| FoaXformerMatrix.newDominateX(gain).matrix} ]),
 	'direct',		IdentityDictionary(know: true).putPairs(
-		[ 'min', 0, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newDirectX(deg)} ]),
+		[ 'min', 0, 'max', pi/2, 'default', 0,
+			'getMatrix', {|deg| FoaXformerMatrix.newDirectX(deg).matrix} ]),
 	'rotate',	IdentityDictionary(know: true).putPairs(
-		[ 'min', 2pi,	'max', -2pi, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newRotate(deg)} ]),
+		[ 'min', 2pi,	'max', -2pi, 'default', 0,
+			'getMatrix', {|deg| FoaXformerMatrix.newRotate(deg).matrix} ]),
 	'asymmetry',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2,	'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newAsymmetry(deg)} ]),
+		[ 'min', -pi/2,	'max', pi/2, 'default', 0,
+			'getMatrix', {|deg| FoaXformerMatrix.newAsymmetry(deg).matrix} ]),
 	'balance',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2,	'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newBalance(deg)} ]),
+		[ 'min', -pi/2,	'max', pi/2, 'default', 0,
+			'getMatrix', {|deg| FoaXformerMatrix.newBalance(deg).matrix} ]),
+	'gain',	IdentityDictionary(know: true).putPairs(
+		[ 'min', -24,	'max', 24, 'default', 0,
+			'getMatrix', {|gainDB| gainDB.dbamp } ]),
+	'subtract', IdentityDictionary(know: true).putPairs(
+		[ 'min', 0,	'max', 0, 'default', 0,
+			'getMatrix', {|deg| FoaXformerMatrix.newBalance(deg)} ]),
 ]);
 
 // order determines sf processing chain
@@ -200,6 +266,10 @@ createXForm = {
 			dict.xform_(xfName).degree_(deg);
 			updateMatrix.();
 			w.refresh;
+			},{ // nil mutes the transform
+				dict.xform_(nil).degree_(nil);
+				updateMatrix.();
+				w.refresh;
 		});
 	}).maxWidth_(75).value_(0);
 
@@ -342,6 +412,7 @@ uv.drawFunc_({|view|
 
 	postf("min gain: %\n", aeds.collect({|me| me[1]}).minItem);
 	postf("max gain: %\n", aeds.collect({|me| me[1]}).maxItem);
+	aeds.do(_.postln);
 
 	getColor = { |gain|
 		var i;
@@ -350,7 +421,8 @@ uv.drawFunc_({|view|
 		{i < 256} {Color.new255(255, i, 0)}
 		{i < 384} {Color.new255(255 - (i-256), 255, 0)}
 		{i < 512} {Color.new255(0, 255, (i-384)*2)}
-		{i < 768} {Color.new255(0, 255 - (i-512), 255)};
+		{i < 768} {Color.new255(0, 255 - (i-512), 255)}
+		{i >= 768} {Color.new255(0, 0, 255)}; // catch all
 	};
 
 	aeds.do{|pntGainArr, i|
