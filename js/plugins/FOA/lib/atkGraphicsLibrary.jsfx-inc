@@ -27,6 +27,11 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 
 
+/********************************************************************
+Functions in the init section can be used by any plugin loading this
+file, encouraging DRY (don't repeat yourself)
+********************************************************************/
+@init
 
 
 /********************************************************************
