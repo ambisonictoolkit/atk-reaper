@@ -31,6 +31,11 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Ambisonic Super Stereo encoder.
 
+
+// Import library with shared functions
+import atkKernelLibrary.jsfx-inc
+
+
 in_pin:L
 in_pin:R
 
@@ -40,7 +45,12 @@ out_pin:Y
 out_pin:Z
 
 slider1:3<0,5,1{256, 512, 1024, 2048, 4096, 8192}>Kernel size
-slider2:0,Sample Rate
+
+/* Processing sample rate is not alway the same as the project sample rate.
+ When project sample rate is changed, the current audio driver will use this sample rate
+ If the sample rate is not supported by the current audio driver, the change will be ignored.
+*/
+slider2:5<0,10,1{8000 - Not supported, 11025 - Not supported, 16000 - Not supported, 22050 - Not supported, 24000 - Not supported, 41000, 48000, 88200, 96000, 176400 - Not supported, 192000}>Processing Sample Rate
 
 
 /**********************************************************
@@ -85,6 +95,8 @@ mBlockLastAndNextR2YZ = 131072 * 14;
 // FFT- and convolution-related variables
 mPreviousKernelSliderValue = -1;
 mPreviousSampleRate        = -1;
+
+mSampleRateSupported       =  0;
 
 mFftSize                   = -1;
 mKernelSize                = -1;
@@ -174,8 +186,12 @@ Updated slider value:
 ((mPreviousKernelSliderValue != slider1) || (mPreviousSampleRate != srate)) ?
 (
   mPreviousKernelSliderValue = slider1;
+  
   mPreviousSampleRate        = srate;
+  slider2 = sampleRateToSlider();
   sliderchange(slider2);
+  
+  mSampleRateSupported = isThisSampleRateSupported();
   
   // Get new kernel size
   mKernelSize = 256;
@@ -201,13 +217,10 @@ Preprocessing prior to audio vector processing.
 **********************************************************/
 @block
 
-// If kernel size has changed, we need to prepare a new kernel
-mFftNewRequired ? (
+// If kernel size has changed and sample rate is supported, prepare a new kernel
+(mFftNewRequired && mSampleRateSupported) ? (
   
   mFftSize = 2 * mKernelSize;
-  
-  slider2=mPreviousSampleRate;
-  sliderchange(slider2);
   
   // What is chunksize and chunksize2 used for?
   // If mKernelSize = 256 and mFftSize = 512, chunksize = 512 - 256 - 1 = 255 and chunksize2 = 510
@@ -228,6 +241,10 @@ mFftNewRequired ? (
   mFftNewRequired = 0; 
 );
 
+// Force reset value of slider in case the user changed it manually
+slider2 = sampleRateToSlider();
+sliderchange(slider2);
+
 
 /**********************************************************
 Calculate audio sample
@@ -237,115 +254,125 @@ This limits how DRY we're able to make this section
 **********************************************************/
 @sample
 
-// If we're past the chunksize, it's time to convolve
-mBufferPosition >= chunksize ? 
-(
-  /***** Convolve Left to WX *****/
+// Process audio provided that project sample rate is supported
+mSampleRateSupported ? (
+
+  // If we're past the chunksize, it's time to convolve
+  mBufferPosition >= chunksize ? 
+  (
+    /***** Convolve Left to WX *****/
+    
+    // Swap which block is last and current
+    mTempBlock            = mBlockLastAndNextL2WX;
+    mBlockLastAndNextL2WX = mBlockCurrentL2WX;
+    mBlockCurrentL2WX     = mTempBlock;
+    
+    // Pad the tail of the buffer to zero
+    memset(mBlockCurrentL2WX+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+    // The actual convolution
+    fft(mBlockCurrentL2WX, mFftSize);
+    convolve_c(mBlockCurrentL2WX, mKernelL2WX, mFftSize);
+    ifft(mBlockCurrentL2WX, mFftSize);
+    
+    
+    /***** Convolve Left to Y (and Z)  *****/
+    
+    // Swap which block is last and current
+    mTempBlock            = mBlockLastAndNextL2YZ;
+    mBlockLastAndNextL2YZ = mBlockCurrentL2YZ;
+    mBlockCurrentL2YZ     = mTempBlock;
+    
+    // Pad the tail of the buffer to zero
+    memset(mBlockCurrentL2YZ+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+    // The actual convolution
+    fft(mBlockCurrentL2YZ, mFftSize);
+    convolve_c(mBlockCurrentL2YZ, mKernelL2YZ, mFftSize);
+    ifft(mBlockCurrentL2YZ, mFftSize);
+    
+    
+    /***** Convolve Right to WX *****/
+    
+    // Swap which block is last and current
+    mTempBlock            = mBlockLastAndNextR2WX;
+    mBlockLastAndNextR2WX = mBlockCurrentR2WX;
+    mBlockCurrentR2WX     = mTempBlock;
+    
+    // Pad the tail of the buffer to zero
+    memset(mBlockCurrentR2WX+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+    // The actual convolution
+    fft(mBlockCurrentR2WX, mFftSize);
+    convolve_c(mBlockCurrentR2WX, mKernelR2WX, mFftSize);
+    ifft(mBlockCurrentR2WX, mFftSize);
+    
+    
+    /***** Convolve Right to Y (and Z)  *****/
+    
+    // Swap which block is last and current
+    mTempBlock            = mBlockLastAndNextR2YZ;
+    mBlockLastAndNextR2YZ = mBlockCurrentR2YZ;
+    mBlockCurrentR2YZ     = mTempBlock;
+    
+    // Pad the tail of the buffer to zero
+    memset(mBlockCurrentR2YZ+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+    // The actual convolution
+    fft(mBlockCurrentR2YZ, mFftSize);
+    convolve_c(mBlockCurrentR2YZ, mKernelR2YZ, mFftSize);
+    ifft(mBlockCurrentR2YZ, mFftSize);
+    
+    
+    // Current write/read position within the blocks starts counting from 0 again
+    mBufferPosition=0;
+  );
   
-  // Swap which block is last and current
-  mTempBlock            = mBlockLastAndNextL2WX;
-  mBlockLastAndNextL2WX = mBlockCurrentL2WX;
-  mBlockCurrentL2WX     = mTempBlock;
   
-  // Pad the tail of the buffer to zero
-  memset(mBlockCurrentL2WX+chunksize*2, 0, (mFftSize-chunksize)*2);
-  
-  // The actual convolution
-  fft(mBlockCurrentL2WX, mFftSize);
-  convolve_c(mBlockCurrentL2WX, mKernelL2WX, mFftSize);
-  ifft(mBlockCurrentL2WX, mFftSize);
+  mBufferPosition2 = mBufferPosition*2;
   
   
-  /***** Convolve Left to Y (and Z)  *****/
+  // Buffer incoming audio as real value, set imaginary value to zero
   
-  // Swap which block is last and current
-  mTempBlock            = mBlockLastAndNextL2YZ;
-  mBlockLastAndNextL2YZ = mBlockCurrentL2YZ;
-  mBlockCurrentL2YZ     = mTempBlock;
+  // Left to WX
+  mBlockLastAndNextL2WX[mBufferPosition2]   = spl0;
+  mBlockLastAndNextL2WX[mBufferPosition2+1] = 0;
   
-  // Pad the tail of the buffer to zero
-  memset(mBlockCurrentL2YZ+chunksize*2, 0, (mFftSize-chunksize)*2);
+  // Left to YZ
+  mBlockLastAndNextL2YZ[mBufferPosition2]   = spl0;
+  mBlockLastAndNextL2YZ[mBufferPosition2+1] = 0;
   
-  // The actual convolution
-  fft(mBlockCurrentL2YZ, mFftSize);
-  convolve_c(mBlockCurrentL2YZ, mKernelL2YZ, mFftSize);
-  ifft(mBlockCurrentL2YZ, mFftSize);
+  // Right to WX
+  mBlockLastAndNextR2WX[mBufferPosition2]   = spl1;
+  mBlockLastAndNextR2WX[mBufferPosition2+1] = 0;
   
-  
-  /***** Convolve Right to WX *****/
-  
-  // Swap which block is last and current
-  mTempBlock            = mBlockLastAndNextR2WX;
-  mBlockLastAndNextR2WX = mBlockCurrentR2WX;
-  mBlockCurrentR2WX     = mTempBlock;
-  
-  // Pad the tail of the buffer to zero
-  memset(mBlockCurrentR2WX+chunksize*2, 0, (mFftSize-chunksize)*2);
-  
-  // The actual convolution
-  fft(mBlockCurrentR2WX, mFftSize);
-  convolve_c(mBlockCurrentR2WX, mKernelR2WX, mFftSize);
-  ifft(mBlockCurrentR2WX, mFftSize);
+  // Right to YZ
+  mBlockLastAndNextR2YZ[mBufferPosition2]   = spl1;
+  mBlockLastAndNextR2YZ[mBufferPosition2+1] = 0;
   
   
-  /***** Convolve Right to Y (and Z)  *****/
-  
-  // Swap which block is last and current
-  mTempBlock            = mBlockLastAndNextR2YZ;
-  mBlockLastAndNextR2YZ = mBlockCurrentR2YZ;
-  mBlockCurrentR2YZ     = mTempBlock;
-  
-  // Pad the tail of the buffer to zero
-  memset(mBlockCurrentR2YZ+chunksize*2, 0, (mFftSize-chunksize)*2);
-  
-  // The actual convolution
-  fft(mBlockCurrentR2YZ, mFftSize);
-  convolve_c(mBlockCurrentR2YZ, mKernelR2YZ, mFftSize);
-  ifft(mBlockCurrentR2YZ, mFftSize);
+  // Copy convolved sample values to output
+  spl0 = mBlockCurrentL2WX[mBufferPosition2]   + mBlockCurrentR2WX[mBufferPosition2];
+  spl1 = mBlockCurrentL2WX[mBufferPosition2+1] + mBlockCurrentR2WX[mBufferPosition2+1];
+  spl2 = mBlockCurrentL2YZ[mBufferPosition2]   + mBlockCurrentR2YZ[mBufferPosition2];
+  spl3 = 0.;
   
   
-  // Current write/read position within the blocks starts counting from 0 again
-  mBufferPosition=0;
+  // Add the overlap part (In this plugin we will always be overlapping)
+  mBufferPosition < mFftSize-chunksize ? 
+  (
+    spl0 += mBlockLastAndNextL2WX[chunksize2+mBufferPosition2]   + mBlockLastAndNextR2WX[chunksize2+mBufferPosition2]  ;
+    spl1 += mBlockLastAndNextL2WX[chunksize2+mBufferPosition2+1] + mBlockLastAndNextR2WX[chunksize2+mBufferPosition2+1];  
+    spl2 += mBlockLastAndNextL2YZ[chunksize2+mBufferPosition2]   + mBlockLastAndNextR2YZ[chunksize2+mBufferPosition2]  ;
+  );
+  
+  
+  // Increment buffer position
+  mBufferPosition += 1;
+) : (
+  // Project sample rate is not supported, zero all channels
+  spl0 = 0;
+  spl1 = 0;
+  spl2 = 0;
+  spl3 = 0;
 );
-
-
-mBufferPosition2 = mBufferPosition*2;
-
-
-// Buffer incoming audio as real value, set imaginary value to zero
-
-// Left to WX
-mBlockLastAndNextL2WX[mBufferPosition2]   = spl0;
-mBlockLastAndNextL2WX[mBufferPosition2+1] = 0;
-
-// Left to YZ
-mBlockLastAndNextL2YZ[mBufferPosition2]   = spl0;
-mBlockLastAndNextL2YZ[mBufferPosition2+1] = 0;
-
-// Right to WX
-mBlockLastAndNextR2WX[mBufferPosition2]   = spl1;
-mBlockLastAndNextR2WX[mBufferPosition2+1] = 0;
-
-// Right to YZ
-mBlockLastAndNextR2YZ[mBufferPosition2]   = spl1;
-mBlockLastAndNextR2YZ[mBufferPosition2+1] = 0;
-
-
-// Copy convolved sample values to output
-spl0 = mBlockCurrentL2WX[mBufferPosition2]   + mBlockCurrentR2WX[mBufferPosition2];
-spl1 = mBlockCurrentL2WX[mBufferPosition2+1] + mBlockCurrentR2WX[mBufferPosition2+1];
-spl2 = mBlockCurrentL2YZ[mBufferPosition2]   + mBlockCurrentR2YZ[mBufferPosition2];
-spl3 = 0.;
-
-
-// Add the overlap part (In this plugin we will always be overlapping)
-mBufferPosition < mFftSize-chunksize ? 
-(
-  spl0 += mBlockLastAndNextL2WX[chunksize2+mBufferPosition2]   + mBlockLastAndNextR2WX[chunksize2+mBufferPosition2]  ;
-  spl1 += mBlockLastAndNextL2WX[chunksize2+mBufferPosition2+1] + mBlockLastAndNextR2WX[chunksize2+mBufferPosition2+1];  
-  spl2 += mBlockLastAndNextL2YZ[chunksize2+mBufferPosition2]   + mBlockLastAndNextR2YZ[chunksize2+mBufferPosition2]  ;
-);
-
-
-// Increment buffer position
-mBufferPosition += 1;

@@ -34,6 +34,11 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Frequency spreading mono encoder
 
+
+// Import library with shared functions
+import atkKernelLibrary.jsfx-inc
+
+
 in_pin:M
 
 out_pin:W
@@ -43,8 +48,12 @@ out_pin:Z
 
 slider1:3<0,5,1{256, 512, 1024, 2048, 4096, 8192}>Kernel size
 slider2:3<0,5,1{0: Low, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12: High}>  Number of bands per octave
-slider3:0,Sample Rate
 
+/* Processing sample rate is not alway the same as the project sample rate.
+ When project sample rate is changed, the current audio driver will use this sample rate
+ If the sample rate is not supported by the current audio driver, the change will be ignored.
+*/
+slider3:5<0,10,1{8000 - Not supported, 11025 - Not supported, 16000 - Not supported, 22050 - Not supported, 24000 - Not supported, 44100, 48000, 88200, 96000, 176400 - Not supported, 192000}>Processing Sample Rate
 
 
 /**********************************************************
@@ -78,6 +87,7 @@ mBlockLastAndNextYZ = 131072 * 7;
 mPreviousKernelSliderValue = -1;
 mPreviousBandsPerOctave    = -1;
 mPreviousSampleRate        = -1;
+mSampleRateSupported       =  0;
 
 mFftSize                   = -1;
 mKernelSize                = -1;
@@ -159,8 +169,10 @@ Updated slider value:
   mPreviousBandsPerOctave    = slider2;
   mPreviousSampleRate        = srate;
   
-  slider3 = mPreviousSampleRate;
+  slider3 = sampleRateToSlider(srate);
   sliderchange(slider3);
+
+  mSampleRateSupported = isThisSampleRateSupported();
   
   // Get new kernel size
   mKernelSize = 256;
@@ -184,13 +196,10 @@ Preprocessing prior to audio vector processing.
 **********************************************************/
 @block
 
-// If kernel size has changed, we need to prepare a new kernel
-mFftNewRequired ? (
+// If kernel size has changed and sample rate is supported, prepare a new kernel
+(mFftNewRequired && mSampleRateSupported) ? (
   
   mFftSize = 2 * mKernelSize;
-  
-  slider3=mPreviousSampleRate;
-  sliderchange(slider3);
   
   // What is chunksize and chunksize2 used for?
   // If mKernelSize = 256 and mFftSize = 512, chunksize = 512 - 256 - 1 = 255 and chunksize2 = 510
@@ -208,6 +217,10 @@ mFftNewRequired ? (
   mFftNewRequired = 0; 
 );
 
+// Force reset value of slider in case the user changed it manually
+slider3 = sampleRateToSlider(srate);
+sliderchange(slider3);
+
 
 /**********************************************************
 Calculate audio sample
@@ -217,78 +230,87 @@ This limits how DRY we're able to make this section
 **********************************************************/
 @sample
 
-// If we're past the chunksize, it's time to convolve
-mBufferPosition >= chunksize ? 
-(
-  /***** Convolve WX *****/
+// Process audio provided that project sample rate is supported
+mSampleRateSupported ? (
+  // If we're past the chunksize, it's time to convolve
+  mBufferPosition >= chunksize ? 
+  (
+    /***** Convolve WX *****/
+    
+    // Swap which block is last and current
+    mTempBlock          = mBlockLastAndNextWX;
+    mBlockLastAndNextWX = mBlockCurrentWX;
+    mBlockCurrentWX     = mTempBlock;
+    
+    // Pad the tail of the buffer to zero
+    memset(mBlockCurrentWX+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+    // The actual convolution
+    fft(mBlockCurrentWX, mFftSize);
+    convolve_c(mBlockCurrentWX, mKernelWX, mFftSize);
+    ifft(mBlockCurrentWX, mFftSize);
+    
+    
+    /***** Convolve YZ *****/
+    
+    // Swap which block is last and current
+    mTempBlock          = mBlockLastAndNextYZ;
+    mBlockLastAndNextYZ = mBlockCurrentYZ;
+    mBlockCurrentYZ     = mTempBlock;
+    
+    // Pad the tail of the buffer to zero
+    memset(mBlockCurrentYZ+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+    // The actual convolution
+    fft(mBlockCurrentYZ, mFftSize);
+    convolve_c(mBlockCurrentYZ, mKernelYZ, mFftSize);
+    ifft(mBlockCurrentYZ, mFftSize);
+    
+    
+    // Current write/read position within the blocks starts counting from 0 again
+    mBufferPosition=0;
+  );
   
-  // Swap which block is last and current
-  mTempBlock          = mBlockLastAndNextWX;
-  mBlockLastAndNextWX = mBlockCurrentWX;
-  mBlockCurrentWX     = mTempBlock;
   
-  // Pad the tail of the buffer to zero
-  memset(mBlockCurrentWX+chunksize*2, 0, (mFftSize-chunksize)*2);
-  
-  // The actual convolution
-  fft(mBlockCurrentWX, mFftSize);
-  convolve_c(mBlockCurrentWX, mKernelWX, mFftSize);
-  ifft(mBlockCurrentWX, mFftSize);
+  mBufferPosition2 = mBufferPosition*2;
   
   
-  /***** Convolve YZ *****/
+  // Buffer incoming audio as real value, set imaginary value to zero
   
-  // Swap which block is last and current
-  mTempBlock          = mBlockLastAndNextYZ;
-  mBlockLastAndNextYZ = mBlockCurrentYZ;
-  mBlockCurrentYZ     = mTempBlock;
+  // WX
+  mBlockLastAndNextWX[mBufferPosition2]   = spl0;
+  mBlockLastAndNextWX[mBufferPosition2+1] = 0;
   
-  // Pad the tail of the buffer to zero
-  memset(mBlockCurrentYZ+chunksize*2, 0, (mFftSize-chunksize)*2);
-  
-  // The actual convolution
-  fft(mBlockCurrentYZ, mFftSize);
-  convolve_c(mBlockCurrentYZ, mKernelYZ, mFftSize);
-  ifft(mBlockCurrentYZ, mFftSize);
+  // YZ
+  mBlockLastAndNextYZ[mBufferPosition2]   = spl0;
+  mBlockLastAndNextYZ[mBufferPosition2+1] = 0;
   
   
-  // Current write/read position within the blocks starts counting from 0 again
-  mBufferPosition=0;
+  // Copy convolved sample values to output
+  spl0 = mBlockCurrentWX[mBufferPosition2];
+  spl1 = mBlockCurrentWX[mBufferPosition2+1];
+  
+  spl2 = mBlockCurrentYZ[mBufferPosition2];
+  spl3 = mBlockCurrentYZ[mBufferPosition2+1];
+  
+  
+  // Add the overlap part (In this plugin we will always be overlapping)
+  mBufferPosition < mFftSize-chunksize ? 
+  (
+    spl0 += mBlockLastAndNextWX[chunksize2+mBufferPosition2];
+    spl1 += mBlockLastAndNextWX[chunksize2+mBufferPosition2+1];
+    
+    spl2 += mBlockLastAndNextYZ[chunksize2+mBufferPosition2];
+    spl3 += mBlockLastAndNextYZ[chunksize2+mBufferPosition2+1];
+  );
+  
+  
+  // Increment buffer position
+  mBufferPosition += 1;
+) : (
+  // Project sample rate is not supported, zero all channels
+  spl0 = 0;
+  spl1 = 0;
+  spl2 = 0;
+  spl3 = 0;
 );
-
-
-mBufferPosition2 = mBufferPosition*2;
-
-
-// Buffer incoming audio as real value, set imaginary value to zero
-
-// WX
-mBlockLastAndNextWX[mBufferPosition2]   = spl0;
-mBlockLastAndNextWX[mBufferPosition2+1] = 0;
-
-// YZ
-mBlockLastAndNextYZ[mBufferPosition2]   = spl0;
-mBlockLastAndNextYZ[mBufferPosition2+1] = 0;
-
-
-// Copy convolved sample values to output
-spl0 = mBlockCurrentWX[mBufferPosition2];
-spl1 = mBlockCurrentWX[mBufferPosition2+1];
-
-spl2 = mBlockCurrentYZ[mBufferPosition2];
-spl3 = mBlockCurrentYZ[mBufferPosition2+1];
-
-
-// Add the overlap part (In this plugin we will always be overlapping)
-mBufferPosition < mFftSize-chunksize ? 
-(
-  spl0 += mBlockLastAndNextWX[chunksize2+mBufferPosition2];
-  spl1 += mBlockLastAndNextWX[chunksize2+mBufferPosition2+1];
-  
-  spl2 += mBlockLastAndNextYZ[chunksize2+mBufferPosition2];
-  spl3 += mBlockLastAndNextYZ[chunksize2+mBufferPosition2+1];
-);
-
-
-// Increment buffer position
-mBufferPosition += 1;

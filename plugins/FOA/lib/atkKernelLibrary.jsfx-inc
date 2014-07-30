@@ -1,0 +1,83 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: atkKernelLibrary.jsfx-inc
+  Library of functions relating to kernels and convolution
+---------------------------------------------------------------------
+
+
+/********************************************************************
+Functions in the init section can be used by any plugin loading this
+file, encouraging DRY (don't repeat yourself)
+********************************************************************/
+@init
+
+
+/********************************************************************
+Check if current project sample rate is supported or not
+********************************************************************/
+function isThisSampleRateSupported() local(lFlag)
+(
+  lFlag = 0;
+  
+  // Sample rates below 44100 are not currently supported
+  
+  ((srate|0) ==  44100) ? lFlag = 1;
+  ((srate|0) ==  48000) ? lFlag = 1;
+  ((srate|0) ==  88200) ? lFlag = 1;
+  ((srate|0) ==  96000) ? lFlag = 1;
+  
+  // Sample rate 176400 is not currently supported
+  
+  ((srate|0) == 192000) ? lFlag = 1;
+  
+  // Return flag value
+  lFlag;
+);
+
+
+
+
+/********************************************************************
+Get slider value from sample rate
+********************************************************************/
+function sampleRateToSlider(aSampleRate)
+(
+  lSliderValue = -1;
+   
+  ((srate|0) ==   8000) ? (lSliderValue = 0);
+  ((srate|0) ==  11025) ? (lSliderValue = 1);
+  ((srate|0) ==  16000) ? (lSliderValue = 2);
+  ((srate|0) ==  22050) ? (lSliderValue = 3);
+  ((srate|0) ==  24000) ? (lSliderValue = 4);
+  ((srate|0) ==  44100) ? (lSliderValue = 5);
+  ((srate|0) ==  48000) ? (lSliderValue = 6);
+  ((srate|0) ==  88200) ? (lSliderValue = 7);
+  ((srate|0) ==  96000) ? (lSliderValue = 8);
+  ((srate|0) == 176400) ? (lSliderValue = 9);
+  ((srate|0) == 192000) ? (lSliderValue = 10);
+  
+  // Return slider value
+  lSliderValue;
+);
