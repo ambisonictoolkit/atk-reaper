@@ -1,0 +1,114 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: atkConstantsAndMathsLibrary.jsfx-inc
+  Library of constants and shared maths functions
+---------------------------------------------------------------------
+
+
+
+/* Naming conventions in this set of plugins:
+kSomething      // A constant
+gSomething      // A global variable
+mSometing       // A member of a class - used for plugin top-level variables
+aSomething      // An argument to a method
+lSomething      // A variable local to the method
+*/
+
+/********************************************************************
+Functions in the init section can be used by any plugin loading this
+file, encouraging DRY (don't repeat yourself)
+********************************************************************/
+@init
+
+
+/********************************************************************
+Global constants
+********************************************************************/
+
+kInvPi   = 1. / $pi;
+
+kRad2Deg = 180. / $pi;
+kDeg2Rad = $pi / 180.;
+
+kRad2Norm = 1. / $pi;
+
+kSqrt2   = sqrt(2.);
+kInvSqrt2  = 1. / kSqrt2;
+kHalfInvSqrt2 = 0.5 * kInvSqrt2;
+
+kSqrt3Div2   = sqrt(3.) / 2.;
+kSqrt3Div6   = sqrt(3.) / 6.;
+kSqrt6Div3   = sqrt(6.) / 3.;
+kRecSqrt6    = 1. / sqrt(6.);
+
+
+/*---------------------------------------------------------------------
+  Mathematical functions
+---------------------------------------------------------------------*/
+
+
+/********************************************************************
+Maths: Round to nearest integer
+********************************************************************/
+function round(aValue)
+(
+  (aValue >= 0.) ? ceil(aValue + 0.5) : ceil(aValue - 0.5);
+);
+
+
+/********************************************************************
+Maths: Convert linear gain to decibel
+********************************************************************/
+function db2amp(aGain)
+(
+  pow(10.0, aGain * 0.05);  // returns linear gain
+);
+
+
+/********************************************************************
+Maths: Convert linear gain to decibel
+********************************************************************/
+function amp2db(aGain)
+(
+  20 * log10(aGain);       // returns dB gain
+);
+
+
+/********************************************************************
+Maths: Clip value
+********************************************************************/
+function clipValue(aValue, aMin, aMax) local(lTemp, lTest)
+(
+  lTemp = aValue;
+  
+  lTemp < aMin ? (
+    lTemp = aMin;
+  ) : (
+    lTemp > aMax ? (
+      lTemp = aMax;
+    );
+  );
+  lTemp      // return lTemp
+);
