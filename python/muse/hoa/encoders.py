@@ -19,6 +19,8 @@ from muse import *
 #from math import factorial
 from scipy.misc import factorial
 
+from muse.hoa import *
+
 # import muse defined constants
 import muse.constants as C
 
@@ -57,6 +59,10 @@ _fuma_MaxN_weights = concatenate((
 #=========================
 # Functions
 #=========================
+
+
+#=========================
+# Spherical Harmonics - Coefficients
 
 # Generate un-normalised spherical harmonic coefficients
 #
@@ -145,12 +151,14 @@ def spher_harm(lm = (0, 0), theta = 0, phi = 0):
     return res
 
 
+#=========================
+# Spherical Harmonics - Normalisation
+
 # Schmidt semi-normalisation (3D)
-def sn3d(lm = (0, 0), normalise_zero = True):
+def sn3d(lm = (0, 0)):
     """Args:
         - l              : Associated Legendre degree (ambisonic 'order')
         - m              : Associated Legendre order (ambisonic 'index')
-        - normalise_zero : normalise to 0th harmonic
 
     SN3D: returns Schmidt semi-normalisation (3D) weighting coefficients
     for spherical harmonics in the form required for Higher Order Ambisonics.
@@ -165,19 +173,15 @@ def sn3d(lm = (0, 0), normalise_zero = True):
         (2 - dm) * \
         (factorial(l - absolute(m)) / factorial(l + absolute(m)))
     )
-    
-    if not normalise_zero:
-        res = res * reciprocal(sqrt(4*pi))
-    
+        
     return res
 
 
 # full 3D normalisation
-def n3d(lm = (0, 0), normalise_zero = True):
+def n3d(lm = (0, 0)):
     """Args:
         - l              : Associated Legendre degree (ambisonic 'order')
         - m              : Associated Legendre order (ambisonic 'index')
-        - normalise_zero : normalise to 0th harmonic
 
     N3D: returns full 3D normalisation weighting coefficients
     for spherical harmonics in the form required for Higher Order Ambisonics.
@@ -190,8 +194,58 @@ def n3d(lm = (0, 0), normalise_zero = True):
     """
     l, m = lm
     
-    res = sqrt(2 * l + 1) * sn3d(lm, normalise_zero)
+    res = sqrt(2 * l + 1) * sn3d(lm)
     
+    return res
+
+
+# full 2D normalisation
+def n2d(lm = (0, 0)):
+    """Args:
+        - l              : Associated Legendre degree (ambisonic 'order')
+        - m              : Associated Legendre order (ambisonic 'index')
+
+    N2D: returns full 2D normalisation weighting coefficients
+    for spherical harmonics in the form required for Higher Order Ambisonics.
+    
+    Daniel states: "2D-restricted formalism (cylindrical harmonics), but
+    may also apply to 3D spherical harmonics provided that clear extension
+    rules are given..."
+
+    Useful for solving decoding problems [..]
+    (2D reconstruction).
+    """
+    l, m = lm
+    
+    res = sqrt(
+        pow(2, 2 * l) * pow(factorial(l), 2) / factorial(2 * l + 1)
+    ) * n3d(lm)
+    
+    return res
+
+
+# Semi-normalisation (2D)
+def sn2d(lm = (0, 0)):
+    """Args:
+        - l              : Associated Legendre degree (ambisonic 'order')
+        - m              : Associated Legendre order (ambisonic 'index')
+
+    SN2D: returns Semi-normalisation (2D) weighting coefficients
+    for spherical harmonics in the form required for Higher Order Ambisonics.
+    
+    Daniel states: "2D-restricted formalism (cylindrical harmonics), but
+    may also apply to 3D spherical harmonics provided that clear extension
+    rules are given..."
+
+    Useful for solving decoding problems [..]
+    (2D reconstruction).
+    """
+    l, m = lm
+    
+    lne0 = not_equal(0, l).astype(int)
+    
+    res = pow(2, -1./2 * lne0) * n2d(lm)
+        
     return res
 
 
@@ -207,28 +261,42 @@ def n3d(lm = (0, 0), normalise_zero = True):
 # 8th-order. Solved via Mathematica.
 
 # maxN & MaxN normalisation
-def maxN(lm = (0, 0), MaxN = True, normalise_zero = True):
+def maxN(lm = (0, 0)):
     """Args:
         - l              : Associated Legendre degree (ambisonic 'order')
         - m              : Associated Legendre order (ambisonic 'index')
-        - MaxN           : 'MaxN', scale 0th harmonic (W) to 1./sqrt(2)
-        - normalise_zero : normalise to 0th harmonic
 
-    maxN: returns 'maxN' or 'MaxN' normalisation weighting coefficients
+    maxN: returns 'maxN' normalisation weighting coefficients
     for spherical harmonics in the form required for Higher Order Ambisonics.
+    0th harmonic (W) scaled to 1.
     
     Normalises the maximum value for for each harmonic to 1. This is the
     normalisation scaling for the Furse-Malham convention.
     """
-    res = sn3d(lm, normalise_zero)
-    
-    if MaxN:
-        res = res  * _fuma_MaxN_weights[lm_to_fuma(lm)]
-    else: 
-        res = res  * _fuma_maxN_weights[lm_to_fuma(lm)]
+    res = sn3d(lm)  * _fuma_maxN_weights[lm_to_fuma(lm)]
     
     return res
 
+
+def MaxN(lm = (0, 0)):
+    """Args:
+        - l              : Associated Legendre degree (ambisonic 'order')
+        - m              : Associated Legendre order (ambisonic 'index')
+
+    maxN: returns 'maxN' or 'MaxN' normalisation weighting coefficients
+    for spherical harmonics in the form required for Higher Order Ambisonics.
+    0th harmonic (W) scaled to 1./sqrt(2)
+    
+    Normalises the maximum value for for each harmonic to 1. This is the
+    normalisation scaling for the Furse-Malham convention.
+    """
+    res = sn3d(lm)  * _fuma_MaxN_weights[lm_to_fuma(lm)]
+    
+    return res
+
+
+#=========================
+# Spherical Harmonics - Channel Order
 
 # ACN (Ambisonic Channel Number) Utilities
 def lm_to_acn(lm = (0, 0)):
@@ -354,65 +422,139 @@ def fuma_to_lm(fuma = 0):
     return res
 
 
-# NOTE: this may be renamed as planewave...
-#
-#def mono_to_b(a, azimuth = 0., elevation = 0.):
-#    """mono_to_b(a, azimuth = 0., elevation = 0.)
-#    
-#    Args:
-#        - a         : Input mono signal
-#        - azimuth   : counter-clockwise, in radians
-#        - elevation : upwards, in radian
-#
-#    Encode a mono signal into the B-format domain.
-#
-#    """
-#
-#    # compute cosines and sines
-#    cos_azim, sin_azim = cos(azimuth), sin(azimuth)
-#    cos_elev, sin_elev = cos(elevation), sin(elevation)
-#
-#    # compute scalars
-#    w_scale = C.rec_sqrt2
-#    x_scale = cos_elev * cos_azim
-#    y_scale = cos_elev * sin_azim
-#    z_scale = sin_elev
-#
-#    # for testing for and constructing vectors
-#    azim_scalar = isscalar(azimuth)
-#    elev_scalar = isscalar(elevation)
-#    n = len(a)
-#
-#    # construct appropriate encoder
-#    if not elev_scalar:         # case 2, 4: x, y, z vectors
-#        encoder = interleave(
-#            array([
-#                repeat(w_scale, n),
-#                x_scale,
-#                y_scale,
-#                z_scale
-#            ]))
-#    elif not azim_scalar:       # case 3: x, y vectors
-#        encoder = interleave(
-#            array([
-#                repeat(w_scale, n),
-#                x_scale,
-#                y_scale,
-#                repeat(z_scale, n)
-#            ]))
-#    else:                       # case 1: all scalars
-#        encoder = array([
-#            w_scale,
-#            x_scale,
-#            y_scale,
-#            z_scale
-#            ])
-#
-#    # copy input mono array into four channel array
-#    b = repeat(a, 4).reshape(-1,4)
-#
-#    # encode here!
-#    return b * encoder
+#=========================
+# Encoding - Matricies
+
+# NOTE: suitable for both encoding, transforming, decoding
+#       may want to move to 'utilities' 
+def encoding_convert_matrix(input_format, output_format, order = 1):
+    """Args:
+        - input_format  : (ordering, normalisation)
+        - output_format : (ordering, normalisation)
+        - order         : HOA order
+
+        ordering      : 'acn', 'sid', 'fuma'
+        normalisation : 'sn3d', 'n3d', 'sn2d', 'n2d', 'maxN', 'MaxN'
+
+
+    Generate a matrix to encode / transcode an HOA signal.
+    NOTE: AmbiX format = ('acn', 'sn3d')
+    
+    Use in conjunction with mmix().
+    """
+
+    input_ordering, input_norm = input_format
+    output_ordering, output_norm = output_format
+
+    # ordering: acn, sid, fuma
+    ordering_to_lm_dict = {
+        'acn': acn_to_lm,
+        'sid': sid_to_lm,
+        'fuma': fuma_to_lm,
+    }
+
+    lm_to_ordering_dict = {
+        'acn': lm_to_acn,
+        'sid': lm_to_sid,
+        'fuma': lm_to_fuma,
+    }
+
+    # normalisation: sn3d, n3d, maxN, MaxN
+    lm_to_norma_dict = {
+        'sn3d': sn3d,
+        'n3d': n3d,
+        'sn2d': sn2d,
+        'n2d': n2d,
+        'maxN': maxN,
+        'MaxN': MaxN,
+    }
+    
+    nchans = (order+1)**2
+    lm = ordering_to_lm_dict[input_ordering](arange(nchans))
+    norm = lm_to_norma_dict[output_norm](lm) / lm_to_norma_dict[input_norm](lm)
+
+    res = identity(nchans)[:, lm_to_ordering_dict[output_ordering](lm)] * norm
+
+    return res
+    
+
+def planewave_matrix(direction = array([0, 0]), order = 1):
+    """
+    Args:
+        - direction : [azimuth, elevation]
+        - order     : HOA order
+    
+    Direction argument may take several forms:
+        
+        shape(direction) == (2,): 
+            encode one input as a TI, single planewave
+
+        shape(direction) == (nframes, 2):
+            encode one input as a TV, single planewave
+
+        shape(direction) == (1, npws, 2):
+            encode npws input as TI, multiple planewaves
+
+        shape(direction) == (nframes, npws, 2):
+            encode npws input as TV, multiple planewaves
+
+    
+    Generate a matrix to encode a signal (mono or multi-channel)
+    into the B-format domain (AmbiX).
+    
+    Use in conjunction with mmix() to encode a signal.
+    """
+    # case 1: one input TI, single planewave
+    #           - shape(dir) = (2,)
+    #
+    # case 2: one input TV, single planewave
+    #           - shape(dir) = (nframes, 2)
+    #
+    # case 3: npws input TI, multiple planewaves
+    #           - shape(dir) = (1, npws, 2)
+    #
+    # case 4: npws input TV, multiple planewaves
+    #           - shape(dir) = (nframes, npws, 2)
+
+    theta, phi = transpose(direction)
+
+    lm = acn_to_lm(arange((1+order)**2))
+    norm = sn3d(lm)
+    
+    # case 4
+    if len(shape(direction)) == 3 and shape(direction)[0] != 1:
+        
+        nframes, npws, dim = shape(direction)
+        res = zeros((npws, nframes, (order+1)**2))
+        
+        # itterate by planewave
+        for i in range(npws):
+            res[i] = norm * spher_harm(lm, theta[i], phi[i])
+    
+        # reshape to return (nframes, out, in)
+        res = transpose(res, (1, 2, 0))
+
+    # cases 1, 2, 3
+    else:
+        res = norm * spher_harm(lm, theta, phi)
+    
+        if len(shape(direction)) == 3 and shape(direction)[0] == 1:
+            # case 3
+            res = transpose(res)
+    
+        else:        
+            # case 1, 2
+            res = reshape(
+                res,
+                shape(res) + (1,)
+            )
+
+    return res
+
+
+# NOTE: may want to include pressurewave_matrix (omni) encoder
+#       AND have a parameter to normalise according to:
+#           'amp', 'rms', 'energy' - see decoders
 
 
 #---------------------------------------------

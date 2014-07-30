@@ -20,14 +20,13 @@ from muse import *
 #from filters import *
 #from transforms import *
 
-from muse import *
+from muse.hoa import *
 
 from numpy.polynomial import Chebyshev as T
 from numpy.polynomial import Legendre as L
 from numpy import math
 #from math import factorial
 from scipy.misc import factorial
-
 
 
 # import muse defined constants
@@ -221,7 +220,7 @@ def decoder_E(order = 1, dec_type = 'basic', dim = 2):
 
 
 # decoder_matching_gain     : calculate gain to 'match' decoder types
-def decoder_matching_gain(order = 1, dec_type = 'basic', dim = 2, \
+def decoder_matching_gain(order = 1, dec_type = 'basic', dim = 3, \
     match = 'amp', num_spkrs = nan):
     """
     Args:
@@ -262,5 +261,37 @@ def decoder_matching_gain(order = 1, dec_type = 'basic', dim = 2, \
     elif match == 'energy':
         N = num_spkrs
         res = sqrt(N/decoder_E(M, dec_type, dim))
+
+    return res
+
+
+#=========================
+# Decoding - Matricies
+
+def order_gains_matrix(order = 1, dec_type = 'basic', dim = 3):
+    """    
+    Args:
+        - order      : Ambisonic order, e.g., 1, 2, 3...
+
+        - dec_type   : Decoder type
+                        'basic'      --> basic, velocity, rV
+                        'energy'     --> energy, rE
+                        'controlled' --> controlled opposites, in phase
+                            
+        - dim        : Decoder dimensions: 2D or 3D
+
+
+    Compute 'order gains' for a given Ambisonic decoder.
+    
+    Returns order gain matrix. See decoder_order_gains()
+    """
+    M = order
+
+    res = diag(
+        decoder_order_gains(
+            M,
+            dec_type,
+            dim
+        )[acn_to_lm(arange((M+1)**2))[0]])
 
     return res

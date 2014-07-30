@@ -605,6 +605,69 @@ def over_write(a, b, index = 0, write_over = False):
     return res
 
 
+#=========================
+# Matrix Utility Functions
+# 
+#=========================
+
+def mmix(a, b):
+    """
+    Args:
+        - a         : Input multi-channel signal (interleaved)
+        - b         : a matrix, may be a single matrix, or an array of
+                      nframes(b) = nframes(a)
+
+    Matrix mix a multi-channel signal. (Encode, Transform, Decode)
+    
+    Returs dot product, a[0] . b
+
+    """
+    
+    # test shape
+    dim_a = len(shape(a))
+    dim_b = len(shape(b))
+    
+    if (dim_a is 2) and (dim_b is 2):
+        res = einsum(a, [0,1], b, [2,1])
+
+    elif (dim_a is 2) and (dim_b is 3):
+        res = einsum(a, [0,1], b, [0,3,1], [0, 3])
+        
+    return res
+    
+
+def mmul(a, b):
+    """
+    Args:
+        - a         : a matrix, may be a single matrix, or an array of
+                      nframes(a)
+        - b         : a matrix, may be a single matrix, or an array of
+                      nframes(b)
+
+    Returns dot product, b . a
+    
+    NOTE: if nframes(a) or nframes(b) !=, broadcasting will fail
+    """
+    
+    # test shape
+    dim_a = len(shape(a))
+    dim_b = len(shape(b))
+    
+    if (dim_a is 2) and (dim_b is 2):
+        res = einsum(b, [0, 1], a, [1, 3])
+
+    elif (dim_a is 3) and (dim_b is 2):
+        res = einsum(b, [0, 1], a, [2, 1, 4], [2, 0, 4])
+
+    elif (dim_a is 2) and (dim_b is 3):
+        res = einsum(b, [0, 1, 2], a, [2, 4], [0, 1, 4])
+
+    elif (dim_a is 3) and (dim_b is 3):
+        res = einsum(b, [0, 1, 2], a, [0, 2, 4], [0, 1, 4])
+  
+    return res
+
+
 # consider creating a muse signal subclass of ndarray
 # advantage would be to include the above as methods of
 # the new signal class--could be very useful!
