@@ -58,7 +58,7 @@ out_pin:15
 out_pin:16
 
 slider1:4<3,16,1>Number of speakers
-slider2:0<0,1,1{Flat, Point}>Speaker layout
+slider2:0<0,1,1{Flat, Point}>Speaker orientation
 
 /**********************************************************
 Initialisation
