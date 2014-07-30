@@ -25,11 +25,14 @@ var degreeSpec, degreeSl, degreeNB, degreePiNB, xFormMenu, xForms;
 var rotSpec, rotSl, rotNB, rotPiNB;
 var selDex, adjustRhos, getColCount, layoutFunc, colors;
 
+var tv, maxGainTxt, minGainTxt;
+
 // xFormDuples = [['push', pi/4],['focus', pi/4],['rotate', pi/3]];
 // xFormDuples = [];
 
 processPoints = {|xFormedMatrix|
 	var w,x,y,z, az, el, g0square, g1square, term, omni, gain;
+
 	#w,x,y,z = xFormedMatrix.getCol(0);
     az  = atan2(y, x);
 	el  = atan2(z, sqrt(x.squared + y.squared));
@@ -43,28 +46,23 @@ processPoints = {|xFormedMatrix|
 
     // Gain
 	term		= sin(omni);
-	(term == -1).if{term = -0.99999999}; // protect from NaN
+	(term <= -1).if{term = -0.99999999}; // protect from NaN
     gain		= w * sqrt(2 / (1 + term));
+
+
 
 	// Normalise omni to [0,1] range
 	omni = 2 * omni / pi;
 	omni = 1 - omni;
 	omni = omni.clip(0.0,1.0);
 
-	// debug ---
-	[ Polar(omni, az), // gain.ampdb
-		[gain, 0.00000001].maxItem.ampdb // protect from -inf
-	].postln;
-	[w,x,y,z, az, el].postln;
-	omni.postln;
-	// --- debug
-
 	// ignore elev for now, implement with Spherical to include elev
 	// omni is normalized and scales rho (distance from center)
+	postf("w: %\nx: %\ny: %\nz: %\naz: %\nel: %\nomni: %\ngain:: %\n", w,x,y,z, az, el, omni, gain); // debug
 	[
-		Polar(omni, az), // gain.ampdb
-		[gain, 0.00000001].maxItem.ampdb // protect from -inf
-	];
+		Polar(omni, az), gain.abs.ampdb
+		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
+	].postln; // debug
 };
 
 initPointsMatrices = numPoints.collect{|i|
@@ -116,7 +114,7 @@ updateMatrix = {
 	};
 
 };*/
-chainXForms = {|inputMtx...xFormDegPrs|
+chainXForms = {|...xFormDegPrs|
 	var mtx;
 	"in chainXForms".postln;
 	xFormDegPrs.postln;
@@ -131,10 +129,13 @@ chainXForms = {|inputMtx...xFormDegPrs|
 				{ mtx = xForms[name]['getMatrix'].(deg) * mtx; }
 			);
 			},{ // subtract
-				mtx = Matrix.newIdentity(4) - mtx;
+				mtx = Matrix.newIdentity(4) + (mtx * -1);
+				// mtx = mtx/2;
 		});
 	};
-	mtx * inputMtx;
+	// mtx * inputMtx;
+	// mtx * (Matrix.newIdentity(4) * -1) * inputMtx
+	mtx
 };
 
 updateMatrix = {
@@ -150,13 +151,18 @@ updateMatrix = {
 
 	transformedPoints = (xFormDuples.size > 0).if({
 		initPointsMatrices.collect{ |pointMtx|
-			// var xformMtx;
+			var xformMtx;
 			// xformMtx = chainXForms.(pointMtx, *xFormDuples);
 			// xformMtx * pointMtx;
-			chainXForms.(pointMtx, *xFormDuples);
+			xformMtx = chainXForms.(*xFormDuples);
+			xformMtx * pointMtx
 		};
 		},{ initPointsMatrices } // no transform
 	);
+
+	// transformedPoints = initPointsMatrices.collect{ |pointMtx|
+	// 	(Matrix.newIdentity(4) * -2) * pointMtx;
+	// };
 
 	// calculate and set aeds var for gui update
 	aeds = transformedPoints.collect{|ptMtx|
@@ -323,15 +329,19 @@ createXForm = {
 	.maxWidth_(20);
 
 	removeBut = Button().states_([["X"]])
-	.action_({ |but| removeXForm.(dict) })
+	.action_({ |but|
+		removeXForm.(dict);
+		updateMatrix.(deg);
+		w.refresh;
+	})
 	.maxWidth_(20);
 
 	layout = HLayout(
 		xFormMenu, degNB,
-		VLayout( degSl, StaticText().string_("Degree of Tranform") ),
+		degSl,
 		degPiNB, StaticText().string_("pi").align_('left'),
 		removeBut, addBut
-	);
+	).margins_([10,0,10,3]);
 
 	view.layout_(layout);
 
@@ -376,10 +386,71 @@ removeXForm = {|dict| var rmvDex;
 // 	)
 // );
 
-ctlv.layout_( VLayout() );
+ctlv.layout_( VLayout().margins_(0) );
+ctlv.layout.add(
+	HLayout(
+		StaticText().string_("Transform").maxWidth_(60), 20,
+		StaticText().string_("Degree of Tranform").minWidth_(150), 280,
+		HLayout(
+			StaticText().string_("remove").minWidth_(50),
+			StaticText().string_("add").maxWidth_(30) //, a: \right],
+		)
+	)
+	// .setAlignment(1, \right).setAlignment(2, \right).setAlignment(3, \right)
+	.margins_([10, 5,5,0])
+);
 ctlv.layout.add(createNewXFormView.());
 ctlv.layout.add( codev.layout_(VLayout(TextView().enterInterpretsSelection_(true))) );
 
+// // tv = View(uv, Rect(3*uv.bounds.width/4, 0, uv.bounds.width/4, uv.bounds.height/2)).layout_(
+// tv = View(uv, Rect(0, 0, uv.bounds.width/4, uv.bounds.height/2)).layout_(
+// 	VLayout(
+// 		Slider().maxWidth_(25),
+// 		Button().maxWidth_(25),
+// 		Slider().maxWidth_(25)
+// 	).setAlignment(1, 'right')
+// );
+// // w.view.onResize_({|winview| tv.bounds_(Rect(3*uv.bounds.width/4, 0, uv.bounds.width/4, uv.bounds.height/2))});
+
+// tv = View(w, uv.bounds);
+tv = View(uv,Rect(0, uv.bounds.height/2, uv.bounds.width,uv.bounds.height/2)).layout_(
+	HLayout(
+		VLayout(
+			nil,
+			maxGainTxt = StaticText().string_("one").font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
+			minGainTxt = StaticText().string_("two").font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
+		),
+		VLayout(
+			[ Button()
+				.states_([
+					["Pan Test", Color.black, Color.grey],
+					["Stop test", Color.black, Color.red],
+			]).maxWidth_(65), a: \right],
+			Button().states_([
+				["Continuous", Color.black, Color.grey],["Pulsed", Color.black, Color.green]]),
+			HLayout(
+				StaticText().string_("Period"),
+				NumberBox().maxWidth_(25).value_(5)
+			).setAlignment(0,\right).setAlignment(1,\right),
+			VLayout(
+				HLayout(
+					StaticText().string_("Gain").maxHeight_(25),
+					NumberBox().maxWidth_(25)
+				).setAlignment(0, \right).setAlignment(1, \right),
+				// Slider().maxWidth_(150).orientation_(\horizontal)
+			).setAlignment(0,\right) //.setAlignment(1,\right) //.setAlignment(0,\right)
+		)
+		// .setAlignment(0, 'right')
+		.setAlignment(1, 'right') // continuous/pulses buttons
+		.setAlignment(2, 'right')
+		.setAlignment(3, 'right')
+	)
+);
+
+w.view.onResize_({ |winview|
+	uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
+	tv.bounds_(Rect(0, uv.bounds.height/2, uv.bounds.width,uv.bounds.height/2));
+});
 
 /*******************
 Draw the soundfield
@@ -387,10 +458,12 @@ Draw the soundfield
 
 uv.drawFunc_({|view|
 	var cen, getColor, circleViewRatio;
-	var alphaSpec, gainSpec, colorSpec;
+	var alphaSpec, gainSpec, colorSpec, maxMinStr;
+	var testSigPnt;
 
 	ctlv.bounds_(Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2));
-	uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
+	// uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
+	// tv.bounds_(uv.bounds);
 	r = uv.bounds.height * 0.02;
 	d = r*2;
 	circleViewRatio = 0.8;
@@ -411,9 +484,17 @@ uv.drawFunc_({|view|
 		gainSpec = ControlSpec(-90, 6, -2);
 	colorSpec = ControlSpec(768,0);
 
-	postf("min gain: %\n", aeds.collect({|me| me[1]}).minItem);
-	postf("max gain: %\n", aeds.collect({|me| me[1]}).maxItem);
-	aeds.do(_.postln);
+	// postf("min gain: %\n", aeds.collect({|me| me[1]}).minItem);
+	// postf("max gain: %\n", aeds.collect({|me| me[1]}).maxItem);
+	// aeds.do(_.postln);
+
+		// draw test signal planewave circle
+	testSigPnt = Polar(1.1,rrand(0, 2pi)).asPoint
+		.rotate(pi/2)	// convert ambi to screen coords
+		* Point(1,-1)	// flip Y for drawing
+		* arcH;			// scale normalized points to arcH
+	Pen.fillColor_(Color.magenta);
+	Pen.fillOval( Rect(testSigPnt.x-r, testSigPnt.y-r, d, d) );
 
 	getColor = { |gain|
 		var i;
@@ -463,38 +544,22 @@ uv.drawFunc_({|view|
 		Pen.fillColor_(gainColor.alpha_(1));
 		QPen.stringCenteredIn(gain.round(0.1).asString, Rect(gainPnt.x-(r*10), gainPnt.y-(r*10), d*10, d*10));
 	};
-	// draw min/max gain
-	Pen.fillColor_(Color.black);
-	QPen.stringCenteredIn(
-		"max gain\n" ++ aeds.collect({|me| me[1]}).maxItem.round(0.1).asString,
-		Rect(ctlv.bounds.width/3.neg, ctlv.bounds.height/4, d*7.5, d*3) );
-	QPen.stringCenteredIn(
-		"min gain\n" ++ aeds.collect({|me| me[1]}).minItem.round(0.1).asString,
-		Rect(ctlv.bounds.width/3.neg, ctlv.bounds.height/2.9, d*7.5, d*3) );
 
-	// // draw transducer layout
-	// Pen.push;
-	// Pen.translate((uv.bounds.width/4).neg, (uv.bounds.height/4));
-	// tw = uv.bounds.width/2/maxCols-tgap;
-	// th = 10;
-	// colgroups.do{|colDict, i|
-	// 	Pen.fillColor_(colDict.color);
-	// 	colDict.cols.do{
-	// 		Pen.fillRect(Rect(0,0, tw, th));
-	// 		Pen.translate(tw+tgap,0);
-	// 	};
-	// };
-	// Pen.pop;
-	//
-	// // draw group angles
-	// Pen.push;
-	// Pen.translate((uv.bounds.width/4).neg, (uv.bounds.height/4 - th));
-	// colgroups.do{|colDict, i|
-	// 	Pen.translate((tw+tgap)*(colDict.cols/2),0);
-	// 	QPen.stringCenteredIn(colDict.theta.raddeg.round.asString, Rect(tw.neg, th.neg, tw*3, th*2), color: colDict.color);
-	// 	Pen.translate((tw+tgap)*(colDict.cols/2),0);
-	// };
-	// Pen.pop;
+	// // draw min/max gain
+	// maxMinStr = format("Max Gain: %\nMin Gain: %",
+	// 	aeds.collect({|me| me[1]}).maxItem.round(0.1),
+	// 	aeds.collect({|me| me[1]}).minItem.round(0.1)
+	// );
+	// Pen.translate(cen.x.neg, cen.y.neg);
+	// Pen.fillColor_(Color.black);
+	// Pen.font_(Font('Helvetica', 20));
+	// QPen.stringCenteredIn(
+	// 	maxMinStr,
+	// 	Rect(0,0,uv.bounds.width/3, ctlv.bounds.height)
+	// );
+
+	maxGainTxt.string_(format("Max Gain:  %", aeds.collect({|me| me[1]}).maxItem.round(0.1)));
+	minGainTxt.string_(format("Min Gain:   %", aeds.collect({|me| me[1]}).minItem.round(0.1)));
 });
 
 w.refresh;

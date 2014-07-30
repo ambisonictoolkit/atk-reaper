@@ -424,7 +424,7 @@ FoaXformView {
 			VLayout( ctlSl, StaticText().string_("Degree of Tranform") ),
 			ctlPiNB, StaticText().string_("pi").align_('left'),
 			removeBut, addBut
-		);
+		).margins_(0);
 
 		view.layout_(layout);
 
