@@ -30,9 +30,6 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Mirror sound field across origo . NOTE: This plugin has no parameters.
 
-// No need to import library with shared functions
-//import atkFunctionLibrary.jsfx-inc
-
 in_pin:W
 in_pin:X
 in_pin:Y

@@ -72,15 +72,12 @@ aSomething      // An argument to a method
 lSomething      // A variable local to the method
 */
 
+
 /********************************************************************
 Functions in the init section can be used by any plugin loading this
 file, encouraging DRY (don't repeat yourself)
 ********************************************************************/
 @init
-
-/*---------------------------------------------------------------------
-  Matrix section
----------------------------------------------------------------------*/
 
 
 /********************************************************************

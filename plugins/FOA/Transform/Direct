@@ -32,8 +32,10 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Adjust FOA soundfield directivity across arbitrary plane
 
-// Import library with shared functions for matrix and graphics processing
-import atkFunctionLibrary.jsfx-inc
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
 
 in_pin:W
 in_pin:X

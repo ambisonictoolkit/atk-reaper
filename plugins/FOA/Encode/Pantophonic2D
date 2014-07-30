@@ -35,8 +35,10 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Pantophonic (2D) regular polygon encoder
 
-// Import library with shared functions for matrix and graphics processing
-import atkFunctionLibrary.jsfx-inc
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
 
 in_pin:1
 in_pin:2

@@ -32,8 +32,10 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Encode a mono signal as a directional (planewave) soundfield
 
-// Import library with shared functions for matrix and graphics processing
-import atkFunctionLibrary.jsfx-inc
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
 
 slider1:0<-180,180,1>Azimuth Left (mouse)
 slider2:0<-90,90,1>Elevation

@@ -53,8 +53,6 @@ This plugin wraps the ATK classes NearFieldCompensation and Proximity
 
 desc: Apply nearfield compensation filtering to a first order ambisonic signal (B-format).
 
-// This plugin is not using any shared library functions
-//import atkFunctionLibrary.jsfx-inc
 
 in_pin:W
 in_pin:X
