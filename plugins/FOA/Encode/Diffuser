@@ -189,7 +189,14 @@ mFftNewRequired ? (
   prepareKernel(mImpulseBuffer, mKernelYZ, mKernelSize, mFftSize, 2);
   
   // Reset current write/read position within the blocks
-  mBufferPosition = 0; 
+  mBufferPosition = 0;
+  
+  // Update delay compensation
+  pdc_delay = ((1.5 * mKernelSize)|0) - 2;
+  
+  // Delay compensation affects channels 1-3
+  pdc_bot_ch=0;
+  pdc_top_ch=4;
   
   // Convolution kernel is now up to date
   mFftNewRequired = 0; 

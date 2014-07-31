@@ -260,6 +260,14 @@ mBufferPosition >= chunksize ?
   ifft(mBlockCurrentY, mFftSize);
   
   
+  // Update delay compensation
+  pdc_delay = ((1.5 * mKernelSize)|0) - 2;
+  
+  // Delay compensation affects channels 1-2
+  pdc_bot_ch=0;
+  pdc_top_ch=2;
+  
+  
   // Current write/read position within the blocks starts counting from 0 again
   mBufferPosition=0;
 );
