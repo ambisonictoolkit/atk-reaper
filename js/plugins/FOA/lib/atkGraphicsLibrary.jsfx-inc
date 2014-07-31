@@ -117,19 +117,27 @@ function gxColorSetHsl(anAlpha, aHue, aSaturation, aLightness) local(lRed, lGree
 /********************************************************************
 Graphics: Express gain (in dB) as graphics color
 ********************************************************************/
-function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) local(lHue, lSaturation, lLightness)
+function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) local(lHue, lSaturation, lLightness, lGainClipped, lAlpha)
 (
+  
+  // Restrict gain to (-70, ->) dB
+  (aGain < -70.) ? (
+    aGain = -70.;
+  );
+  
+  lGainClipped = aGain;
+  
   // Clip gain to prescribed range:
-  aGain < aGainLowLimit ? (
-    aGain = aGainLowLimit;
+  lGainClipped < aGainLowLimit ? (
+    lGainClipped = aGainLowLimit;
   ) : (
-    aGain > aGainHighLimit ? (
-      aGain = aGainHighLimit;
+    lGainClipped > aGainHighLimit ? (
+      lGainClipped = aGainHighLimit;
     );
   );
   
   // Map gain to hue
-  lHue = ((aGain - aGainHighLimit) / (aGainLowLimit - aGainHighLimit)) * 240.;
+  lHue = ((lGainClipped - aGainHighLimit) / (aGainLowLimit - aGainHighLimit)) * 240.;
   
   // Map vertical position to saturation and lightness
   aVerticalOffset < 0 ? (
@@ -140,8 +148,21 @@ function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) loca
     lLightness = 0.5 + 0.4*aVerticalOffset;
   );
   
+  // Turn towards black for gains in the (-70, aGainLowLimit) dB range
+  (aGain<aGainLowLimit) ? (
+    lSaturation = lSaturation * (aGain - (-70.))/(aGainLowLimit - (-70.));
+    lLightness = lLightness * (aGain - (-70.))/(aGainLowLimit - (-70.));
+  );
+  
+  // Make point increasingly transparent for gains below -50 dB
+  (aGain < -50.) ? (
+    lAlpha = (aGain - (-70.))/(-50. - (-70.));
+  ) : (
+    lAlpha = 1.;
+  );
+  
   // Set color as hsl
-  gxColorSetHsl(1., lHue, lSaturation, lLightness)
+  gxColorSetHsl(lAlpha, lHue, lSaturation, lLightness);
 );
 
 
@@ -245,14 +266,15 @@ Graphics: Draw centered filled-in square
 ********************************************************************/
 function drawSourceLocation(aCenterX, aCenterY, aPosZ, aDirectedness) local(lRadius, lAlpha, lRed, lGreen, lBlue)
 (
+  lAlpha = gfx_a;
   // Calculate radius and transparency
   lRadius = (1. - aDirectedness) * (gRadius-6.) + + 2.5*aPosZ + 6.;
   // We use the square of lDirectedness for alpha so that it gets more rapidly transparent when the circle grows.
   // This looks better in the GUIs, as it doesn't get completely clogged by many almost non-transparent circles.
-  gfx_a = (aDirectedness*aDirectedness*0.9) + 0.1;
+  gfx_a = ((aDirectedness*aDirectedness*0.9) + 0.1)*lAlpha;
   
   // Draw circle
-	lAlpha = gfx_a;
+	
   gfx_circle(aCenterX,aCenterY,lRadius,1,1);
   gfx_a = lAlpha;
 );
@@ -320,7 +342,7 @@ function drawInteractionCircle(aCenterX, aCenterY, aRadius) local(lSquareRadius,
 /********************************************************************
 Graphics: Draw points illustrating the effect of various transforms
 ********************************************************************/
-function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i, lPosX, lPosY, lPosZ, lDirectedness, lSquareSize)
+function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i, lPosX, lPosY, lPosZ, lGain, lDirectedness, lSquareSize)
 (
   // Draw transparent circles indicating the location and directedness of each source after the transform
   // TODO: Also take z value into account in this visualisation?
@@ -330,6 +352,7 @@ function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i
     lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
     lPosY = gCenterY - gRadius * aMatrix[i];
     lPosZ = aMatrix[2 * aNumPoints + i];
+    lGain = aMatrix[3 * aNumPoints + i];
     
     // Calculate degree of directedness
     lDirectedness = sqrt(aMatrix[i]*aMatrix[i] + aMatrix[aNumPoints+i]*aMatrix[aNumPoints+i] + aMatrix[2*aNumPoints+i]*aMatrix[2*aNumPoints+i]);
@@ -339,7 +362,9 @@ function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i
     gainToColor(aMatrix[3 * aNumPoints + i], -24., 6., lPosZ);
     
     //drawCenteredSquare(lPosX, lPosY, lSquareSize);
-    drawSourceLocation(lPosX, lPosY, lPosZ, lDirectedness);
+    //(lGain >= -70.) ? (
+      drawSourceLocation(lPosX, lPosY, lPosZ, lDirectedness);
+      //);
     i += 1;
   );
   
@@ -497,8 +522,8 @@ function postMatrixForDebugging(aMatrix, aNumRows, aNumCols) local(i, j, lAlpha,
     // Iterate over rows
     j = 0;
     loop(aNumRows,
-      gxPositionSet(i*80 + 40, j*20 + 20);
-      gfx_drawnumber( aMatrix[i + aNumCols*j],5);
+      gxPositionSet(i*70 + 10, j*20 + 20);
+      gfx_drawnumber( aMatrix[i + aNumCols*j],4);
       j += 1;
     );
     i += 1;
