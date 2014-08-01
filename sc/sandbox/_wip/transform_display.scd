@@ -8,7 +8,7 @@
 // --post min/max gain
 // implement units for tranform (pi, db, receiver index)
 // add azimuth controls to the transforms
-
+// add option to display directivity as expanding/transparent circle or just proximity to origin
 
 // constants
 var kInvSqrt2 = 1/(2.sqrt);
@@ -27,28 +27,86 @@ var selDex, adjustRhos, getColCount, layoutFunc, colors;
 
 var tv, maxGainTxt, minGainTxt;
 
-// xFormDuples = [['push', pi/4],['focus', pi/4],['rotate', pi/3]];
-// xFormDuples = [];
+// // based on ATK-JS plugins
+// processPoints = {|xFormedMatrix|
+// 	var w,x,y,z, az, el, g0square, g1square, term, omni, gain;
+//
+// 	#w,x,y,z = xFormedMatrix.getCol(0);
+// 	az  = atan2(y, x);
+// 	el  = atan2(z, sqrt(x.squared + y.squared));
+//
+// 	// Omni transform angle
+// 	g0square	= w.squared;
+// 	g1square	= x.squared + y.squared + z.squared;
+// 	term 		= ((2*g0square) + g1square);
+// 	(term == 0).if{term = 0.0000000001}; // protect from NaN
+// 	omni		= asin(( (2*g0square) - g1square) / term);
+//
+// 	// Gain
+// 	term		= sin(omni);
+// 	(term <= -1).if{term = -0.99999999}; // protect from NaN
+// 	gain		= w * sqrt(2 / (1 + term));
+//
+//
+//
+// 	// Normalise omni to [0,1] range
+// 	omni = 2 * omni / pi;
+// 	omni = 1 - omni;
+// 	omni = omni.clip(0.0,1.0);
+//
+// 	// ignore elev for now, implement with Spherical to include elev
+// 	// omni is normalized and scales rho (distance from center)
+// 	postf("w: %\nx: %\ny: %\nz: %\naz: %\nel: %\nomni: %\ngain:: %\n", w,x,y,z, az, el, omni, gain); // debug
+// 	[
+// 		Polar(omni, az), gain.abs.ampdb
+// 		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
+// 	].postln; // debug
+// };
 
+// based on Muse AED function plugins
 processPoints = {|xFormedMatrix|
 	var w,x,y,z, az, el, g0square, g1square, term, omni, gain;
+	var b, pv_mean, b_sqrd_mean, p_sqrd, v_sqrd, a, e, d, d_norm;
 
+	b = xFormedMatrix.getCol(0);
+	b[0] = b[0] * sqrt(2); // scale W
+
+	b_sqrd_mean = b**2;
+
+	p_sqrd = b_sqrd_mean[0]; // W component, pressure?
+	v_sqrd = b_sqrd_mean[1..].sum; // summed XYZ, velocity?
+
+	d = (pi/2) - (2 * atan2(sqrt(v_sqrd), sqrt(p_sqrd)));
+
+	pv_mean = b * b[0]; // mul all WXYZ by W ( [w,x,y,z] * (W*sqrt(2)) )
+	a = atan2(pv_mean[2], pv_mean[1]); // atan2(y,x) - see pv_mean above
+	e = atan2(pv_mean[3], sqrt((pv_mean[1]**2) + (pv_mean[2]**2))); // atan2(z,sqrt(x^2 + y^2))
+
+	d_norm = 1 - (d.abs / 0.5pi);
+	// d_norm = (d.abs / 0.5pi);
+
+	postf("w,x,y,z: %\naz, el: %\nd_norm: %\n", b.round(0.01), [a, e].round(0.01), d_norm);
+
+	/* -------- old code ----*/
 	#w,x,y,z = xFormedMatrix.getCol(0);
-    az  = atan2(y, x);
+	az  = atan2(y, x);
 	el  = atan2(z, sqrt(x.squared + y.squared));
-
-    // Omni transform angle
-    g0square	= w.squared;
-    g1square	= x.squared + y.squared + z.squared;
+	// Omni transform angle
+	g0square	= w.squared;
+	g1square	= x.squared + y.squared + z.squared;
 	term 		= ((2*g0square) + g1square);
 	(term == 0).if{term = 0.0000000001}; // protect from NaN
 	omni		= asin(( (2*g0square) - g1square) / term);
 
-    // Gain
+	// Gain
 	term		= sin(omni);
 	(term <= -1).if{term = -0.99999999}; // protect from NaN
-    gain		= w * sqrt(2 / (1 + term));
+	gain		= w * sqrt(2 / (1 + term));
 
+	// // to retain the sign of the gain
+	// a = [-1,2,-3,4];
+	// b = a**2;
+	// c = b * (a.abs/a); // how to protect from /0?
 
 
 	// Normalise omni to [0,1] range
@@ -58,12 +116,19 @@ processPoints = {|xFormedMatrix|
 
 	// ignore elev for now, implement with Spherical to include elev
 	// omni is normalized and scales rho (distance from center)
-	postf("w: %\nx: %\ny: %\nz: %\naz: %\nel: %\nomni: %\ngain:: %\n", w,x,y,z, az, el, omni, gain); // debug
+	// postf("w: %\nx: %\ny: %\nz: %\naz: %\nel: %\nomni: %\ngain:: %\n", b[0],b[1],b[2],b[3], a, e, d, gain); // debug
+	// [
+	// 	Polar(omni, az), gain.abs.ampdb
+	// 	// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
+	// ].postln; // debug
+
 	[
-		Polar(omni, az), gain.abs.ampdb
+		Polar(d_norm, a), gain //.abs.ampdb
 		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
 	].postln; // debug
+
 };
+
 
 initPointsMatrices = numPoints.collect{|i|
 	var ang;
@@ -72,48 +137,6 @@ initPointsMatrices = numPoints.collect{|i|
 	FoaEncoderMatrix.newDirection(ang).matrix.addRow([0]); // need to add z manually
 };
 
-/*chainXForms = {|...xFormDegPrs|
-	var mtx;
-	"in chainXForms".postln;
-	xFormDegPrs.postln;
-	xFormDegPrs.do{ |xNameDeg|
-		var name, deg, xMtx;
-		#name, deg = xNameDeg;
-		mtx.isNil.if(
-			{ mtx = xForms[name]['getMatrix'].(deg).matrix; }, // make last xform the first mtx
-			{
-				xMtx = xForms[name]['getMatrix'].(deg).matrix;
-				mtx = xMtx * mtx;
-			}
-		);
-	};
-	mtx;
-};
-
-updateMatrix = {
-	var xFormDuples = [];
-	"in updateMatrix".postln;
-	controls.do{|ctlDict|
-		ctlDict.xform.notNil.if{
-			ctlDict.degree.isNil.if{"trasform degree is nil!".error};
-			xFormDuples = xFormDuples.add( [ctlDict.xform, ctlDict.degree] );
-		};
-	};
-	// "Duples: ".post; xFormDuples.postln; // debug
-	transformedPoints = (xFormDuples.size > 0).if({
-		initPointsMatrices.collect{ |pointMtx|
-			var xformMtx;
-			xformMtx = chainXForms.(*xFormDuples);
-			xformMtx * pointMtx;
-		};
-		},{ initPointsMatrices } // no transform
-	);
-	// set aeds var for gui update
-	aeds = transformedPoints.collect{|ptMtx|
-		processPoints.(ptMtx);
-	};
-
-};*/
 chainXForms = {|...xFormDegPrs|
 	var mtx;
 	"in chainXForms".postln;
@@ -149,6 +172,8 @@ updateMatrix = {
 		};
 	};
 
+	"found these duples: ".post; xFormDuples.postln;
+
 	transformedPoints = (xFormDuples.size > 0).if({
 		initPointsMatrices.collect{ |pointMtx|
 			var xformMtx;
@@ -166,9 +191,11 @@ updateMatrix = {
 
 	// calculate and set aeds var for gui update
 	aeds = transformedPoints.collect{|ptMtx|
+		"\n******-------------".postln;
 		processPoints.(ptMtx);
 	};
-
+	aeds.collect({|aed|aed[1]}).postln.do(_.postln);
+	aeds = aeds.collect({|aed|[aed[0], aed[1].abs.ampdb]});
 };
 
 updateMatrix.(); // initialize
@@ -358,8 +385,9 @@ createNewXFormView = { |behindThisView|
 			(ctldict.view === behindThisView).if{behindDex = i};
 		};
 		behindDex.isNil.if{"preceeding view not found!".error};
+		"behindDex: ".post; behindDex.postln;
 		controls.insert(behindDex+1, dict);
-		ctlv.layout.insert(dict.view, behindDex+1);
+		ctlv.layout.insert(dict.view, behindDex+2); // +2 to account for label row in ctlv[0]
 		},{
 			controls.insert(0, dict);
 			ctlv.layout.insert(dict.view, 0);
@@ -839,3 +867,49 @@ Graphics
 /**********************************************************
 --Graphics
 **********************************************************/
+
+// From Muse
+# aed (azimuth, elevation, directivity)
+# return constants
+def aed(a):
+    """aed(a)
+
+    Analyze an ambisonic B-format sound field, returning azimuth,
+    elevation and directivity.
+
+    Inputs:
+        - b         : Input b-format signal
+
+    Outputs: ([a, e, d])
+
+      [a, e, d] -- Azimuth, elevation and directivity in radians.
+                   (See direct for details on directivity.)
+
+    """
+
+    // normalise W
+b = copy(a)
+b[:, 0] *= sqrt(2) // normalize all Ws by sqrt(2)
+
+// pv & b**2 mean
+
+// grab w, multiply input array (W,X,Y,Z) all by w
+pv_mean = mean(b * interleave(b[:, 0]), 0) // mul all WXYZ by (W*sqrt(2)) then take average (if input is an array of soundfields)?
+b_sqrd_mean = mean((b**2), 0) // square all components and average them (if input is an array of soundfields)
+
+// # p**2 and v**2
+p_sqrd = b_sqrd_mean[0] // W component, pressure?
+v_sqrd = sum(b_sqrd_mean[1:]) // summed XYZ, velocity?
+
+// # calculate azimuth, elevation
+a = arctan2(pv_mean[2], pv_mean[1]) // atan2(y,x) - see pv_mean above
+e = arctan2(pv_mean[3], sqrt((pv_mean[1])**2 + (pv_mean[2])**2)) // atan2(z,sqrt(x^2 + y^2))
+
+// # calculate directivity
+// # pi/2 - 2 * arctan(v/p)
+d = pi/2 - 2 * arctan2(sqrt(v_sqrd), sqrt(p_sqrd))
+
+// # return [azimuth, elevation, directivity]
+    res = array([a, e, d])
+
+    return res
