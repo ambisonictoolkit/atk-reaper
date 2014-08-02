@@ -99,3 +99,8 @@ processPoints.(z);
 processPoints.(q);
 nil
 )
+
+	// // to retain the sign of the gain
+	// a = [-1,2,-3,4];
+	// b = a**2;
+	// c = b * (a.abs/a); // how to protect from /0?
