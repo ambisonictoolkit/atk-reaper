@@ -1,13 +1,13 @@
 (
 // Todo:
 // --add gain labels on every other point
-// add makeup gain slider
-// add matrix subtraction
+// --add makeup gain slider
+// --add matrix subtraction
 // consider annular wedge representations
 // --add circle on original 0,0 point
 // --post min/max gain
-// implement units for tranform (pi, db, receiver index)
-// add azimuth controls to the transforms
+// --implement units for tranform (pi, db, receiver index)
+// --add azimuth controls to the transforms
 // add option to display directivity as expanding/transparent circle or just proximity to origin
 // consider a view down positive X axis
 // filter out points <-90dB
@@ -26,10 +26,10 @@ var gControls;
 // var xFormDuples = [];
 // functions
 var processPoints, updateMatrix, getXForm, chainXForms, createXForm;
-var createNewXFormView, removeXForm;
+var createNewXFormView, removeXForm, showMatrixWindow;
 
 // drawing vars
-var scrnB, winW, winH, uv, ctlv, codev, pnts, arcH;
+var scrnB, win, winW, winH, uv, ctlv, codev, pnts, arcH, codeWin;
 var degreeSpec, degreeSl, degreeNB, degreePiNB, xFormMenu, xForms;
 var rotSpec, rotSl, rotNB, rotPiNB;
 var selDex, adjustRhos, getColCount, layoutFunc, colors;
@@ -123,10 +123,26 @@ chainXForms = {|...xFormCtlPrs|
 	mtx
 };
 
+~updateMatrix = { |xfMatrix|
+	transformedPoints = initPointsMatrices.collect{ |pointMtx|
+		xfMatrix * pointMtx
+	};
+
+	"\n******-------------".postln;
+	// calculate and set aeds var for gui update
+	aeds = transformedPoints.collect{|ptMtx|
+		processPoints.(ptMtx);
+	};
+	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
+	aeds = aeds.collect({|aed|[aed[0], aed[1].abs.ampdb]}); // debug: convert to db in processPoints
+	w.refresh;
+};
+
 updateMatrix = {
 	var xFormDuples = [];
 
 	"in updateMatrix".postln;
+
 	gControls.do{|ctlDict|
 		ctlDict.xform.notNil.if{
 			var ctlStates;
@@ -153,10 +169,6 @@ updateMatrix = {
 		},{ initPointsMatrices } // no transform
 	);
 
-	// transformedPoints = initPointsMatrices.collect{ |pointMtx|
-	// 	(Matrix.newIdentity(4) * -2) * pointMtx;
-	// };
-
 	"\n******-------------".postln;
 	// calculate and set aeds var for gui update
 	aeds = transformedPoints.collect{|ptMtx|
@@ -164,7 +176,7 @@ updateMatrix = {
 	};
 	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
 	aeds = aeds.collect({|aed|[aed[0], aed[1].abs.ampdb]}); // debug: convert to db in processPoints
-	w.refresh;
+	win !? {win.refresh};
 };
 
 updateMatrix.(); // initialize
@@ -175,11 +187,12 @@ Drawing
 scrnB = Window.screenBounds;
 winW= 600;
 winH= 600;
-w = Window("soundfield transform", Rect(scrnB.center.x - (winW/2), scrnB.center.y - (winH/2), winW, winH), resizable: true).front;
+win = Window("soundfield transform", Rect(scrnB.center.x - (winW/2), scrnB.height-winH-45, winW, winH), resizable: true).front;
 // w.layout_(VLayout(
-uv = UserView( w, Rect(0,0, w.view.bounds.width, w.view.bounds.height/2) ).resize_(5).background_(Color.gray.alpha_(0.99));
-ctlv = View( w, Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2) ).resize_(5);
-codev = View();
+uv = UserView( win, Rect(0,0, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5).background_(Color.gray.alpha_(0.99));
+ctlv = View( win, Rect(0,win.view.bounds.height/2, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5);
+
+// codev = View();
 // ));
 // uv = UserView();
 // ctlv = View();
@@ -188,48 +201,110 @@ codev = View();
 // xForms = ['push', 'press', 'focus', 'zoom'];
 xForms = IdentityDictionary(know: true).putPairs([
 
-	'push',
-	IdentityDictionary(know: true)
+	'push', IdentityDictionary(know: true)
 	.put( 'controls', [
 		// this order defines the order of arguments passed to the transform matrix
-			'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
-			'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
 		]
 	).put( 'getMatrix',
 		{|deg=0, az=0, el=0| FoaXformerMatrix.newPush(deg, az, el).matrix}
 	),
 
-	'press',
-	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newPressX(deg).matrix} ]),
-	'focus',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newFocusX(deg).matrix} ]),
-	'zoom',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newZoomX(deg).matrix} ]),
-	'dominate',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -24, 'max', 24, 'default', 0,
-			'getMatrix', {|gain| FoaXformerMatrix.newDominateX(gain).matrix} ]),
-	'direct',		IdentityDictionary(know: true).putPairs(
-		[ 'min', 0, 'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newDirectX(deg).matrix} ]),
-	'rotate',	IdentityDictionary(know: true).putPairs(
-		[ 'min', 2pi,	'max', -2pi, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newRotate(deg).matrix} ]),
-	'asymmetry',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2,	'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newAsymmetry(deg).matrix} ]),
-	'balance',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2,	'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newBalance(deg).matrix} ]),
-	'gain',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -24,	'max', 24, 'default', 0,
-			'getMatrix', {|gainDB| gainDB.dbamp } ]),
-	'subtract', IdentityDictionary(know: true).putPairs(
-		[ 'min', 0,	'max', 0, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newBalance(deg)} ]),
+	'press', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newPress(deg, az, el).matrix}
+	),
+
+	'focus', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newFocus(deg, az, el).matrix}
+	),
+
+	'zoom',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newZoom(deg, az, el).matrix}
+	),
+
+	'direct',		IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newDirect(deg, az, el).matrix}
+	),
+
+	'rotate',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Azimuth',	ControlSpec(2pi, -2pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|az=0| FoaXformerMatrix.newRotate(az).matrix}
+	),
+
+	'asymmetry',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0| FoaXformerMatrix.newAsymmetry(deg).matrix}
+	),
+
+	'balance',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0| FoaXformerMatrix.newBalance(deg).matrix}
+	),
+
+	'dominate',		IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Gain',		ControlSpec(-24, 24, default: 0, units: "dB"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|gain=0, az=0, el=0| FoaXformerMatrix.newDominate(gain, az, el).matrix}
+	),
+
+	'gain',	IdentityDictionary(know: true).put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+			'Gain',		ControlSpec(-24, 24, default: 0, units: "dB")
+		]
+	).put( 'getMatrix',
+		{|gain=0| gain.dbamp }
+	),
+
+	'subtract', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+			'This index',	nil,
+			'from this index',	nil
+		]
+	).put( 'getMatrix',
+		{|subtractIndex, fromIndex| }
+	),
 ]);
 
 // order determines sf processing chain
@@ -288,7 +363,10 @@ createXForm = {
 		.action_(
 			{ |sldr| var val;
 				val = spec.map(sldr.value);
-				nb.value_(val.round(0.001));
+				if(spec.units == "pi",
+					{ nb.value_(val.round(0.001) / pi) },
+					{ nb.value_(val.round(0.001)) }
+				);
 				xfStuff.controlStates[ctlOrder] = val;
 				updateMatrix.();
 			}
@@ -298,7 +376,10 @@ createXForm = {
 		nb = NumberBox()
 		.action_(
 			{ |nb| var val;
-				val = nb.value;
+				if(spec.units == "pi",
+					{ val = nb.value * pi; },
+					{ val = nb.value; }
+				);
 				sl.value_(spec.unmap(val));
 				xfStuff.controlStates[ctlOrder] = val;
 				updateMatrix.();
@@ -393,56 +474,79 @@ ctlv.layout.add(
 	.margins_([10, 5,5,0])
 );
 ctlv.layout.add(createNewXFormView.());
-ctlv.layout.add( codev.layout_(VLayout(TextView().enterInterpretsSelection_(true))) );
 
-// // tv = View(uv, Rect(3*uv.bounds.width/4, 0, uv.bounds.width/4, uv.bounds.height/2)).layout_(
-// tv = View(uv, Rect(0, 0, uv.bounds.width/4, uv.bounds.height/2)).layout_(
-// 	VLayout(
-// 		Slider().maxWidth_(25),
-// 		Button().maxWidth_(25),
-// 		Slider().maxWidth_(25)
-// 	).setAlignment(1, 'right')
-// );
-// // w.view.onResize_({|winview| tv.bounds_(Rect(3*uv.bounds.width/4, 0, uv.bounds.width/4, uv.bounds.height/2))});
+showMatrixWindow = {
+	codeWin ?? {
+		var mwinH = 200;
+		var evalTxtView, mtxString;
+		mtxString = "var matrix; \n\n/*set you Matrix here, select all and evaluate, or click Evaluate above*/\nmatrix = ;\n\n~updateMatrix.(matrix)";
 
-// tv = View(w, uv.bounds);
-tv = View(uv,Rect(0, uv.bounds.height/2, uv.bounds.width,uv.bounds.height/2)).layout_(
+		codeWin = Window("Evaluate Matrix",
+			Rect(win.bounds.left,
+				scrnB.height - win.bounds.height - mwinH
+				- (2*20) - 25, // (title bar: 20, OS menu bar: 25)
+				win.bounds.width, mwinH))
+		.onClose_({codeWin = nil})
+		.front;
+
+		View(codeWin, Rect(0,0, codeWin.bounds.width, codeWin.bounds.height))
+		.layout_(
+			VLayout(
+				evalTxtView = TextView().enterInterpretsSelection_(true).string_(mtxString),
+				HLayout(
+					Button().states_([["Evaluate"]]).action_({evalTxtView.string.interpret}),
+					Button().states_([["Reset"]]).action_({evalTxtView.string = mtxString}),
+				),
+			)
+		);
+	};
+};
+
+tv = View(uv,Rect(0, 0, uv.bounds.width,uv.bounds.height)).layout_(
 	HLayout(
 		VLayout(
+			VLayout(
+				maxGainTxt = StaticText().string_("one")
+				.font_(Font('Helvetica', 16)).maxWidth_(180).minHeight_(21),
+				minGainTxt = StaticText().string_("two")
+				.font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
+			),
 			nil,
-			maxGainTxt = StaticText().string_("one").font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
-			minGainTxt = StaticText().string_("two").font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
+			Button().states_(
+				[["Enter Custom Matrix"]]).action_({|but| showMatrixWindow.() }).maxWidth_(130),
 		),
 		VLayout(
-			[ Button()
-				.states_([
-					["Pan Test", Color.black, Color.grey],
-					["Stop test", Color.black, Color.red],
-			]).maxWidth_(65), a: \right],
-			Button().states_([
-				["Continuous", Color.black, Color.grey],["Pulsed", Color.black, Color.green]]),
-			HLayout(
-				StaticText().string_("Period"),
-				NumberBox().maxWidth_(25).value_(5)
-			).setAlignment(0,\right).setAlignment(1,\right),
+			nil,
 			VLayout(
+				[ Button()
+					.states_([
+						["Pan Test", Color.black, Color.grey],
+						["Stop test", Color.black, Color.red],
+				]).maxWidth_(65), a: \bottomRight],
+				Button().states_([
+					["Continuous", Color.black, Color.grey],["Pulsed", Color.black, Color.green]]),
 				HLayout(
-					StaticText().string_("Gain").maxHeight_(25),
-					NumberBox().maxWidth_(25)
-				).setAlignment(0, \right).setAlignment(1, \right),
-				// Slider().maxWidth_(150).orientation_(\horizontal)
-			).setAlignment(0,\right) //.setAlignment(1,\right) //.setAlignment(0,\right)
+					StaticText().string_("Period"),
+					NumberBox().maxWidth_(25).value_(5)
+				).setAlignment(0,\right).setAlignment(1,\right),
+				VLayout(
+					HLayout(
+						StaticText().string_("Gain").maxHeight_(25),
+						NumberBox().maxWidth_(25)
+					).setAlignment(0, \right).setAlignment(1, \right),
+					// Slider().maxWidth_(150).orientation_(\horizontal)
+				).setAlignment(0,\right) //.setAlignment(1,\right) //.setAlignment(0,\right)
+			)
+			.setAlignment(1, \bottomRight)
+			.setAlignment(2, \bottomRight)
+			.setAlignment(3, \bottomRight)
 		)
-		// .setAlignment(0, 'right')
-		.setAlignment(1, 'right') // continuous/pulses buttons
-		.setAlignment(2, 'right')
-		.setAlignment(3, 'right')
 	)
 );
 
-w.view.onResize_({ |winview|
-	uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
-	tv.bounds_(Rect(0, uv.bounds.height/2, uv.bounds.width,uv.bounds.height/2));
+win.view.onResize_({ |winview|
+	uv.bounds_(Rect(0,0, win.view.bounds.width, win.view.bounds.height/2));
+	tv.bounds_(Rect(0, 0, uv.bounds.width,uv.bounds.height));
 });
 
 /*******************
@@ -454,9 +558,8 @@ uv.drawFunc_({|view|
 	var alphaSpec, gainSpec, colorSpec, maxMinStr;
 	var testSigPnt;
 
-	ctlv.bounds_(Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2));
-	// uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
-	// tv.bounds_(uv.bounds);
+	ctlv.bounds_(Rect(0,win.view.bounds.height/2, win.view.bounds.width, win.view.bounds.height/2));
+
 	r = uv.bounds.height * 0.02;
 	d = r*2;
 	circleViewRatio = 0.8;
@@ -555,7 +658,7 @@ uv.drawFunc_({|view|
 	minGainTxt.string_(format("Min Gain:   %", aeds.collect({|me| me[1]}).minItem.round(0.1)));
 });
 
-w.refresh;
+win.refresh;
 )
 
 
