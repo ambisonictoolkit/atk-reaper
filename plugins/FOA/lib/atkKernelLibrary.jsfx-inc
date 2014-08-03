@@ -81,3 +81,29 @@ function sampleRateToSlider(aSampleRate)
   // Return slider value
   lSliderValue;
 );
+
+
+
+/********************************************************************
+Read a kernel impulse response file from disk
+********************************************************************/
+function readKernelImpulseFromFile(aFileName, anImpulseBuffer) local(lFileHandle, lNumberOfSamples, lNumChannels, lSampleRate, i)
+(
+  // Open the appropriate file
+  lFileHandle = file_open(aFileName);
+
+  lFileHandle > 0 ? 
+  (
+    // Get number of channels and sample rate of the file
+    file_riff(lFileHandle, lNumChannels, lSampleRate);
+    
+    // Calculate number of samples of the left channel of impulse response
+    lNumberOfSamples = ( file_avail(lFileHandle) / lNumChannels ) | 0;
+    
+    // Read samples from the impulse response file and copy into mImpulseBufferW
+    file_mem(lFileHandle, anImpulseBuffer, lNumberOfSamples*lNumChannels);
+    
+    // Close the impulse response file again.
+    file_close(lFileHandle);
+  );
+);
