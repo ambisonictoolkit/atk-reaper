@@ -2,8 +2,9 @@ FoaXformChain {
 	classvar <xForms;
 
 	// copyArgs
-	var xFormAmtPairs;
-	var <view;
+	var <xfAmtPrs;
+	var <transformedMatrix, <testDef, <testSynth, <view;
+	var <server;
 
 	*initClass {
 		xForms = IdentityDictionary(know: true).putPairs([
@@ -44,11 +45,78 @@ FoaXformChain {
 		]);
 	}
 
-	*new { |xFormAmtPairs|
+	*getMatrixFromChain {|...xFormAmtPairs|
+		var mtx;
+		xFormAmtPairs.do{ |xNameDeg|
+			var name, deg;
+			#name, deg = xNameDeg;
+			(name != 'subtract').if({
+				// tranform via matrix multiplication
+				mtx.isNil.if(
+					{ mtx = FoaXformChain.xForms[name]['getMatrix'].(deg) }, // first mtx
+					{ mtx = FoaXformChain.xForms[name]['getMatrix'].(deg) * mtx; }
+				);
+				},{ // subtract
+					mtx = Matrix.newIdentity(4) - mtx;
+			});
+		};
+		^mtx;
+	}
+
+	*new { |...xFormAmtPairs|
 		^super.newCopyArgs(xFormAmtPairs).init;
 	}
 
 	init {
+		server = Server.local;
+		xfAmtPrs  !? {this.updateMatrix(*xfAmtPrs)};
+	}
+
+	updateMatrix { |...newxfAmtPrs|
+		newxfAmtPrs !? {
+			transformedMatrix = FoaXformChain.getMatrixFromChain(*xfAmtPrs);
+		}
+	}
+
+	loadSynthWithMatrix { |foaXfMatrix, loadCond|
+		fork {
+			testDef = SynthDef(\foaPanThruXform, {
+				arg outbus=0, panRate=0.2, amp=0.25, whichSrc=0, fadeTime=0.2, gate=1;
+				var env, sig, panCtl, bf;
+				env =EnvGen.kr(Env([0,1,0],fadeTime, \sin, 1), gate, doneAction: 2);
+				sig = SelectX.ar(Lag.kr(whichSrc,1), [
+					PinkNoise.ar(amp),
+					Decay.ar(Impulse.ar(2.5), 0.3, PinkNoise.ar(amp))
+				]);
+				panCtl = LFSaw.kr(panRate, 1).range(-pi,pi);
+				bf = FoaPanB.ar(sig * env, panCtl);
+				bf = AtkMatrixMix.ar(bf, foaXfMatrix);
+				Out.ar(outbus, bf)
+			}).send(server);
+
+			server.sync;
+			loadCond.test_(true).signal;
+		}
+	}
+
+	playTest { |outbus=0, panRate=0.2, amp=0.25, whichSrc=0, fadeTime=0.2|
+		transformedMatrix.notNil.if({
+			fork {
+				var cond;
+				cond = Condition();
+				this.loadSynthWithMatrix(transformedMatrix, cond);
+				cond.wait;
+
+				testSynth = Synth(\foaPanThruXform,
+					[\outbus, outbus, \panRate, panRate,
+						\amp, amp, \whichSrc, whichSrc, \fadeTime, fadeTime]
+				);
+			}
+		},{ "No transform matrix defined yet".warn })
+	}
+
+	stopTest {
+		testSynth.set(\gate, 0); // release
 	}
 
 	*view {
@@ -216,27 +284,6 @@ FoaXformChainView {
 		];
 	}
 
-	xFormPointThruChain {|inputMtx ...xFormAmtPrs|
-		var mtx;
-		"in xFormPointThruChain".postln;
-		xFormAmtPrs.postln;
-		xFormAmtPrs.do{ |xNameDeg|
-			var name, deg;
-			#name, deg = xNameDeg;
-
-			(name != 'subtract').if({
-				// tranform via matrix multiplication
-				mtx.isNil.if(
-					{ mtx = FoaXformChain.xForms[name]['getMatrix'].(deg) }, // first mtx
-					{ mtx = FoaXformChain.xForms[name]['getMatrix'].(deg) * mtx; }
-				);
-				},{ // subtract
-					mtx = Matrix.newIdentity(4) - mtx;
-			});
-		};
-		^mtx * inputMtx;
-	}
-
 	updateMatrix {
 		var xFormDuples = [];
 
@@ -250,7 +297,10 @@ FoaXformChainView {
 
 		transformedPoints = (xFormDuples.size > 0).if({
 			initPointsMatrices.collect{ |pointMtx|
-				this.xFormPointThruChain(pointMtx, *xFormDuples);
+				var xformMtx;
+				// this.xFormPointThruChain(*xFormDuples);
+				xformMtx = FoaXformChain.getMatrixFromChain(*xFormDuples);
+				xformMtx * pointMtx;
 			};
 			},{ initPointsMatrices } // no transform
 		);

@@ -8,12 +8,21 @@
 // --post min/max gain
 // implement units for tranform (pi, db, receiver index)
 // add azimuth controls to the transforms
-
+// add option to display directivity as expanding/transparent circle or just proximity to origin
+// consider a view down positive X axis
+// filter out points <-90dB
+// draw most transparent circles first
+// implement matrix input section as well as "post trasnform matrix"
+// add test signal feature
+// add addition
+// add indeces in chain for selecting input and receivers for addition/subtraction
+// make matrix text view a pop-out window
+// double check how often window needs to be refreshed... maybe just views
 
 // constants
 var kInvSqrt2 = 1/(2.sqrt);
 var numPoints = 24, initPointsMatrices, transformedPoints, aeds;
-var controls;
+var gControls;
 // var xFormDuples = [];
 // functions
 var processPoints, updateMatrix, getXForm, chainXForms, createXForm;
@@ -27,43 +36,61 @@ var selDex, adjustRhos, getColCount, layoutFunc, colors;
 
 var tv, maxGainTxt, minGainTxt;
 
-// xFormDuples = [['push', pi/4],['focus', pi/4],['rotate', pi/3]];
-// xFormDuples = [];
-
+// based on Muse AED function plugins
 processPoints = {|xFormedMatrix|
 	var w,x,y,z, az, el, g0square, g1square, term, omni, gain;
+	var b, pv_mean, b_sqrd_mean, p_sqrd, v_sqrd, a, e, d, d_norm;
 
+	b = xFormedMatrix.getCol(0);
+	b[0] = b[0] * sqrt(2); // scale W
+
+	b_sqrd_mean = b**2;
+
+	p_sqrd = b_sqrd_mean[0]; // W component, pressure?
+	v_sqrd = b_sqrd_mean[1..].sum; // summed XYZ, velocity?
+
+	d = (pi/2) - (2 * atan2(sqrt(v_sqrd), sqrt(p_sqrd)));
+
+	pv_mean = b * b[0]; // mul all WXYZ by W ( [w,x,y,z] * (W*sqrt(2)) )
+	a = atan2(pv_mean[2], pv_mean[1]); // atan2(y,x) - see pv_mean above
+	e = atan2(pv_mean[3], sqrt((pv_mean[1]**2) + (pv_mean[2]**2))); // atan2(z,sqrt(x^2 + y^2))
+
+	d_norm = 1 - (d.abs / 0.5pi);
+
+	// postf("w,x,y,z: %\naz, el: %\nd_norm: %\n", b.round(0.01), [a, e].round(0.01), d_norm);
+
+	// TODO: get gain from above code, not the old code
+
+	/* -------- old code ----*/
 	#w,x,y,z = xFormedMatrix.getCol(0);
-    az  = atan2(y, x);
+	az  = atan2(y, x);
 	el  = atan2(z, sqrt(x.squared + y.squared));
-
-    // Omni transform angle
-    g0square	= w.squared;
-    g1square	= x.squared + y.squared + z.squared;
+	// Omni transform angle
+	g0square	= w.squared;
+	g1square	= x.squared + y.squared + z.squared;
 	term 		= ((2*g0square) + g1square);
 	(term == 0).if{term = 0.0000000001}; // protect from NaN
 	omni		= asin(( (2*g0square) - g1square) / term);
 
-    // Gain
+	// Gain
 	term		= sin(omni);
 	(term <= -1).if{term = -0.99999999}; // protect from NaN
-    gain		= w * sqrt(2 / (1 + term));
+	gain		= w * sqrt(2 / (1 + term));
 
-
-
-	// Normalise omni to [0,1] range
-	omni = 2 * omni / pi;
-	omni = 1 - omni;
-	omni = omni.clip(0.0,1.0);
+	// // Normalise omni to [0,1] range
+	// omni = 2 * omni / pi;
+	// omni = 1 - omni;
+	// omni = omni.clip(0.0,1.0);
 
 	// ignore elev for now, implement with Spherical to include elev
-	// omni is normalized and scales rho (distance from center)
-	postf("w: %\nx: %\ny: %\nz: %\naz: %\nel: %\nomni: %\ngain:: %\n", w,x,y,z, az, el, omni, gain); // debug
 	[
-		Polar(omni, az), gain.abs.ampdb
+		// 	Polar(omni, az), gain.abs.ampdb
+		Polar(d_norm, a), gain //.abs.ampdb
 		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
 	].postln; // debug
+
 };
+
 
 initPointsMatrices = numPoints.collect{|i|
 	var ang;
@@ -72,61 +99,19 @@ initPointsMatrices = numPoints.collect{|i|
 	FoaEncoderMatrix.newDirection(ang).matrix.addRow([0]); // need to add z manually
 };
 
-/*chainXForms = {|...xFormDegPrs|
+chainXForms = {|...xFormCtlPrs|
 	var mtx;
 	"in chainXForms".postln;
-	xFormDegPrs.postln;
-	xFormDegPrs.do{ |xNameDeg|
-		var name, deg, xMtx;
-		#name, deg = xNameDeg;
-		mtx.isNil.if(
-			{ mtx = xForms[name]['getMatrix'].(deg).matrix; }, // make last xform the first mtx
-			{
-				xMtx = xForms[name]['getMatrix'].(deg).matrix;
-				mtx = xMtx * mtx;
-			}
-		);
-	};
-	mtx;
-};
-
-updateMatrix = {
-	var xFormDuples = [];
-	"in updateMatrix".postln;
-	controls.do{|ctlDict|
-		ctlDict.xform.notNil.if{
-			ctlDict.degree.isNil.if{"trasform degree is nil!".error};
-			xFormDuples = xFormDuples.add( [ctlDict.xform, ctlDict.degree] );
-		};
-	};
-	// "Duples: ".post; xFormDuples.postln; // debug
-	transformedPoints = (xFormDuples.size > 0).if({
-		initPointsMatrices.collect{ |pointMtx|
-			var xformMtx;
-			xformMtx = chainXForms.(*xFormDuples);
-			xformMtx * pointMtx;
-		};
-		},{ initPointsMatrices } // no transform
-	);
-	// set aeds var for gui update
-	aeds = transformedPoints.collect{|ptMtx|
-		processPoints.(ptMtx);
-	};
-
-};*/
-chainXForms = {|...xFormDegPrs|
-	var mtx;
-	"in chainXForms".postln;
-	xFormDegPrs.postln;
-	xFormDegPrs.do{ |xNameDeg|
-		var name, deg;
-		#name, deg = xNameDeg;
+	xFormCtlPrs.postln;
+	xFormCtlPrs.do{ |xNameDeg|
+		var name, ctlVals;
+		#name, ctlVals = xNameDeg;
 
 		(name != 'subtract').if({
 			// tranform via matrix multiplication
 			mtx.isNil.if(
-				{ mtx = xForms[name]['getMatrix'].(deg) }, // first mtx
-				{ mtx = xForms[name]['getMatrix'].(deg) * mtx; }
+				{ mtx = xForms[name]['getMatrix'].(*ctlVals) }, // first mtx
+				{ mtx = xForms[name]['getMatrix'].(*ctlVals) * mtx; }
 			);
 			},{ // subtract
 				mtx = Matrix.newIdentity(4) + (mtx * -1);
@@ -142,12 +127,20 @@ updateMatrix = {
 	var xFormDuples = [];
 
 	"in updateMatrix".postln;
-	controls.do{|ctlDict|
+	gControls.do{|ctlDict|
 		ctlDict.xform.notNil.if{
-			ctlDict.degree.isNil.if{"trasform degree is nil!".error};
-			xFormDuples = xFormDuples.add( [ctlDict.xform, ctlDict.degree] );
+			var ctlStates;
+			ctlStates = ctlDict.controlStates;
+			(ctlStates.size == 0).if{"trasform control states aren't assigned!".error};
+			// xFormDuples = xFormDuples.add( [ctlDict.xform, ctlDict.controls] );
+			xFormDuples = xFormDuples.add([
+				ctlDict.xform,
+				ctlStates.indices.collect{|dex| ctlStates[dex] }
+			]);
 		};
 	};
+
+	"found these duples: ".post; xFormDuples.postln;
 
 	transformedPoints = (xFormDuples.size > 0).if({
 		initPointsMatrices.collect{ |pointMtx|
@@ -164,11 +157,14 @@ updateMatrix = {
 	// 	(Matrix.newIdentity(4) * -2) * pointMtx;
 	// };
 
+	"\n******-------------".postln;
 	// calculate and set aeds var for gui update
 	aeds = transformedPoints.collect{|ptMtx|
 		processPoints.(ptMtx);
 	};
-
+	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
+	aeds = aeds.collect({|aed|[aed[0], aed[1].abs.ampdb]}); // debug: convert to db in processPoints
+	w.refresh;
 };
 
 updateMatrix.(); // initialize
@@ -191,11 +187,20 @@ codev = View();
 // controls
 // xForms = ['push', 'press', 'focus', 'zoom'];
 xForms = IdentityDictionary(know: true).putPairs([
-	'push',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newPushX(deg).matrix} ]
+
+	'push',
+	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+			'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+			'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newPush(deg, az, el).matrix}
 	),
-	'press',	IdentityDictionary(know: true).putPairs(
+
+	'press',
+	IdentityDictionary(know: true).putPairs(
 		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
 			'getMatrix', {|deg| FoaXformerMatrix.newPressX(deg).matrix} ]),
 	'focus',	IdentityDictionary(know: true).putPairs(
@@ -229,139 +234,134 @@ xForms = IdentityDictionary(know: true).putPairs([
 
 // order determines sf processing chain
 // list can grow with inserted items and shrink when removed
-controls = List();
+gControls = List();
 
 createXForm = {
-	var updateSpecs, xFormMenu, degSpec, degSl, degNB, degPiNB, removeBut, addBut;
-	var dict, view, layout, deg;
+	var updateControls, addMenu, addSliderCtl, addAddRmvButs;
+	var xFormMenu, degSpec, degSl, degNB, degPiNB, rmvBut, addBut;
+	var xfStuff, view, layout, deg;
+	var curXform; // the currently selected xform
 
 	"in createXForm".postln;
+	xfStuff = IdentityDictionary(know: true); // store xform, degree, view, layout here
+	xfStuff.put('controlStates', Order()); // to store this xform's controls' states
+	degSpec = ControlSpec(); // initialize var
 
 	view = View();
-	// store xform, degree, view, layout here
-	dict = IdentityDictionary(know: true);
+	layout = HLayout().margins_([10,0,10,3]);
+	view.layout_(layout);
+	xfStuff.view = view;
+	xfStuff.layout = layout;
 
-	updateSpecs = { |xf| // xf is a dict from xForms
-		var min, max;
-		"in updatespecs".postln;
-		degSpec = ControlSpec(xf.min, xf.max, default: xf.default);
-		// .min/maxItem to handle negative max on rotate
-		min = [xf.min, xf.max].minItem;
-		max = [xf.min, xf.max].maxItem;
-		degNB.clipHi_(max).clipLo_(min);
-		degPiNB.clipHi_(max).clipLo_(min);
-		// initialize widgets
-		deg.notNil.if({
-			if( (deg<min) or: (deg>max), { deg = degSpec.default });
-			},{ deg = degSpec.default }
-		);
-		degSl.value   = degSpec.unmap(deg);
-		degNB.value   = deg;
-		degPiNB.value = deg / pi;
+	updateControls = { |xfName| // xf is a dict from xForms
+		var xfAttributes, min, max, controls;
+		"in updateControls".postln;
+		if(xfName != curXform, {
+
+			xfAttributes = xForms[xfName];
+			controls = xfAttributes.controls;
+			controls = controls.clump(2);
+
+			// rebuild the view with the new controls
+			view.children.do(_.remove); // clear the view's elements
+			// add menu back, new xform selected
+			addMenu.(xfName);
+			controls.do{|pair, i|
+				var name, ctl;
+				#name, ctl = pair;
+				ctl.isKindOf(ControlSpec).if({
+					addSliderCtl.(name, ctl, i);
+					xfStuff.controlStates.put(i, ctl.default);
+				});
+			};
+			addAddRmvButs.();
+		})
 	};
 
-	degSpec = ControlSpec();
+	addSliderCtl = { |name, spec, ctlOrder|
+		var min, max, nb, txt, sl;
+		// .min/maxItem to handle negative max on rotate
+		min = [spec.minval, spec.maxval].minItem;
+		max = [spec.minval, spec.maxval].maxItem;
 
-	xFormMenu = PopUpMenu().items_(['-']++xForms.keys)
-	.action_({ |mn|
-		if( mn.item != '-', {
-			var xfName, xfAttributes;
-			xfName = mn.item;
-			xfAttributes = xForms[xfName];
-			updateSpecs.(xfAttributes);
-			// update control dict
-			dict.xform_(xfName).degree_(deg);
-			updateMatrix.();
-			w.refresh;
-			},{ // nil mutes the transform
-				dict.xform_(nil).degree_(nil);
+		sl = Slider()
+		.action_(
+			{ |sldr| var val;
+				val = spec.map(sldr.value);
+				nb.value_(val.round(0.001));
+				xfStuff.controlStates[ctlOrder] = val;
 				updateMatrix.();
-				w.refresh;
-		});
-	}).maxWidth_(75).value_(0);
+			}
+		).orientation_('horizontal')
+		.value_(spec.unmap(spec.default));
 
-	degSl = Slider()
-	.action_(
-		{ |sl| var val;
-			val = degSpec.map(sl.value);
-			deg = val;
-			degNB.value_(val.round(0.001));
-			degPiNB.value_(val.round(0.001)/pi);
-			dict.degree_(deg);
-			updateMatrix.(deg);
-			w.refresh;
-		}
-	)
-	.step_(0.001).orientation_('horizontal');
+		nb = NumberBox()
+		.action_(
+			{ |nb| var val;
+				val = nb.value;
+				sl.value_(spec.unmap(val));
+				xfStuff.controlStates[ctlOrder] = val;
+				updateMatrix.();
+			}
+		).clipHi_(max).clipLo_(min)
+		.step_(0.01).maxWidth_(60);
 
-	degNB = NumberBox()
-	.action_(
-		{ |nb| var val;
-			val = nb.value;
-			deg = val;
-			degSl.value_(degSpec.unmap(val));
-			degPiNB.value_(val / pi);
-			dict.degree_(deg);
-			updateMatrix.(deg);
-			w.refresh;
-		}
-	)
-	.step_(0.01).maxWidth_(60);
+		txt = StaticText().string_(spec.units).align_('left');
 
-	degPiNB = NumberBox()
-	.action_(
-		{ |nb| var val;
-			val = nb.value * pi;
-			deg = val;
-			degSl.value_(degSpec.unmap(val));
-			degNB.value_(val);
-			dict.degree_(deg);
-			updateMatrix.(deg);
-			w.refresh;
-		}
-	)
-	.step_(0.01/pi).maxWidth_(60);
+		[nb, txt, sl].do{ |me| layout.add(me) };
+	};
 
-	addBut = Button().states_([["+"]])
-	.action_({ |but|
-		createNewXFormView.(view);
-	})
-	.maxWidth_(20);
+	addMenu = { |selectedName|
+		xFormMenu = PopUpMenu().items_(['-']++xForms.keys)
+		.action_({ |mn|
+			if( mn.item != '-', {
+				xfStuff.xform_(mn.item);
+				updateControls.(mn.item);
+				},
+				{ xfStuff.xform_(nil) } // nil mutes the transform
+			);
+			updateMatrix.();
+		}).maxWidth_(75).value_(0);
 
-	removeBut = Button().states_([["X"]])
-	.action_({ |but|
-		removeXForm.(dict);
-		updateMatrix.(deg);
-		w.refresh;
-	})
-	.maxWidth_(20);
+		layout.add(xFormMenu);
+		selectedName !? { xFormMenu.value_(xFormMenu.items.indexOf(selectedName)) };
+	};
 
-	layout = HLayout(
-		xFormMenu, degNB,
-		degSl,
-		degPiNB, StaticText().string_("pi").align_('left'),
-		removeBut, addBut
-	).margins_([10,0,10,3]);
 
-	view.layout_(layout);
+	addAddRmvButs = {
+		rmvBut = Button().states_([["X"]])
+		.action_({ |but|
+			removeXForm.(xfStuff);
+			updateMatrix.();
+		}).maxWidth_(20);
 
-	dict.view = view;
-	dict.layout = layout;
-	dict; // return
+		addBut = Button().states_([["+"]])
+		.action_({ |but|
+			createNewXFormView.(view);
+		}).maxWidth_(20);
+
+		layout.add(rmvBut);
+		layout.add(addBut);
+	};
+
+	addMenu.(); // add the first dropdown
+
+	xfStuff; // return this transform's dictionary
 };
 
 createNewXFormView = { |behindThisView|
 	var behindDex, dict;
 	dict = createXForm.();
 	behindThisView.notNil.if({
-		controls.do{|ctldict, i|
+		gControls.do{|ctldict, i|
 			(ctldict.view === behindThisView).if{behindDex = i};
 		};
 		behindDex.isNil.if{"preceeding view not found!".error};
-		controls.insert(behindDex+1, dict);
-		ctlv.layout.insert(dict.view, behindDex+1);
+		"behindDex: ".post; behindDex.postln;
+		gControls.insert(behindDex+1, dict);
+		ctlv.layout.insert(dict.view, behindDex+2); // +2 to account for label row in ctlv[0]
 		},{
-			controls.insert(0, dict);
+			gControls.insert(0, dict);
 			ctlv.layout.insert(dict.view, 0);
 	});
 	// return
@@ -369,22 +369,15 @@ createNewXFormView = { |behindThisView|
 };
 
 removeXForm = {|dict| var rmvDex;
-	controls.do{|ctldict, i|
+	gControls.do{|ctldict, i|
 		(ctldict === dict).if{rmvDex = i};
 	};
 	rmvDex.isNil.if{"view not found!".error};
 	dict.view.remove;
 	dict.layout.destroy;
-	controls.removeAt(rmvDex);
+	gControls.removeAt(rmvDex);
 };
 
-
-// ctlv.layout_(
-// 	VLayout(
-// 		createNewXFormView.(),
-// 		codev.layout_(VLayout(TextView().enterInterpretsSelection_(true)))
-// 	)
-// );
 
 ctlv.layout_( VLayout().margins_(0) );
 ctlv.layout.add(
@@ -565,6 +558,42 @@ uv.drawFunc_({|view|
 w.refresh;
 )
 
+
+// // based on ATK-JS plugins
+// processPoints = {|xFormedMatrix|
+// 	var w,x,y,z, az, el, g0square, g1square, term, omni, gain;
+//
+// 	#w,x,y,z = xFormedMatrix.getCol(0);
+// 	az  = atan2(y, x);
+// 	el  = atan2(z, sqrt(x.squared + y.squared));
+//
+// 	// Omni transform angle
+// 	g0square	= w.squared;
+// 	g1square	= x.squared + y.squared + z.squared;
+// 	term 		= ((2*g0square) + g1square);
+// 	(term == 0).if{term = 0.0000000001}; // protect from NaN
+// 	omni		= asin(( (2*g0square) - g1square) / term);
+//
+// 	// Gain
+// 	term		= sin(omni);
+// 	(term <= -1).if{term = -0.99999999}; // protect from NaN
+// 	gain		= w * sqrt(2 / (1 + term));
+//
+//
+//
+// 	// Normalise omni to [0,1] range
+// 	omni = 2 * omni / pi;
+// 	omni = 1 - omni;
+// 	omni = omni.clip(0.0,1.0);
+//
+// 	// ignore elev for now, implement with Spherical to include elev
+// 	// omni is normalized and scales rho (distance from center)
+// 	postf("w: %\nx: %\ny: %\nz: %\naz: %\nel: %\nomni: %\ngain:: %\n", w,x,y,z, az, el, omni, gain); // debug
+// 	[
+// 		Polar(omni, az), gain.abs.ampdb
+// 		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
+// 	].postln; // debug
+// };
 
 
 /********************************************************************
@@ -839,3 +868,49 @@ Graphics
 /**********************************************************
 --Graphics
 **********************************************************/
+
+// From Muse
+# aed (azimuth, elevation, directivity)
+# return constants
+def aed(a):
+    """aed(a)
+
+    Analyze an ambisonic B-format sound field, returning azimuth,
+    elevation and directivity.
+
+    Inputs:
+        - b         : Input b-format signal
+
+    Outputs: ([a, e, d])
+
+      [a, e, d] -- Azimuth, elevation and directivity in radians.
+                   (See direct for details on directivity.)
+
+    """
+
+    // normalise W
+b = copy(a)
+b[:, 0] *= sqrt(2) // normalize all Ws by sqrt(2)
+
+// pv & b**2 mean
+
+// grab w, multiply input array (W,X,Y,Z) all by w
+pv_mean = mean(b * interleave(b[:, 0]), 0) // mul all WXYZ by (W*sqrt(2)) then take average (if input is an array of soundfields)?
+b_sqrd_mean = mean((b**2), 0) // square all components and average them (if input is an array of soundfields)
+
+// # p**2 and v**2
+p_sqrd = b_sqrd_mean[0] // W component, pressure?
+v_sqrd = sum(b_sqrd_mean[1:]) // summed XYZ, velocity?
+
+// # calculate azimuth, elevation
+a = arctan2(pv_mean[2], pv_mean[1]) // atan2(y,x) - see pv_mean above
+e = arctan2(pv_mean[3], sqrt((pv_mean[1])**2 + (pv_mean[2])**2)) // atan2(z,sqrt(x^2 + y^2))
+
+// # calculate directivity
+// # pi/2 - 2 * arctan(v/p)
+d = pi/2 - 2 * arctan2(sqrt(v_sqrd), sqrt(p_sqrd))
+
+// # return [azimuth, elevation, directivity]
+    res = array([a, e, d])
+
+    return res
