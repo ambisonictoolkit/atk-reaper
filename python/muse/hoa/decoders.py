@@ -328,7 +328,7 @@ def zero_order_matrix(order_in, order_out):
         - order_out  : Ambisonic order, e.g., 1, 2, 3...
 
 
-    Resize Ambisonic order:
+    Zero (truncate) Ambisonic order:
         order_in > order_out --> insert zeros
         order_in < order_out --> invalid, returns identity matrix
     
@@ -365,7 +365,7 @@ def peri_to_panto_matrix(order):
     
     nchans_in = (order+1)**2
     
-    l, m = hoa.acn_to_lm(arange(nchans_in))
+    l, m = acn_to_lm(arange(nchans_in))
     
     res = identity(nchans_in)[((l == abs(m)))]
 
@@ -401,7 +401,7 @@ def zero_peri_matrix(order):
     Returns (square) matrix.
     """
     
-    l, m = hoa.acn_to_lm(arange((order+1)**2))
+    l, m = acn_to_lm(arange((order+1)**2))
     
     res = diag((l == abs(m)).astype(int))
 
