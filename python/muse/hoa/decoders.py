@@ -295,3 +295,114 @@ def order_gains_matrix(order = 1, dec_type = 'basic', dim = 3):
         )[acn_to_lm(arange((M+1)**2))[0]])
 
     return res
+    
+
+def resize_order_matrix(order_in, order_out):
+    """    
+    Args:
+        - order_in   : Ambisonic order, e.g., 1, 2, 3...
+
+        - order_out  : Ambisonic order, e.g., 1, 2, 3...
+
+
+    Resize Ambisonic order:
+        order_in > order_out --> discard harmonics
+        order_in < order_out --> insert zeros
+    
+    Returns matrix.
+    """
+    
+    nchans_in = (order_in+1)**2
+    nchans_out = (order_out+1)**2
+    
+    res = eye(nchans_out, nchans_in)
+    
+    return res
+
+
+def zero_order_matrix(order_in, order_out):
+    """
+    Args:
+        - order_in   : Ambisonic order, e.g., 1, 2, 3...
+
+        - order_out  : Ambisonic order, e.g., 1, 2, 3...
+
+
+    Resize Ambisonic order:
+        order_in > order_out --> insert zeros
+        order_in < order_out --> invalid, returns identity matrix
+    
+    Returns (square) matrix.
+    """
+    
+    nchans_in = (order_in+1)**2
+    nchans_out = (order_out+1)**2
+    
+    if nchans_out > nchans_in:
+        nchans_out = nchans_in
+    
+    res = diag(
+        concatenate((
+            ones(nchans_out),
+            zeros(nchans_in - nchans_out)
+        ))
+    )
+    
+    return res
+
+
+def peri_to_panto_matrix(order):
+    """
+    Args:
+        - order   : Ambisonic order, e.g., 1, 2, 3...
+
+
+    Discard periphonic (3D) harmonics. No (cylindrical) weighting
+    is applied.
+    
+    Returns matrix.
+    """
+    
+    nchans_in = (order+1)**2
+    
+    l, m = hoa.acn_to_lm(arange(nchans_in))
+    
+    res = identity(nchans_in)[((l == abs(m)))]
+
+    return res
+
+
+def panto_to_peri_matrix(order):
+    """
+    Args:
+        - order   : Ambisonic order, e.g., 1, 2, 3...
+
+
+    Insert periphonic (3D) harmonics, as zeros. No (spherical) weighting
+    is applied.
+    
+    Returns matrix.
+    """
+    
+    res = transpose(peri_to_panto_matrix(order))
+
+    return res
+
+
+def zero_peri_matrix(order):
+    """
+    Args:
+        - order   : Ambisonic order, e.g., 1, 2, 3...
+
+
+    Zero periphonic (3D) harmonics. No (cylindrical) weighting
+    is applied.
+    
+    Returns (square) matrix.
+    """
+    
+    l, m = hoa.acn_to_lm(arange((order+1)**2))
+    
+    res = diag((l == abs(m)).astype(int))
+
+    return res
