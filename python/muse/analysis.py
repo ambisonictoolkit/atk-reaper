@@ -173,6 +173,9 @@ def venv(a, N, t, T, width=pi, mode = 'z', kind = 'fft', zi = None):
         return res
 
 
+# NOTE: vaed() appears to return incorrect azimuth angles, 
+#       at least for single sample scalar input.
+#       Core testing is needed! Compare with aed()
 # vaed (azimuth, elevation, directivity)
 def vaed(a, zi = None):
     """vaed(a, zi = None)
