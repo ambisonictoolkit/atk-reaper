@@ -427,10 +427,10 @@ def fuma_to_lm(fuma = 0):
 
 # NOTE: suitable for both encoding, transforming, decoding
 #       may want to move to 'utilities' 
-def encoding_convert_matrix(input_format, output_format, order = 1):
+def encoding_convert_matrix(format_in, format_out, order = 1):
     """Args:
-        - input_format  : (ordering, normalisation)
-        - output_format : (ordering, normalisation)
+        - format_in     : (ordering, normalisation)
+        - format_out    : (ordering, normalisation)
         - order         : HOA order
 
         ordering      : 'acn', 'sid', 'fuma'
@@ -443,8 +443,8 @@ def encoding_convert_matrix(input_format, output_format, order = 1):
     Use in conjunction with mmix().
     """
 
-    input_ordering, input_norm = input_format
-    output_ordering, output_norm = output_format
+    ordering_in, input_norm = format_in
+    ordering_out, output_norm = format_out
 
     # ordering: acn, sid, fuma
     ordering_to_lm_dict = {
@@ -470,10 +470,10 @@ def encoding_convert_matrix(input_format, output_format, order = 1):
     }
     
     nchans = (order+1)**2
-    lm = ordering_to_lm_dict[input_ordering](arange(nchans))
+    lm = ordering_to_lm_dict[ordering_in](arange(nchans))
     norm = lm_to_norma_dict[output_norm](lm) / lm_to_norma_dict[input_norm](lm)
 
-    res = identity(nchans)[:, lm_to_ordering_dict[output_ordering](lm)] * norm
+    res = identity(nchans)[:, lm_to_ordering_dict[ordering_out](lm)] * norm
 
     return res
     
