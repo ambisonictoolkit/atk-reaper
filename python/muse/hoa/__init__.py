@@ -17,7 +17,16 @@ This is the start of the Muse project, a Music V type language.
 #print 'Importing HOA!\n'
 
 print 'Importing HOA functions...'
+from muse.hoa import *
 from muse.hoa.encoders import *
 from muse.hoa.decoders import *
+#from muse.hoa.constants import *
+
+#from muse.hoa import *
+#
+#from encoders import *
+#from decoders import *
+#from constants import *
+
 
 print '                         ... success!'

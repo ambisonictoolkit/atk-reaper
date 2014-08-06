@@ -20,6 +20,11 @@ from muse import *
 from scipy.misc import factorial
 
 from muse.hoa import *
+from muse.hoa.decoders import *
+#from muse.hoa.constants import *
+
+#from muse.hoa import *
+#from constants import *
 
 # import muse defined constants
 import muse.constants as C
@@ -55,6 +60,7 @@ _fuma_MaxN_weights = concatenate((
     array([1./sqrt(2)]),
     _fuma_maxN_weights[1:]
 ))
+
 
 #=========================
 # Functions
@@ -423,8 +429,37 @@ def fuma_to_lm(fuma = 0):
 
 
 #=========================
+# Definition of dictionaries
+#=========================
+
+# ordering: acn, sid, fuma
+ordering_to_lm_dict = {
+    'acn': acn_to_lm,
+    'sid': sid_to_lm,
+    'fuma': fuma_to_lm,
+}
+
+lm_to_ordering_dict = {
+    'acn': lm_to_acn,
+    'sid': lm_to_sid,
+    'fuma': lm_to_fuma,
+}
+
+# normalisation: sn3d, n3d, maxN, MaxN
+lm_to_normal_dict = {
+    'sn3d': sn3d,
+    'n3d': n3d,
+    'sn2d': sn2d,
+    'n2d': n2d,
+    'maxN': maxN,
+    'MaxN': MaxN,
+}
+
+
+#=========================
 # Encoding - Matricies
 
+# NOTE: deprecate encoding_convert_matrix()
 # NOTE: suitable for both encoding, transforming, decoding
 #       may want to move to 'utilities' 
 def encoding_convert_matrix(format_in, format_out, order = 1):
@@ -479,12 +514,48 @@ def encoding_convert_matrix(format_in, format_out, order = 1):
     return res
     
 
-def planewave_matrix(direction = array([0, 0]), order = 1):
+def format_matrix(order, format_in, format_out):
+    """Args:
+        - order         : HOA order
+        - format_in     : (ordering, normalisation)
+        - format_out    : (ordering, normalisation)
+
+        ordering      : 'acn', 'sid', 'fuma'
+        normalisation : 'sn3d', 'n3d', 'sn2d', 'n2d', 'maxN', 'MaxN'
+
+
+    Generate a matrix to encode / transcode an HOA signal from one
+    HOA format to another.
+
+    NOTE: AmbiX format = ('acn', 'sn3d')
+    
+    Use in conjunction with mmix().
+    """
+    N = order
+
+    ordering_in, norm_in = format_in
+    ordering_out, norm_out = format_out
+    
+    nchans = (N+1)**2
+    lm = ordering_to_lm_dict[ordering_in](arange(nchans))
+    norm = lm_to_normal_dict[norm_out](lm) / lm_to_normal_dict[norm_in](lm)
+
+    res = identity(nchans)[:, lm_to_ordering_dict[ordering_out](lm)] * norm
+
+    return res
+
+
+def planewave_matrix(direction = array([0, 0]), order = 1, \
+    format = ('acn', 'sn3d')):
     """
     Args:
         - direction : [azimuth, elevation]
         - order     : HOA order
-    
+        - format    : (ordering, normalisation)
+
+    ordering      : 'acn', 'sid', 'fuma'
+    normalisation : 'sn3d', 'n3d', 'sn2d', 'n2d', 'maxN', 'MaxN'
+        
     Direction argument may take several forms:
         
         shape(direction) == (2,): 
@@ -501,7 +572,9 @@ def planewave_matrix(direction = array([0, 0]), order = 1):
 
     
     Generate a matrix to encode a signal (mono or multi-channel)
-    into the B-format domain (AmbiX).
+    into the B-format domain.
+    
+    format = ('acn', 'sn3d') returns AmbiX, ATK's convention.
     
     Use in conjunction with mmix() to encode a signal.
     """
@@ -518,17 +591,20 @@ def planewave_matrix(direction = array([0, 0]), order = 1):
     #           - shape(dir) = (nframes, npws, 2)
 
     N = order
+    ordering, normalisation = format
     
     theta, phi = transpose(direction)
 
-    lm = acn_to_lm(arange((1+N)**2))
-    norm = sn3d(lm)
+    nchans = (N+1)**2
+
+    lm = ordering_to_lm_dict[ordering](arange(nchans))
+    norm = lm_to_normal_dict[normalisation](lm)
     
     # case 4
     if len(shape(direction)) == 3 and shape(direction)[0] != 1:
         
         nframes, npws, dim = shape(direction)
-        res = zeros((npws, nframes, (N+1)**2))
+        res = zeros((npws, nframes, nchans))
         
         # itterate by planewave
         for i in range(npws):

@@ -21,6 +21,11 @@ from muse import *
 #from transforms import *
 
 from muse.hoa import *
+from muse.hoa.encoders import *
+#from muse.hoa.constants import *
+
+#from muse.hoa import *
+#from constants import *
 
 from numpy.polynomial import Chebyshev as T
 from numpy.polynomial import Legendre as L
@@ -222,7 +227,7 @@ def decoder_E(order = 1, dec_type = 'basic', dim = 2):
 
 
 # decoder_matching_gain     : calculate gain to 'match' decoder types
-def decoder_matching_gain(order = 1, dec_type = 'basic', dim = 3, \
+def decoder_matching_gain(order = 1, dec_type = 'basic', dim = 2, \
     match = 'amp', num_spkrs = nan):
     """
     Args:
@@ -270,7 +275,7 @@ def decoder_matching_gain(order = 1, dec_type = 'basic', dim = 3, \
 #=========================
 # Decoding - Matricies (utilities)
 
-def order_gains_matrix(order = 1, dec_type = 'basic', dim = 3):
+def order_gains_matrix(order = 1, dec_type = 'basic', dim = 2):
     """    
     Args:
         - order      : Ambisonic order, e.g., 1, 2, 3...
