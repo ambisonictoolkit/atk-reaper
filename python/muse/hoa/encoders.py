@@ -442,9 +442,10 @@ def encoding_convert_matrix(format_in, format_out, order = 1):
     
     Use in conjunction with mmix().
     """
+    N = order
 
-    ordering_in, input_norm = format_in
-    ordering_out, output_norm = format_out
+    ordering_in, norm_in = format_in
+    ordering_out, norm_out = format_out
 
     # ordering: acn, sid, fuma
     ordering_to_lm_dict = {
@@ -469,9 +470,9 @@ def encoding_convert_matrix(format_in, format_out, order = 1):
         'MaxN': MaxN,
     }
     
-    nchans = (order+1)**2
+    nchans = (N+1)**2
     lm = ordering_to_lm_dict[ordering_in](arange(nchans))
-    norm = lm_to_norma_dict[output_norm](lm) / lm_to_norma_dict[input_norm](lm)
+    norm = lm_to_norma_dict[norm_out](lm) / lm_to_norma_dict[norm_in](lm)
 
     res = identity(nchans)[:, lm_to_ordering_dict[ordering_out](lm)] * norm
 
@@ -516,16 +517,18 @@ def planewave_matrix(direction = array([0, 0]), order = 1):
     # case 4: npws input TV, multiple planewaves
     #           - shape(dir) = (nframes, npws, 2)
 
+    N = order
+    
     theta, phi = transpose(direction)
 
-    lm = acn_to_lm(arange((1+order)**2))
+    lm = acn_to_lm(arange((1+N)**2))
     norm = sn3d(lm)
     
     # case 4
     if len(shape(direction)) == 3 and shape(direction)[0] != 1:
         
         nframes, npws, dim = shape(direction)
-        res = zeros((npws, nframes, (order+1)**2))
+        res = zeros((npws, nframes, (N+1)**2))
         
         # itterate by planewave
         for i in range(npws):
