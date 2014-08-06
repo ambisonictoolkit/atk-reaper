@@ -29,6 +29,11 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Frequency diffusion mono encoder
 
+
+// Import library with shared functions
+import atkKernelLibrary.jsfx-inc
+
+
 in_pin:M
 
 out_pin:W
@@ -74,33 +79,6 @@ mPhaseDispersion           = -1;
 mFftSize                   = -1;
 mKernelSize                = -1;
 mFftNewRequired            =  1;
-
-
-/********************************************************************
-Read a stereo kernel impulse response file from disk
-********************************************************************/
-function readKernelImpulseFromFile(aFileName, anImpulseBuffer) local(lFileHandle, lNumberOfSamples, lNumChannels, lSampleRate)
-(
-  // TODO: Oppdater for aChannelOffset
-  
-  // Open the appropriate file
-  lFileHandle = file_open(aFileName);
-
-  lFileHandle > 0 ? 
-  (
-    // Get number of channels and sample rate of the file
-    file_riff(lFileHandle, lNumChannels, lSampleRate);
-    
-    // Calculate number of samples of the left channel of impulse response
-    lNumberOfSamples = ( file_avail(lFileHandle) / lNumChannels ) | 0;
-    
-    // Read samples from the impulse response file and copy into mImpulseBufferW
-    file_mem(lFileHandle, anImpulseBuffer, lNumberOfSamples*lNumChannels);
-    
-    // Close the impulse response file again.
-    file_close(lFileHandle);
-  );
-);
 
 
 
