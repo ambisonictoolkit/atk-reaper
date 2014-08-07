@@ -20,9 +20,20 @@ from muse import *
 #from filters import *
 #from transforms import *
 
-from muse.hoa import *
-from muse.hoa.encoders import *
+#import muse.hoa as hoa
+#from hoa.encoders import *
+##from muse.hoa.constants import *
+
+#from muse.hoa import *
+#from muse.hoa.encoders import *
 #from muse.hoa.constants import *
+
+from muse.hoa.hoa_encoders import *
+
+from muse.hoa.hoa_encoders import ordering_to_lm_dict
+from muse.hoa.hoa_encoders import lm_to_ordering_dict
+from muse.hoa.hoa_encoders import lm_to_normal_dict
+
 
 #from muse.hoa import *
 #from constants import *
@@ -362,10 +373,11 @@ def zero_order_matrix(order_in, order_out):
     return res
 
 
-def peri_to_panto_matrix(order):
+def peri_to_panto_matrix(order, ordering = 'acn'):
     """
     Args:
-        - order   : Ambisonic order, e.g., 1, 2, 3...
+        - order     : Ambisonic order, e.g., 1, 2, 3...
+        - ordering  : 'acn', 'sid', 'fuma'
 
 
     Discard periphonic (3D) harmonics. No (cylindrical) weighting
@@ -377,17 +389,18 @@ def peri_to_panto_matrix(order):
     
     nchans_in = (M+1)**2
     
-    l, m = acn_to_lm(arange(nchans_in))
+    l, m = ordering_to_lm_dict[ordering](arange(nchans_in))
     
     res = identity(nchans_in)[((l == abs(m)))]
 
     return res
 
 
-def panto_to_peri_matrix(order):
+def panto_to_peri_matrix(order, ordering = 'acn'):
     """
     Args:
         - order   : Ambisonic order, e.g., 1, 2, 3...
+        - ordering  : 'acn', 'sid', 'fuma'
 
 
     Insert periphonic (3D) harmonics, as zeros. No (spherical) weighting
@@ -397,7 +410,7 @@ def panto_to_peri_matrix(order):
     """
     M = order
     
-    res = transpose(peri_to_panto_matrix(M))
+    res = transpose(peri_to_panto_matrix(M, ordering))
 
     return res
 
