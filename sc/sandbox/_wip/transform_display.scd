@@ -35,6 +35,8 @@ var rotSpec, rotSl, rotNB, rotPiNB;
 var selDex, adjustRhos, getColCount, layoutFunc, colors;
 
 var tv, maxGainTxt, minGainTxt;
+var getColor, alphaSpec, gainSpec, colorSpec, gainThresh;
+var dirDisplay = 'size';
 
 // based on Muse AED function plugins
 processPoints = {|xFormedMatrix|
@@ -85,7 +87,8 @@ processPoints = {|xFormedMatrix|
 	// ignore elev for now, implement with Spherical to include elev
 	[
 		// 	Polar(omni, az), gain.abs.ampdb
-		Polar(d_norm, a), gain //.abs.ampdb
+		// Polar(d_norm, a), gain //.abs.ampdb
+		a, e, d_norm, gain
 		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
 	].postln; // debug
 
@@ -134,7 +137,8 @@ chainXForms = {|...xFormCtlPrs|
 		processPoints.(ptMtx);
 	};
 	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
-	aeds = aeds.collect({|aed|[aed[0], aed[1].abs.ampdb]}); // debug: convert to db in processPoints
+	// aeds = aeds.collect({|aed|[aed[0], aed[3].abs.ampdb]});
+	aeds = aeds.collect({|aedg| aedg[3] = aedg[3].abs.ampdb }); // debug: convert to db in processPoints
 	w.refresh;
 };
 
@@ -175,7 +179,9 @@ updateMatrix = {
 		processPoints.(ptMtx);
 	};
 	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
-	aeds = aeds.collect({|aed|[aed[0], aed[1].abs.ampdb]}); // debug: convert to db in processPoints
+	// aeds = aeds.collect({|aed|[aed[0], aed[3].abs.ampdb]});
+	aeds = aeds.collect({|aedg| aedg[3] = aedg[3].abs.ampdb }); // debug: convert to db in processPoints
+
 	win !? {win.refresh};
 };
 
@@ -393,7 +399,7 @@ createXForm = {
 	};
 
 	addMenu = { |selectedName|
-		xFormMenu = PopUpMenu().items_(['-']++xForms.keys)
+		xFormMenu = PopUpMenu().items_(['-']++xForms.asSortedArray.collect{|me|me[0]})
 		.action_({ |mn|
 			if( mn.item != '-', {
 				xfStuff.xform_(mn.item);
@@ -402,7 +408,7 @@ createXForm = {
 				{ xfStuff.xform_(nil) } // nil mutes the transform
 			);
 			updateMatrix.();
-		}).maxWidth_(75).value_(0);
+		}).maxWidth_(95).value_(0);
 
 		layout.add(xFormMenu);
 		selectedName !? { xFormMenu.value_(xFormMenu.items.indexOf(selectedName)) };
@@ -479,7 +485,7 @@ showMatrixWindow = {
 	codeWin ?? {
 		var mwinH = 200;
 		var evalTxtView, mtxString;
-		mtxString = "var matrix; \n\n/*set you Matrix here, select all and evaluate, or click Evaluate above*/\nmatrix = ;\n\n~updateMatrix.(matrix)";
+		mtxString = "var matrix; \n\n/*set you Matrix here, select all and evaluate, or click Evaluate*/\nmatrix = ;\n\n~updateMatrix.(matrix)";
 
 		codeWin = Window("Evaluate Matrix",
 			Rect(win.bounds.left,
@@ -512,6 +518,12 @@ tv = View(uv,Rect(0, 0, uv.bounds.width,uv.bounds.height)).layout_(
 				.font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
 			),
 			nil,
+			StaticText().string_("Directivity Display"),
+			PopUpMenu().items_(['Size and Radius', 'Radius Only'])
+			.action_({|mn|
+				dirDisplay = switch(mn.value, 0,{'size'},1,{'radius'});
+				updateMatrix.();
+			}).maxWidth_(130),
 			Button().states_(
 				[["Enter Custom Matrix"]]).action_({|but| showMatrixWindow.() }).maxWidth_(130),
 		),
@@ -549,14 +561,33 @@ win.view.onResize_({ |winview|
 	tv.bounds_(Rect(0, 0, uv.bounds.width,uv.bounds.height));
 });
 
+gainThresh = -90;
+
+alphaSpec = ControlSpec(0.1, 1, warp:3);
+// gainSpec = ControlSpec(-100, 6, 'db');
+gainSpec = ControlSpec(-90, 6, -2);
+colorSpec = ControlSpec(768,0);
+
+getColor = { |gain|
+	var i;
+	i = colorSpec.map(gainSpec.unmap(gain));
+	case
+	{i < 256} {Color.new255(255, i, 0)}
+	{i < 384} {Color.new255(255 - (i-256), 255, 0)}
+	{i < 512} {Color.new255(0, 255, (i-384)*2)}
+	{i < 768} {Color.new255(0, 255 - (i-512), 255)}
+	{i >= 768} {Color.new255(0, 0, 255)}; // catch all
+};
+
+
 /*******************
 Draw the soundfield
 *******************/
 
 uv.drawFunc_({|view|
-	var cen, getColor, circleViewRatio;
-	var alphaSpec, gainSpec, colorSpec, maxMinStr;
-	var testSigPnt;
+	var cen, circleViewRatio, maxMinStr, testSigPnt, azLineClr;
+	var azPnt, drawPnt, omniRad, omniDiam, fullOmni, gainColor, gainPnt;
+	var az, el, dir, gain, aeds_sortOrder;
 
 	ctlv.bounds_(Rect(0,win.view.bounds.height/2, win.view.bounds.width, win.view.bounds.height/2));
 
@@ -564,98 +595,90 @@ uv.drawFunc_({|view|
 	d = r*2;
 	circleViewRatio = 0.8;
 	arcH = uv.bounds.height * circleViewRatio / 2;	// height of the "fan" arc
+	fullOmni = 2 * arcH;
 
-	// center drawing origin
-	cen = view.bounds.center;
+	cen = view.bounds.center; // center drawing origin
 	Pen.translate(cen.x, cen.y);
-	// draw background "fan"
-	Pen.strokeColor_(Color.red).fillColor_(Color.blue);
+	Pen.strokeColor_(Color.red).fillColor_(Color.blue); // draw background "fan"
 	Pen.fillOval(Rect(r.neg, r.neg, d,d));
 	Pen.strokeOval(Rect(r.neg, r.neg, d,d));
 	Pen.addAnnularWedge( 0@0, 5, arcH, 0, 2pi );
 	Pen.fillColor_(Color.gray(0.9)).fill;
 
-	alphaSpec = ControlSpec(0.1, 1, warp:3);
-	// gainSpec = ControlSpec(-100, 6, 'db');
-		gainSpec = ControlSpec(-90, 6, -2);
-	colorSpec = ControlSpec(768,0);
-
-	// postf("min gain: %\n", aeds.collect({|me| me[1]}).minItem);
-	// postf("max gain: %\n", aeds.collect({|me| me[1]}).maxItem);
-	// aeds.do(_.postln);
-
-		// draw test signal planewave circle
+	// draw test signal planewave circle
 	testSigPnt = Polar(1.1,rrand(0, 2pi)).asPoint
-		.rotate(pi/2)	// convert ambi to screen coords
-		* Point(1,-1)	// flip Y for drawing
-		* arcH;			// scale normalized points to arcH
+	.rotate(pi/2)	// convert ambi to screen coords
+	* Point(1,-1)	// flip Y for drawing
+	* arcH;			// scale normalized points to arcH
 	Pen.fillColor_(Color.magenta);
 	Pen.fillOval( Rect(testSigPnt.x-r, testSigPnt.y-r, d, d) );
 
-	getColor = { |gain|
-		var i;
-		i = colorSpec.map(gainSpec.unmap(gain));
-		case
-		{i < 256} {Color.new255(255, i, 0)}
-		{i < 384} {Color.new255(255 - (i-256), 255, 0)}
-		{i < 512} {Color.new255(0, 255, (i-384)*2)}
-		{i < 768} {Color.new255(0, 255 - (i-512), 255)}
-		{i >= 768} {Color.new255(0, 0, 255)}; // catch all
+	azLineClr = Color.gray.alpha_(0.2);// line fron center to point
+
+	// get sort order by directivity to draw most transparent first
+	aeds_sortOrder = aeds.collect({|arr| arr[2]}).order;
+	aeds_sortOrder.do{|sortDex, i|
+
+		#az, el, dir, gain = aeds[sortDex];
+
+		(gain > gainThresh).if{
+			omniDiam =	1 - dir * fullOmni;
+			omniDiam =	omniDiam.clip(d, fullOmni);
+			omniRad	=	omniDiam/2;
+
+			gainColor = getColor.(gain);
+
+			// cartesian point in view coordinates
+			azPnt = Point(cos(az), sin(az)) // = Polar(dir, az).asPoint
+			.rotate(pi/2)	// convert ambi to screen coords
+			* Point(1,-1)	// flip Y for drawing
+			* arcH;			// scale normalized points to arcH
+			drawPnt = azPnt * dir;
+
+			// line fron center to point
+			Pen.strokeColor_(azLineClr);
+			Pen.line(drawPnt, 0@0).stroke;
+
+			// directivity circle
+			Pen.fillColor_(gainColor.alpha_(alphaSpec.map(dir)));
+			switch(dirDisplay,
+				'size',{
+					Pen.fillOval( Rect(drawPnt.x-omniRad, drawPnt.y-omniRad, omniDiam, omniDiam) );
+					gainPnt = azPnt * 1.15; // scale in/out toward/away from origin
+				},
+				'radius', {
+					Pen.fillOval( Rect(drawPnt.x-r, drawPnt.y-r, d, d) );
+					gainPnt = drawPnt * dir.linlin(0,1,1.75,1.15); // scale in/out toward/away from origin
+				}
+			);
+
+			// gain labels
+			Pen.fillColor_(gainColor.alpha_(1));
+			QPen.stringCenteredIn(
+				gain.round(0.1).asString,
+				Rect(gainPnt.x-(r*10), gainPnt.y-(r*10), d*10, d*10)
+			);
+		}
 	};
 
-	aeds.do{|pntGainArr, i|
-		var drawPnt, polar, gain, omniRad, omniDiam, fullOmni, gainColor, gainLabelColor, gainPnt;
-		#polar, gain = pntGainArr;
-		fullOmni = 2 * arcH;
-		omniDiam = 1-polar.rho * fullOmni;
-		omniDiam = omniDiam.clip(d, fullOmni);
-		omniRad= omniDiam/2;
+	// original 0 deg azimuth point circle ---
+	#az, el, dir, gain = aeds[0];
+	omniDiam = 1 - dir * fullOmni;
+	omniDiam = omniDiam.clip(d, fullOmni);
+	omniRad= omniDiam/2;
+	azPnt = Point(cos(az), sin(az)) // = Polar(dir, az).asPoint
+	.rotate(pi/2)	// convert ambi to screen coords
+	* Point(1,-1)	// flip Y for drawing
+	* arcH;			// scale normalized points to arcH
+	drawPnt = azPnt * dir;
 
-		gainColor = getColor.(gain);
-		// gainLabelColor = getColor.(gain + 3);
-		// cartesian point in view coordinates
-		drawPnt = polar.asPoint
-		.rotate(pi/2)	// convert ambi to screen coords
-		* Point(1,-1)	// flip Y for drawing
-		* arcH;			// scale normalized points to arcH
-		// original 0deg azimuth point circle
-		if( i==0, {
-			Pen.strokeColor_(Color.fromHexString("#CC0000"));
-			Pen.strokeOval( Rect(drawPnt.x-r, drawPnt.y-r, d, d) );
-		});
-		// line fron center to point
-		Pen.strokeColor_(Color.gray.alpha_(0.5));
-		Pen.line(drawPnt, 0@0).stroke;
-		// directivity circle
-		Pen.fillColor_(gainColor.alpha_(alphaSpec.map(polar.rho)));
-		Pen.fillOval( Rect(drawPnt.x-omniRad, drawPnt.y-omniRad, omniDiam, omniDiam) );
-		// gain labels
-		gainPnt = polar.rho = 1;
-		gainPnt = gainPnt.asPoint.rotate(pi/2)
-		// flip y for screen bounds and
-		// scale in/out toward/away from origin, >1 outside circle
-		// * Point(0.4,-0.4)
-		* Point(1.15,-1.15)
-		* arcH;
-		Pen.fillColor_(gainColor.alpha_(1));
-		QPen.stringCenteredIn(gain.round(0.1).asString, Rect(gainPnt.x-(r*10), gainPnt.y-(r*10), d*10, d*10));
-	};
+	Pen.strokeColor = Color.fromHexString("#CC0000");
+	Pen.width = 3;
+	Pen.strokeOval( Rect(drawPnt.x-r, drawPnt.y-r, d, d) );
+	// --- original 0 deg azimuth point circle
 
-	// // draw min/max gain
-	// maxMinStr = format("Max Gain: %\nMin Gain: %",
-	// 	aeds.collect({|me| me[1]}).maxItem.round(0.1),
-	// 	aeds.collect({|me| me[1]}).minItem.round(0.1)
-	// );
-	// Pen.translate(cen.x.neg, cen.y.neg);
-	// Pen.fillColor_(Color.black);
-	// Pen.font_(Font('Helvetica', 20));
-	// QPen.stringCenteredIn(
-	// 	maxMinStr,
-	// 	Rect(0,0,uv.bounds.width/3, ctlv.bounds.height)
-	// );
-
-	maxGainTxt.string_(format("Max Gain:  %", aeds.collect({|me| me[1]}).maxItem.round(0.1)));
-	minGainTxt.string_(format("Min Gain:   %", aeds.collect({|me| me[1]}).minItem.round(0.1)));
+	maxGainTxt.string_(format("Max Gain:  %", aeds.collect({|me| me[3]}).maxItem.round(0.1)));
+	minGainTxt.string_(format("Min Gain:   %", aeds.collect({|me| me[3]}).minItem.round(0.1)));
 });
 
 win.refresh;
