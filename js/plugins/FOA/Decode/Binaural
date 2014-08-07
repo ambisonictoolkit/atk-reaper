@@ -1,0 +1,559 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: Binaural
+  Binaural stereo decoder using Spherical, Cipic and Listen head-related transfer functions (HRTF)
+
+  About the classes of HRTF:
+
+  Spherical: Synthetic spherical head model HRTF2 decoder, equalised for the diffuse field [1].
+  0 is the smallest and 9 the largest head.
+  Spherical is a horisontal-only decoder, disregarding the Z component of the B-format signal.
+  
+  Cipic: Measured HRTF decoder, with measurements from the University of California Davis'
+  CIPIC HRTF database equalised for the diffuse field [2].
+  The CIPIC HRTF database provides two KEMAR dummy measurements.
+  subjectID = 21 is the large pinnae dummy and subjectID = 165 is the small pinnae dummy.
+
+  Listen: Measured HRTF decoder, with measurements from IRCAM's Listen 
+  HRTF database equalised for the diffuse field [3].
+
+  CIPIC and Listen are only available at 44100 Hz sample rate.
+
+  REFERENCES:
+
+  [1] R. O. Duda, "Modeling head related transfer functions,"
+       in Proceedings of the Twenty-Seventh Annual Asilomar Conference
+       on Signals, Systems and Computers, Asilomar, CA, 1993.
+  [2] http://interface.cipic.ucdavis.edu/sound/hrtf.html
+  [3] http://recherche.ircam.fr/equipes/salles/listen/
+  
+---------------------------------------------------------------------
+*/
+
+desc: Binaural stereo decoder
+
+
+// Import library with shared functions
+import atkKernelLibrary.jsfx-inc
+
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:L
+out_pin:R
+
+
+slider1:0<0,105,1{Spherical 0 - Smallest Head,Spherical 1,Spherical 2,Spherical 3,Spherical 4,Spherical 5,Spherical 6,Spherical 7,Spherical 8,Spherical 9 - Largest Head,Cipic 0003,Cipic 0008,Cipic 0009,Cipic 0010,Cipic 0011,Cipic 0012,Cipic 0015,Cipic 0017,Cipic 0018,Cipic 0019,Cipic 0020,Cipic 0021 - KEMAR Large Pinnae Dummy,Cipic 0027,Cipic 0028,Cipic 0033,Cipic 0040,Cipic 0044,Cipic 0048,Cipic 0050,Cipic 0051,Cipic 0058,Cipic 0059,Cipic 0060,Cipic 0061,Cipic 0065,Cipic 0119,Cipic 0124,Cipic 0126,Cipic 0127,Cipic 0131,Cipic 0133,Cipic 0134,Cipic 0135,Cipic 0137,Cipic 0147,Cipic 0148,Cipic 0152,Cipic 0153,Cipic 0154,Cipic 0155,Cipic 0156,Cipic 0158,Cipic 0162,Cipic 0163,Cipic 0165 KEMAR Small Pinnae Dummy,Listen 1002,Listen 1003,Listen 1004,Listen 1005,Listen 1006,Listen 1007,Listen 1008,Listen 1009,Listen 1012,Listen 1013,Listen 1014,Listen 1015,Listen 1016,Listen 1017,Listen 1018,Listen 1020,Listen 1021,Listen 1022,Listen 1023,Listen 1025,Listen 1026,Listen 1028,Listen 1029,Listen 1030,Listen 1031,Listen 1032,Listen 1033,Listen 1034,Listen 1037,Listen 1038,Listen 1039,Listen 1040,Listen 1041,Listen 1042,Listen 1043,Listen 1044,Listen 1045,Listen 1046,Listen 1047,Listen 1048,Listen 1049,Listen 1050,Listen 1051,Listen 1052,Listen 1053,Listen 1054,Listen 1055,Listen 1056,Listen 1057,Listen 1058,Listen 1059}>Head-related transfer function (HRTF)
+slider2:0<-120,30,1>Preamp (dB)
+slider3:0<0,1,1{MUTED - Not supported at current sample rate,Loaded successfully}>HRTF Status
+
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Allocate slots for file and folder names
+mFilenameW  = 1;
+mFilenameX  = 2;
+mFilenameY  = 3;
+mFilenameZ  = 4;
+
+mFolderPath = 5;
+
+// Allocate buffer and block locations...
+
+// ...for the impulse response kernel,
+mImpulseBufferW    = 65536 * 1;
+mImpulseBufferX    = 65536 * 2;
+mImpulseBufferY    = 65536 * 3;
+mImpulseBufferZ    = 65536 * 4;
+
+// ..the FFT-transformed kernel,
+mKernelW           = 65536 * 5;
+mKernelX           = 65536 * 6;
+mKernelY           = 65536 * 7;
+mKernelZ           = 65536 * 8;
+
+// ...and for two blocks of running samples to be convolved:
+
+// mBlockCurrentW,... is the most recently convolved block
+mBlockCurrentW     = 65536 * 9;
+mBlockCurrentX     = 65536 * 10;
+mBlockCurrentY     = 65536 * 11;
+mBlockCurrentZ     = 65536 * 12;
+
+// mBlockLastAndNextW,... is the previously used block. It will also be the next block
+mBlockLastAndNextW = 65536 * 13;
+mBlockLastAndNextX = 65536 * 14;
+mBlockLastAndNextY = 65536 * 15;
+mBlockLastAndNextY = 65536 * 16;
+
+// FFT- and convolution-related variables
+mPreviousSliderValue   = -1;
+mVerticalIsSupported   = -1;
+mSampleRateIsSupported = -1;
+
+mPreviousSampleRate    = -1;
+
+mFftSize               = -1;
+mKernelSize            = -1;
+mFftNewRequired        =  1;
+
+
+
+/********************************************************************
+Get folderpath to impulse responses
+********************************************************************/
+function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported, lHrtf)
+(
+  (aSliderValue < 10) ? (
+    
+    // Spherical HRTFs are provided at a number of sample rates
+    lSampleRateIsSupported = isThisSampleRateSupported();
+    (lSampleRateIsSupported) ? (
+      
+      /***** Slider values 0-9 : Spherical HRTF *****/
+      
+      // Spherical HRTFs are horisontal only
+      mVerticalIsSupported = 0;
+      
+      // Kernel size depends on sample rate
+      ((srate == 44100) || (srate == 48000)) ? (
+        mKernelSize = 512;
+      ) : (
+        ((srate == 88200) || (srate == 96000)) ? (
+          mKernelSize = 1014;
+        ) : (
+          (srate == 192000) ? (
+            mKernelSize = 2048;
+          );
+        );
+      );
+      
+      lHrtf = aSliderValue;
+      
+      sprintf(aFolderPath, "ATK/kernels/FOA/decoders/spherical/%i/%i/%04d/", srate, mKernelSize, lHrtf);
+    ) : (
+      // Current sample rate is not supported
+      sprintf(aFolderPath, "/No HRTF available/");
+      mKernelSize = 0;
+      mVerticalIsSupported = 0;
+    );
+  ) : (
+    
+    // CIPIC and Listen are only supported for 44100 Hz
+    (srate == 44100) ? (
+      
+      /***** Slider values 10-54 : CIPIC HRTF *****/
+      (aSliderValue < 55) ? (
+        
+        mVerticalIsSupported = 1;
+        mKernelSize = 512;
+        
+        (aSliderValue == 10) ? (lHrtf =   3) :
+        (aSliderValue == 11) ? (lHrtf =   8) :
+        (aSliderValue == 12) ? (lHrtf =   9) :
+        (aSliderValue == 13) ? (lHrtf =  10) :
+        (aSliderValue == 14) ? (lHrtf =  11) :
+        (aSliderValue == 15) ? (lHrtf =  12) :
+        (aSliderValue == 16) ? (lHrtf =  15) :
+        (aSliderValue == 17) ? (lHrtf =  17) :
+        (aSliderValue == 18) ? (lHrtf =  18) :
+        (aSliderValue == 19) ? (lHrtf =  19) :
+        (aSliderValue == 20) ? (lHrtf =  20) :
+        (aSliderValue == 21) ? (lHrtf =  21) :
+        (aSliderValue == 22) ? (lHrtf =  27) :
+        (aSliderValue == 23) ? (lHrtf =  28) :
+        (aSliderValue == 24) ? (lHrtf =  33) :
+        (aSliderValue == 25) ? (lHrtf =  40) :
+        (aSliderValue == 26) ? (lHrtf =  44) :
+        (aSliderValue == 27) ? (lHrtf =  48) :
+        (aSliderValue == 28) ? (lHrtf =  50) :
+        (aSliderValue == 29) ? (lHrtf =  51) :
+        (aSliderValue == 30) ? (lHrtf =  58) :
+        (aSliderValue == 31) ? (lHrtf =  59) :
+        (aSliderValue == 32) ? (lHrtf =  60) :
+        (aSliderValue == 33) ? (lHrtf =  61) :
+        (aSliderValue == 34) ? (lHrtf =  65) :
+        (aSliderValue == 35) ? (lHrtf = 119) :
+        (aSliderValue == 36) ? (lHrtf = 124) :
+        (aSliderValue == 37) ? (lHrtf = 126) :
+        (aSliderValue == 38) ? (lHrtf = 127) :
+        (aSliderValue == 39) ? (lHrtf = 131) :
+        (aSliderValue == 30) ? (lHrtf = 133) :
+        (aSliderValue == 41) ? (lHrtf = 134) :
+        (aSliderValue == 42) ? (lHrtf = 135) :
+        (aSliderValue == 43) ? (lHrtf = 137) :
+        (aSliderValue == 44) ? (lHrtf = 147) :
+        (aSliderValue == 45) ? (lHrtf = 148) :
+        (aSliderValue == 46) ? (lHrtf = 152) :
+        (aSliderValue == 47) ? (lHrtf = 153) :
+        (aSliderValue == 48) ? (lHrtf = 154) :
+        (aSliderValue == 49) ? (lHrtf = 155) :
+        (aSliderValue == 40) ? (lHrtf = 156) :
+        (aSliderValue == 51) ? (lHrtf = 158) :
+        (aSliderValue == 52) ? (lHrtf = 162) :
+        (aSliderValue == 53) ? (lHrtf = 163) :
+        (aSliderValue == 54) ? (lHrtf = 165);
+        
+        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/cipic/44100/512/%04d/", lHrtf);
+        
+      ) : (
+        
+        /***** Slider values 55-105 : Listen HRTF *****/
+        
+        mVerticalIsSupported = 1;
+        mKernelSize = 512;
+        
+        (aSliderValue ==  55) ? (lHrtf = 1002) :
+        (aSliderValue ==  56) ? (lHrtf = 1003) :
+        (aSliderValue ==  57) ? (lHrtf = 1004) :
+        (aSliderValue ==  58) ? (lHrtf = 1005) :
+        (aSliderValue ==  59) ? (lHrtf = 1006) :
+        (aSliderValue ==  60) ? (lHrtf = 1007) :
+        (aSliderValue ==  61) ? (lHrtf = 1008) :
+        (aSliderValue ==  62) ? (lHrtf = 1009) :
+        (aSliderValue ==  63) ? (lHrtf = 1012) :
+        (aSliderValue ==  64) ? (lHrtf = 1013) :
+        (aSliderValue ==  65) ? (lHrtf = 1014) :
+        (aSliderValue ==  66) ? (lHrtf = 1015) :
+        (aSliderValue ==  67) ? (lHrtf = 1016) :
+        (aSliderValue ==  68) ? (lHrtf = 1017) :
+        (aSliderValue ==  69) ? (lHrtf = 1018) :
+        (aSliderValue ==  70) ? (lHrtf = 1020) :
+        (aSliderValue ==  71) ? (lHrtf = 1021) :
+        (aSliderValue ==  72) ? (lHrtf = 1022) :
+        (aSliderValue ==  73) ? (lHrtf = 1023) :
+        (aSliderValue ==  74) ? (lHrtf = 1025) :
+        (aSliderValue ==  75) ? (lHrtf = 1026) :
+        (aSliderValue ==  76) ? (lHrtf = 1028) :
+        (aSliderValue ==  77) ? (lHrtf = 1029) :
+        (aSliderValue ==  78) ? (lHrtf = 1030) :
+        (aSliderValue ==  79) ? (lHrtf = 1031) :
+        (aSliderValue ==  80) ? (lHrtf = 1032) :
+        (aSliderValue ==  81) ? (lHrtf = 1033) :
+        (aSliderValue ==  82) ? (lHrtf = 1034) :
+        (aSliderValue ==  83) ? (lHrtf = 1037) :
+        (aSliderValue ==  84) ? (lHrtf = 1038) :
+        (aSliderValue ==  85) ? (lHrtf = 1039) :
+        (aSliderValue ==  86) ? (lHrtf = 1040) :
+        (aSliderValue ==  87) ? (lHrtf = 1041) :
+        (aSliderValue ==  88) ? (lHrtf = 1042) :
+        (aSliderValue ==  89) ? (lHrtf = 1043) :
+        (aSliderValue ==  90) ? (lHrtf = 1044) :
+        (aSliderValue ==  91) ? (lHrtf = 1045) :
+        (aSliderValue ==  92) ? (lHrtf = 1046) :
+        (aSliderValue ==  93) ? (lHrtf = 1047) :
+        (aSliderValue ==  94) ? (lHrtf = 1048) :
+        (aSliderValue ==  95) ? (lHrtf = 1049) :
+        (aSliderValue ==  96) ? (lHrtf = 1050) :
+        (aSliderValue ==  97) ? (lHrtf = 1051) :
+        (aSliderValue ==  98) ? (lHrtf = 1052) :
+        (aSliderValue ==  99) ? (lHrtf = 1053) :
+        (aSliderValue == 100) ? (lHrtf = 1054) :
+        (aSliderValue == 101) ? (lHrtf = 1055) :
+        (aSliderValue == 102) ? (lHrtf = 1056) :
+        (aSliderValue == 103) ? (lHrtf = 1057) :
+        (aSliderValue == 104) ? (lHrtf = 1058) :
+        (aSliderValue == 105) ? (lHrtf = 1059);
+        
+        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/listen/44100/512/%04d/", lHrtf);
+      );
+    ) : (
+      
+      // CIPIC and Listen do not support current sample rate
+      lSampleRateIsSupported = 0;
+      
+      sprintf(aFolderPath, "/No HRTF available/");
+      mKernelSize = 0;
+      mVerticalIsSupported = 0;
+    );
+  );
+  
+  // Return value
+  lSampleRateIsSupported;
+);
+
+
+/********************************************************************
+Prepare a new kernel from an impulse buffer
+********************************************************************/
+function prepareKernel(anImpulseBuffer, aKernel, aKernelSize, anFftSize) local(i, lInvFftSize)
+(
+  // We do not need to resample, as IR in UHJ decoding does not depend on sample rate
+  
+  // Copy left and right channel of IR to the kernel buffer
+  // Every 2nd sample is left, right, left, right,...
+  // FFT and convolution operate on complex numbers
+  memcpy(aKernel, anImpulseBuffer, aKernelSize*2);
+  
+  /* FFT Size is twice that of the kernel, and we need to pad with zeros.
+   Additionally we do complex FFT and hence operate on stereo buffers.
+   */
+  memset(aKernel + (aKernelSize*2), 0.0, aKernelSize*2);
+  
+  // Do FFT of the impulse response
+  fft(aKernel, mFftSize);
+  
+  // Scale kernel to compensate for the size of the FFT window
+  lInvFftSize = 1 / anFftSize;
+  i=0;
+  loop(anFftSize*2, 
+    aKernel[i] *= lInvFftSize; 
+    i += 1; 
+  );
+);
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+// TODO: Re-read kernel if samle rate has changed - check this for all other sample-rate-dependent plugins as well!
+
+// Has kernel size changed?
+((mPreviousSliderValue != slider1) || (mPreviousSampleRate != srate)) ?
+(
+  mPreviousSliderValue = slider1;
+  mPreviousSampleRate  = srate;
+  
+  // This function also sets mKernelSize and mVerticalIsSupported
+  mSampleRateIsSupported = getFolderPath(mPreviousSliderValue, mFolderPath);
+  
+  (mSampleRateIsSupported) ? (
+    // Set filename of impulse response files, and read impulse files from disk
+    strcpy(mFilenameW, mFolderPath);
+    strcat(mFilenameW, "HRIR_W.wav");
+    readKernelImpulseFromFile(mFilenameW, mImpulseBufferW);
+    
+    strcpy(mFilenameX, mFolderPath);
+    strcat(mFilenameX, "HRIR_X.wav");
+    readKernelImpulseFromFile(mFilenameX, mImpulseBufferX);
+    
+    strcpy(mFilenameY, mFolderPath);
+    strcat(mFilenameY, "HRIR_Y.wav");
+    readKernelImpulseFromFile(mFilenameY, mImpulseBufferY);
+    
+    (mVerticalIsSupported) ? (
+      strcpy(mFilenameZ, mFolderPath);
+      strcat(mFilenameZ, "HRIR_Z.wav");
+      readKernelImpulseFromFile(mFilenameZ, mImpulseBufferZ);
+    );
+    
+    // Set flag that FFT need to be recalculated
+    mFftNewRequired = 1;
+  );
+);
+
+preamp = 2^(slider2/6);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+// If kernel size has changed, we need to prepare a new kernel
+mFftNewRequired ? (
+  
+  mFftSize = 2 * mKernelSize;
+  
+  // What is chunksize and chunksize2 used for?
+  // If mKernelSize = 256 and mFftSize = 512, chunksize = 512 - 256 - 1 = 255 and chunksize2 = 510
+  chunksize  = mFftSize - mKernelSize - 1;
+  chunksize2 = chunksize * 2;
+  
+  // Do FFT on the impulse responses
+  prepareKernel(mImpulseBufferW, mKernelW, mKernelSize, mFftSize);
+  prepareKernel(mImpulseBufferX, mKernelX, mKernelSize, mFftSize);
+  prepareKernel(mImpulseBufferY, mKernelY, mKernelSize, mFftSize);
+  mVerticalIsSupported ? (
+    prepareKernel(mImpulseBufferZ, mKernelZ, mKernelSize, mFftSize);
+  );
+  
+  // Reset current write/read position within the blocks
+  mBufferPosition = 0;
+  
+  // TODO: Add slider that provides feedback whether HRTF is supported at this sample rate
+  
+  // Convolution kernel is now up to date
+  mFftNewRequired = 0; 
+);
+
+slider3 = mSampleRateIsSupported;
+sliderchange(slider3);
+
+
+/**********************************************************
+Calculate audio sample
+
+Functions with arguments do not work within the @sample block as of Reaper 4.71,
+This limits how DRY we're able to make this section
+**********************************************************/
+@sample
+
+mSampleRateIsSupported ? (
+  // If we're past the chunksize, it's time to convolve
+  mBufferPosition >= chunksize ? 
+  (
+    /***** Convolve W *****/
+    
+    // Swap which block is last and current
+    mTempBlock         = mBlockLastAndNextW;
+    mBlockLastAndNextW = mBlockCurrentW;
+    mBlockCurrentW     = mTempBlock;
+    
+    // Pad the tail of the buffer to zero
+    memset(mBlockCurrentW+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+    // The actual convolution
+    fft(mBlockCurrentW, mFftSize);
+    convolve_c(mBlockCurrentW, mKernelW, mFftSize);
+    ifft(mBlockCurrentW, mFftSize);
+    
+    
+    /***** Convolve X *****/
+    
+    // Swap which block is last and current
+    mTempBlock         = mBlockLastAndNextX;
+    mBlockLastAndNextX = mBlockCurrentX;
+    mBlockCurrentX     = mTempBlock;
+    
+    // Pad the tail of the buffer to zero
+    memset(mBlockCurrentX+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+    // The actual convolution
+    fft(mBlockCurrentX, mFftSize);
+    convolve_c(mBlockCurrentX, mKernelX, mFftSize);
+    ifft(mBlockCurrentX, mFftSize);
+    
+    
+    /***** Convolve Y *****/
+    
+    // Swap which block is last and current
+    mTempBlock         = mBlockLastAndNextY;
+    mBlockLastAndNextY = mBlockCurrentY;
+    mBlockCurrentY     = mTempBlock;
+    
+    // Pad the tail of the buffer to zero
+    memset(mBlockCurrentY+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+    // The actual convolution
+    fft(mBlockCurrentY, mFftSize);
+    convolve_c(mBlockCurrentY, mKernelY, mFftSize);
+    ifft(mBlockCurrentY, mFftSize);
+    
+    
+    /***** Convolve Y *****/
+    
+    mVerticalIsSupported ? (
+      // Swap which block is last and current
+      mTempBlock         = mBlockLastAndNextZ;
+      mBlockLastAndNextZ = mBlockCurrentZ;
+      mBlockCurrentZ     = mTempBlock;
+    
+      // Pad the tail of the buffer to zero
+      memset(mBlockCurrentZ+chunksize*2, 0, (mFftSize-chunksize)*2);
+    
+      // The actual convolution
+      fft(mBlockCurrentZ, mFftSize);
+      convolve_c(mBlockCurrentZ, mKernelZ, mFftSize);
+      ifft(mBlockCurrentZ, mFftSize);
+    ) : (
+      // Vertical component is ignored, zeroing all buffer values
+       memset(mBlockCurrentZ, 0, (mFftSize-chunksize)*4);
+    );
+    
+    
+    // Update delay compensation
+    pdc_delay = ((1.5 * mKernelSize)|0) - 2;
+    
+    // Delay compensation affects channels 1-2
+    pdc_bot_ch=0;
+    pdc_top_ch=2;
+    
+    
+    // Current write/read position within the blocks starts counting from 0 again
+    mBufferPosition=0;
+  );
+  
+  
+  mBufferPosition2 = mBufferPosition*2;
+  
+  
+  // Buffer incoming audio as real value, set imaginary value to zero:
+  
+  // W
+  mBlockLastAndNextW[mBufferPosition2]   = spl0 * preamp;
+  mBlockLastAndNextW[mBufferPosition2+1] = 0;
+  
+  // X
+  mBlockLastAndNextX[mBufferPosition2]   = spl1 * preamp;
+  mBlockLastAndNextX[mBufferPosition2+1] = 0;
+  
+  // Y
+  mBlockLastAndNextY[mBufferPosition2]   = spl2 * preamp;
+  mBlockLastAndNextY[mBufferPosition2+1] = 0;
+  
+  // Z
+  mBlockLastAndNextZ[mBufferPosition2]   = spl3 * preamp;
+  mBlockLastAndNextZ[mBufferPosition2+1] = 0;
+  
+  // Copy convolved sample values to output
+  spl0 = mBlockCurrentW[mBufferPosition2]   + mBlockCurrentX[mBufferPosition2]   + mBlockCurrentY[mBufferPosition2]   + mBlockCurrentZ[mBufferPosition2];
+  spl1 = mBlockCurrentW[mBufferPosition2+1] + mBlockCurrentX[mBufferPosition2+1] + mBlockCurrentY[mBufferPosition2+1] + mBlockCurrentZ[mBufferPosition2+1];
+  
+  
+  // Add the overlap part (In this plugin we will always be overlapping)
+  mBufferPosition < mFftSize-chunksize ? 
+  (
+    spl0 += mBlockLastAndNextW[chunksize2+mBufferPosition2]   + mBlockLastAndNextX[chunksize2+mBufferPosition2]   
+          + mBlockLastAndNextY[chunksize2+mBufferPosition2]   + mBlockLastAndNextZ[chunksize2+mBufferPosition2];;
+          
+    spl1 += mBlockLastAndNextW[chunksize2+mBufferPosition2+1] + mBlockLastAndNextX[chunksize2+mBufferPosition2+1] 
+          + mBlockLastAndNextY[chunksize2+mBufferPosition2+1] + mBlockLastAndNextZ[chunksize2+mBufferPosition2+1];;
+  );
+  
+    
+  // Increment buffer position
+  mBufferPosition += 1;
+  
+  
+  // Output is stereo only, so we silence channels 3 and 4:
+  spl2 = 0.;
+  spl3 = 0.;
+) : (
+  // Current HRTF is not supported at this sample rate, we are not able to produce audio
+  spl0 = 0;
+  spl1 = 0;
+  spl2 = 0;
+  spl3 = 0;
+);

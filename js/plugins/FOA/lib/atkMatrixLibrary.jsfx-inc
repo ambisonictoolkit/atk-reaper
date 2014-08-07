@@ -1,0 +1,1220 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: atkMatrixLibrary.jsfx-inc
+  Library of shared functions relating to matrix operations
+---------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------
+Third Party Notices
+---------------------------------------------------------------------
+
+
+---------------------------------------------------------------------
+The function for inverting a 4x4 matrix is lifted of StackOverflow:
+http://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix
+
+The code there is itself lifted of the MESA implementation of the GLU library:
+http://www.mesa3d.org/
+---------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------
+Support for Gerzon's Diametric Decoder Theorem (DDT) decoding algorithm is derived
+from Aaron Heller's Octave code available at: http://www.ai.sri.com/ajh/ambisonics/
+
+Benjamin, et al., "Localization in Horizontal-Only Ambisonic Systems"
+Preprint from AES-121, 10/2006, San Francisco
+
+Implementation in the SuperCollider3 version of the ATK is by
+Joseph Anderson <j.anderson[at]ambisonictoolkit.net>
+---------------------------------------------------------------------
+
+---------------------------------------------------------------------
+Irregular array decoding coefficients (5.0, 7.0) are kindly provided by
+Bruce Wiggins: http://www.brucewiggins.co.uk/
+
+B. Wiggins, "An Investigation into the Real-time Manipulation and Control of
+Three-dimensional Sound Fields," PhD Thesis, University of Derby, Derby, 2004.
+---------------------------------------------------------------------
+
+*/
+
+/* Naming conventions in this set of plugins:
+kSomething      // A constant
+gSomething      // A global variable
+mSometing       // A member of a class - used for plugin top-level variables
+aSomething      // An argument to a method
+lSomething      // A variable local to the method
+*/
+
+
+/********************************************************************
+Functions in the init section can be used by any plugin loading this
+file, encouraging DRY (don't repeat yourself)
+********************************************************************/
+@init
+
+
+/********************************************************************
+Matrix: Generate 4 x 8 matrix for equal 5.0 decoding. 
+  Channel configuration: L - R - C - LFE - SL - SR - SBL - SBR
+  LFE, SBL and SBR are not being used by this decoder
+Decoding makes use of Wigging's matricies (credit at top)
+********************************************************************/
+function generateDecode50EqualMatrix(aMatrix)
+(
+  // Left
+  aMatrix[0]  =  0.3650;
+  aMatrix[1]  =  0.4350;
+  aMatrix[2]  =  0.3400;
+  aMatrix[3]  =  0.0;
+  
+  // Right
+  aMatrix[4]  =  0.3650;
+  aMatrix[5]  =  0.4350;
+  aMatrix[6]  = -0.3400;
+  aMatrix[7]  =  0.0;
+  
+  // Center
+  aMatrix[8]  =  0.0000;
+  aMatrix[9]  =  0.0850;
+  aMatrix[10] =  0.0000;
+  aMatrix[11] =  0.0;
+  
+  // LFE - no signal
+  aMatrix[12] =  0.0;
+  aMatrix[13] =  0.0;
+  aMatrix[14] =  0.0;
+  aMatrix[15] =  0.0;
+  
+  // Surround left (SL)
+  aMatrix[16] =  0.5550;
+  aMatrix[17] = -0.2850;
+  aMatrix[18] =  0.4050;
+  aMatrix[19] =  0.0;
+  
+  // Surround right (SR)
+  aMatrix[20] =  0.5550;
+  aMatrix[21] = -0.2850;
+  aMatrix[22] = -0.4050;
+  aMatrix[23] =  0.0;
+  
+  // Surround back left (SBL) - no signal
+  aMatrix[24] =  0.0;
+  aMatrix[25] =  0.0;
+  aMatrix[26] =  0.0;
+  aMatrix[27] =  0.0;
+  
+  // Surround back right (SBR) - no signal
+  aMatrix[28] =  0.0;
+  aMatrix[29] =  0.0;
+  aMatrix[30] =  0.0;
+  aMatrix[31] =  0.0;
+);
+
+
+/********************************************************************
+Matrix: Generate 4 x 8 matrix for focused 5.0 decoding. 
+  Channel configuration: L - R - C - LFE - SL - SR - SBL - SBR
+  LFE, Lsb and Rsb are not being used by this decoder
+Decoding makes use of Wigging's matricies (credit at top)
+********************************************************************/
+function generateDecode50FocusedMatrix(aMatrix)
+(
+  // Left
+  aMatrix[0]  =  0.4250;
+  aMatrix[1]  =  0.3600;
+  aMatrix[2]  =  0.4050;
+  aMatrix[3]  =  0.0;
+  
+  // Right
+  aMatrix[4]  =  0.4250;
+  aMatrix[5]  =  0.3600;
+  aMatrix[6]  = -0.4050;
+  aMatrix[7]  =  0.0;
+  
+  // Center
+  aMatrix[8]  =  0.2000;
+  aMatrix[9]  =  0.1600;
+  aMatrix[10] =  0.0000;
+  aMatrix[11] =  0.0;
+  
+  // LFE - no signal
+  aMatrix[12] =  0.0;
+  aMatrix[13] =  0.0;
+  aMatrix[14] =  0.0;
+  aMatrix[15] =  0.0;
+  
+  // Surround left (SL)
+  aMatrix[16] =  0.4700;
+  aMatrix[17] = -0.3300;
+  aMatrix[18] =  0.4150;
+  aMatrix[19] =  0.0;
+  
+  // Surround right (SR)
+  aMatrix[20] =  0.4700;
+  aMatrix[21] = -0.3300;
+  aMatrix[22] = -0.4150;
+  aMatrix[23] =  0.0;
+  
+  // Surround back left (SBL) - no signal
+  aMatrix[24] =  0.0;
+  aMatrix[25] =  0.0;
+  aMatrix[26] =  0.0;
+  aMatrix[27] =  0.0;
+  
+  // Surround back right (SBR) - no signal
+  aMatrix[28] =  0.0;
+  aMatrix[29] =  0.0;
+  aMatrix[30] =  0.0;
+  aMatrix[31] =  0.0;
+);
+
+
+/********************************************************************
+Matrix: Generate 4 x 8 matrix for four channel 5.0 decoding.
+  Channel configuration: L - R - C - LFE - Ls - Rs - LsB - RsB
+  C, LFE, SBL and SBR are not being used by this decoder
+Decoding makes use of Wigging's matricies (credit at top)
+********************************************************************/
+function generateDecode50FourlMatrix(aMatrix)
+(
+  // Left
+  aMatrix[0]  =  0.4250;
+  aMatrix[1]  =  0.3850;
+  aMatrix[2]  =  0.3300;
+  aMatrix[3]  =  0.0;
+  
+  // Right
+  aMatrix[4]  =  0.4250;
+  aMatrix[5]  =  0.3850;
+  aMatrix[6]  = -0.3300;
+  aMatrix[7]  =  0.0;
+  
+  // Center
+  aMatrix[8]  =  0.0000;
+  aMatrix[9]  =  0.0000;
+  aMatrix[10] =  0.0000;
+  aMatrix[11] =  0.0;
+  
+  // LFE - no signal
+  aMatrix[12] =  0.0;
+  aMatrix[13] =  0.0;
+  aMatrix[14] =  0.0;
+  aMatrix[15] =  0.0;
+  
+  // Surround left (SL)
+  aMatrix[16] =  0.6300;
+  aMatrix[17] = -0.2750;
+  aMatrix[18] =  0.2850;
+  aMatrix[19] =  0.0;
+  
+  // Surround right (SR)
+  aMatrix[20] =  0.6300;
+  aMatrix[21] = -0.2750;
+  aMatrix[22] = -0.2850;
+  aMatrix[23] =  0.0;
+  
+  // Surround back left (SBL) - no signal
+  aMatrix[24] =  0.0;
+  aMatrix[25] =  0.0;
+  aMatrix[26] =  0.0;
+  aMatrix[27] =  0.0;
+  
+  // Surround back right (SBR) - no signal
+  aMatrix[28] =  0.0;
+  aMatrix[29] =  0.0;
+  aMatrix[30] =  0.0;
+  aMatrix[31] =  0.0;  
+);
+
+
+/********************************************************************
+Matrix: Generate 2x4 matrix for stereo decoding
+********************************************************************/
+function generateDecodeStereoMatrix(aMatrix, anAngle, aPattern) local(lG0, lG1, lG2)
+(
+	// calculate lG0, lG1, lG2 (scaled by pattern)
+	lG0	= (1.0 - aPattern) * sqrt(2);
+	lG1	= aPattern * cos(anAngle);
+	lG2	= aPattern * sin(anAngle);
+
+  // Left
+  aMatrix[0]  =  lG0;
+  aMatrix[1]  =  lG1;
+  aMatrix[2]  =  lG2;
+  aMatrix[3]  =  0.0;
+  
+  // Right
+  aMatrix[4]  =  lG0;
+  aMatrix[5]  =  lG1;
+  aMatrix[6]  = -lG2;
+  aMatrix[7]  =  0.0;
+);
+
+
+/********************************************************************
+Matrix: Generate 4 x 8 matrix for optimised quadrophonic decoding.
+  Channel configuration: L - R - C - LFE - Ls - Rs - LsB - RsB
+  C, LFE, SBL and SBR are not being used by this decoder
+********************************************************************/
+function generateDecodeQuadMatrix(aMatrix, anAngle) local(lG0, lG1, lG2, lAngle)
+(
+	// In Reaper the shelf filter is implemented as a separate plugin
+  
+  // calculate g1, g2
+	lG0	= kSqrt2 / 4.;
+	lG1	= cos(anAngle) / 4.;
+	lG2	= sin(anAngle) / 4.;
+  
+  // Left
+  aMatrix[0]  =  lG0;
+  aMatrix[1]  =  lG1;
+  aMatrix[2]  =  lG2;
+  aMatrix[3]  =  0.0;
+  
+  // Right
+  aMatrix[4]  =  lG0;
+  aMatrix[5]  =  lG1;
+  aMatrix[6]  = -lG2;
+  aMatrix[7]  =  0.0;
+  
+  // Center - no signal
+  aMatrix[8]  =  0.0;
+  aMatrix[9]  =  0.0;
+  aMatrix[10] =  0.0;
+  aMatrix[11] =  0.0;
+  
+  // LFE - no signal
+  aMatrix[12] =  0.0;
+  aMatrix[13] =  0.0;
+  aMatrix[14] =  0.0;
+  aMatrix[15] =  0.0;
+  
+  // Surround left (SL)
+  aMatrix[16] =  lG0;
+  aMatrix[17] = -lG1;
+  aMatrix[18] =  lG2;
+  aMatrix[19] =  0.0;
+  
+  // Surround right (SR)
+  aMatrix[20] =  lG0;
+  aMatrix[21] = -lG1;
+  aMatrix[22] = -lG2;
+  aMatrix[23] =  0.0;
+  
+  // Surround back left (SBL) - no signal
+  aMatrix[24] =  0.0;
+  aMatrix[25] =  0.0;
+  aMatrix[26] =  0.0;
+  aMatrix[27] =  0.0;
+  
+  // Surround back right (SBR) - no signal
+  aMatrix[28] =  0.0;
+  aMatrix[29] =  0.0;
+  aMatrix[30] =  0.0;
+  aMatrix[31] =  0.0;
+);
+
+
+/********************************************************************
+Matrix: Generate 4 x 16 matrix for optimised quadrophonic decoding.
+  Channel configuration: L - R - C - LFE - Ls - Rs - LsB - RsB
+********************************************************************/
+function generateDecodePantoMatrix(aMatrix, aNumSpeakers, aSpeakerLayout) local(lG0, lAngle, lDeltaAngle)
+(
+	lG0 = kInvSqrt2;
+  lDeltaAngle = 2.0 * $pi / aNumSpeakers;
+  
+  (aSpeakerLayout == 0) ? (
+    lAngle = $pi / aNumSpeakers;
+  ) :
+  (
+    lAngle = 0.;
+  );
+  
+  // Clear the whole matrix:
+  i = 0;
+  loop(64,
+    aMatrix[i] = 0.0;
+    i += 1;
+  );
+  
+  // Set the appropriate number of channels:
+  i = 0;
+  loop(aNumSpeakers,
+    aMatrix[4*i    ]  =  lG0;
+    aMatrix[4*i + 1]  =  cos(lAngle);
+    aMatrix[4*i + 2]  =  sin(lAngle);
+    // aMatrix[4*i + 3]  =  0.0; // This is already cleared
+    lAngle += lDeltaAngle;
+    i += 1;
+  );
+);
+
+
+/********************************************************************
+Matrix: Generate 8x4 matrix with equally distributed source signals for display purposes
+********************************************************************/
+function generateDisplaySignalMatrix(aMatrix, aNumPoints) local(i, lAngle, lInc)
+( 
+  // Encoding equally distributed points in the horisontal plane
+  i = 0;
+  lAngle = 0.;
+  lInc = 2. * $pi / aNumPoints;
+  loop(aNumPoints,
+    aMatrix[i]                 = kInvSqrt2;
+    aMatrix[i + aNumPoints]    = cos(lAngle);
+    aMatrix[i + 2*aNumPoints]  = sin(lAngle);
+    aMatrix[i + 3*aNumPoints]  = 0.;
+    
+    lAngle += lInc;
+    i += 1;
+  );
+);
+
+
+/********************************************************************
+Matrix: Interprete processed points
+
+In the resulting matrixOut:
+- Row 1 is x position of transformed point
+- Row 2 is y position of transformed point
+- Row 3 is z position of transformed point
+- Row 4 is gain value in dB for transformed point
+********************************************************************/
+function interpreteProcessedPoints(aMatrixOut, aMatrixIn, aNumPoints) local(i, lG0square, lG1square, lW, lX, lY, lZ, lAzi, lEle, lOmni, lGgain)
+(
+  i = 0;
+  loop(aNumPoints,
+    lW = aMatrixIn[i];
+    lX = aMatrixIn[aNumPoints + i];
+    lY = aMatrixIn[aNumPoints*2 + i];
+    lZ = aMatrixIn[aNumPoints*3 + i];
+    
+    lAzi  = atan2(lY, lX);
+    lEle  = atan2(lZ, sqrt(lX*lX + lY*lY));
+    
+    // Omni transform angle
+    lG0square        = lW * lW;
+    lG1square        = lX*lX + lY*lY + lZ*lZ;
+    lOmni = asin((2.*lG0square - lG1square) / (2.*lG0square + lG1square));
+    
+    // Gain
+    lGain = lW * sqrt(2. / (1. + sin(lOmni)));
+    
+    // Normalise omni to [0,1] range
+    lOmni = 2 * lOmni / $pi;
+    lOmni = 1. - lOmni;
+    
+    // From this we calculate relative xyz position of the transformed point
+    aMatrixOut[i]                = lOmni * cos(lAzi) * cos(lEle);
+    aMatrixOut[aNumPoints   + i] = lOmni * sin(lAzi) * cos(lEle);
+    aMatrixOut[aNumPoints*2 + i] = lOmni * sin(lEle);
+    aMatrixOut[aNumPoints*3 + i] = amp2db(lGain);
+    
+    i += 1;
+  );
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for B to A decoding
+********************************************************************/
+function generateBtoAMatrix(aMatrix, anOrientation, aWeight) local(lG0)
+(  
+  // Option 0: orthogonal (front left up) [ FLU, FRD, BLD, BRU ]
+  anOrientation == 0 ?
+  ( 
+    aMatrix[0] =   0.5;
+    aMatrix[1] =   0.5;
+    aMatrix[2] =   0.5;
+    aMatrix[3] =   0.5;
+
+    aMatrix[4] =   0.5;
+    aMatrix[5] =   0.5;
+    aMatrix[6] =  -0.5;
+    aMatrix[7] =  -0.5;
+
+    aMatrix[8] =   0.5;
+    aMatrix[9] =  -0.5;
+    aMatrix[10] =  0.5;
+    aMatrix[11] = -0.5;
+
+    aMatrix[12] =  0.5;
+    aMatrix[13] = -0.5;
+    aMatrix[14] = -0.5;
+    aMatrix[15] =  0.5;
+  ) :
+  (
+    // Option 1: front left down [ FLD, FRU, BLU, BRD ]
+    anOrientation == 1 ?
+    (
+      aMatrix[0] =  0.5;
+      aMatrix[1] =  0.5;
+      aMatrix[2] =  0.5;
+      aMatrix[3] = -0.5;
+
+      aMatrix[4] =  0.5;
+      aMatrix[5] =  0.5;
+      aMatrix[6] = -0.5;
+      aMatrix[7] =  0.5;
+
+      aMatrix[8] =  0.5;
+      aMatrix[9] = -0.5;
+      aMatrix[10] =  0.5;
+      aMatrix[11] =  0.5;
+
+      aMatrix[12] =  0.5;
+      aMatrix[13] = -0.5;
+      aMatrix[14] = -0.5;
+      aMatrix[15] = -0.5;
+    ) :
+    (
+      // Option 2: front left-right [ FL, FR, BU, BD ]
+    
+      anOrientation == 2 ?
+      (     
+        aMatrix[0] =  0.5;
+        aMatrix[1] =  0.5;
+        aMatrix[2] =  kInvSqrt2;
+        aMatrix[3] =  0.;
+
+        aMatrix[4] =  0.5;
+        aMatrix[5] =  0.5;
+        aMatrix[6] = -kInvSqrt2;
+        aMatrix[7] =  0.;
+
+        aMatrix[8] =  0.5;
+        aMatrix[9] = -0.5;
+        aMatrix[10] =  0.;
+        aMatrix[11] =  kInvSqrt2;
+
+        aMatrix[12] =  0.5;
+        aMatrix[13] = -0.5;
+        aMatrix[14] =  0.;
+        aMatrix[15] = -kInvSqrt2;
+      ) :
+      (
+        // Option 3: front up-down [ FU, FD, BL, BR ]
+      
+        anOrientation == 3 ?
+        (
+          aMatrix[0] =  0.5;
+          aMatrix[1] =  0.5;
+          aMatrix[2] =  0.;
+          aMatrix[3] =  kInvSqrt2;
+
+          aMatrix[4] =  0.5;
+          aMatrix[5] =  0.5;
+          aMatrix[6] =  0.;
+          aMatrix[7] = -kInvSqrt2;
+
+          aMatrix[8] =  0.5;
+          aMatrix[9] = -0.5;
+          aMatrix[10] =  kInvSqrt2;
+          aMatrix[11] =  0.;
+
+          aMatrix[12] =  0.5;
+          aMatrix[13] = -0.5;
+          aMatrix[14] = -kInvSqrt2;
+          aMatrix[15] =  0.;
+        ) :
+        (
+          // Option 4: front & back down [ F, BD, BLU, BRU ]
+        
+          anOrientation == 4 ?
+          (
+            aMatrix[0] =  0.5;
+            aMatrix[1] =  kSqrt3Div2;
+            aMatrix[2] =  0.;
+            aMatrix[3] =  0.;
+
+            aMatrix[4] =  0.5;
+            aMatrix[5] = -kSqrt3Div6;
+            aMatrix[6] =  0.;
+            aMatrix[7] = -kSqrt6Div3;
+
+            aMatrix[8] =  0.5;
+            aMatrix[9] = -kSqrt3Div6;
+            aMatrix[10] =  kInvSqrt2;
+            aMatrix[11] =  kRecSqrt6;
+
+            aMatrix[12] =  0.5;
+            aMatrix[13] = -kSqrt3Div6;
+            aMatrix[14] = -kInvSqrt2;
+            aMatrix[15] =  kRecSqrt6;
+          ) :
+          (
+            // Option 5: front & back up [ F, BU, BLD, BRD ]
+          
+            anOrientation == 5 ?
+            (
+              aMatrix[0] =  0.5;
+              aMatrix[1] =  kSqrt3Div2;
+              aMatrix[2] =  0.;
+              aMatrix[3] =  0.;
+
+              aMatrix[4] =  0.5;
+              aMatrix[5] = -kSqrt3Div6;
+              aMatrix[6] =  0.0;
+              aMatrix[7] =  kSqrt6Div3;
+
+              aMatrix[8] =  0.5;
+              aMatrix[9] = -kSqrt3Div6;
+              aMatrix[10] =  kInvSqrt2;
+              aMatrix[11] = -kRecSqrt6;
+
+              aMatrix[12] =  0.5;
+              aMatrix[13] = -kSqrt3Div6;
+              aMatrix[14] = -kInvSqrt2;
+              aMatrix[15] = -kRecSqrt6;
+            ) :
+            (
+              // Option 6: front left-right up [ FLU, FRU, FD, B ]
+            
+              anOrientation == 6 ?
+              (
+                aMatrix[0] =  0.5;
+                aMatrix[1] =  kSqrt3Div6;
+                aMatrix[2] =  kInvSqrt2;
+                aMatrix[3] =  kRecSqrt6;
+
+                aMatrix[4] =  0.5;
+                aMatrix[5] =  kSqrt3Div6;
+                aMatrix[6] = -kInvSqrt2;
+                aMatrix[7] =  kRecSqrt6;
+
+                aMatrix[8] =  0.5;
+                aMatrix[9] =  kSqrt3Div6;
+                aMatrix[10] =  0.;
+                aMatrix[11] = -kSqrt6Div3;
+
+                aMatrix[12] =  0.5;
+                aMatrix[13] = -kSqrt3Div2;
+                aMatrix[14] =  0.;
+                aMatrix[15] =  0.;
+              ) :
+              (
+                // Option 7: front left-right down [ FLD, FRD, FU, B ]
+
+                aMatrix[0] =  0.5;
+                aMatrix[1] =  kSqrt3Div6;
+                aMatrix[2] =  kInvSqrt2;
+                aMatrix[3] = -kRecSqrt6;
+
+                aMatrix[4] =  0.5;
+                aMatrix[5] =  kSqrt3Div6;
+                aMatrix[6] = -kInvSqrt2;
+                aMatrix[7] = -kRecSqrt6;
+
+                aMatrix[8] =  0.5;
+                aMatrix[9] =  kSqrt3Div6;
+                aMatrix[10] =  0.;
+                aMatrix[11] =  kSqrt6Div3;
+
+                aMatrix[12] =  0.5;
+                aMatrix[13] = -kSqrt3Div2;
+                aMatrix[14] =  0.;
+                aMatrix[15] =  0.;
+              );
+            );
+          );
+        );
+      );
+    );
+  );
+
+
+  // Weight:
+  // Option 0: Decorrelated (on the sphere)
+  aWeight == 0 ?
+  (
+    lG0 = sqrt(2./3.);
+  ) :
+  (
+    // Option 1: Canonical
+    aWeight == 1 ?
+    (
+      lG0 = 1.;
+    ) :
+    (
+      // Option 2: Unscaled, W_gain = 1
+      aWeight == 2 ?
+      (
+        lG0 = kSqrt2;
+      ) :
+      // Option 3: Cardioid
+      (
+        lG0 = sqrt(6.);
+      );
+    );
+  );
+
+  // Compensate matrix for weight:
+  aMatrix[0] =  lG0 * aMatrix[0];
+  aMatrix[4] =  lG0 * aMatrix[4];
+  aMatrix[8] =  lG0 * aMatrix[8];
+  aMatrix[12] = lG0 * aMatrix[12];
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for directX transformation
+********************************************************************/
+function generateDirectMatrix(aMatrix, anAngle) local(lG0, lG1)
+(
+  lG0 = sqrt(1 + sin(anAngle));
+  lG1 = sqrt(1 - sin(anAngle));
+  
+  aMatrix[0]  = lG0;
+  aMatrix[1]  = 0.;
+  aMatrix[2]  = 0.;
+  aMatrix[3]  = 0.;
+  
+  aMatrix[4]  = 0.;
+  aMatrix[5]  = lG1;
+  aMatrix[6]  = 0.;
+  aMatrix[7]  = 0.;
+  
+  aMatrix[8]  = 0.;
+  aMatrix[9]  = 0.;
+  aMatrix[10] = lG0;
+  aMatrix[11] = 0.;
+  
+  aMatrix[12] = 0.;
+  aMatrix[13] = 0.;
+  aMatrix[14] = 0.;
+  aMatrix[15] = lG0;
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for directX transformation
+********************************************************************/
+function generateDirectOrigoMatrix(aMatrix, anAngle) local(lG0, lG1)
+(
+  
+  lG0 = sqrt(1 + sin(anAngle));
+  lG1 = sqrt(1 - sin(anAngle));
+  
+  aMatrix[0]  = lG0;
+  aMatrix[1]  = 0.;
+  aMatrix[2]  = 0.;
+  aMatrix[3]  = 0.;
+  
+  aMatrix[4]  = 0.;
+  aMatrix[5]  = lG1;
+  aMatrix[6]  = 0.;
+  aMatrix[7]  = 0.;
+  
+  aMatrix[8]  = 0.;
+  aMatrix[9]  = 0.;
+  aMatrix[10] = lG1;
+  aMatrix[11] = 0.;
+  
+  aMatrix[12] = 0.;
+  aMatrix[13] = 0.;
+  aMatrix[14] = 0.;
+  aMatrix[15] = lG1;
+);
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for dominateX transformation
+********************************************************************/
+function generateDominateMatrix(aMatrix, aGain) local(lTemp, lG0, lG1)
+(
+	lTemp = db2amp(aGain);		
+	lG0 = (lTemp + 1. / lTemp) * 0.5;
+	lG1 = (lTemp - 1. / lTemp) / kSqrt2;
+    
+  aMatrix[0]  = lG0;
+  aMatrix[1]  = lG1 * 0.5;
+  aMatrix[2]  = 0.;
+  aMatrix[3]  = 0.;
+  
+  aMatrix[4]  = lG1;
+  aMatrix[5]  = lG0;
+  aMatrix[6]  = 0.;
+  aMatrix[7]  = 0.;
+  
+  aMatrix[8]  = 0.;
+  aMatrix[9]  = 0.;
+  aMatrix[10] = 1.;
+  aMatrix[11] = 0.;
+  
+  aMatrix[12] = 0.;
+  aMatrix[13] = 0.;
+  aMatrix[14] = 0.;
+  aMatrix[15] = 1.;
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for focus transformation
+********************************************************************/
+function generateFocusMatrix(aMatrix, anAngle) local(lG0, lG1, lG2)
+(  
+	lG0 = 1. / (1 + sin(abs(anAngle)));
+	lG1 = kSqrt2 *  sin(anAngle) * lG0;
+	lG2 = cos(anAngle) * lG0;
+  
+  aMatrix[0]  = lG0;
+  aMatrix[1]  = lG1 * 0.5;
+  aMatrix[2]  = 0.;
+  aMatrix[3]  = 0.;
+
+  aMatrix[4]  = lG1; 
+  aMatrix[5]  = lG0;
+  aMatrix[6]  = 0.;
+  aMatrix[7]  = 0.;
+  
+  aMatrix[8]  = 0.;
+  aMatrix[9]  = 0.;
+  aMatrix[10] = lG2;
+  aMatrix[11] = 0.;
+  
+  aMatrix[12] = 0.;
+  aMatrix[13] = 0.;
+  aMatrix[14] = 0.;
+  aMatrix[15] = lG2;
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for mirrorX transformation
+********************************************************************/
+function generateMirrorMatrix(aMatrix)
+(  
+  aMatrix[0]  =  1.;
+  aMatrix[1]  =  0.;
+  aMatrix[2]  =  0.;
+  aMatrix[3]  =  0.;
+
+  aMatrix[4]  =  0.;
+  aMatrix[5]  = -1.;
+  aMatrix[6]  =  0.;
+  aMatrix[7]  =  0.;
+  
+  aMatrix[8]  =  0.;
+  aMatrix[9]  =  0.;
+  aMatrix[10] =  1.;
+  aMatrix[11] =  0.;
+  
+  aMatrix[12] =  0.;
+  aMatrix[13] =  0.;
+  aMatrix[14] =  0.;
+  aMatrix[15] =  1.;
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for mirrorO transformation
+********************************************************************/
+function generateMirrorOMatrix(aMatrix)
+(  
+  aMatrix[0]  =  1.;
+  aMatrix[1]  =  0.;
+  aMatrix[2]  =  0.;
+  aMatrix[3]  =  0.;
+
+  aMatrix[4]  =  0.;
+  aMatrix[5]  = -1.;
+  aMatrix[6]  =  0.;
+  aMatrix[7]  =  0.;
+  
+  aMatrix[8]  =  0.;
+  aMatrix[9]  =  0.;
+  aMatrix[10] = -1.;
+  aMatrix[11] =  0.;
+  
+  aMatrix[12] =  0.;
+  aMatrix[13] =  0.;
+  aMatrix[14] =  0.;
+  aMatrix[15] = -1.;
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for pressX transformation
+********************************************************************/
+function generatePressMatrix(aMatrix, anAngle) local(lG0, lG1, lG2)
+(
+  lG0 = kSqrt2 * sin(anAngle) * sin(abs(anAngle));
+  lG2 = cos(anAngle);
+  lG1 = lG2 * lG2;
+  
+  aMatrix[0]  = 1.;
+  aMatrix[1]  = 0.;
+  aMatrix[2]  = 0.;
+  aMatrix[3]  = 0.;
+  
+  aMatrix[4]  = lG0;
+  aMatrix[5]  = lG1;
+  aMatrix[6]  = 0.;
+  aMatrix[7]  = 0.;
+  
+  aMatrix[8]  = 0.;
+  aMatrix[9]  = 0.;
+  aMatrix[10] = lG2;
+  aMatrix[11] = 0.;
+  
+  aMatrix[12] = 0.;
+  aMatrix[13] = 0.;
+  aMatrix[14] = 0.;
+  aMatrix[15] = lG2;
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for pushX transformation
+********************************************************************/
+function generatePushMatrix(aMatrix, anAngle) local(lG0, lG1)
+(  
+  lG0 = kSqrt2 * sin(anAngle) * sin(abs(anAngle));
+  lG1 = cos(anAngle);
+  lG1 = lG1 * lG1;
+    
+  aMatrix[0]  = 1.;
+  aMatrix[1]  = 0.;
+  aMatrix[2]  = 0.;
+  aMatrix[3]  = 0.;
+  
+  aMatrix[4]  = lG0;
+  aMatrix[5]  = lG1;
+  aMatrix[6]  = 0.;
+  aMatrix[7]  = 0.;
+  
+  aMatrix[8]  = 0.;
+  aMatrix[9]  = 0.;
+  aMatrix[10] = lG1;
+  aMatrix[11] = 0.;
+  
+  aMatrix[12] = 0.;
+  aMatrix[13] = 0.;
+  aMatrix[14] = 0.;
+  aMatrix[15] = lG1;
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for rotation transformation
+********************************************************************/
+function generateRotationMatrix(aMatrix, anAngle)
+(
+  // We use SpatDIF (navigational) coordinate system rather than mathematical.
+  
+  aMatrix[0]  = 1.;
+  aMatrix[1]  = 0.;
+  aMatrix[2]  = 0.;
+  aMatrix[3]  = 0.;
+  
+  aMatrix[4]  = 0.;
+  aMatrix[5]  = cos(anAngle);
+  aMatrix[6]  = sin(anAngle);
+  aMatrix[7]  = 0.;
+  
+  aMatrix[8]  = 0.;
+  aMatrix[9]  = -aMatrix[6];
+  aMatrix[10] =  aMatrix[5];
+  aMatrix[11] = 0.;
+  
+  aMatrix[12] = 0.;
+  aMatrix[13] = 0.;
+  aMatrix[14] = 0.;
+  aMatrix[15] = 1.;
+);
+
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for tilt transformation
+********************************************************************/
+function generateTiltlMatrix(aMatrix, anAngle)
+(  
+  aMatrix[0]  =  1.;
+  aMatrix[1]  =  0.;
+  aMatrix[2]  =  0.;
+  aMatrix[3]  =  0.;
+  
+  aMatrix[4]  =  0.;
+  aMatrix[5]  =  1.;
+  aMatrix[6]  =  0.;
+  aMatrix[7]  =  0.;
+  
+  aMatrix[8]  =  0.;
+  aMatrix[9]  =  0.;
+  aMatrix[10] =  cos(anAngle);
+  aMatrix[11] = -sin(anAngle);
+  
+  aMatrix[12] =  0.;
+  aMatrix[13] =  0.;
+  aMatrix[14] = -aMatrix[11];
+  aMatrix[15] =  aMatrix[10];  
+);
+
+
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for tumble transformation
+********************************************************************/
+function generateTumblelMatrix(aMatrix, anAngle)
+(  
+  aMatrix[0]  =  1.;
+  aMatrix[1]  =  0.;
+  aMatrix[2]  =  0.;
+  aMatrix[3]  =  0.;
+  
+  aMatrix[4]  =  0.;
+  aMatrix[5]  =  cos(anAngle);
+  aMatrix[6]  =  0.;
+  aMatrix[7]  = -sin(anAngle);
+  
+  aMatrix[8]  =  0.;
+  aMatrix[9]  =  0.;
+  aMatrix[10] =  1.;
+  aMatrix[11] =  0.;
+  
+  aMatrix[12] =  0.;
+  aMatrix[13] = -aMatrix[7];
+  aMatrix[14] =  0.;
+  aMatrix[15] =  aMatrix[5];  
+);
+
+
+/********************************************************************
+Matrix: Generate 1st order 4x4 matrix for zoomX transformation
+********************************************************************/
+function generateZoomMatrix(aMatrix, anAngle) local(lG0, lG1)
+(
+  lG0 = sin(anAngle);
+  lG1 = cos(anAngle);
+    
+  aMatrix[0]  = 1.;
+  aMatrix[1]  = lG0 / kSqrt2;
+  aMatrix[2]  = 0.;
+  aMatrix[3]  = 0.;
+  
+  aMatrix[4]  = lG0 * kSqrt2;
+  aMatrix[5]  = 1.;
+  aMatrix[6]  = 0.;
+  aMatrix[7]  = 0.;
+  
+  aMatrix[8]  = 0.;
+  aMatrix[9]  = 0.;
+  aMatrix[10] = lG1;
+  aMatrix[11] = 0.;
+  
+  aMatrix[12] = 0.;
+  aMatrix[13] = 0.;
+  aMatrix[14] = 0.;
+  aMatrix[15] = lG1;
+);
+
+
+/********************************************************************
+Matrix: Multiplication of two matrixes: result = left x right
+********************************************************************/
+function matrixMultiplication(aResultMatrix, aNumRowsLeft, aNumColsLeft, aLeftMatrix, aNumRowsRight, aNumColsRight, aRightMatrix) local(lRow, lCol, i)
+(
+  // It is the responsibility of each plugin calling this function to ensure that numColsLeft == numRowsRight.
+  // We do not check for that here.
+  
+  // Iterate over rows of left matrix
+  lRow = 0;
+  loop(aNumRowsLeft,
+    // Iterate over columns of right matrix
+    lCol = 0;
+    loop(aNumColsRight,
+      // Calculate one cell
+      aResultMatrix[aNumColsRight*lRow + lCol] = 0.;
+      i = 0;
+      loop(aNumColsLeft,
+        aResultMatrix[aNumColsRight*lRow + lCol] += aLeftMatrix[aNumColsLeft*lRow + i] * aRightMatrix[aNumColsRight*i + lCol];
+        i += 1;
+      );
+      lCol += 1;
+    );
+    lRow += 1;
+  );
+);
+
+
+/********************************************************************
+Matrix: Invert a 4x4 matrix
+********************************************************************/
+function invertMatrix(aMatrix) local(lDeterminant, lInv)
+(
+  // Setting memory slot for local array
+  lInv = 10000;
+  
+  lInv[0] =   aMatrix[5]  * aMatrix[10] * aMatrix[15] -
+              aMatrix[5]  * aMatrix[11] * aMatrix[14] -
+              aMatrix[9]  * aMatrix[6]  * aMatrix[15] +
+              aMatrix[9]  * aMatrix[7]  * aMatrix[14] +
+              aMatrix[13] * aMatrix[6]  * aMatrix[11] -
+              aMatrix[13] * aMatrix[7]  * aMatrix[10];
+
+  lInv[4] =  -aMatrix[4]  * aMatrix[10] * aMatrix[15] +
+              aMatrix[4]  * aMatrix[11] * aMatrix[14] +
+              aMatrix[8]  * aMatrix[6]  * aMatrix[15] -
+              aMatrix[8]  * aMatrix[7]  * aMatrix[14] -
+              aMatrix[12] * aMatrix[6]  * aMatrix[11] +
+              aMatrix[12] * aMatrix[7]  * aMatrix[10];
+
+  lInv[8] =   aMatrix[4]  * aMatrix[9]  * aMatrix[15] -
+              aMatrix[4]  * aMatrix[11] * aMatrix[13] -
+              aMatrix[8]  * aMatrix[5]  * aMatrix[15] +
+              aMatrix[8]  * aMatrix[7]  * aMatrix[13] +
+              aMatrix[12] * aMatrix[5]  * aMatrix[11] -
+              aMatrix[12] * aMatrix[7]  * aMatrix[9];
+
+  lInv[12] = -aMatrix[4]  * aMatrix[9]  * aMatrix[14] +
+              aMatrix[4]  * aMatrix[10] * aMatrix[13] +
+              aMatrix[8]  * aMatrix[5]  * aMatrix[14] -
+              aMatrix[8]  * aMatrix[6]  * aMatrix[13] -
+              aMatrix[12] * aMatrix[5]  * aMatrix[10] +
+              aMatrix[12] * aMatrix[6]  * aMatrix[9];
+
+  lInv[1] =  -aMatrix[1]  * aMatrix[10] * aMatrix[15] +
+              aMatrix[1]  * aMatrix[11] * aMatrix[14] +
+              aMatrix[9]  * aMatrix[2]  * aMatrix[15] -
+              aMatrix[9]  * aMatrix[3]  * aMatrix[14] -
+              aMatrix[13] * aMatrix[2]  * aMatrix[11] +
+              aMatrix[13] * aMatrix[3]  * aMatrix[10];
+
+  lInv[5] =   aMatrix[0]  * aMatrix[10] * aMatrix[15] -
+              aMatrix[0]  * aMatrix[11] * aMatrix[14] -
+              aMatrix[8]  * aMatrix[2]  * aMatrix[15] +
+              aMatrix[8]  * aMatrix[3]  * aMatrix[14] +
+              aMatrix[12] * aMatrix[2]  * aMatrix[11] - 
+              aMatrix[12] * aMatrix[3]  * aMatrix[10];
+
+  lInv[9] =  -aMatrix[0]  * aMatrix[9]  * aMatrix[15] +
+              aMatrix[0]  * aMatrix[11] * aMatrix[13] +
+              aMatrix[8]  * aMatrix[1]  * aMatrix[15] -
+              aMatrix[8]  * aMatrix[3]  * aMatrix[13] -
+              aMatrix[12] * aMatrix[1]  * aMatrix[11] +
+              aMatrix[12] * aMatrix[3]  * aMatrix[9];
+
+  lInv[13] =  aMatrix[0]  * aMatrix[9]  * aMatrix[14] -
+              aMatrix[0]  * aMatrix[10] * aMatrix[13] -
+              aMatrix[8]  * aMatrix[1]  * aMatrix[14] +
+              aMatrix[8]  * aMatrix[2]  * aMatrix[13] +
+              aMatrix[12] * aMatrix[1]  * aMatrix[10] -
+              aMatrix[12] * aMatrix[2]  * aMatrix[9];
+
+  lInv[2] =   aMatrix[1]  * aMatrix[6]  * aMatrix[15] -
+              aMatrix[1]  * aMatrix[7]  * aMatrix[14] -
+              aMatrix[5]  * aMatrix[2]  * aMatrix[15] +
+              aMatrix[5]  * aMatrix[3]  * aMatrix[14] +
+              aMatrix[13] * aMatrix[2]  * aMatrix[7] -
+              aMatrix[13] * aMatrix[3]  * aMatrix[6];
+
+  lInv[6] =  -aMatrix[0]  * aMatrix[6]  * aMatrix[15] +
+              aMatrix[0]  * aMatrix[7]  * aMatrix[14] +
+              aMatrix[4]  * aMatrix[2]  * aMatrix[15] -
+              aMatrix[4]  * aMatrix[3]  * aMatrix[14] -
+              aMatrix[12] * aMatrix[2]  * aMatrix[7] +
+              aMatrix[12] * aMatrix[3]  * aMatrix[6];
+
+  lInv[10] =  aMatrix[0]  * aMatrix[5]  * aMatrix[15] -
+              aMatrix[0]  * aMatrix[7]  * aMatrix[13] -
+              aMatrix[4]  * aMatrix[1]  * aMatrix[15] +
+              aMatrix[4]  * aMatrix[3]  * aMatrix[13] +
+              aMatrix[12] * aMatrix[1]  * aMatrix[7] -
+              aMatrix[12] * aMatrix[3]  * aMatrix[5];
+
+  lInv[14] = -aMatrix[0]  * aMatrix[5]  * aMatrix[14] +
+              aMatrix[0]  * aMatrix[6]  * aMatrix[13] +
+              aMatrix[4]  * aMatrix[1]  * aMatrix[14] -
+              aMatrix[4]  * aMatrix[2]  * aMatrix[13] -
+              aMatrix[12] * aMatrix[1]  * aMatrix[6] +
+              aMatrix[12] * aMatrix[2]  * aMatrix[5];
+
+  lInv[3] =  -aMatrix[1]  * aMatrix[6]  * aMatrix[11] +
+              aMatrix[1]  * aMatrix[7]  * aMatrix[10] +
+              aMatrix[5]  * aMatrix[2]  * aMatrix[11] -
+              aMatrix[5]  * aMatrix[3]  * aMatrix[10] -
+              aMatrix[9]  * aMatrix[2]  * aMatrix[7] +
+              aMatrix[9]  * aMatrix[3]  * aMatrix[6];
+
+  lInv[7] =   aMatrix[0]  * aMatrix[6]  * aMatrix[11] -
+              aMatrix[0]  * aMatrix[7]  * aMatrix[10] -
+              aMatrix[4]  * aMatrix[2]  * aMatrix[11] +
+              aMatrix[4]  * aMatrix[3]  * aMatrix[10] +
+              aMatrix[8]  * aMatrix[2]  * aMatrix[7] -
+              aMatrix[8]  * aMatrix[3]  * aMatrix[6];
+
+  lInv[11] = -aMatrix[0]  * aMatrix[5]  * aMatrix[11] +
+              aMatrix[0]  * aMatrix[7]  * aMatrix[9] +
+              aMatrix[4]  * aMatrix[1]  * aMatrix[11] -
+              aMatrix[4]  * aMatrix[3]  * aMatrix[9] -
+              aMatrix[8]  * aMatrix[1]  * aMatrix[7] +
+              aMatrix[8]  * aMatrix[3]  * aMatrix[5];
+
+  lInv[15] =  aMatrix[0]  * aMatrix[5]  * aMatrix[10] -
+              aMatrix[0]  * aMatrix[6]  * aMatrix[9] -
+              aMatrix[4]  * aMatrix[1]  * aMatrix[10] +
+              aMatrix[4]  * aMatrix[2]  * aMatrix[9] +
+              aMatrix[8]  * aMatrix[1]  * aMatrix[6] -
+              aMatrix[8]  * aMatrix[2]  * aMatrix[5];
+					
+  lDeterminant = aMatrix[0] * lInv[0] +
+	               aMatrix[1] * lInv[4] +
+				         aMatrix[2] * lInv[8] +
+				         aMatrix[3] * lInv[12];
+
+  /* Might be difficult to check this in Reaper/JS, but it might also be redundant?
+	if (lDeterminant == 0)
+    return false;
+	*/
+
+  lDeterminant = 1.0 / lDeterminant;
+
+  aMatrix[0]  = lInv[0]  * lDeterminant;
+	aMatrix[1]  = lInv[1]  * lDeterminant;
+	aMatrix[2]  = lInv[2]  * lDeterminant;
+	aMatrix[3]  = lInv[3]  * lDeterminant;
+	
+	aMatrix[4]  = lInv[4]  * lDeterminant;
+	aMatrix[5]  = lInv[5]  * lDeterminant;
+	aMatrix[6]  = lInv[6]  * lDeterminant;
+	aMatrix[7]  = lInv[7]  * lDeterminant;
+	
+	aMatrix[8]  = lInv[8]  * lDeterminant;
+	aMatrix[9]  = lInv[9]  * lDeterminant;
+	aMatrix[10] = lInv[10] * lDeterminant;
+	aMatrix[11] = lInv[11] * lDeterminant;
+	
+	aMatrix[12] = lInv[12] * lDeterminant;
+	aMatrix[13] = lInv[13] * lDeterminant;
+	aMatrix[14] = lInv[14] * lDeterminant;
+	aMatrix[15] = lInv[15] * lDeterminant;
+);

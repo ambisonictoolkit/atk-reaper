@@ -1,0 +1,222 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: Direct
+  First Order Ambisonic (FOA) directivity transformer. Adjust the 
+  soundfield directivity of a first order ambisonic signal (B-format) 
+  across an arbitrary plane.
+---------------------------------------------------------------------
+*/
+
+
+desc: Adjust FOA soundfield directivity across arbitrary plane
+
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+slider1:0<-180,180,1>Azimuth (mouse)
+slider2:0<-90,90,1>Elevation
+slider3:0<0,90,1>Degree of transformation (mouse)
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Flag indicating that the plugin has not been fully initialised yet
+initialised = 0;
+
+azimuth   = 0;
+elevation = 0.;
+
+// Setting memory locations for a number of 4x4 matrixes as 1D arrays
+matrixRotate1   = 1000;
+matrixTumble1   = 1020;
+matrixTransform = 1040;
+matrixTumble2   = 1060;
+matrixRotate2   = 1080;
+
+// These are used for matrix multiplications
+matrixTemp1     = 1100;
+matrixTemp2     = 1120;
+
+// Resulting matrixes used for DSP processing
+matrixDSP       = 1200;
+matrixNewDSP    = 1220;
+matrixInc       = 1240;
+
+// Matrixes for graphic display of transformations
+matrixDisplayPoints      = 1300;
+matrixDisplayTransformed = 1400;
+matrixDisplayInterpreted = 1500;
+
+// This only needs to be generated once:
+numDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
+
+
+function calculateMatrix()
+(
+  // Required for graphics
+  cosAzimuth   = cos(azimuth);
+  sinAzimuth   = sin(azimuth);
+
+  cosElevation = cos(elevation);
+  sinElevation = sin(elevation);
+  
+  // Generate matrixes
+  generateRotationMatrix(matrixRotate1, (-azimuth));
+  generateTumblelMatrix(matrixTumble1, -elevation);
+  generateDirectMatrix(matrixTransform, transformAngle);
+  generateRotationMatrix(matrixRotate2, azimuth);
+  generateTumblelMatrix(matrixTumble2, elevation);
+  
+  /* Build processing matrix by performing a series of matrix multiplications
+                       result =              left     X               right             */
+  matrixMultiplication(matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1);
+  matrixMultiplication(matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
+  matrixMultiplication(matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
+  matrixMultiplication(matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
+  
+  /* Transformation and interpretation of display points */
+  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
+  
+  // Set initial DSP processing coefficients if the plugin has not yet been initialised
+  initialised == 0 ?
+  (
+    i = 0;
+    loop(16,
+      matrixDSP[i] = matrixNewDSP[i];
+    );
+    // Now we are fully initialised
+    initialised = 1;
+  );
+);
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+azimuth         = slider1 * kDeg2Rad;
+elevation       = slider2 * kDeg2Rad;
+transformAngle  = slider3 * kDeg2Rad;
+
+calculateMatrix();
+
+
+/**********************************************************
+Graphics
+**********************************************************/
+@gfx 500 500
+
+gxColorSet(1, 1, 1, 1);
+determineGeometry();
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
+
+// Only update transformation settings at mouse drag
+mouse_cap == 1 ?
+(
+  mouseX = mouse_x - gCenterX;
+  mouseY = mouse_y - gCenterY;
+  azimuth = atan2(mouseX, -mouseY);
+
+  // Update slider2 and notify GUI of the change  
+  slider1 = azimuth * kRad2Deg;
+  slider_automate(slider1);
+  
+  mNormTransformAngle = (1. - sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius);
+  // Restrict the range to [0, 1.]
+  mNormTransformAngle < 0. ? mNormTransformAngle = 0.;
+
+  // Update transformAngle and slider, and notify GUI of the change
+  transformAngle = mNormTransformAngle * $pi*0.5;
+  slider3 = mNormTransformAngle*90.;
+  slider_automate(slider3);
+  
+  calculateMatrix();
+);
+
+// Draw points illustrating the effect of the transform
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
+
+// Drawing line and interactive circle
+gxColorSetHsl(1.0, 195., 1., 0.4);
+drawLineSegment(gCenterX, gCenterY, posX, posY, 1.);
+posX = gCenterX + gRadius * (1. - mNormTransformAngle) * sin(azimuth);
+posY = gCenterY - gRadius * (1. - mNormTransformAngle) * cos(azimuth);
+drawInteractionCircle(posX, posY, 10.);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+inverseSamplesblock = 1. / samplesblock;
+
+// Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
+ii = 0;
+loop(16,
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  ii += 1;
+);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+ii = 0;
+loop(16,
+  matrixDSP[ii] += matrixInc[ii];
+  ii += 1;
+);
+
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Matrix multiplication with input signal:
+spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
+spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+spl2 = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
+spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];

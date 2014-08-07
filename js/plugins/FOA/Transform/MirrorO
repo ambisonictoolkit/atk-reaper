@@ -1,0 +1,76 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: MirrorO
+  Mirror sound field across origo.
+---------------------------------------------------------------------
+*/
+
+
+desc: Mirror sound field across origo . NOTE: This plugin has no parameters.
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+// No interaction and no sliders
+
+/**********************************************************
+No initialisation required
+**********************************************************/
+//@init
+
+
+
+/**********************************************************
+No slider interaction
+**********************************************************/
+//@slider
+
+/**********************************************************
+No graphics
+**********************************************************/
+//@gfx 500 500
+
+/**********************************************************
+No preprocessing required prior to audio vector processing.
+**********************************************************/
+//@block
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+// Inverting sign of all 1st order signals
+spl0 =  spl0;
+spl1 = -spl1;
+spl2 = -spl2;
+spl3 = -spl3;

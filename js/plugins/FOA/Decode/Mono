@@ -1,0 +1,121 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: mono
+  A Matrix decoder synthesising a single microphone
+  
+---------------------------------------------------------------------
+*/
+
+desc: Mono decoder - synthesises a single microphone
+
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:L
+out_pin:R
+
+
+slider1:0<-180,180,1>Azimuth
+slider2:0<-90,90,1>Elevation
+slider3:0.5<0,1.,0.01>Mic pattern (Omni - Cardoid - Figure 8)
+slider4:0<0,1,1{Left channel only, Left and right channel}>Returned signal
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Setting memory locations for 4x4 matrix as 1D array
+mIsInitialised = 0;
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+mAzi        = slider1 * kDeg2Rad;
+mEle        = slider2 * kDeg2Rad;
+mPattern = slider3;
+mReturnMode = slider4;
+
+
+mNewW = (1. - mPattern) * sqrt(2.);
+mNewX = mPattern * cos(mAzi) * cos(mEle);
+mNewY = mPattern * sin(mAzi) * cos(mEle);
+mNewZ = mPattern * sin(mEle);
+
+(mIsInitialised == 0) ?
+(
+  mW = mNewW;
+  mX = mNewX;
+  mY = mNewY;
+  mZ = mNewZ;
+);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+mInverseSamplesblock = 1. / samplesblock;
+
+// Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
+
+mIncW = (mNewW - mW) * mInverseSamplesblock;
+mIncX = (mNewX - mX) * mInverseSamplesblock;
+mIncY = (mNewY - mY) * mInverseSamplesblock;
+mIncZ = (mNewZ - mZ) * mInverseSamplesblock;
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Linear interpolation to new coefficients:
+mW += mIncW;
+mX += mIncX;
+mY += mIncY;
+mZ += mIncZ;
+
+spl0 = wIn * mW  + xIn * mX  + yIn * mY  + zIn * mZ;
+spl1 = spl0 * mReturnMode;
+// Channel 3 and 4 need to be silenced to prevent signals from leaking through
+spl2 = 0.;
+spl3 = 0.;

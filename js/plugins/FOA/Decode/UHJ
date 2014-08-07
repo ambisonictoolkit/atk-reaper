@@ -1,0 +1,291 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: UHJ
+  Ambisonic UHJ stereo decoder
+---------------------------------------------------------------------
+*/
+
+desc: Ambisonic UHJ stereo decoder
+
+
+// Import library with shared functions
+import atkKernelLibrary.jsfx-inc
+
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:L
+out_pin:R
+
+slider1:3<0,5,1{256, 512, 1024, 2048, 4096, 8192}>Kernel size
+slider2:0<-120,30,1>Preamp (dB)
+
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Allocate slots for filenames:
+mFilenameW = 1;
+mFilenameX = 2;
+mFilenameY = 3;
+
+// Allocate buffer and block locations...
+
+// ...for the impulse response kernel,
+mImpulseBufferW    = 65536 * 1;
+mImpulseBufferX    = 65536 * 2;
+mImpulseBufferY    = 65536 * 3;
+
+// ..the FFT-transformed kernel,
+mKernelW           = 65536 * 4;
+mKernelX           = 65536 * 5;
+mKernelY           = 65536 * 6;
+
+// ...and for two blocks of running samples to be convolved:
+
+// mBlockCurrentW,... is the most recently convolved block
+mBlockCurrentW     = 65536 * 7;
+mBlockCurrentX     = 65536 * 8;
+mBlockCurrentY     = 65536 * 9;
+
+// mBlockLastAndNextW,... is the previously used block. It will also be the next block
+mBlockLastAndNextW = 65536 * 10;
+mBlockLastAndNextX = 65536 * 11;
+mBlockLastAndNextY = 65536 * 12;
+
+// FFT- and convolution-related variables
+mPreviousSliderValue = -1;
+mFftSize             = -1;
+mKernelSize          = -1;
+mFftNewRequired      =  1;
+
+
+/********************************************************************
+Prepare a new kernel from an impulse buffer
+********************************************************************/
+function prepareKernel(anImpulseBuffer, aKernel, aKernelSize, anFftSize) local(i, lInvFftSize)
+(
+  // We do not need to resample, as IR in UHJ decoding does not depend on sample rate
+  
+  // Copy left and right channel of IR to the kernel buffer
+  // Every 2nd sample is left, right, left, right,...
+  // FFT and convolution operate on complex numbers
+  memcpy(aKernel, anImpulseBuffer, aKernelSize*2);
+  
+  /* FFT Size is twice that of the kernel, and we need to pad with zeros.
+   Additionally we do complex FFT and hence operate on stereo buffers.
+   */
+  memset(aKernel + (aKernelSize*2), 0.0, aKernelSize*2);
+  
+  // Do FFT of the impulse response
+  fft(aKernel, mFftSize);
+  
+  // Scale kernel to compensate for the size of the FFT window
+  lInvFftSize = 1 / anFftSize;
+  i=0;
+  loop(anFftSize*2, 
+    aKernel[i] *= lInvFftSize; 
+    i += 1; 
+  );
+);
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+// Has kernel size changed?
+(mPreviousSliderValue != slider1) ?
+(
+  mPreviousSliderValue = slider1;
+  
+  // Get new kernel size
+  mKernelSize = 256;
+  loop (slider1,
+    mKernelSize = mKernelSize * 2;
+  );
+    
+  // Set filename of impulse response files  
+  sprintf(mFilenameW, "ATK/kernels/FOA/decoders/uhj/None/%i/0000/UHJ_W.wav", mKernelSize);
+  sprintf(mFilenameX, "ATK/kernels/FOA/decoders/uhj/None/%i/0000/UHJ_X.wav", mKernelSize);
+  sprintf(mFilenameY, "ATK/kernels/FOA/decoders/uhj/None/%i/0000/UHJ_Y.wav", mKernelSize);
+  
+  // Read impulse files from disk
+  readKernelImpulseFromFile(mFilenameW, mImpulseBufferW);
+  readKernelImpulseFromFile(mFilenameX, mImpulseBufferX);
+  readKernelImpulseFromFile(mFilenameY, mImpulseBufferY);
+  
+  // Set flag that FFT need to be recalculated
+  mFftNewRequired = 1;
+);
+
+preamp = 2^(slider2/6);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+// If kernel size has changed, we need to prepare a new kernel
+mFftNewRequired ? (
+  
+  mFftSize = 2 * mKernelSize;
+  
+  // What is chunksize and chunksize2 used for?
+  // If mKernelSize = 256 and mFftSize = 512, chunksize = 512 - 256 - 1 = 255 and chunksize2 = 510
+  chunksize  = mFftSize - mKernelSize - 1;
+  chunksize2 = chunksize * 2;
+  
+  // Do FFT on the impulse responses
+  prepareKernel(mImpulseBufferW, mKernelW, mKernelSize, mFftSize);
+  prepareKernel(mImpulseBufferX, mKernelX, mKernelSize, mFftSize);
+  prepareKernel(mImpulseBufferY, mKernelY, mKernelSize, mFftSize);
+  
+  // Reset current write/read position within the blocks
+  mBufferPosition = 0; 
+  
+  // Convolution kernel is now up to date
+  mFftNewRequired = 0; 
+);
+
+
+/**********************************************************
+Calculate audio sample
+
+Functions with arguments do not work within the @sample block as of Reaper 4.71,
+This limits how DRY we're able to make this section
+**********************************************************/
+@sample
+
+// If we're past the chunksize, it's time to convolve
+mBufferPosition >= chunksize ? 
+(
+  /***** Convolve W *****/
+  
+  // Swap which block is last and current
+  mTempBlock         = mBlockLastAndNextW;
+  mBlockLastAndNextW = mBlockCurrentW;
+  mBlockCurrentW     = mTempBlock;
+  
+  // Pad the tail of the buffer to zero
+  memset(mBlockCurrentW+chunksize*2, 0, (mFftSize-chunksize)*2);
+  
+  // The actual convolution
+  fft(mBlockCurrentW, mFftSize);
+  convolve_c(mBlockCurrentW, mKernelW, mFftSize);
+  ifft(mBlockCurrentW, mFftSize);
+  
+  
+  /***** Convolve X *****/
+  
+  // Swap which block is last and current
+  mTempBlock         = mBlockLastAndNextX;
+  mBlockLastAndNextX = mBlockCurrentX;
+  mBlockCurrentX     = mTempBlock;
+  
+  // Pad the tail of the buffer to zero
+  memset(mBlockCurrentX+chunksize*2, 0, (mFftSize-chunksize)*2);
+  
+  // The actual convolution
+  fft(mBlockCurrentX, mFftSize);
+  convolve_c(mBlockCurrentX, mKernelX, mFftSize);
+  ifft(mBlockCurrentX, mFftSize);
+  
+  
+  /***** Convolve Y *****/
+  
+  // Swap which block is last and current
+  mTempBlock         = mBlockLastAndNextY;
+  mBlockLastAndNextY = mBlockCurrentY;
+  mBlockCurrentY     = mTempBlock;
+  
+  // Pad the tail of the buffer to zero
+  memset(mBlockCurrentY+chunksize*2, 0, (mFftSize-chunksize)*2);
+  
+  // The actual convolution
+  fft(mBlockCurrentY, mFftSize);
+  convolve_c(mBlockCurrentY, mKernelY, mFftSize);
+  ifft(mBlockCurrentY, mFftSize);
+  
+  
+  // Update delay compensation
+  pdc_delay = ((1.5 * mKernelSize)|0) - 2;
+  
+  // Delay compensation affects channels 1-2
+  pdc_bot_ch=0;
+  pdc_top_ch=2;
+  
+  
+  // Current write/read position within the blocks starts counting from 0 again
+  mBufferPosition=0;
+);
+
+
+mBufferPosition2 = mBufferPosition*2;
+
+
+// Buffer incoming audio as real value, set imaginary value to zero:
+
+// W
+mBlockLastAndNextW[mBufferPosition2]   = spl0 * preamp;
+mBlockLastAndNextW[mBufferPosition2+1] = 0;
+
+// X
+mBlockLastAndNextX[mBufferPosition2]   = spl1 * preamp;
+mBlockLastAndNextX[mBufferPosition2+1] = 0;
+
+// Y
+mBlockLastAndNextY[mBufferPosition2]   = spl2 * preamp;
+mBlockLastAndNextY[mBufferPosition2+1] = 0;
+
+
+// Copy convolved sample values to output
+spl0 = mBlockCurrentW[mBufferPosition2]   + mBlockCurrentX[mBufferPosition2]   + mBlockCurrentY[mBufferPosition2];
+spl1 = mBlockCurrentW[mBufferPosition2+1] + mBlockCurrentX[mBufferPosition2+1] + mBlockCurrentY[mBufferPosition2+1];
+
+
+// Add the overlap part (In this plugin we will always be overlapping)
+mBufferPosition < mFftSize-chunksize ? 
+(
+  spl0 += mBlockLastAndNextW[chunksize2+mBufferPosition2]   + mBlockLastAndNextX[chunksize2+mBufferPosition2]   + mBlockLastAndNextY[chunksize2+mBufferPosition2];
+  spl1 += mBlockLastAndNextW[chunksize2+mBufferPosition2+1] + mBlockLastAndNextX[chunksize2+mBufferPosition2+1] + mBlockLastAndNextY[chunksize2+mBufferPosition2+1];
+);
+
+
+// Increment buffer position
+mBufferPosition += 1;
+
+
+// Output is stereo only, so we silence channels 3 and 4:
+spl2 = 0.;
+spl3 = 0.;

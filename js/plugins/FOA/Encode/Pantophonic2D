@@ -1,0 +1,191 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: Pantophonic (2D) regular polygon encoder.
+  
+  Inputs are in anti-clockwise order. The position of the first input 
+  channel is either centre or left of centre. -dirChannels may be used 
+  to query resulting input channel directions. This encoding is equivalent 
+  to placing infinitely distant loudspeakers around a soundfield microphone 
+  in an anechoic chamber.
+
+---------------------------------------------------------------------
+*/
+
+desc: Pantophonic (2D) regular polygon encoder
+
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
+
+in_pin:1
+in_pin:2
+in_pin:3
+in_pin:4
+in_pin:5
+in_pin:6
+in_pin:7
+in_pin:8
+in_pin:9
+in_pin:10
+in_pin:11
+in_pin:12
+in_pin:13
+in_pin:14
+in_pin:15
+in_pin:16
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+slider1:4<2,16,1>Number of speakers
+slider2:0<0,1,1{Flat, Point}>Speaker orientation
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Allocation of memory for matrix used for DSP processing
+sIn        = 1000;
+matrixDSP  = 1200;
+
+function calculateEncodeMatrix()
+(
+  mSpeakerAziDelta = $pi * 2.0 / mNumSpeakers;
+
+  (mSpeakerLayout==0) ? (
+    mSpeakerAzi = 0.5 * mSpeakerAziDelta;
+  ) : (
+    mSpeakerAzi = 0.;
+  );
+
+  // Clear the matrix
+  i = 0;
+  loop(64,
+    matrixDSP[i] = 0.;
+    i += 1;
+  );
+
+  i = 0;
+  loop(mNumSpeakers,
+    matrixDSP[i]    = kInvSqrt2;        // W
+    matrixDSP[i+16] = cos(mSpeakerAzi); // X
+    matrixDSP[i+32] = sin(mSpeakerAzi); // Y
+    mSpeakerAzi += mSpeakerAziDelta;
+    i += 1;
+  );
+);
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+// Round off in case user types in a decimal value
+mNumSpeakers   = floor(slider1+0.5);
+slider1 = mNumSpeakers;
+slider_automate(slider1);
+
+mSpeakerLayout = slider2;
+
+calculateEncodeMatrix();
+
+
+/**********************************************************
+Custom graphic interface
+**********************************************************/
+@gfx 500 500
+
+determineGeometry();
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
+
+// Size, saturation and luminocity depends on posZ
+gainToColor(0., -24., 6., 0.);
+
+(mSpeakerLayout==0) ? (
+  mSpeakerAzi = 0.5 * mSpeakerAziDelta;
+) : (
+  mSpeakerAzi = 0.;
+);
+
+loop(mNumSpeakers,
+  drawSourceLocation(gCenterX - gRadius*sin(mSpeakerAzi),  gCenterY - gRadius*cos(mSpeakerAzi),  0., 1.);
+  mSpeakerAzi += mSpeakerAziDelta;
+);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+sIn[0]  = spl0;
+sIn[1]  = spl1;
+sIn[2]  = spl2;
+sIn[3]  = spl3;
+sIn[4]  = spl4;
+sIn[5]  = spl5;
+sIn[6]  = spl6;
+sIn[7]  = spl7;
+sIn[8]  = spl8;
+sIn[9]  = spl9;
+sIn[10] = spl10;
+sIn[11] = spl11;
+sIn[12] = spl12;
+sIn[13] = spl13;
+sIn[14] = spl14;
+sIn[15] = spl15;
+
+spl0 = 0.;
+spl1 = 0.;
+spl2 = 0.;
+
+ii = 0;
+loop(mNumSpeakers,
+  spl0 += sIn[ii] * matrixDSP[ii];   // W
+  spl1 += sIn[ii] * matrixDSP[ii+16]; // X
+  spl2 += sIn[ii] * matrixDSP[ii+32]; // Y
+  ii += 1;
+);
+spl3 = 0.; // Z
+
+// Avoid input sound from leaking through on channel 5-16:
+spl4 =  0.;
+spl5 =  0.;
+spl6 =  0.;
+spl7 =  0.;
+spl8 =  0.;
+spl9 =  0.;
+spl10 = 0.;
+spl11 = 0.;
+spl12 = 0.;
+spl13 = 0.;
+spl14 = 0.;
+spl15 = 0.;
+

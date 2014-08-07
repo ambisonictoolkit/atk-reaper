@@ -1,0 +1,533 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: atkGraphicsLibrary.jsfx-inc
+  Library of shared functions relating to graphics
+---------------------------------------------------------------------
+
+
+/********************************************************************
+Functions in the init section can be used by any plugin loading this
+file, encouraging DRY (don't repeat yourself)
+********************************************************************/
+@init
+
+
+/********************************************************************
+Graphics: Set drawing color
+********************************************************************/
+function gxColorSet(anAlpha, aRed, aGreen, aBlue)
+(
+	gfx_a = anAlpha;
+	gfx_r = aRed;
+	gfx_g = aGreen;
+	gfx_b = aBlue;
+);
+
+
+/********************************************************************
+Graphics: Set drawing position
+********************************************************************/
+function gxPositionSet(aX, aY)
+(
+	gfx_x = aX;
+	gfx_y = aY;
+);
+
+
+/********************************************************************
+Graphics: Color convertion utility for hsl to rgb convertions
+********************************************************************/
+function hls_value(aN1, aN2, aHue)
+(
+	// Restrict incoming range to [0., 360.]
+  aHue > 360.0 ? (
+    aHue -= 360.;
+  ) : (
+    aHue < 0.0 ? (
+      aHue += 360.;
+    );
+  );
+  
+  aHue < 60. ? (
+    aN1+(aN2-aN1)*aHue/60.
+  ) : (
+    aHue < 180. ? (
+      aN2;
+    ) : (
+      aHue < 240. ? (
+        aN1+(aN2-aN1)*(240-aHue)/60.;
+      ) : (
+        aN1;
+      );
+    );
+  );
+);
+
+
+
+/********************************************************************
+Graphics: Set color based on hsl values
+********************************************************************/
+function gxColorSetHsl(anAlpha, aHue, aSaturation, aLightness) local(lRed, lGreen, lBlue, lM1, lM2)
+(
+  aLightness <= 0.5 ? (
+    lM2 = aLightness*(1.0+aSaturation);
+  ) : (
+    lM2 = aLightness + aSaturation - aLightness * aSaturation;
+  );
+  
+  lM1 = 2.0 * aLightness-lM2;
+  
+  aSaturation == 0.0 ? (
+    lRed = aLightness;
+  	lGreen = aLightness;
+  	lBlue = aLightness;
+  ) : (
+    lRed = hls_value(lM1, lM2, aHue+120.0);
+  	lGreen = hls_value(lM1, lM2, aHue);
+  	lBlue = hls_value(lM1, lM2, aHue-120.0);
+  );
+  
+  gxColorSet(anAlpha, lRed, lGreen, lBlue)
+);
+
+
+/********************************************************************
+Graphics: Express gain (in dB) as graphics color
+********************************************************************/
+function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) local(lHue, lSaturation, lLightness, lGainClipped, lAlpha)
+(
+  
+  // Restrict gain to (-70, ->) dB
+  (aGain < -70.) ? (
+    aGain = -70.;
+  );
+  
+  lGainClipped = aGain;
+  
+  // Clip gain to prescribed range:
+  lGainClipped < aGainLowLimit ? (
+    lGainClipped = aGainLowLimit;
+  ) : (
+    lGainClipped > aGainHighLimit ? (
+      lGainClipped = aGainHighLimit;
+    );
+  );
+  
+  // Map gain to hue
+  lHue = ((lGainClipped - aGainHighLimit) / (aGainLowLimit - aGainHighLimit)) * 240.;
+  
+  // Map vertical position to saturation and lightness
+  aVerticalOffset < 0 ? (
+    lSaturation = 1. - 0.4*aVerticalOffset;
+    lLightness = 0.5;
+  ) : (
+    lSaturation = 1.;
+    lLightness = 0.5 + 0.4*aVerticalOffset;
+  );
+  
+  // Turn towards black for gains in the (-70, aGainLowLimit) dB range
+  (aGain<aGainLowLimit) ? (
+    lSaturation = lSaturation * (aGain - (-70.))/(aGainLowLimit - (-70.));
+    lLightness = lLightness * (aGain - (-70.))/(aGainLowLimit - (-70.));
+  );
+  
+  // Make point increasingly transparent for gains below -50 dB
+  (aGain < -50.) ? (
+    lAlpha = (aGain - (-70.))/(-50. - (-70.));
+  ) : (
+    lAlpha = 1.;
+  );
+  
+  // Set color as hsl
+  gxColorSetHsl(lAlpha, lHue, lSaturation, lLightness);
+);
+
+
+/********************************************************************
+Graphics: Determine geometry
+********************************************************************/
+function determineGeometry()
+(
+  gCenterX = gfx_w  * 0.5;
+  gCenterY = gfx_h * 0.5;
+
+  gCenterX < gCenterY ? gRadius = gCenterX : gRadius = gCenterY;
+  gRadius = gRadius - 10;
+  gInverseRadius = 1. / gRadius;
+);
+
+
+/********************************************************************
+Graphics: Draw line segment
+********************************************************************/
+function drawLineSegment(aPosition1x, aPosition1y, aPosition2x, aPosition2y, anAntiAliasing)
+(
+  gfx_x = aPosition1x;
+  gfx_y = aPosition1y;
+  gfx_lineto(aPosition2x, aPosition2y, anAntiAliasing);
+);
+
+
+/********************************************************************
+Graphics: Draw background image based on ICST ambimonitor
+********************************************************************/
+function drawBackgroundImage(aSourceWidth, aSourceHeight, aDstLeft, aDstTop, aDstWidth, aDstHeight) local(lCoordinatelist, i, lDeltaX, lDeltaY)
+(
+  // Setting memory slot for local array
+  lCoordinatelist = 10000;
+  
+  // Draw background circle
+  gxColorSet(1.0, 0.2, 0.2, 0.2);
+  gfx_circle(gCenterX, gCenterY, gRadius, 1, 1);
+  
+  gxColorSet(1.0, 0.5, 0.5, 0.5);
+  // Draw circles
+  i = 1;
+  loop(10,
+    gfx_circle(gCenterX, gCenterY, 0.1*i*gRadius, 0, 1);
+    i += 1;
+  );
+  
+  // Draw lines for every 30 degrees
+  i = 0;
+  loop(6,
+    lDeltaX = gRadius * cos($pi*i/6);
+    lDeltaY = gRadius * sin($pi*i/6);
+    drawLineSegment(gCenterX - lDeltaX, gCenterY - lDeltaY, gCenterX + lDeltaX, gCenterY + lDeltaY, 1);
+    i += 1;
+  );
+);
+
+
+
+
+
+/********************************************************************
+Graphics: Draw outline of polygon with four sides and four corners
+********************************************************************/
+function drawQuadrangleOutline(aPosition1x, aPosition1y, aPosition2x, aPosition2y, aPosition3x, aPosition3y, aPosition4x, aPosition4y, anAntiAliasing)
+(
+  gfx_x = aPosition1x;
+  gfx_y = aPosition1y;
+  gfx_lineto(aPosition2x, aPosition2y, anAntiAliasing);
+  gfx_lineto(aPosition3x, aPosition3y, anAntiAliasing);
+  gfx_lineto(aPosition4x, aPosition4y, anAntiAliasing);
+  gfx_lineto(aPosition1x, aPosition1y, anAntiAliasing);
+);
+
+
+/********************************************************************
+Graphics: Draw outline of polygon with four sides and four corners
+********************************************************************/
+function drawRectangle(aLeft, aTop, aRight, aBottom)
+(
+  gfx_x = aLeft;
+  gfx_y = aTop;
+  gfx_rectto(aRight, aBottom);
+);
+
+/********************************************************************
+Graphics: Draw centered filled-in square
+********************************************************************/
+function drawCenteredSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRadius)
+(
+  lSquareRadius = aSquareSize * 0.5;
+  gfx_x = aCenterX - lSquareRadius;
+  gfx_y = aCenterY - lSquareRadius;
+  gfx_rectto(aCenterX + lSquareRadius, aCenterY + lSquareRadius);
+);
+
+
+/********************************************************************
+Graphics: Draw centered filled-in square
+********************************************************************/
+function drawSourceLocation(aCenterX, aCenterY, aPosZ, aDirectedness) local(lRadius, lAlpha, lRed, lGreen, lBlue)
+(
+  lAlpha = gfx_a;
+  // Calculate radius and transparency
+  lRadius = (1. - aDirectedness) * (gRadius-6.) + + 2.5*aPosZ + 6.;
+  // We use the square of lDirectedness for alpha so that it gets more rapidly transparent when the circle grows.
+  // This looks better in the GUIs, as it doesn't get completely clogged by many almost non-transparent circles.
+  gfx_a = ((aDirectedness*aDirectedness*0.9) + 0.1)*lAlpha;
+  
+  // Draw circle
+	
+  gfx_circle(aCenterX,aCenterY,lRadius,1,1);
+  gfx_a = lAlpha;
+);
+
+
+/********************************************************************
+Graphics: Draw centered filled-in square
+********************************************************************/
+function drawSourceLocationCenter(aCenterX, aCenterY) local(lRadius)
+(
+  gfx_circle(aCenterX,aCenterY,3,1,1);
+);
+
+
+/********************************************************************
+Graphics: Draw interactive square
+********************************************************************/
+function drawInteractionSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRadius, lAlpha, lRed, lGreen, lBlue)
+(
+  // Temporarily store incoming color
+	lAlpha = gfx_a;
+	lRed   = gfx_r;
+	lGreen = gfx_g;
+	lBlue  = gfx_b;
+  
+  // Draw square with white frame:
+  drawCenteredSquare(aCenterX, aCenterY, aSquareSize);
+  gxColorSet(1., 1., 1., 1.);
+  lSquareRadius = aSquareSize * 0.5;
+  drawQuadrangleOutline(aCenterX - lSquareRadius, aCenterY - lSquareRadius, 
+                        aCenterX + lSquareRadius, aCenterY - lSquareRadius,
+                        aCenterX + lSquareRadius, aCenterY + lSquareRadius,
+                        aCenterX - lSquareRadius, aCenterY + lSquareRadius,
+                        1.
+                      );
+                      
+  // Return color to its prior value
+  gxColorSet(lAlpha, lRed, lGreen, lBlue);
+);
+
+
+/********************************************************************
+Graphics: Draw interactive square
+********************************************************************/
+function drawInteractionCircle(aCenterX, aCenterY, aRadius) local(lSquareRadius, lAlpha, lRed, lGreen, lBlue)
+(
+  // Temporarily store incoming color
+	lAlpha = gfx_a;
+	lRed   = gfx_r;
+	lGreen = gfx_g;
+	lBlue  = gfx_b;
+  
+  // Draw filled circle
+  gfx_circle(aCenterX,aCenterY,aRadius,1,1);
+  
+  // Draw white border
+  gxColorSet(1., 1., 1., 1.);
+  gfx_circle(aCenterX,aCenterY,aRadius,0,1);
+                      
+  // Return color to its prior value
+  gxColorSet(lAlpha, lRed, lGreen, lBlue);
+);
+
+
+/********************************************************************
+Graphics: Draw points illustrating the effect of various transforms
+********************************************************************/
+function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i, lPosX, lPosY, lPosZ, lGain, lDirectedness, lSquareSize)
+(
+  // Draw transparent circles indicating the location and directedness of each source after the transform
+  // TODO: Also take z value into account in this visualisation?
+  i = 0;
+  loop(
+    aNumPoints,
+    lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
+    lPosY = gCenterY - gRadius * aMatrix[i];
+    lPosZ = aMatrix[2 * aNumPoints + i];
+    lGain = aMatrix[3 * aNumPoints + i];
+    
+    // Calculate degree of directedness
+    lDirectedness = sqrt(aMatrix[i]*aMatrix[i] + aMatrix[aNumPoints+i]*aMatrix[aNumPoints+i] + aMatrix[2*aNumPoints+i]*aMatrix[2*aNumPoints+i]);
+    
+    // Size, saturation and luminocity depends on posZ
+    lSquareSize = 2. * lPosZ + 8.;
+    gainToColor(aMatrix[3 * aNumPoints + i], -24., 6., lPosZ);
+    
+    //drawCenteredSquare(lPosX, lPosY, lSquareSize);
+    //(lGain >= -70.) ? (
+      drawSourceLocation(lPosX, lPosY, lPosZ, lDirectedness);
+      //);
+    i += 1;
+  );
+  
+  // Draw darker circles at the azi/ele/directedness center location of each source after the transform
+  ( aDrawCenterPoint ?
+    (
+      i = 0;
+      loop(
+        aNumPoints,
+        lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
+        lPosY = gCenterY - gRadius * aMatrix[i];
+        gxColorSet(0.25, 0., 0., 0.);
+        drawSourceLocationCenter(lPosX, lPosY);
+        i += 1;
+      );
+    );
+  );
+);
+
+
+/********************************************************************
+Graphics: Draw multi-channel level meter
+********************************************************************/
+function drawMultichannelLevelMeterInterface(gain, displaydDbGain, numChannels)
+local (decibel, deltaX, hideSectionWidth, i, left, 
+  stripHeight, stripLeft, stripRight, stripSeparatorHeight, stripTotalHeight, stripWidth, 
+  top, xPos, yPos2, stripTop, stripBottom)
+(
+  // Setting memory slots for local arrays:
+  stripTop    = 10000;
+  stripBottom = 10100;
+  
+  // Set colors
+  gxColorSet(1, 1, 1, 1);
+
+  // Draw background image providing gain color indication
+  left             = 10;
+  top              = 10;
+  stripWidth       = gfx_w - 20;
+  stripTotalHeight = gfx_h - 20;
+  drawBackgroundImage(661, 1, left, top, stripWidth, stripTotalHeight);
+
+  // Geometry for channel strips - if more than 4 channels they are grouped as pairs
+  numChannels > 4 ? (
+    stripHeight          = (stripTotalHeight-(numChannels*0.5)) / (numChannels+1);
+    stripSeparatorHeight = (stripTotalHeight-(numChannels*0.5)) / ((numChannels+1) * (numChannels*0.5 - 1));
+    stripLeft            = 10.;                               // Same for all strips
+    stripRight           = gfx_w - 10.;                       // Same for all strips
+  ) : (
+    stripHeight          = (stripTotalHeight-(numChannels-1.)) / numChannels;
+    stripSeparatorHeight = 1.;
+    stripLeft            = 10.;                               // Same for all strips
+    stripRight           = gfx_w - 10.;                       // Same for all strips
+  );
+  
+
+  // Calculate borders for each section of the multichannel meter
+  i = 0;
+  top = 10;
+  loop(numChannels,
+    stripTop[i]    = top;
+    stripBottom[i] = top + stripHeight;
+    top += stripHeight + 1.;
+    i += 1.;
+  
+    stripTop[i]    = top;
+    stripBottom[i] = top + stripHeight;
+    top += stripHeight + stripSeparatorHeight;
+  
+    i += 1.;
+  );
+
+  // Draw separators:
+  gxColorSet(1., 0, 0, 0);
+  i = 0;
+  loop(numChannels-1,
+    drawRectangle(stripLeft, stripBottom[i], stripRight, stripTop[i+1]);
+    i += 1.;
+  );
+
+  // Draw black square in front of background to display gain
+  i = 0;
+  top = 10;
+  loop(numChannels,  
+    // Determine max absolute sample value in dB:
+    decibel = amp2db(sqrt(gain[i]));
+    decibel = clipValue(decibel, -60. , 6);
+    decibel > displaydDbGain[i] ?
+      displaydDbGain[i] = decibel;
+  
+    // Mask parts of background
+    hideSectionWidth = (6. - displaydDbGain[i]) / 66.;
+    drawRectangle(stripLeft + round((1. - hideSectionWidth) * stripWidth), stripTop[i]-1, stripRight, stripBottom[i]+1);
+  
+    // Reset gain:
+    gain[i] = 0.;
+    displaydDbGain[i] -= 2.;
+  
+    i += 1;
+  );
+
+  // Drawing vertical red line at 0 dB. This will be partly masked later
+  xPos = 10. + 10*deltaX;
+  yPos2 = gfx_h-10.;
+  gxColorSet(1., 1., 0., 0.);
+  drawLineSegment(xPos, 10., xPos, yPos2, 1.);
+
+  // Draw vertical db lines for every 6 dB:
+  gxColorSet(0.75, 1., 1., 1.);
+  i = 0;
+  xPos = 10.;
+  yPos2 = gfx_h-10.;
+  deltaX = stripWidth / 11.;
+  loop(12,
+    drawLineSegment(xPos, 10., xPos, yPos2, 1.);
+    xPos += deltaX;
+    i += 1;
+  );
+
+  // Write dB values. Don't need to do so at 0 db as it already stands out colorwise
+  yPos2 = gfx_h-20.;
+
+  gxPositionSet(13., yPos2);
+  gfx_drawnumber(-60,0);
+
+  gxPositionSet(13. + 2*deltaX, yPos2);
+  gfx_drawnumber(-48,0);
+
+  gxPositionSet(13. + 4*deltaX, yPos2);
+  gfx_drawnumber(-36,0);
+
+  gxPositionSet(13. + 6*deltaX, yPos2);
+  gfx_drawnumber(-24,0);
+
+  gxPositionSet(13. + 8*deltaX, yPos2);
+  gfx_drawnumber(-12,0);
+);
+
+
+/********************************************************************
+Graphics: Post matrix content to GUI, can be used for debugging
+********************************************************************/
+function postMatrixForDebugging(aMatrix, aNumRows, aNumCols) local(i, j, lAlpha, lRed, lGreen, lBlue)
+(
+  // Temporarily store gx color, and set color to white
+	lAlpha = gfx_a;
+	lRed   = gfx_r;
+	lGreen = gfx_g;
+	lBlue  = gfx_b;
+  gxColorSet(1., 1., 1., 1.);
+  
+  // Iterate over columns:
+  i = 0;
+  loop(aNumCols,
+    // Iterate over rows
+    j = 0;
+    loop(aNumRows,
+      gxPositionSet(i*70 + 10, j*20 + 20);
+      gfx_drawnumber( aMatrix[i + aNumCols*j],4);
+      j += 1;
+    );
+    i += 1;
+  );
+  // Return color to what it used to be
+  gxColorSet(lAlpha, lRed, lGreen, lBlue);
+);

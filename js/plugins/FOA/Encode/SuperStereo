@@ -1,0 +1,327 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: SuperStereo
+  Ambisonic Super Stereo encoder.
+  The Super Stereo encoding technique is the classic method for 
+  encoding stereophonic signals into B-format.
+---------------------------------------------------------------------
+*/
+
+desc: Ambisonic Super Stereo encoder.
+
+
+// Import library with shared functions
+import atkKernelLibrary.jsfx-inc
+
+
+in_pin:L
+in_pin:R
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+slider1:3<0,5,1{256, 512, 1024, 2048, 4096, 8192}>Kernel size
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Allocate slots for filenames:
+mFilenameL = 1;
+mFilenameR = 2;
+
+// Allocate buffer and block locations...
+
+// ...for the impulse response kernel,
+mImpulseBufferL       = 131072 * 1;
+mImpulseBufferR       = 131072 * 2;
+
+// ..the FFT-transformed kernel,
+mKernelL2WX           = 131072 * 3;
+mKernelL2YZ           = 131072 * 4;
+
+mKernelR2WX           = 131072 * 5;
+mKernelR2YZ           = 131072 * 6;
+
+// ...and for two blocks of running samples to be convolved:
+
+// mBlockCurrentW,... is the most recently convolved block
+mBlockCurrentL2WX     = 131072 * 7;
+mBlockCurrentL2YZ     = 131072 * 8;
+
+mBlockCurrentR2WX     = 131072 * 9;
+mBlockCurrentR2YZ     = 131072 * 10;
+
+// mBlockLastAndNextW,... is the previously used block. It will also be the next block
+mBlockLastAndNextL2WX = 131072 * 11;
+mBlockLastAndNextL2YZ = 131072 * 12;
+
+mBlockLastAndNextR2WX = 131072 * 13;
+mBlockLastAndNextR2YZ = 131072 * 14;
+
+
+// FFT- and convolution-related variables
+mPreviousKernelSliderValue = -1;
+mFftSize                   = -1;
+mKernelSize                = -1;
+mFftNewRequired            =  1;
+
+
+/********************************************************************
+Prepare a new kernel from an impulse buffer
+********************************************************************/
+function prepareKernel(anImpulseBuffer, aKernel, aKernelSize, anFftSize, aChannelOffset, aNumChannels) local(i, i2, i3, lInvFftSize)
+(
+  // We do not need to resample, as IR in SuperStereo encoder does not depend on sample rate
+  
+  // Copy two channels from IR to the kernel buffer
+  // Samples are inter-leaved (L,R,L,R, .... or 1,2,3,4,1,2,3,4,...)
+  // FFT and convolution operate on complex numbers
+  i2 = 0;
+  i3 = 0;
+  loop(aKernelSize,
+    
+    // Copy first channel
+    aKernel[i2]     = anImpulseBuffer[i3 + aChannelOffset];
+    
+    // Are we to copy two (WX) or one (Y) channel from the IR into kernel?
+    (aNumChannels == 2) ? (
+      aKernel[i2 + 1] = anImpulseBuffer[i3 + aChannelOffset + 1];
+    ) : (
+      aKernel[i2 + 1] = 0.;
+    );
+    
+    i2 += 2;
+    i3 += 3;
+  );
+  
+  /* FFT Size is twice that of the kernel, and we need to pad with zeros.
+   Additionally we do complex FFT and hence operate on stereo buffers.
+   */
+  memset(aKernel + (aKernelSize*2), 0.0, aKernelSize*2);
+  
+  // Do FFT of the impulse response
+  fft(aKernel, mFftSize);
+  
+  // Scale kernel to compensate for the size of the FFT window
+  lInvFftSize = 1 / anFftSize;
+  i=0;
+  loop(anFftSize*2, 
+    aKernel[i] *= lInvFftSize; 
+    i += 1; 
+  );
+);
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+// Has kernel size changed?
+(mPreviousKernelSliderValue != slider1) ?
+(
+  mPreviousKernelSliderValue = slider1;
+  
+  // Get new kernel size
+  mKernelSize = 256;
+  loop (slider1,
+    mKernelSize = mKernelSize * 2;
+  );
+    
+  // Set filename of impulse response file
+  sprintf(mFilenameL, "ATK/kernels/FOA/encoders/super/None/%i/0000/Super_L.wav", mKernelSize);
+  sprintf(mFilenameR, "ATK/kernels/FOA/encoders/super/None/%i/0000/Super_R.wav", mKernelSize);
+  
+  // Cupy impulse (3 channels WXY) from file to buffer
+  readKernelImpulseFromFile(mFilenameL, mImpulseBufferL);
+  readKernelImpulseFromFile(mFilenameR, mImpulseBufferR);
+  
+  // Set flag that FFT need to be recalculated
+  mFftNewRequired = 1;
+);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+// If kernel size has changed, we need to prepare a new kernel
+mFftNewRequired ? (
+  
+  mFftSize = 2 * mKernelSize;
+  
+  // What is chunksize and chunksize2 used for?
+  // If mKernelSize = 256 and mFftSize = 512, chunksize = 512 - 256 - 1 = 255 and chunksize2 = 510
+  chunksize  = mFftSize - mKernelSize - 1;
+  chunksize2 = chunksize * 2;
+  
+  // Do FFT on the impulse responses
+  prepareKernel(mImpulseBufferL, mKernelL2WX, mKernelSize, mFftSize, 0, 2);
+  prepareKernel(mImpulseBufferL, mKernelL2YZ, mKernelSize, mFftSize, 2, 1);
+
+  prepareKernel(mImpulseBufferR, mKernelR2WX, mKernelSize, mFftSize, 0, 2);
+  prepareKernel(mImpulseBufferR, mKernelR2YZ, mKernelSize, mFftSize, 2, 1);
+  
+  // Reset current write/read position within the blocks
+  mBufferPosition = 0; 
+  
+  // Convolution kernel is now up to date
+  mFftNewRequired = 0; 
+);
+
+
+/**********************************************************
+Calculate audio sample
+
+Functions with arguments do not work within the @sample block as of Reaper 4.71,
+This limits how DRY we're able to make this section
+**********************************************************/
+@sample
+
+// If we're past the chunksize, it's time to convolve
+mBufferPosition >= chunksize ? 
+(
+  /***** Convolve Left to WX *****/
+  
+  // Swap which block is last and current
+  mTempBlock            = mBlockLastAndNextL2WX;
+  mBlockLastAndNextL2WX = mBlockCurrentL2WX;
+  mBlockCurrentL2WX     = mTempBlock;
+  
+  // Pad the tail of the buffer to zero
+  memset(mBlockCurrentL2WX+chunksize*2, 0, (mFftSize-chunksize)*2);
+  
+  // The actual convolution
+  fft(mBlockCurrentL2WX, mFftSize);
+  convolve_c(mBlockCurrentL2WX, mKernelL2WX, mFftSize);
+  ifft(mBlockCurrentL2WX, mFftSize);
+  
+  
+  /***** Convolve Left to Y (and Z)  *****/
+  
+  // Swap which block is last and current
+  mTempBlock            = mBlockLastAndNextL2YZ;
+  mBlockLastAndNextL2YZ = mBlockCurrentL2YZ;
+  mBlockCurrentL2YZ     = mTempBlock;
+  
+  // Pad the tail of the buffer to zero
+  memset(mBlockCurrentL2YZ+chunksize*2, 0, (mFftSize-chunksize)*2);
+  
+  // The actual convolution
+  fft(mBlockCurrentL2YZ, mFftSize);
+  convolve_c(mBlockCurrentL2YZ, mKernelL2YZ, mFftSize);
+  ifft(mBlockCurrentL2YZ, mFftSize);
+  
+  
+  /***** Convolve Right to WX *****/
+  
+  // Swap which block is last and current
+  mTempBlock            = mBlockLastAndNextR2WX;
+  mBlockLastAndNextR2WX = mBlockCurrentR2WX;
+  mBlockCurrentR2WX     = mTempBlock;
+  
+  // Pad the tail of the buffer to zero
+  memset(mBlockCurrentR2WX+chunksize*2, 0, (mFftSize-chunksize)*2);
+  
+  // The actual convolution
+  fft(mBlockCurrentR2WX, mFftSize);
+  convolve_c(mBlockCurrentR2WX, mKernelR2WX, mFftSize);
+  ifft(mBlockCurrentR2WX, mFftSize);
+  
+  
+  /***** Convolve Right to Y (and Z)  *****/
+  
+  // Swap which block is last and current
+  mTempBlock            = mBlockLastAndNextR2YZ;
+  mBlockLastAndNextR2YZ = mBlockCurrentR2YZ;
+  mBlockCurrentR2YZ     = mTempBlock;
+  
+  // Pad the tail of the buffer to zero
+  memset(mBlockCurrentR2YZ+chunksize*2, 0, (mFftSize-chunksize)*2);
+  
+  // The actual convolution
+  fft(mBlockCurrentR2YZ, mFftSize);
+  convolve_c(mBlockCurrentR2YZ, mKernelR2YZ, mFftSize);
+  ifft(mBlockCurrentR2YZ, mFftSize);
+  
+  
+  // Update delay compensation
+  pdc_delay = ((1.5 * mKernelSize)|0) - 2;
+  
+  // Delay compensation affects channels 1-3
+  pdc_bot_ch=0;
+  pdc_top_ch=4;
+  
+  // Current write/read position within the blocks starts counting from 0 again
+  mBufferPosition=0;
+);
+
+
+mBufferPosition2 = mBufferPosition*2;
+
+
+// Buffer incoming audio as real value, set imaginary value to zero
+
+// Left to WX
+mBlockLastAndNextL2WX[mBufferPosition2]   = spl0;
+mBlockLastAndNextL2WX[mBufferPosition2+1] = 0;
+
+// Left to YZ
+mBlockLastAndNextL2YZ[mBufferPosition2]   = spl0;
+mBlockLastAndNextL2YZ[mBufferPosition2+1] = 0;
+
+// Right to WX
+mBlockLastAndNextR2WX[mBufferPosition2]   = spl1;
+mBlockLastAndNextR2WX[mBufferPosition2+1] = 0;
+
+// Right to YZ
+mBlockLastAndNextR2YZ[mBufferPosition2]   = spl1;
+mBlockLastAndNextR2YZ[mBufferPosition2+1] = 0;
+
+
+// Copy convolved sample values to output
+spl0 = mBlockCurrentL2WX[mBufferPosition2]   + mBlockCurrentR2WX[mBufferPosition2];
+spl1 = mBlockCurrentL2WX[mBufferPosition2+1] + mBlockCurrentR2WX[mBufferPosition2+1];
+spl2 = mBlockCurrentL2YZ[mBufferPosition2]   + mBlockCurrentR2YZ[mBufferPosition2];
+spl3 = 0.;
+
+
+// Add the overlap part (In this plugin we will always be overlapping)
+mBufferPosition < mFftSize-chunksize ? 
+(
+  spl0 += mBlockLastAndNextL2WX[chunksize2+mBufferPosition2]   + mBlockLastAndNextR2WX[chunksize2+mBufferPosition2]  ;
+  spl1 += mBlockLastAndNextL2WX[chunksize2+mBufferPosition2+1] + mBlockLastAndNextR2WX[chunksize2+mBufferPosition2+1];  
+  spl2 += mBlockLastAndNextL2YZ[chunksize2+mBufferPosition2]   + mBlockLastAndNextR2YZ[chunksize2+mBufferPosition2]  ;
+);
+
+
+// Increment buffer position
+mBufferPosition += 1;

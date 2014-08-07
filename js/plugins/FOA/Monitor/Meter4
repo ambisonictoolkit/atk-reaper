@@ -1,0 +1,103 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: meter8
+  Display instant sound level for 4 channel surround signal
+*/
+
+desc: Instant level meter for 4 channel surround signal
+
+// Graphics file
+filename:0,../lib/GainSlider.png
+//filename:0,HorizontalBackground.png
+
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+numChannels = 4;
+
+// Setting pointer addresses for a few arrays:
+gain           = 100;
+displaydDbGain = 120;
+stripTop       = 140;
+stripBottom    = 160;
+
+i = 0;
+loop(numChannels,
+  gain[i]           =  0.;
+  displaydDbGain[i] = -60.;
+);
+
+
+/**********************************************************
+Graphics
+**********************************************************/
+@gfx 500 49
+
+drawMultichannelLevelMeterInterface(gain, displaydDbGain, numChannels);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+temp = spl0 * spl0;
+test = temp > gain[0];
+gain[0] = test * temp + (1. - test) * gain[0];
+
+temp = spl1 * spl1;
+test = temp > gain[1];
+gain[1] = test * temp + (1. - test) * gain[1];
+
+temp = spl2 * spl2;
+test = temp > gain[2];
+gain[2] = test * temp + (1. - test) * gain[2];
+
+temp = spl3 * spl3;
+test = temp > gain[3];
+gain[3] = test * temp + (1. - test) * gain[3];
+
+// All channels are passed on unprocessed
+spl0 = spl0;
+spl1 = spl1;
+spl2 = spl2;
+spl3 = spl3;

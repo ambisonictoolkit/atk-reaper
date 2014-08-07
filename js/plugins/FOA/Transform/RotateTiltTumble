@@ -1,0 +1,386 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: RotateTiltTumble
+  First Order Ambisonic (FOA) multi-axes rotation transformer
+---------------------------------------------------------------------
+*/
+
+
+desc: Rotate a first order ambisonic signal (B-format) around the z, x and y axes.
+
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+// Slider range is set to [-360,360] rather than [-180, 180] for more flexible scripting of rotating movements
+slider1:0<-180,180,1>Rotate (mouse)
+slider2:0<-180,180,1>Tilt (shift + mouse)
+slider3:0<-180,180,1>Tumble (cmd + mouse)
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Graphics constants:
+mInteractionCircleRadius = 11.;
+
+// Flag indicating that the plugin has not been fully initialised yet
+initialised = 0;
+
+// Setting memory locations for a number of 4x4 matrixes as 1D arrays
+matrixRotate    = 1000;
+matrixTumble    = 1020;
+matrixTilt      = 1040;
+
+// These are used for matrix multiplications
+matrixTemp      = 1100;
+
+// Resulting matrixes used for DSP processing
+matrixDSP       = 1200;
+matrixNewDSP    = 1220;
+matrixInc       = 1240;
+
+// Matrixes for graphic display of transformations
+matrixDisplayPoints      = 1300;
+matrixDisplayTransformed = 1400;
+matrixDisplayInterpreted = 1500;
+
+// This only needs to be generated once:
+numDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints); 
+
+function calculateCoefficients()
+(
+  generateRotationMatrix(matrixRotate, rotateAngle);
+  generateTiltlMatrix(matrixTilt,  tiltAngle);
+  generateTumblelMatrix(matrixTumble,  tumbleAngle);
+  
+  /* Build processing matrix by performing a series of matrix multiplications
+                        result =         left X                   right             */
+  matrixMultiplication  (matrixTemp,     4, 4, matrixTilt,        4, 4, matrixRotate);
+  matrixMultiplication  (matrixNewDSP,   4, 4, matrixTumble,      4, 4, matrixTemp);
+  
+  /* Transformation and interpretation of display points */
+  matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
+  
+  // Set initial DSP processing coefficients if the plugin has not yet been initialised
+  initialised == 0 ?
+  (
+    i = 0;
+    loop(16,
+      matrixDSP[i] = matrixNewDSP[i];
+    );
+    // Now we are fully initialised
+    initialised = 1;
+  );
+  
+  // The following are used for graphics processing:
+  cosRotation = cos(rotateAngle);
+  sinRotation = sin(rotateAngle);
+  
+  cosTilt = cos(tiltAngle);
+  sinTilt = sin(tiltAngle);
+  
+  cosTumble = cos(tumbleAngle);
+  sinTumble = sin(tumbleAngle);
+);
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+rotateAngle = slider1 * kDeg2Rad;
+tiltAngle   = slider2 * kDeg2Rad;
+tumbleAngle = slider3 * kDeg2Rad;
+
+calculateCoefficients();
+
+
+/**********************************************************
+Custom graphic interface
+**********************************************************/
+@gfx 500 500
+
+// First we deal with mouse interactions:
+
+// Mouse drag: Update rotateAngle
+mouse_cap == 1 ?
+(
+  mouseX = mouse_x - gCenterX;
+  mouseY = mouse_y - gCenterY;
+  rotateAngle = atan2(mouseX, -mouseY);
+  slider1 = rotateAngle * kRad2Deg;
+  
+  // Notify GUI that rotation has changed, and update coefficients
+  slider_automate(slider1);
+  calculateCoefficients();
+);
+
+// SHIFT + mouse drag: Update tiltAngle
+mouse_cap == 9 ?
+(
+  mouseX = mouse_x - gCenterX;
+  
+  mouseX > gRadius ? (
+    mouseX = gRadius
+  ) : (
+    mouseX < -gRadius ? (
+      mouseX = -gRadius
+    );
+  );
+  
+  tiltAngle = mouseX  * $pi / gRadius;
+  slider2 = tiltAngle * kRad2Deg;
+  
+  // Notify GUI/automation that tilt has changed, and update coefficients
+  slider_automate(slider2);
+  calculateCoefficients();
+);
+
+
+// CMD + mouse: Update tumbleAngle
+mouse_cap == 5 ?
+(
+  mouseY = gCenterY - mouse_y;
+  mouseY > gRadius ? (
+    mouseY = gRadius
+  ) : (
+    mouseY < -gRadius ? mouseY = -gRadius;
+  );
+  mouseY = mouseY * $pi / gRadius;
+  tumbleAngle = mouseY;
+  slider3 = tumbleAngle * kRad2Deg;
+  
+  // Notify GUI/automation that tumble has changed, and update coefficients
+  slider_automate(slider3);
+  calculateCoefficients();
+);
+
+
+// Track geometry and draw background
+gxColorSet(1, 1, 1, 1);
+determineGeometry();
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
+
+
+// TILT: Draw plane illustrating the effect of the tilt transform, the plane is darker when upside down
+cosTilt < 0 ?
+(
+  gxColorSetHsl(1.0, 195, 1.0, 0.25);
+) :
+( 
+  gxColorSetHsl(1.0, 195., 1.0, 0.4);
+);
+tiltDeltaX = gRadius * cosTilt;
+tiltDeltaY = gRadius * sinTilt * 0.1;
+radiusFraction = 0.2 * gRadius;
+
+drawQuadrangleOutline(gCenterX - tiltDeltaX - 0.5, gCenterY - radiusFraction - tiltDeltaY - 0.5,
+                      gCenterX + tiltDeltaX - 0.5, gCenterY - radiusFraction + tiltDeltaY - 0.5,
+                      gCenterX + tiltDeltaX - 0.5, gCenterY + radiusFraction - tiltDeltaY - 0.5,
+                      gCenterX - tiltDeltaX - 0.5, gCenterY + radiusFraction + tiltDeltaY - 0.5, 
+                      1.);
+
+drawQuadrangleOutline(gCenterX - tiltDeltaX + 0.5, gCenterY - radiusFraction - tiltDeltaY + 0.5,
+                      gCenterX + tiltDeltaX + 0.5, gCenterY - radiusFraction + tiltDeltaY + 0.5,
+                      gCenterX + tiltDeltaX + 0.5, gCenterY + radiusFraction - tiltDeltaY + 0.5,
+                      gCenterX - tiltDeltaX + 0.5, gCenterY + radiusFraction + tiltDeltaY + 0.5, 
+                      1.);
+                      
+drawQuadrangleOutline(gCenterX - tiltDeltaX, gCenterY - radiusFraction - tiltDeltaY,
+                      gCenterX + tiltDeltaX, gCenterY - radiusFraction + tiltDeltaY,
+                      gCenterX + tiltDeltaX, gCenterY + radiusFraction - tiltDeltaY,
+                      gCenterX - tiltDeltaX, gCenterY + radiusFraction + tiltDeltaY, 
+                      1.); 
+
+// TUMBLE: Draw plane illustrating the effect of the tumble transform, the plane is darker when upside down
+cosTumble < 0 ?
+(
+  gxColorSetHsl(1.0, 195, 1.0, 0.25);
+) : 
+(
+  gxColorSetHsl(1.0, 195., 1.0, 0.4);
+  
+);
+
+tumbleDeltaX = gRadius * sinTumble * 0.1;
+tumbleDeltaY = gRadius * cosTumble;
+
+drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX-0.5, gCenterY - tumbleDeltaY-0.5,
+                      gCenterX - radiusFraction + tumbleDeltaX-0.5, gCenterY + tumbleDeltaY-0.5,
+                      gCenterX + radiusFraction - tumbleDeltaX-0.5, gCenterY + tumbleDeltaY-0.5,
+                      gCenterX + radiusFraction + tumbleDeltaX-0.5, gCenterY - tumbleDeltaY-0.5,
+                      1.);
+
+drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX+0.5, gCenterY - tumbleDeltaY+0.5,
+                      gCenterX - radiusFraction + tumbleDeltaX+0.5, gCenterY + tumbleDeltaY+0.5,
+                      gCenterX + radiusFraction - tumbleDeltaX+0.5, gCenterY + tumbleDeltaY+0.5,
+                      gCenterX + radiusFraction + tumbleDeltaX+0.5, gCenterY - tumbleDeltaY+0.5,
+                      1.);
+
+drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX, gCenterY - tumbleDeltaY,
+                      gCenterX - radiusFraction + tumbleDeltaX, gCenterY + tumbleDeltaY,
+                      gCenterX + radiusFraction - tumbleDeltaX, gCenterY + tumbleDeltaY,
+                      gCenterX + radiusFraction + tumbleDeltaX, gCenterY - tumbleDeltaY,
+                      1.);
+
+// Draw points illustrating the combined effect of the transforms
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
+
+
+// ROTATION: Draw indicator with grey inner circle
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+drawInteractionCircle(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, mInteractionCircleRadius);
+gxColorSet(1.0, 0.8, 0.8, 0.8);
+drawInteractionCircle(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, mInteractionCircleRadius-7);
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+
+// TILT: Draw indicator with gray horisontal inner line, it is shifted slightly upwards in order to avoid intial overlap with tumble indicator
+drawInteractionCircle(gCenterX + tiltAngle * kRad2Norm * gRadius, gCenterY-25., mInteractionCircleRadius);
+
+gxColorSet(1.0, 0.8, 0.8, 0.8);
+drawLineSegment(gCenterX + tiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. - 1,
+                gCenterX + tiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. - 1, 1);
+drawLineSegment(gCenterX + tiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. + 1,
+                gCenterX + tiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. + 1, 1);
+drawLineSegment(gCenterX + tiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25.,
+                gCenterX + tiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25., 1);
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+
+// TUMBLE: Draw indicator with grey inner vertical line
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+drawInteractionCircle(gCenterX, gCenterY - tumbleAngle * kRad2Norm * gRadius, mInteractionCircleRadius);
+
+gxColorSet(1.0, 0.8, 0.8, 0.8);
+drawLineSegment(gCenterX,       gCenterY - tumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
+                gCenterX,       gCenterY - tumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
+drawLineSegment(gCenterX - 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
+                gCenterX - 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
+drawLineSegment(gCenterX + 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
+                gCenterX + 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+/*
+inverseSamplesblock = 1. / samplesblock;
+
+// Linear ramp to new coefficient values over the vector to prevent clicks
+incCosRotation = (cosRotation - cosRotationDspCoeff) * inverseSamplesblock;
+incSinRotation = (sinRotation - sinRotationDspCoeff) * inverseSamplesblock;
+
+incCosTilt  = (cosTilt - cosTiltDspCoeff) * inverseSamplesblock;
+incSinTilt = (sinTilt - sinTiltDspCoeff) * inverseSamplesblock;
+
+incCosTumble = (cosTumble - cosTumbleDspCoeff) * inverseSamplesblock;
+incSinTumble = (sinTumble - sinTumbleDspCoeff) * inverseSamplesblock;
+
+*/
+
+inverseSamplesblock = 1. / samplesblock;
+
+// Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
+ii = 0;
+loop(16,
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  ii += 1;
+);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+/*
+// Increment matric coefficients for linear interpolation
+cosRotationDspCoeff = cosRotationDspCoeff + incCosRotation;
+sinRotationDspCoeff = sinRotationDspCoeff + incSinRotation;
+
+cosTiltDspCoeff = cosTiltDspCoeff + incCosTilt;
+sinTiltDspCoeff = sinTiltDspCoeff + incSinTilt;
+
+cosTumbleDspCoeff = cosTumbleDspCoeff + incCosTumble;
+sinTumbleDspCoeff = sinTumbleDspCoeff + incSinTumble;
+
+// w remains unchanged, so we don't need to change spl0
+//spl0 = spl0;
+
+// Rotation only affects x and y:
+x = spl1;
+y = spl2;
+// We use SpatDIF (navigational) coordinate system rather than mathematical.
+// Hence we need to invert sign of sinRotation as compared to Malham's formula.
+spl1 =  x * cosRotationDspCoeff + y * sinRotationDspCoeff;
+spl2 = -x * sinRotationDspCoeff + y * cosRotationDspCoeff;
+
+// Tilt only affects y and z:
+y = spl2;
+z = spl3;
+spl2 = y * cosTiltDspCoeff - z * sinTiltDspCoeff;
+spl3 = y * sinTiltDspCoeff + z * cosTiltDspCoeff;
+
+// Tumble only affects x and z:
+x = spl1;
+z = spl3;
+spl1 = x * cosTumbleDspCoeff - z * sinTumbleDspCoeff;
+spl3 = x * sinTumbleDspCoeff + z * cosTumbleDspCoeff;
+*/
+
+ii = 0;
+loop(16,
+  matrixDSP[ii] += matrixInc[ii];
+  ii += 1;
+);
+
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Matrix multiplication with input signal:
+spl0 = wIn * matrixDSP[0] + xIn  * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
+spl1 = wIn * matrixDSP[4] + xIn  * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+spl2 = wIn * matrixDSP[8] + xIn  * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
+spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];

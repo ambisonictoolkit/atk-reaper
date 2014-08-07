@@ -1,0 +1,189 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: DirectO
+  Adjust the soundfield directivity of a first order ambisonic signal 
+  (B-format) across the origin. A spatial low-pass filter.
+---------------------------------------------------------------------
+*/
+
+
+desc: Adjust soundfield directivity of first order ambisonic signal across the origin
+
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+slider1:0<0,90,1>Degree of transformation
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Flag indicating that the plugin has not been fully initialised yet
+initialised = 0;
+
+// Matrixes used for DSP processing
+matrixDSP       = 1200;
+matrixNewDSP    = 1220;
+matrixInc       = 1240;
+
+// Matrixes for graphic display of transformations
+matrixDisplayPoints      = 1300;
+matrixDisplayTransformed = 1400;
+matrixDisplayInterpreted = 1500;
+
+// This only needs to be generated once:
+numDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
+
+function calculateMatrix()
+(
+  generateDirectOrigoMatrix(matrixNewDSP, transformAngle);
+  
+  /* Transformation and interpretation of display points */
+  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
+
+  // Set initial DSP matrix at initialisation
+  initialised == 0 ?
+  (
+    loop(
+      16,
+      matrixDSP[i] = matrixNewDSP[i];
+    );
+    // Now we are initialised
+    initialised = 1;
+  );
+);
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+transformAngle  = slider1 * kDeg2Rad;
+calculateMatrix();
+
+
+/**********************************************************
+Graphics
+**********************************************************/
+
+@gfx 500 500
+
+// Set colors
+gxColorSet(1, 1, 1, 1);
+determineGeometry();
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
+
+mouseX = mouse_x - gCenterX;
+mouseY = mouse_y - gCenterY;
+azimuth = atan2(mouseX, -mouseY);
+
+tentativeNewTransformationAngle = 1. - sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius;
+// Restrict the range to [0, 1]
+tentativeNewTransformationAngle < 0. ? tentativeNewTransformationAngle = 0.;
+
+// Only update transformation settings at mouse drag
+mouse_cap == 1 ?
+(  
+  slider1 = tentativeNewTransformationAngle * 90.;
+  transformAngle = tentativeNewTransformationAngle * $pi * 0.5;
+  slider_automate(slider1);
+  calculateMatrix();
+  
+  // Set alpha value of interaction square
+  alpha = 0.5;
+) : (
+  alpha = 0.35;
+);
+
+// Draw points illustrating the effect of the transform
+displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
+
+// Draw circle for interaction, map vertical position to saturation, lightness and radius
+posX = gCenterX + gRadius * (1. - tentativeNewTransformationAngle) * sin(azimuth);
+posY = gCenterY - gRadius * (1. - tentativeNewTransformationAngle) * cos(azimuth);
+
+// Only draw the white outline around interaction circle when mouse is active
+mInteractionCircleRadius = 11;
+mouse_cap == 1 ? (
+  gxColorSetHsl(1.0, 195., 1., 0.4);
+  drawInteractionCircle(posX, posY, mInteractionCircleRadius);
+) : (
+  gxColorSetHsl(0.5, 195., 1., 0.4);
+  gfx_circle(posX, posY, mInteractionCircleRadius, 1, 1);
+);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+inverseSamplesblock = 1. / samplesblock;
+
+// Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
+ii = 0;
+loop(16,
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  ii += 1;
+);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+ii = 0;
+loop(16,
+  matrixDSP[ii] += matrixInc[ii];
+  ii += 1;
+);
+
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Matrix multiplication with input signal:
+spl0 = wIn * matrixDSP[0] + xIn  * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
+spl1 = wIn * matrixDSP[4] + xIn  * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+spl2 = wIn * matrixDSP[8] + xIn  * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
+spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];

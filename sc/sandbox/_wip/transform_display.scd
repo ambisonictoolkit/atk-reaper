@@ -1,53 +1,96 @@
 (
 // Todo:
 // --add gain labels on every other point
-// add makeup gain slider
-// add matrix subtraction
+// --add makeup gain slider
+// --add matrix subtraction
 // consider annular wedge representations
 // --add circle on original 0,0 point
-// post min/max gain
-
+// --post min/max gain
+// --implement units for tranform (pi, db, receiver index)
+// --add azimuth controls to the transforms
+// add option to display directivity as expanding/transparent circle or just proximity to origin
+// consider a view down positive X axis
+// filter out points <-90dB
+// draw most transparent circles first
+// implement matrix input section as well as "post trasnform matrix"
+// add test signal feature
+// add addition
+// add indeces in chain for selecting input and receivers for addition/subtraction
+// make matrix text view a pop-out window
+// double check how often window needs to be refreshed... maybe just views
 
 // constants
 var kInvSqrt2 = 1/(2.sqrt);
-var numPoints = 12, initPointsMatrices, transformedPoints, aeds;
-var controls;
+var numPoints = 24, initPointsMatrices, transformedPoints, aeds;
+var gControls;
 // var xFormDuples = [];
 // functions
 var processPoints, updateMatrix, getXForm, chainXForms, createXForm;
-var createNewXFormView, removeXForm;
+var createNewXFormView, removeXForm, showMatrixWindow;
 
 // drawing vars
-var scrnB, winW, winH, uv, ctlv, codev, pnts, arcH;
+var scrnB, win, winW, winH, uv, ctlv, codev, pnts, arcH, codeWin;
 var degreeSpec, degreeSl, degreeNB, degreePiNB, xFormMenu, xForms;
 var rotSpec, rotSl, rotNB, rotPiNB;
 var selDex, adjustRhos, getColCount, layoutFunc, colors;
 
-// xFormDuples = [['push', pi/4],['focus', pi/4],['rotate', pi/3]];
-// xFormDuples = [];
+var tv, maxGainTxt, minGainTxt;
 
+// based on Muse AED function plugins
 processPoints = {|xFormedMatrix|
-	var w,x,y,z, az, el, g0square, g1square, omni, gain;
+	var w,x,y,z, az, el, g0square, g1square, term, omni, gain;
+	var b, pv_mean, b_sqrd_mean, p_sqrd, v_sqrd, a, e, d, d_norm;
+
+	b = xFormedMatrix.getCol(0);
+	b[0] = b[0] * sqrt(2); // scale W
+
+	b_sqrd_mean = b**2;
+
+	p_sqrd = b_sqrd_mean[0]; // W component, pressure?
+	v_sqrd = b_sqrd_mean[1..].sum; // summed XYZ, velocity?
+
+	d = (pi/2) - (2 * atan2(sqrt(v_sqrd), sqrt(p_sqrd)));
+
+	pv_mean = b * b[0]; // mul all WXYZ by W ( [w,x,y,z] * (W*sqrt(2)) )
+	a = atan2(pv_mean[2], pv_mean[1]); // atan2(y,x) - see pv_mean above
+	e = atan2(pv_mean[3], sqrt((pv_mean[1]**2) + (pv_mean[2]**2))); // atan2(z,sqrt(x^2 + y^2))
+
+	d_norm = 1 - (d.abs / 0.5pi);
+
+	// postf("w,x,y,z: %\naz, el: %\nd_norm: %\n", b.round(0.01), [a, e].round(0.01), d_norm);
+
+	// TODO: get gain from above code, not the old code
+
+	/* -------- old code ----*/
 	#w,x,y,z = xFormedMatrix.getCol(0);
-    az  = atan2(y, x);
+	az  = atan2(y, x);
 	el  = atan2(z, sqrt(x.squared + y.squared));
+	// Omni transform angle
+	g0square	= w.squared;
+	g1square	= x.squared + y.squared + z.squared;
+	term 		= ((2*g0square) + g1square);
+	(term == 0).if{term = 0.0000000001}; // protect from NaN
+	omni		= asin(( (2*g0square) - g1square) / term);
 
-    // Omni transform angle
-    g0square	= w.squared;
-    g1square	= x.squared + y.squared + z.squared;
-	omni		= asin(( (2*g0square) - g1square) / ((2*g0square) + g1square));
+	// Gain
+	term		= sin(omni);
+	(term <= -1).if{term = -0.99999999}; // protect from NaN
+	gain		= w * sqrt(2 / (1 + term));
 
-    // Gain
-    gain = w * sqrt(2 / (1 + sin(omni)));
+	// // Normalise omni to [0,1] range
+	// omni = 2 * omni / pi;
+	// omni = 1 - omni;
+	// omni = omni.clip(0.0,1.0);
 
-	// Normalise omni to [0,1] range
-	omni = 2 * omni / pi;
-	omni = 1 - omni;
+	// ignore elev for now, implement with Spherical to include elev
+	[
+		// 	Polar(omni, az), gain.abs.ampdb
+		Polar(d_norm, a), gain //.abs.ampdb
+		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
+	].postln; // debug
 
-	// ignore el for now, implement with Spherical to include el
-	// omni is normalized and scales rho (distance from center)
-	[Polar(omni, az), gain.ampdb];
 };
+
 
 initPointsMatrices = numPoints.collect{|i|
 	var ang;
@@ -56,61 +99,84 @@ initPointsMatrices = numPoints.collect{|i|
 	FoaEncoderMatrix.newDirection(ang).matrix.addRow([0]); // need to add z manually
 };
 
-getXForm = {|nameDegPr|
-	var name, deg;
-	"in gatXForm".postln;
-	#name, deg = nameDegPr;
-	xForms[name]['getMatrix'].(deg).matrix;
+chainXForms = {|...xFormCtlPrs|
+	var mtx;
+	"in chainXForms".postln;
+	xFormCtlPrs.postln;
+	xFormCtlPrs.do{ |xNameDeg|
+		var name, ctlVals;
+		#name, ctlVals = xNameDeg;
 
-	// switch( name,
-	// 	'push',		{FoaXformerMatrix.newPushX(deg)},
-	// 	'press',	{FoaXformerMatrix.newPressX(deg)},
-	// 	'focus',	{FoaXformerMatrix.newFocusX(deg)},
-	// 	'zoom',		{FoaXformerMatrix.newZoomX(deg)},
-	// 	'rotate',	{FoaXformerMatrix.newRotate(deg)}
-	// ).matrix
+		(name != 'subtract').if({
+			// tranform via matrix multiplication
+			mtx.isNil.if(
+				{ mtx = xForms[name]['getMatrix'].(*ctlVals) }, // first mtx
+				{ mtx = xForms[name]['getMatrix'].(*ctlVals) * mtx; }
+			);
+			},{ // subtract
+				mtx = Matrix.newIdentity(4) + (mtx * -1);
+				// mtx = mtx/2;
+		});
+	};
+	// mtx * inputMtx;
+	// mtx * (Matrix.newIdentity(4) * -1) * inputMtx
+	mtx
 };
 
-chainXForms = {|...xFormDegPrs|
-	var mtx;
-			"in chainXForms".postln;
-	xFormDegPrs.postln;
-	xFormDegPrs.do{ |xNameDeg|
-		var xMtx;
-		mtx.isNil.if(
-			{ mtx = getXForm.(xNameDeg) }, // make last xform the first mtx
-			{
-				xMtx = getXForm.(xNameDeg);
-				mtx = xMtx * mtx;
-			}
-		);
+~updateMatrix = { |xfMatrix|
+	transformedPoints = initPointsMatrices.collect{ |pointMtx|
+		xfMatrix * pointMtx
 	};
-	mtx;
+
+	"\n******-------------".postln;
+	// calculate and set aeds var for gui update
+	aeds = transformedPoints.collect{|ptMtx|
+		processPoints.(ptMtx);
+	};
+	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
+	aeds = aeds.collect({|aed|[aed[0], aed[1].abs.ampdb]}); // debug: convert to db in processPoints
+	w.refresh;
 };
 
 updateMatrix = {
 	var xFormDuples = [];
+
 	"in updateMatrix".postln;
-	controls.do{|ctlDict|
+
+	gControls.do{|ctlDict|
 		ctlDict.xform.notNil.if{
-			ctlDict.degree.isNil.if{"trasform degree is nil!".error};
-			xFormDuples = xFormDuples.add( [ctlDict.xform, ctlDict.degree] );
+			var ctlStates;
+			ctlStates = ctlDict.controlStates;
+			(ctlStates.size == 0).if{"trasform control states aren't assigned!".error};
+			// xFormDuples = xFormDuples.add( [ctlDict.xform, ctlDict.controls] );
+			xFormDuples = xFormDuples.add([
+				ctlDict.xform,
+				ctlStates.indices.collect{|dex| ctlStates[dex] }
+			]);
 		};
 	};
-	// "Duples: ".post; xFormDuples.postln; // debug
+
+	"found these duples: ".post; xFormDuples.postln;
+
 	transformedPoints = (xFormDuples.size > 0).if({
-		initPointsMatrices.collect{|pointMtx|
+		initPointsMatrices.collect{ |pointMtx|
 			var xformMtx;
+			// xformMtx = chainXForms.(pointMtx, *xFormDuples);
+			// xformMtx * pointMtx;
 			xformMtx = chainXForms.(*xFormDuples);
-			xformMtx * pointMtx;
+			xformMtx * pointMtx
 		};
 		},{ initPointsMatrices } // no transform
 	);
-	// set aeds var for gui update
+
+	"\n******-------------".postln;
+	// calculate and set aeds var for gui update
 	aeds = transformedPoints.collect{|ptMtx|
 		processPoints.(ptMtx);
 	};
-
+	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
+	aeds = aeds.collect({|aed|[aed[0], aed[1].abs.ampdb]}); // debug: convert to db in processPoints
+	win !? {win.refresh};
 };
 
 updateMatrix.(); // initialize
@@ -121,11 +187,12 @@ Drawing
 scrnB = Window.screenBounds;
 winW= 600;
 winH= 600;
-w = Window("soundfield transform", Rect(scrnB.center.x - (winW/2), scrnB.center.y - (winH/2), winW, winH), resizable: true).front;
+win = Window("soundfield transform", Rect(scrnB.center.x - (winW/2), scrnB.height-winH-45, winW, winH), resizable: true).front;
 // w.layout_(VLayout(
-uv = UserView( w, Rect(0,0, w.view.bounds.width, w.view.bounds.height/2) ).resize_(5);
-ctlv = View( w, Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2) ).resize_(5);
-codev = View();
+uv = UserView( win, Rect(0,0, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5).background_(Color.gray.alpha_(0.99));
+ctlv = View( win, Rect(0,win.view.bounds.height/2, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5);
+
+// codev = View();
 // ));
 // uv = UserView();
 // ctlv = View();
@@ -133,154 +200,249 @@ codev = View();
 // controls
 // xForms = ['push', 'press', 'focus', 'zoom'];
 xForms = IdentityDictionary(know: true).putPairs([
-	'push',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newPushX(deg)} ]
+
+	'push', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newPush(deg, az, el).matrix}
 	),
-	'press',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newPressX(deg)} ]),
-	'focus',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newFocusX(deg)} ]),
-	'zoom',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newZoomX(deg)} ]),
-	'dominate',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -24, 'max', 24, 'default', 0, 'getMatrix', {|gain| FoaXformerMatrix.newDominateX(gain)} ]),
-	'direct',		IdentityDictionary(know: true).putPairs(
-		[ 'min', 0, 'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newDirectX(deg)} ]),
-	'rotate',	IdentityDictionary(know: true).putPairs(
-		[ 'min', 2pi,	'max', -2pi, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newRotate(deg)} ]),
-	'asymmetry',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2,	'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newAsymmetry(deg)} ]),
-	'balance',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2,	'max', pi/2, 'default', 0, 'getMatrix', {|deg| FoaXformerMatrix.newBalance(deg)} ]),
+
+	'press', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newPress(deg, az, el).matrix}
+	),
+
+	'focus', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newFocus(deg, az, el).matrix}
+	),
+
+	'zoom',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newZoom(deg, az, el).matrix}
+	),
+
+	'direct',		IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newDirect(deg, az, el).matrix}
+	),
+
+	'rotate',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Azimuth',	ControlSpec(2pi, -2pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|az=0| FoaXformerMatrix.newRotate(az).matrix}
+	),
+
+	'asymmetry',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0| FoaXformerMatrix.newAsymmetry(deg).matrix}
+	),
+
+	'balance',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0| FoaXformerMatrix.newBalance(deg).matrix}
+	),
+
+	'dominate',		IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Gain',		ControlSpec(-24, 24, default: 0, units: "dB"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|gain=0, az=0, el=0| FoaXformerMatrix.newDominate(gain, az, el).matrix}
+	),
+
+	'gain',	IdentityDictionary(know: true).put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+			'Gain',		ControlSpec(-24, 24, default: 0, units: "dB")
+		]
+	).put( 'getMatrix',
+		{|gain=0| gain.dbamp }
+	),
+
+	'subtract', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+			'This index',	nil,
+			'from this index',	nil
+		]
+	).put( 'getMatrix',
+		{|subtractIndex, fromIndex| }
+	),
 ]);
 
 // order determines sf processing chain
 // list can grow with inserted items and shrink when removed
-controls = List();
+gControls = List();
 
 createXForm = {
-	var updateSpecs, xFormMenu, degSpec, degSl, degNB, degPiNB, removeBut, addBut;
-	var dict, view, layout, deg;
+	var updateControls, addMenu, addSliderCtl, addAddRmvButs;
+	var xFormMenu, degSpec, degSl, degNB, degPiNB, rmvBut, addBut;
+	var xfStuff, view, layout, deg;
+	var curXform; // the currently selected xform
 
 	"in createXForm".postln;
+	xfStuff = IdentityDictionary(know: true); // store xform, degree, view, layout here
+	xfStuff.put('controlStates', Order()); // to store this xform's controls' states
+	degSpec = ControlSpec(); // initialize var
 
 	view = View();
-	// store xform, degree, view, layout here
-	dict = IdentityDictionary(know: true);
+	layout = HLayout().margins_([10,0,10,3]);
+	view.layout_(layout);
+	xfStuff.view = view;
+	xfStuff.layout = layout;
 
-	updateSpecs = { |xf| // xf is a dict from xForms
-		var min, max;
-		"in updatespecs".postln;
-		degSpec = ControlSpec(xf.min, xf.max, default: xf.default);
-		// .min/maxItem to handle negative max on rotate
-		min = [xf.min, xf.max].minItem;
-		max = [xf.min, xf.max].maxItem;
-		degNB.clipHi_(max).clipLo_(min);
-		degPiNB.clipHi_(max).clipLo_(min);
-		// initialize widgets
-		deg.notNil.if({
-			if( (deg<min) or: (deg>max), { deg = degSpec.default });
-			},{ deg = degSpec.default }
-		);
-		degSl.value   = degSpec.unmap(deg);
-		degNB.value   = deg;
-		degPiNB.value = deg / pi;
+	updateControls = { |xfName| // xf is a dict from xForms
+		var xfAttributes, min, max, controls;
+		"in updateControls".postln;
+		if(xfName != curXform, {
+
+			xfAttributes = xForms[xfName];
+			controls = xfAttributes.controls;
+			controls = controls.clump(2);
+
+			// rebuild the view with the new controls
+			view.children.do(_.remove); // clear the view's elements
+			// add menu back, new xform selected
+			addMenu.(xfName);
+			controls.do{|pair, i|
+				var name, ctl;
+				#name, ctl = pair;
+				ctl.isKindOf(ControlSpec).if({
+					addSliderCtl.(name, ctl, i);
+					xfStuff.controlStates.put(i, ctl.default);
+				});
+			};
+			addAddRmvButs.();
+		})
 	};
 
-	degSpec = ControlSpec();
+	addSliderCtl = { |name, spec, ctlOrder|
+		var min, max, nb, txt, sl;
+		// .min/maxItem to handle negative max on rotate
+		min = [spec.minval, spec.maxval].minItem;
+		max = [spec.minval, spec.maxval].maxItem;
 
-	xFormMenu = PopUpMenu().items_(['-']++xForms.keys)
-	.action_({ |mn|
-		if( mn.item != '-', {
-			var xfName, xfAttributes;
-			xfName = mn.item;
-			xfAttributes = xForms[xfName];
-			updateSpecs.(xfAttributes);
-			// update control dict
-			dict.xform_(xfName).degree_(deg);
+		sl = Slider()
+		.action_(
+			{ |sldr| var val;
+				val = spec.map(sldr.value);
+				if(spec.units == "pi",
+					{ nb.value_(val.round(0.001) / pi) },
+					{ nb.value_(val.round(0.001)) }
+				);
+				xfStuff.controlStates[ctlOrder] = val;
+				updateMatrix.();
+			}
+		).orientation_('horizontal')
+		.value_(spec.unmap(spec.default));
+
+		nb = NumberBox()
+		.action_(
+			{ |nb| var val;
+				if(spec.units == "pi",
+					{ val = nb.value * pi; },
+					{ val = nb.value; }
+				);
+				sl.value_(spec.unmap(val));
+				xfStuff.controlStates[ctlOrder] = val;
+				updateMatrix.();
+			}
+		).clipHi_(max).clipLo_(min)
+		.step_(0.01).maxWidth_(60);
+
+		txt = StaticText().string_(spec.units).align_('left');
+
+		[nb, txt, sl].do{ |me| layout.add(me) };
+	};
+
+	addMenu = { |selectedName|
+		xFormMenu = PopUpMenu().items_(['-']++xForms.keys)
+		.action_({ |mn|
+			if( mn.item != '-', {
+				xfStuff.xform_(mn.item);
+				updateControls.(mn.item);
+				},
+				{ xfStuff.xform_(nil) } // nil mutes the transform
+			);
 			updateMatrix.();
-			w.refresh;
-		});
-	}).maxWidth_(75).value_(0);
+		}).maxWidth_(75).value_(0);
 
-	degSl = Slider()
-	.action_(
-		{ |sl| var val;
-			val = degSpec.map(sl.value);
-			deg = val;
-			degNB.value_(val.round(0.001));
-			degPiNB.value_(val.round(0.001)/pi);
-			dict.degree_(deg);
-			updateMatrix.(deg);
-			w.refresh;
-		}
-	)
-	.step_(0.001).orientation_('horizontal');
+		layout.add(xFormMenu);
+		selectedName !? { xFormMenu.value_(xFormMenu.items.indexOf(selectedName)) };
+	};
 
-	degNB = NumberBox()
-	.action_(
-		{ |nb| var val;
-			val = nb.value;
-			deg = val;
-			degSl.value_(degSpec.unmap(val));
-			degPiNB.value_(val / pi);
-			dict.degree_(deg);
-			updateMatrix.(deg);
-			w.refresh;
-		}
-	)
-	.step_(0.01).maxWidth_(60);
 
-	degPiNB = NumberBox()
-	.action_(
-		{ |nb| var val;
-			val = nb.value * pi;
-			deg = val;
-			degSl.value_(degSpec.unmap(val));
-			degNB.value_(val);
-			dict.degree_(deg);
-			updateMatrix.(deg);
-			w.refresh;
-		}
-	)
-	.step_(0.01/pi).maxWidth_(60);
+	addAddRmvButs = {
+		rmvBut = Button().states_([["X"]])
+		.action_({ |but|
+			removeXForm.(xfStuff);
+			updateMatrix.();
+		}).maxWidth_(20);
 
-	addBut = Button().states_([["+"]])
-	.action_({ |but|
-		createNewXFormView.(view);
-	})
-	.maxWidth_(20);
+		addBut = Button().states_([["+"]])
+		.action_({ |but|
+			createNewXFormView.(view);
+		}).maxWidth_(20);
 
-	removeBut = Button().states_([["X"]])
-	.action_({ |but| removeXForm.(dict) })
-	.maxWidth_(20);
+		layout.add(rmvBut);
+		layout.add(addBut);
+	};
 
-	layout = HLayout(
-		xFormMenu, degNB,
-		VLayout( degSl, StaticText().string_("Degree of Tranform") ),
-		degPiNB, StaticText().string_("pi").align_('left'),
-		removeBut, addBut
-	);
+	addMenu.(); // add the first dropdown
 
-	view.layout_(layout);
-
-	dict.view = view;
-	dict.layout = layout;
-	dict; // return
+	xfStuff; // return this transform's dictionary
 };
 
 createNewXFormView = { |behindThisView|
 	var behindDex, dict;
 	dict = createXForm.();
 	behindThisView.notNil.if({
-		controls.do{|ctldict, i|
+		gControls.do{|ctldict, i|
 			(ctldict.view === behindThisView).if{behindDex = i};
 		};
 		behindDex.isNil.if{"preceeding view not found!".error};
-		controls.insert(behindDex+1, dict);
-		ctlv.layout.insert(dict.view, behindDex+1);
+		"behindDex: ".post; behindDex.postln;
+		gControls.insert(behindDex+1, dict);
+		ctlv.layout.insert(dict.view, behindDex+2); // +2 to account for label row in ctlv[0]
 		},{
-			controls.insert(0, dict);
+			gControls.insert(0, dict);
 			ctlv.layout.insert(dict.view, 0);
 	});
 	// return
@@ -288,27 +450,104 @@ createNewXFormView = { |behindThisView|
 };
 
 removeXForm = {|dict| var rmvDex;
-	controls.do{|ctldict, i|
+	gControls.do{|ctldict, i|
 		(ctldict === dict).if{rmvDex = i};
 	};
 	rmvDex.isNil.if{"view not found!".error};
 	dict.view.remove;
 	dict.layout.destroy;
-	controls.removeAt(rmvDex);
+	gControls.removeAt(rmvDex);
 };
 
 
-// ctlv.layout_(
-// 	VLayout(
-// 		createNewXFormView.(),
-// 		codev.layout_(VLayout(TextView().enterInterpretsSelection_(true)))
-// 	)
-// );
-
-ctlv.layout_( VLayout() );
+ctlv.layout_( VLayout().margins_(0) );
+ctlv.layout.add(
+	HLayout(
+		StaticText().string_("Transform").maxWidth_(60), 20,
+		StaticText().string_("Degree of Tranform").minWidth_(150), 280,
+		HLayout(
+			StaticText().string_("remove").minWidth_(50),
+			StaticText().string_("add").maxWidth_(30) //, a: \right],
+		)
+	)
+	// .setAlignment(1, \right).setAlignment(2, \right).setAlignment(3, \right)
+	.margins_([10, 5,5,0])
+);
 ctlv.layout.add(createNewXFormView.());
-ctlv.layout.add( codev.layout_(VLayout(TextView().enterInterpretsSelection_(true))) );
 
+showMatrixWindow = {
+	codeWin ?? {
+		var mwinH = 200;
+		var evalTxtView, mtxString;
+		mtxString = "var matrix; \n\n/*set you Matrix here, select all and evaluate, or click Evaluate above*/\nmatrix = ;\n\n~updateMatrix.(matrix)";
+
+		codeWin = Window("Evaluate Matrix",
+			Rect(win.bounds.left,
+				scrnB.height - win.bounds.height - mwinH
+				- (2*20) - 25, // (title bar: 20, OS menu bar: 25)
+				win.bounds.width, mwinH))
+		.onClose_({codeWin = nil})
+		.front;
+
+		View(codeWin, Rect(0,0, codeWin.bounds.width, codeWin.bounds.height))
+		.layout_(
+			VLayout(
+				evalTxtView = TextView().enterInterpretsSelection_(true).string_(mtxString),
+				HLayout(
+					Button().states_([["Evaluate"]]).action_({evalTxtView.string.interpret}),
+					Button().states_([["Reset"]]).action_({evalTxtView.string = mtxString}),
+				),
+			)
+		);
+	};
+};
+
+tv = View(uv,Rect(0, 0, uv.bounds.width,uv.bounds.height)).layout_(
+	HLayout(
+		VLayout(
+			VLayout(
+				maxGainTxt = StaticText().string_("one")
+				.font_(Font('Helvetica', 16)).maxWidth_(180).minHeight_(21),
+				minGainTxt = StaticText().string_("two")
+				.font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
+			),
+			nil,
+			Button().states_(
+				[["Enter Custom Matrix"]]).action_({|but| showMatrixWindow.() }).maxWidth_(130),
+		),
+		VLayout(
+			nil,
+			VLayout(
+				[ Button()
+					.states_([
+						["Pan Test", Color.black, Color.grey],
+						["Stop test", Color.black, Color.red],
+				]).maxWidth_(65), a: \bottomRight],
+				Button().states_([
+					["Continuous", Color.black, Color.grey],["Pulsed", Color.black, Color.green]]),
+				HLayout(
+					StaticText().string_("Period"),
+					NumberBox().maxWidth_(25).value_(5)
+				).setAlignment(0,\right).setAlignment(1,\right),
+				VLayout(
+					HLayout(
+						StaticText().string_("Gain").maxHeight_(25),
+						NumberBox().maxWidth_(25)
+					).setAlignment(0, \right).setAlignment(1, \right),
+					// Slider().maxWidth_(150).orientation_(\horizontal)
+				).setAlignment(0,\right) //.setAlignment(1,\right) //.setAlignment(0,\right)
+			)
+			.setAlignment(1, \bottomRight)
+			.setAlignment(2, \bottomRight)
+			.setAlignment(3, \bottomRight)
+		)
+	)
+);
+
+win.view.onResize_({ |winview|
+	uv.bounds_(Rect(0,0, win.view.bounds.width, win.view.bounds.height/2));
+	tv.bounds_(Rect(0, 0, uv.bounds.width,uv.bounds.height));
+});
 
 /*******************
 Draw the soundfield
@@ -316,10 +555,11 @@ Draw the soundfield
 
 uv.drawFunc_({|view|
 	var cen, getColor, circleViewRatio;
-	var alphaSpec, gainSpec, colorSpec;
+	var alphaSpec, gainSpec, colorSpec, maxMinStr;
+	var testSigPnt;
 
-	ctlv.bounds_(Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2));
-	uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
+	ctlv.bounds_(Rect(0,win.view.bounds.height/2, win.view.bounds.width, win.view.bounds.height/2));
+
 	r = uv.bounds.height * 0.02;
 	d = r*2;
 	circleViewRatio = 0.8;
@@ -332,7 +572,7 @@ uv.drawFunc_({|view|
 	Pen.strokeColor_(Color.red).fillColor_(Color.blue);
 	Pen.fillOval(Rect(r.neg, r.neg, d,d));
 	Pen.strokeOval(Rect(r.neg, r.neg, d,d));
-	Pen.addAnnularWedge( 0@0, 15, arcH, 0, 2pi );
+	Pen.addAnnularWedge( 0@0, 5, arcH, 0, 2pi );
 	Pen.fillColor_(Color.gray(0.9)).fill;
 
 	alphaSpec = ControlSpec(0.1, 1, warp:3);
@@ -340,8 +580,17 @@ uv.drawFunc_({|view|
 		gainSpec = ControlSpec(-90, 6, -2);
 	colorSpec = ControlSpec(768,0);
 
-	postf("min gain: %\n", aeds.collect({|me| me[1]}).minItem);
-	postf("max gain: %\n", aeds.collect({|me| me[1]}).maxItem);
+	// postf("min gain: %\n", aeds.collect({|me| me[1]}).minItem);
+	// postf("max gain: %\n", aeds.collect({|me| me[1]}).maxItem);
+	// aeds.do(_.postln);
+
+		// draw test signal planewave circle
+	testSigPnt = Polar(1.1,rrand(0, 2pi)).asPoint
+		.rotate(pi/2)	// convert ambi to screen coords
+		* Point(1,-1)	// flip Y for drawing
+		* arcH;			// scale normalized points to arcH
+	Pen.fillColor_(Color.magenta);
+	Pen.fillOval( Rect(testSigPnt.x-r, testSigPnt.y-r, d, d) );
 
 	getColor = { |gain|
 		var i;
@@ -350,7 +599,8 @@ uv.drawFunc_({|view|
 		{i < 256} {Color.new255(255, i, 0)}
 		{i < 384} {Color.new255(255 - (i-256), 255, 0)}
 		{i < 512} {Color.new255(0, 255, (i-384)*2)}
-		{i < 768} {Color.new255(0, 255 - (i-512), 255)};
+		{i < 768} {Color.new255(0, 255 - (i-512), 255)}
+		{i >= 768} {Color.new255(0, 0, 255)}; // catch all
 	};
 
 	aeds.do{|pntGainArr, i|
@@ -390,43 +640,63 @@ uv.drawFunc_({|view|
 		Pen.fillColor_(gainColor.alpha_(1));
 		QPen.stringCenteredIn(gain.round(0.1).asString, Rect(gainPnt.x-(r*10), gainPnt.y-(r*10), d*10, d*10));
 	};
-	// draw min/max gain
-	Pen.fillColor_(Color.black);
-	QPen.stringCenteredIn(
-		"max gain\n" ++ aeds.collect({|me| me[1]}).maxItem.round(0.1).asString,
-		Rect(ctlv.bounds.width/3.neg, ctlv.bounds.height/4, d*7.5, d*3) );
-	QPen.stringCenteredIn(
-		"min gain\n" ++ aeds.collect({|me| me[1]}).minItem.round(0.1).asString,
-		Rect(ctlv.bounds.width/3.neg, ctlv.bounds.height/2.9, d*7.5, d*3) );
 
-	// // draw transducer layout
-	// Pen.push;
-	// Pen.translate((uv.bounds.width/4).neg, (uv.bounds.height/4));
-	// tw = uv.bounds.width/2/maxCols-tgap;
-	// th = 10;
-	// colgroups.do{|colDict, i|
-	// 	Pen.fillColor_(colDict.color);
-	// 	colDict.cols.do{
-	// 		Pen.fillRect(Rect(0,0, tw, th));
-	// 		Pen.translate(tw+tgap,0);
-	// 	};
-	// };
-	// Pen.pop;
-	//
-	// // draw group angles
-	// Pen.push;
-	// Pen.translate((uv.bounds.width/4).neg, (uv.bounds.height/4 - th));
-	// colgroups.do{|colDict, i|
-	// 	Pen.translate((tw+tgap)*(colDict.cols/2),0);
-	// 	QPen.stringCenteredIn(colDict.theta.raddeg.round.asString, Rect(tw.neg, th.neg, tw*3, th*2), color: colDict.color);
-	// 	Pen.translate((tw+tgap)*(colDict.cols/2),0);
-	// };
-	// Pen.pop;
+	// // draw min/max gain
+	// maxMinStr = format("Max Gain: %\nMin Gain: %",
+	// 	aeds.collect({|me| me[1]}).maxItem.round(0.1),
+	// 	aeds.collect({|me| me[1]}).minItem.round(0.1)
+	// );
+	// Pen.translate(cen.x.neg, cen.y.neg);
+	// Pen.fillColor_(Color.black);
+	// Pen.font_(Font('Helvetica', 20));
+	// QPen.stringCenteredIn(
+	// 	maxMinStr,
+	// 	Rect(0,0,uv.bounds.width/3, ctlv.bounds.height)
+	// );
+
+	maxGainTxt.string_(format("Max Gain:  %", aeds.collect({|me| me[1]}).maxItem.round(0.1)));
+	minGainTxt.string_(format("Min Gain:   %", aeds.collect({|me| me[1]}).minItem.round(0.1)));
 });
 
-w.refresh;
+win.refresh;
 )
 
+
+// // based on ATK-JS plugins
+// processPoints = {|xFormedMatrix|
+// 	var w,x,y,z, az, el, g0square, g1square, term, omni, gain;
+//
+// 	#w,x,y,z = xFormedMatrix.getCol(0);
+// 	az  = atan2(y, x);
+// 	el  = atan2(z, sqrt(x.squared + y.squared));
+//
+// 	// Omni transform angle
+// 	g0square	= w.squared;
+// 	g1square	= x.squared + y.squared + z.squared;
+// 	term 		= ((2*g0square) + g1square);
+// 	(term == 0).if{term = 0.0000000001}; // protect from NaN
+// 	omni		= asin(( (2*g0square) - g1square) / term);
+//
+// 	// Gain
+// 	term		= sin(omni);
+// 	(term <= -1).if{term = -0.99999999}; // protect from NaN
+// 	gain		= w * sqrt(2 / (1 + term));
+//
+//
+//
+// 	// Normalise omni to [0,1] range
+// 	omni = 2 * omni / pi;
+// 	omni = 1 - omni;
+// 	omni = omni.clip(0.0,1.0);
+//
+// 	// ignore elev for now, implement with Spherical to include elev
+// 	// omni is normalized and scales rho (distance from center)
+// 	postf("w: %\nx: %\ny: %\nz: %\naz: %\nel: %\nomni: %\ngain:: %\n", w,x,y,z, az, el, omni, gain); // debug
+// 	[
+// 		Polar(omni, az), gain.abs.ampdb
+// 		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
+// 	].postln; // debug
+// };
 
 
 /********************************************************************
@@ -701,3 +971,49 @@ Graphics
 /**********************************************************
 --Graphics
 **********************************************************/
+
+// From Muse
+# aed (azimuth, elevation, directivity)
+# return constants
+def aed(a):
+    """aed(a)
+
+    Analyze an ambisonic B-format sound field, returning azimuth,
+    elevation and directivity.
+
+    Inputs:
+        - b         : Input b-format signal
+
+    Outputs: ([a, e, d])
+
+      [a, e, d] -- Azimuth, elevation and directivity in radians.
+                   (See direct for details on directivity.)
+
+    """
+
+    // normalise W
+b = copy(a)
+b[:, 0] *= sqrt(2) // normalize all Ws by sqrt(2)
+
+// pv & b**2 mean
+
+// grab w, multiply input array (W,X,Y,Z) all by w
+pv_mean = mean(b * interleave(b[:, 0]), 0) // mul all WXYZ by (W*sqrt(2)) then take average (if input is an array of soundfields)?
+b_sqrd_mean = mean((b**2), 0) // square all components and average them (if input is an array of soundfields)
+
+// # p**2 and v**2
+p_sqrd = b_sqrd_mean[0] // W component, pressure?
+v_sqrd = sum(b_sqrd_mean[1:]) // summed XYZ, velocity?
+
+// # calculate azimuth, elevation
+a = arctan2(pv_mean[2], pv_mean[1]) // atan2(y,x) - see pv_mean above
+e = arctan2(pv_mean[3], sqrt((pv_mean[1])**2 + (pv_mean[2])**2)) // atan2(z,sqrt(x^2 + y^2))
+
+// # calculate directivity
+// # pi/2 - 2 * arctan(v/p)
+d = pi/2 - 2 * arctan2(sqrt(v_sqrd), sqrt(p_sqrd))
+
+// # return [azimuth, elevation, directivity]
+    res = array([a, e, d])
+
+    return res

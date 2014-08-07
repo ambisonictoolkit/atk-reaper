@@ -1,0 +1,88 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: AtoB
+  A to B format encoder for a variety of tetrahedral orientations and W channel weights.
+---------------------------------------------------------------------
+*/
+
+desc: A to B format encoder for a variety of tetrahedral orientations and W channel weights.
+
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
+
+in_pin:A
+in_pin:B
+in_pin:C
+in_pin:D
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+slider1:0<0,7,1{Front Left Up [FLU FRD BLD BRU], Front Left Down [FLD FRU BLU BRD], Front Left-Right [FL FR BU BD], Front Up-Down [FU FD BL BR], Front & Back Down [F BD BLU BRU], Front & Back Up [F BU BLD BRD], Front Left-Right Up [FLU FRU FD B], Front Left-Right Down [FLD FRD FU B] }>Orientation
+
+slider2:0<0,3,1{Decorrelated (Planewaves), Canonical, Unscaled, Cardioid}>Weight
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Setting memory locations for 4x4 matrix as 1D array
+matrixDSP       = 1000;
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+// Transformation matrix depends on direction
+// This is the same code as for BtoA, but at the end we invert the matrix
+generateBtoAMatrix(matrixDSP, slider1, slider2);
+
+// As compared to BtoA we now invert the matrix
+invertMatrix(matrixDSP);
+
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Matrix multiplication with input signal:
+spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
+spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+spl2 = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
+spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];

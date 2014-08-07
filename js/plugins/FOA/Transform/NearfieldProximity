@@ -1,0 +1,168 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+This plugin wraps the ATK classes NearFieldCompensation and Proximity
+
+---------------------------------------------------------------------
+  Class: NearFieldCompensation
+
+  FoaNFC facilitates the reduction or removal of the proximity effect 
+  from encoded signals. The proximity effect can be an important 
+  contributor to perceptions of nearness.
+
+  Nearfield compensation1 is usually used in conjunction with 
+  FoaDecode to compensate for the distance of loudspeakers on playback. 
+  Additionally, NearFieldCompensation can also be used to reduce the
+  proximity effect found in nearfield recordings.
+
+  The Ambisonic Toolkit's Proximity filter undoes NearFieldCompensation
+  given the same distance argument.
+---------------------------------------------------------------------
+
+---------------------------------------------------------------------
+  Class: Proximity
+  Proximity facilitates the introduction of the proximity effect
+  to encoded signals. At extremes, the proximity effect introduces
+  a strong bass boost, as well as phase differences. The proximity
+  effect can be an important contributor to perceptions of nearness.
+  The Ambisonic Toolkit's nearfield compensation filter, NFC, undoes
+  Proximity given the same distance argument.
+---------------------------------------------------------------------
+*/
+
+
+desc: Apply nearfield compensation filtering to a first order ambisonic signal (B-format).
+
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:W
+out_pin:X
+out_pin:Y
+out_pin:Z
+
+slider1:0<0,1,1{Near Field Compensation, Introduce Proximity Effect}>Mode
+slider2:5<0.10,5,0.01>Distance (in meters)
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Clear filters
+function clear()
+(
+  y1x = 0.0;
+  y1y = 0.0;
+  y1z = 0.0;
+);
+
+// Flag indicasting that we are not fully initialised yet
+initialised = 0;
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+(slider1 != mMode) ? (
+  mMode = slider1;
+  clear();
+);
+
+
+distanceNew = slider2;
+
+initialised == 0 ? (
+  distanceDSP = distanceNew;
+  initialised = 1;
+  clear();
+);
+
+
+/**********************************************************
+Preprocessing prior to audio vector processing.
+**********************************************************/
+@block
+
+distanceInc = (distanceNew - distanceDSP) / samplesblock;
+sampleDuration = 1. / srate;
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+// Reaper adds anti-denormal noise to input, and hence we do not need to worry about 
+// denorm performance issues with respect to the recursive values y1x, y1y and y1z
+distanceDSP += distanceInc;
+
+freq = 53.0 / distanceDSP;
+wc = (2*$pi * freq) * sampleDuration;
+
+// Filter coefficient depends on mode
+(mMode == 0) ?
+ (  // MODE 0: Near field compensation
+   a0 = 1 / (sqrt((cos(wc) * -2.) + 2.) + 1);
+   
+   // W is passed straight out...
+   spl0 = spl0;
+
+   // ...while we filter all 1st order components
+   y0x = spl1 + a0 * y1x;
+   spl1 = a0 * y0x - a0 * y1x;
+   y1x = y0x;
+
+   y0y = spl2 + a0 * y1y;
+   spl2 = a0 * y0y -a0 * y1y;
+   y1y = y0y;
+
+   y0z = spl3 + a0 * y1z;
+   spl3 = a0 * y0z + -a0 * y1z;
+   y1z = y0z;
+ )
+ :
+ (  // MODE 1: Proximity
+   a0 = 1 + sqrt((cos(wc) * -2.) + 2.);
+
+   // W is passed straight out...
+   spl0 = spl0;
+
+   // ...while we filter all 1st order components
+   y0x = spl1 + y1x;
+   spl1 = a0 * y0x - y1x;
+   y1x = y0x; 
+
+   y0y = spl2 + y1y;
+   spl2 = a0 * y0y - y1y;
+   y1y = y0y;
+
+   y0z = spl3 + y1z;
+   spl3 = a0 * y0z - y1z;
+   y1z = y0z;
+);

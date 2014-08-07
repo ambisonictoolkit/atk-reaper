@@ -1,0 +1,124 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: quad
+  A quadrophonic decoder
+  
+  Pantophonic (2D) regular polygon decoder.
+  
+---------------------------------------------------------------------
+*/
+
+desc: Pantophonic (2D) regular polygon decoder
+
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+import atkMatrixLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:1
+out_pin:2
+out_pin:3
+out_pin:4
+out_pin:5
+out_pin:6
+out_pin:7
+out_pin:8
+out_pin:9
+out_pin:10
+out_pin:11
+out_pin:12
+out_pin:13
+out_pin:14
+out_pin:15
+out_pin:16
+
+slider1:4<3,16,1>Number of speakers
+slider2:0<0,1,1{Flat, Point}>Speaker orientation
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Setting memory locations for 4x4 matrix as 1D array
+matrixDSP       = 1000;
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+// Round off in case user types in a decimal value
+mNumSpeakers   = floor(slider1+0.5);
+slider1 = mNumSpeakers;
+slider_automate(slider1);
+
+mSpeakerLayout = slider2;
+
+// Generate 16 x 4 decoding matrix
+generateDecodePantoMatrix(matrixDSP, mNumSpeakers, mSpeakerLayout);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+
+// We don't envisage angle or pattern being changed dynamically, and hence there is no need for interpolations
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+
+// Matrix multiplication with input signal, 2D so z can be ignored.
+
+spl0  = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2];
+spl1  = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6];
+      
+spl2  = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10];
+spl3  = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14];
+      
+spl4  = wIn * matrixDSP[16] + xIn * matrixDSP[17] + yIn * matrixDSP[18];
+spl5  = wIn * matrixDSP[20] + xIn * matrixDSP[21] + yIn * matrixDSP[22];
+      
+spl6  = wIn * matrixDSP[24] + xIn * matrixDSP[25] + yIn * matrixDSP[26];
+spl7  = wIn * matrixDSP[28] + xIn * matrixDSP[29] + yIn * matrixDSP[30];
+
+spl8  = wIn * matrixDSP[32] + xIn * matrixDSP[33] + yIn * matrixDSP[34];
+spl9  = wIn * matrixDSP[36] + xIn * matrixDSP[37] + yIn * matrixDSP[38];
+
+spl10 = wIn * matrixDSP[40] + xIn * matrixDSP[41] + yIn * matrixDSP[42];
+spl11 = wIn * matrixDSP[44] + xIn * matrixDSP[45] + yIn * matrixDSP[46];
+
+spl12 = wIn * matrixDSP[48] + xIn * matrixDSP[49] + yIn * matrixDSP[50];
+spl13 = wIn * matrixDSP[52] + xIn * matrixDSP[53] + yIn * matrixDSP[54];
+
+spl14 = wIn * matrixDSP[56] + xIn * matrixDSP[57] + yIn * matrixDSP[58];
+spl15 = wIn * matrixDSP[60] + xIn * matrixDSP[61] + yIn * matrixDSP[62];
