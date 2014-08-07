@@ -462,61 +462,6 @@ lm_to_normal_dict = {
 #=========================
 # Encoding - Matricies
 
-# NOTE: deprecate encoding_convert_matrix()
-# NOTE: suitable for both encoding, transforming, decoding
-#       may want to move to 'utilities' 
-def encoding_convert_matrix(format_in, format_out, order = 1):
-    """Args:
-        - format_in     : (ordering, normalisation)
-        - format_out    : (ordering, normalisation)
-        - order         : HOA order
-
-        ordering      : 'acn', 'sid', 'fuma'
-        normalisation : 'sn3d', 'n3d', 'sn2d', 'n2d', 'maxN', 'MaxN'
-
-
-    Generate a matrix to encode / transcode an HOA signal.
-    NOTE: AmbiX format = ('acn', 'sn3d')
-    
-    Use in conjunction with mmix().
-    """
-    N = order
-
-    ordering_in, norm_in = format_in
-    ordering_out, norm_out = format_out
-
-    # ordering: acn, sid, fuma
-    ordering_to_lm_dict = {
-        'acn': acn_to_lm,
-        'sid': sid_to_lm,
-        'fuma': fuma_to_lm,
-    }
-
-    lm_to_ordering_dict = {
-        'acn': lm_to_acn,
-        'sid': lm_to_sid,
-        'fuma': lm_to_fuma,
-    }
-
-    # normalisation: sn3d, n3d, maxN, MaxN
-    lm_to_norma_dict = {
-        'sn3d': sn3d,
-        'n3d': n3d,
-        'sn2d': sn2d,
-        'n2d': n2d,
-        'maxN': maxN,
-        'MaxN': MaxN,
-    }
-    
-    nchans = (N+1)**2
-    lm = ordering_to_lm_dict[ordering_in](arange(nchans))
-    norm = lm_to_norma_dict[norm_out](lm) / lm_to_norma_dict[norm_in](lm)
-
-    res = identity(nchans)[:, lm_to_ordering_dict[ordering_out](lm)] * norm
-
-    return res
-    
-
 def format_matrix(order, format_in, format_out):
     """Args:
         - order         : HOA order
@@ -649,6 +594,8 @@ def planewave_matrix(direction = array([0, 0]), order = 1, \
 
 
 
+#=========================
+# Decoding - Matricies
 
 # --------------------------------------------------------------------------
 #
@@ -674,9 +621,8 @@ def planewave_matrix(direction = array([0, 0]), order = 1, \
 
 
 #=========================
-# Functions
+# Functions - decoding utilities
 #=========================
-
 
 # decoder_rV            : calculate rV for a 'regular' decoder
 def decoder_rV(order = 1, dec_type = 'basic', dim = 2):
@@ -1040,7 +986,7 @@ def zero_peri_matrix(order, ordering = 'acn'):
 # Decoding - Matricies (decoders)
 
 def panto_pinv_decoding_matrix(directions, order = 1, dec_type = 'basic', \
-    match = 'amp'):
+    match = 'amp', format = ('acn', 'sn3d')):
     """
     Args:
         - direction : [[azimuth, elevation], ... ]
@@ -1057,6 +1003,11 @@ def panto_pinv_decoding_matrix(directions, order = 1, dec_type = 'basic', \
                         'rms'    --> RMS (Gerzon / classic)
                         'energy' --> energy
 
+        - format    : (ordering, normalisation)
+
+    ordering      : 'acn', 'sid', 'fuma'
+    normalisation : 'sn3d', 'n3d', 'sn2d', 'n2d', 'maxN', 'MaxN'
+
     Returns pseudo-inverse matrix Ambisonic decoder.
     """
 
@@ -1072,16 +1023,17 @@ def panto_pinv_decoding_matrix(directions, order = 1, dec_type = 'basic', \
         N_out = (num_spkrs - 1) / 2
 
     # --------------------------------
-    # prototype encoding matrix (('acn'), ('sn3d'))
+    # prototype encoding matrix
     encoding_matrix = planewave_matrix(
         array([directions]),
-        N_out
+        N_out,
+        format
     )
         
     # discard 3D harmonics
     encoding_matrix = mmul(
         encoding_matrix,
-        peri_to_panto_matrix(N_out)
+        peri_to_panto_matrix(N_out, format[0])
     )
     
     # decoder: pseudo inverse - via pinv()
@@ -1089,7 +1041,7 @@ def panto_pinv_decoding_matrix(directions, order = 1, dec_type = 'basic', \
     
     # (re-)insert 3D harmonics
     decoding_matrix = mmul(
-        peri_to_panto_matrix(N_out),
+        peri_to_panto_matrix(N_out, format[0]),
         decoding_matrix
     )
     
@@ -1119,7 +1071,7 @@ def panto_pinv_decoding_matrix(directions, order = 1, dec_type = 'basic', \
 
 
 def panto_sad_decoding_matrix(directions, order = 1, dec_type = 'basic', \
-    match = 'amp'):
+    match = 'amp', format = ('acn', 'sn3d')):
     """
     Args:
         - direction : [[azimuth, elevation], ... ]
@@ -1135,6 +1087,11 @@ def panto_sad_decoding_matrix(directions, order = 1, dec_type = 'basic', \
                         'amp'    --> amplitude
                         'rms'    --> RMS (Gerzon / classic)
                         'energy' --> energy
+
+        - format    : (ordering, normalisation)
+
+    ordering      : 'acn', 'sid', 'fuma'
+    normalisation : 'sn3d', 'n3d', 'sn2d', 'n2d', 'maxN', 'MaxN'
 
     Returns projection, aka 'simple Ambisonic decoder' (SAD),
     matrix Ambisonic decoder.
@@ -1152,26 +1109,17 @@ def panto_sad_decoding_matrix(directions, order = 1, dec_type = 'basic', \
         N_out = (num_spkrs - 1) / 2
 
     # --------------------------------
-    # prototype encoding matrix (('acn'), ('sn3d'))
+    # prototype encoding matrix ((ordering), ('n2d'))
     encoding_matrix = planewave_matrix(
         array([directions]),
-        N_out
-    )
-        
-    # convert to n2d scaling - for projection
-    encoding_matrix = mmul(
-        encoding_matrix,
-        encoding_convert_matrix(
-            (('acn'), ('sn3d')),
-            (('acn'), ('n2d')),
-            N_out
-        )
+        N_out,
+        (format[0], 'n2d')
     )
     
     # zero 3D harmonics
     encoding_matrix = mmul(
         encoding_matrix,
-        zero_peri_matrix(N_out)
+        zero_peri_matrix(N_out, format[0])
     )
     
     # transpose and scale
@@ -1179,10 +1127,10 @@ def panto_sad_decoding_matrix(directions, order = 1, dec_type = 'basic', \
     
     # convert to n2d scaling - for input
     decoding_matrix = mmul(
-        encoding_convert_matrix(
-            (('acn'), ('sn3d')),
-            (('acn'), ('n2d')),
-            N_out
+        format_matrix(
+            N_out,
+            format,
+            (format[0], 'n2d')
         ),
         decoding_matrix
     )    
