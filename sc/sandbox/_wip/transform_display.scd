@@ -8,16 +8,20 @@
 // --post min/max gain
 // --implement units for tranform (pi, db, receiver index)
 // --add azimuth controls to the transforms
-// add option to display directivity as expanding/transparent circle or just proximity to origin
+// --add option to display directivity as expanding/transparent circle or just proximity to origin
 // consider a view down positive X axis
-// filter out points <-90dB
-// draw most transparent circles first
-// implement matrix input section as well as "post trasnform matrix"
+// --filter out points <-90dB
+// --draw most transparent circles first
+// --implement matrix input section as well as
+// "post trasnform matrix"
 // add test signal feature
 // add addition
 // add indeces in chain for selecting input and receivers for addition/subtraction
-// make matrix text view a pop-out window
+// --make matrix text view a pop-out window
 // double check how often window needs to be refreshed... maybe just views
+// make controls view grow and shrink the window dynamically
+// play soundfield through the matrix
+// crossfade matrices as parameters are changed
 
 // constants
 var kInvSqrt2 = 1/(2.sqrt);
@@ -37,6 +41,7 @@ var selDex, adjustRhos, getColCount, layoutFunc, colors;
 var tv, maxGainTxt, minGainTxt;
 var getColor, alphaSpec, gainSpec, colorSpec, gainThresh;
 var dirDisplay = 'size';
+var amp, curXformMatrix, evalTxtView;
 
 // based on Muse AED function plugins
 processPoints = {|xFormedMatrix|
@@ -59,25 +64,31 @@ processPoints = {|xFormedMatrix|
 
 	d_norm = 1 - (d.abs / 0.5pi);
 
+	// amp
+	amp = sqrt((b**2).sum / 2);
+
 	// postf("w,x,y,z: %\naz, el: %\nd_norm: %\n", b.round(0.01), [a, e].round(0.01), d_norm);
 
-	// TODO: get gain from above code, not the old code
-
-	/* -------- old code ----*/
-	#w,x,y,z = xFormedMatrix.getCol(0);
-	az  = atan2(y, x);
-	el  = atan2(z, sqrt(x.squared + y.squared));
-	// Omni transform angle
-	g0square	= w.squared;
-	g1square	= x.squared + y.squared + z.squared;
-	term 		= ((2*g0square) + g1square);
-	(term == 0).if{term = 0.0000000001}; // protect from NaN
-	omni		= asin(( (2*g0square) - g1square) / term);
-
-	// Gain
-	term		= sin(omni);
-	(term <= -1).if{term = -0.99999999}; // protect from NaN
-	gain		= w * sqrt(2 / (1 + term));
+	// // TODO: get gain from above code, not the old code
+	// /* -------- old code ----*/
+	// #w,x,y,z = xFormedMatrix.getCol(0);
+	// az  = atan2(y, x);
+	// el  = atan2(z, sqrt(x.squared + y.squared));
+	// // Omni transform angle
+	// g0square	= w.squared;
+	// g1square	= x.squared + y.squared + z.squared;
+	// term 		= ((2*g0square) + g1square);
+	// (term == 0).if{term = 0.0000000001}; // protect from NaN
+	// omni		= asin(( (2*g0square) - g1square) / term);
+	//
+	// // Gain
+	// term		= sin(omni);
+	// (term <= -1).if{term = -0.99999999}; // protect from NaN
+	// gain		= w * sqrt(2 / (1 + term));
+	//
+	// //debug
+	// "AMP AND GAIN:".postln;
+	// [amp, gain].postln;
 
 	// // Normalise omni to [0,1] range
 	// omni = 2 * omni / pi;
@@ -88,7 +99,7 @@ processPoints = {|xFormedMatrix|
 	[
 		// 	Polar(omni, az), gain.abs.ampdb
 		// Polar(d_norm, a), gain //.abs.ampdb
-		a, e, d_norm, gain
+		a, e, d_norm, amp
 		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
 	].postln; // debug
 
@@ -123,10 +134,12 @@ chainXForms = {|...xFormCtlPrs|
 	};
 	// mtx * inputMtx;
 	// mtx * (Matrix.newIdentity(4) * -1) * inputMtx
+	curXformMatrix = mtx;
 	mtx
 };
 
 ~updateMatrix = { |xfMatrix|
+	"updating from external call".postln;
 	transformedPoints = initPointsMatrices.collect{ |pointMtx|
 		xfMatrix * pointMtx
 	};
@@ -139,7 +152,7 @@ chainXForms = {|...xFormCtlPrs|
 	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
 	// aeds = aeds.collect({|aed|[aed[0], aed[3].abs.ampdb]});
 	aeds = aeds.collect({|aedg| aedg[3] = aedg[3].abs.ampdb }); // debug: convert to db in processPoints
-	w.refresh;
+	win !? {win.refresh};
 };
 
 updateMatrix = {
@@ -178,8 +191,7 @@ updateMatrix = {
 	aeds = transformedPoints.collect{|ptMtx|
 		processPoints.(ptMtx);
 	};
-	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
-	// aeds = aeds.collect({|aed|[aed[0], aed[3].abs.ampdb]});
+
 	aeds = aeds.collect({|aedg| aedg[3] = aedg[3].abs.ampdb }); // debug: convert to db in processPoints
 
 	win !? {win.refresh};
@@ -193,15 +205,21 @@ Drawing
 scrnB = Window.screenBounds;
 winW= 600;
 winH= 600;
-win = Window("soundfield transform", Rect(scrnB.center.x - (winW/2), scrnB.height-winH-45, winW, winH), resizable: true).front;
-// w.layout_(VLayout(
-uv = UserView( win, Rect(0,0, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5).background_(Color.gray.alpha_(0.99));
-ctlv = View( win, Rect(0,win.view.bounds.height/2, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5);
+win = Window("soundfield transform",
+	Rect(scrnB.center.x - (winW/2), scrnB.height-winH-45, winW, winH),
+	resizable: true)
+.onClose_({codeWin !? {codeWin.close}}).front;
 
-// codev = View();
-// ));
-// uv = UserView();
-// ctlv = View();
+win.view.palette_(
+	QPalette.dark
+	.setColor(Color.gray, 'base')
+	.setColor(Color.gray, 'alternateBase')
+);
+
+uv = UserView( win, Rect(0,0, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5); //.background_(Color.fromHexString("#003366"));
+
+ctlv = View( win, Rect(0,win.view.bounds.height/2, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5);
+x = ctlv;
 
 // controls
 // xForms = ['push', 'press', 'focus', 'zoom'];
@@ -376,7 +394,7 @@ createXForm = {
 				xfStuff.controlStates[ctlOrder] = val;
 				updateMatrix.();
 			}
-		).orientation_('horizontal')
+		).orientation_('horizontal').maxHeight_(20)
 		.value_(spec.unmap(spec.default));
 
 		nb = NumberBox()
@@ -481,12 +499,18 @@ ctlv.layout.add(
 );
 ctlv.layout.add(createNewXFormView.());
 
-showMatrixWindow = {
-	codeWin ?? {
-		var mwinH = 200;
-		var evalTxtView, mtxString;
-		mtxString = "var matrix; \n\n/*set you Matrix here, select all and evaluate, or click Evaluate*/\nmatrix = ;\n\n~updateMatrix.(matrix)";
+showMatrixWindow = { |postCurrentMatrix=false|
+	var mwinH = 200;
+	var evalMtxString, postMtxString;
 
+	postMtxString =
+	"The current transform matrix:\n\n" ++
+	"matrix = " ++ curXformMatrix.asString ++
+	";\n\nout = AtkMatrixMix.ar(foaSig, matrix);";
+
+	evalMtxString = "var matrix; \n\n/*set you Matrix here, select all and evaluate, or click Evaluate*/\nmatrix = ;\n\n~updateMatrix.(matrix)";
+
+	codeWin.isNil.if( {
 		codeWin = Window("Evaluate Matrix",
 			Rect(win.bounds.left,
 				scrnB.height - win.bounds.height - mwinH
@@ -498,14 +522,25 @@ showMatrixWindow = {
 		View(codeWin, Rect(0,0, codeWin.bounds.width, codeWin.bounds.height))
 		.layout_(
 			VLayout(
-				evalTxtView = TextView().enterInterpretsSelection_(true).string_(mtxString),
+				evalTxtView = TextView().enterInterpretsSelection_(true)
+				.string_(postCurrentMatrix.if({postMtxString},{evalMtxString})),
+
 				HLayout(
-					Button().states_([["Evaluate"]]).action_({evalTxtView.string.interpret}),
-					Button().states_([["Reset"]]).action_({evalTxtView.string = mtxString}),
+					Button().states_([["Evaluate"]])
+					.action_({evalTxtView.string.interpret}),
+					Button().states_([["Reset"]])
+					.action_({evalTxtView.string = evalMtxString}),
 				),
 			)
 		);
-	};
+		},{
+			postCurrentMatrix.if({
+				evalTxtView.string = postMtxString;
+			},{
+					evalTxtView.string = evalMtxString;
+			});
+		}
+	);
 };
 
 tv = View(uv,Rect(0, 0, uv.bounds.width,uv.bounds.height)).layout_(
@@ -518,25 +553,31 @@ tv = View(uv,Rect(0, 0, uv.bounds.width,uv.bounds.height)).layout_(
 				.font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
 			),
 			nil,
-			StaticText().string_("Directivity Display"),
-			PopUpMenu().items_(['Size and Radius', 'Radius Only'])
-			.action_({|mn|
-				dirDisplay = switch(mn.value, 0,{'size'},1,{'radius'});
-				updateMatrix.();
-			}).maxWidth_(130),
 			Button().states_(
 				[["Enter Custom Matrix"]]).action_({|but| showMatrixWindow.() }).maxWidth_(130),
+			Button().states_(
+				[["Post Matrix"]]).action_({|but| showMatrixWindow.(true) }).maxWidth_(130),
 		),
 		VLayout(
-			nil,
 			VLayout(
-				[ Button()
+				StaticText().string_("Directivity Display"),
+				PopUpMenu().items_(['Size and Radius', 'Radius Only'])
+				.action_({|mn|
+					dirDisplay = switch(mn.value, 0,{'size'},1,{'radius'});
+					updateMatrix.();
+				}).maxWidth_(130),
+				nil
+			)
+			.setAlignment(0, \topRight)
+			.setAlignment(1, \topRight),
+			VLayout(
+				Button()
 					.states_([
-						["Pan Test", Color.black, Color.grey],
-						["Stop test", Color.black, Color.red],
-				]).maxWidth_(65), a: \bottomRight],
+						["Pan Test"],
+						["Stop test"],
+				]).maxWidth_(65),
 				Button().states_([
-					["Continuous", Color.black, Color.grey],["Pulsed", Color.black, Color.green]]),
+					["Continuous"],["Pulsed"]]).maxWidth_(70),
 				HLayout(
 					StaticText().string_("Period"),
 					NumberBox().maxWidth_(25).value_(5)
@@ -549,6 +590,7 @@ tv = View(uv,Rect(0, 0, uv.bounds.width,uv.bounds.height)).layout_(
 					// Slider().maxWidth_(150).orientation_(\horizontal)
 				).setAlignment(0,\right) //.setAlignment(1,\right) //.setAlignment(0,\right)
 			)
+			.setAlignment(0, \bottomRight)
 			.setAlignment(1, \bottomRight)
 			.setAlignment(2, \bottomRight)
 			.setAlignment(3, \bottomRight)
@@ -563,7 +605,7 @@ win.view.onResize_({ |winview|
 
 gainThresh = -90;
 
-alphaSpec = ControlSpec(0.1, 1, warp:3);
+alphaSpec = ControlSpec(0.1, 1, warp:5);
 // gainSpec = ControlSpec(-100, 6, 'db');
 gainSpec = ControlSpec(-90, 6, -2);
 colorSpec = ControlSpec(768,0);
@@ -599,11 +641,22 @@ uv.drawFunc_({|view|
 
 	cen = view.bounds.center; // center drawing origin
 	Pen.translate(cen.x, cen.y);
-	Pen.strokeColor_(Color.red).fillColor_(Color.blue); // draw background "fan"
-	Pen.fillOval(Rect(r.neg, r.neg, d,d));
-	Pen.strokeOval(Rect(r.neg, r.neg, d,d));
+	// Pen.strokeColor_(Color.red).fillColor_(Color.blue); // draw background "fan"
+	// Pen.fillOval(Rect(r.neg, r.neg, d,d));
+	// Pen.strokeOval(Rect(r.neg, r.neg, d,d));
 	Pen.addAnnularWedge( 0@0, 5, arcH, 0, 2pi );
 	Pen.fillColor_(Color.gray(0.9)).fill;
+
+	// background circles
+	Pen.strokeColor_(Color.gray.alpha_(0.2));
+	3.do{|i|
+		var val;
+		val = (i+1 / 3);
+		Pen.strokeOval( Rect(
+			(arcH * val).neg, (arcH * val).neg,
+			arcH*2*val, arcH*2*val
+		));
+	};
 
 	// draw test signal planewave circle
 	testSigPnt = Polar(1.1,rrand(0, 2pi)).asPoint
@@ -640,13 +693,15 @@ uv.drawFunc_({|view|
 			Pen.line(drawPnt, 0@0).stroke;
 
 			// directivity circle
-			Pen.fillColor_(gainColor.alpha_(alphaSpec.map(dir)));
+
 			switch(dirDisplay,
 				'size',{
+					Pen.fillColor_(gainColor.alpha_(alphaSpec.map(dir)));
 					Pen.fillOval( Rect(drawPnt.x-omniRad, drawPnt.y-omniRad, omniDiam, omniDiam) );
 					gainPnt = azPnt * 1.15; // scale in/out toward/away from origin
 				},
 				'radius', {
+					Pen.fillColor_(gainColor);
 					Pen.fillOval( Rect(drawPnt.x-r, drawPnt.y-r, d, d) );
 					gainPnt = drawPnt * dir.linlin(0,1,1.75,1.15); // scale in/out toward/away from origin
 				}
