@@ -103,7 +103,8 @@ Updated slider value:
 **********************************************************/
 @slider
 
-mTransformAngle  = slider1 * kDeg2Rad;
+mTransformAngle     = slider1 * kDeg2Rad;
+mNormTransformAngle = slider1 / 90.;
 calculateMatrix();
 
 
@@ -114,43 +115,43 @@ Graphics
 @gfx 500 500
 
 // Set colors
-gxColorSet(1, 1, 1, 1);
 determineGeometry();
 drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
-mMouseX = mouse_x - gCenterX;
-mMouseY = mouse_y - gCenterY;
-mAzimuth = atan2(mMouseX, -mMouseY);
+// Only update plugin parameters if the user click and drag interaction circle
+mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
+// Save current mouse_cap value in order to use in the above test at next iteration
+mPreviousMouseCap = mouse_cap;
 
-mTentativeNewTransformationAngle = 1. - sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius;
-// Restrict the range to [0, 1]
-mTentativeNewTransformationAngle < 0. ? mTentativeNewTransformationAngle = 0.;
+(mClickingAtCircle) ? (
+  mMouseX = mouse_x - gCenterX;
+  mMouseY = mouse_y - gCenterY;
+  mAzimuth = atan2(mMouseX, -mMouseY);
 
-// Only update transformation settings at mouse drag
-mouse_cap == 1 ?
-(  
-  slider1 = mTentativeNewTransformationAngle * 90.;
-  mTransformAngle = mTentativeNewTransformationAngle * $pi * 0.5;
+  mNormTransformAngle = 1. - sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius;
+  // Restrict the range to [0, 1]
+  mNormTransformAngle < 0. ? mNormTransformAngle = 0.;
+  
+  slider1 = mNormTransformAngle * 90.;
+  mTransformAngle = mNormTransformAngle * $pi * 0.5;
   slider_automate(slider1);
   calculateMatrix();
+  
+  mHiglightCircle = 1;
+) : (
+  mHiglightCircle = hoverOverInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 );
 
 // Draw points illustrating the effect of the transform
 displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
 
 // Draw circle for interaction, map vertical position to saturation, lightness and radius
-mPosX = gCenterX + gRadius * (1. - mTentativeNewTransformationAngle) * sin(mAzimuth);
-mPosY = gCenterY - gRadius * (1. - mTentativeNewTransformationAngle) * cos(mAzimuth);
+mPosX = gCenterX + gRadius * (1. - mNormTransformAngle) * sin(mAzimuth);
+mPosY = gCenterY - gRadius * (1. - mNormTransformAngle) * cos(mAzimuth);
 
 // Only draw the white outline around interaction circle when mouse is active
-mInteractionCircleRadius = 11;
-mouse_cap == 1 ? (
-  gxColorSetHsl(1.0, 195., 1., 0.4);
-  drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
-) : (
-  gxColorSetHsl(0.5, 195., 1., 0.4);
-  gfx_circle(mPosX, mPosY, mInteractionCircleRadius, 1, 1);
-);
+gxColorSetHsl(1.0, 195., 1., 0.4 + 0.15*mHiglightCircle);
+drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 
 
 /**********************************************************
