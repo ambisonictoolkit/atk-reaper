@@ -58,10 +58,10 @@ Initialisation
 @init
 
 // Flag indicating that the plugin has not been fully initialised yet
-initialised = 0;
+mInitialised = 0;
 
-azimuth   = 0;
-elevation = 0.;
+mAzimuth   = 0;
+mElevation = 0.;
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
@@ -85,25 +85,25 @@ matrixDisplayTransformed = 1400;
 matrixDisplayInterpreted = 1500;
 
 // This only needs to be generated once:
-numDisplayedPoints = 24;
-generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
+mNumDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
+
+// Radius of interaction circle
+mInteractionCircleRadius = 10.;
+
+// Initialisation of user interaction parameters
+mPreviousMouseCap = 0;
+mClickingAtCircle = 0;
 
 
 function calculateMatrix()
-(
-  // Required for graphics
-  cosAzimuth   = cos(azimuth);
-  sinAzimuth   = sin(azimuth);
-
-  cosElevation = cos(elevation);
-  sinElevation = sin(elevation);
-  
+(  
   // Generate matrixes
-  generateRotationMatrix(matrixRotate1, (-azimuth));
-  generateTumblelMatrix(matrixTumble1, -elevation);
-  generateDirectMatrix(matrixTransform, transformAngle);
-  generateRotationMatrix(matrixRotate2, azimuth);
-  generateTumblelMatrix(matrixTumble2, elevation);
+  generateRotationMatrix(matrixRotate1, (-mAzimuth));
+  generateTumblelMatrix(matrixTumble1, -mElevation);
+  generateDirectMatrix(matrixTransform, mTransformAngle);
+  generateRotationMatrix(matrixRotate2, mAzimuth);
+  generateTumblelMatrix(matrixTumble2, mElevation);
   
   /* Build processing matrix by performing a series of matrix multiplications
                        result =              left     X               right             */
@@ -113,18 +113,18 @@ function calculateMatrix()
   matrixMultiplication(matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
   
   /* Transformation and interpretation of display points */
-  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
-  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
+  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, mNumDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, mNumDisplayedPoints);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
-  initialised == 0 ?
+  mInitialised == 0 ?
   (
     i = 0;
     loop(16,
       matrixDSP[i] = matrixNewDSP[i];
     );
     // Now we are fully initialised
-    initialised = 1;
+    mInitialised = 1;
   );
 );
 
@@ -134,9 +134,10 @@ Updated slider value:
 **********************************************************/
 @slider
 
-azimuth         = slider1 * kDeg2Rad;
-elevation       = slider2 * kDeg2Rad;
-transformAngle  = slider3 * kDeg2Rad;
+mAzimuth         = slider1 * kDeg2Rad;
+mElevation       = slider2 * kDeg2Rad;
+mTransformAngle  = slider3 * kDeg2Rad;
+mNormTransformAngle = slider3 / 90.;
 
 calculateMatrix();
 
@@ -150,38 +151,48 @@ gxColorSet(1, 1, 1, 1);
 determineGeometry();
 drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
-// Only update transformation settings at mouse drag
-mouse_cap == 1 ?
-(
-  mouseX = mouse_x - gCenterX;
-  mouseY = mouse_y - gCenterY;
-  azimuth = atan2(mouseX, -mouseY);
+// Only update plugin parameters if the user click and drag interaction circle
+mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
+// Save current mouse_cap value in order to use in the above test at next iteration
+mPreviousMouseCap = mouse_cap;
+
+(mClickingAtCircle) ? (    
+  mMouseX = mouse_x - gCenterX;
+  mMouseY = mouse_y - gCenterY;
+  
+  mAzimuth = atan2(mMouseX, -mMouseY);
 
   // Update slider2 and notify GUI of the change  
-  slider1 = azimuth * kRad2Deg;
+  slider1 = mAzimuth * kRad2Deg;
   slider_automate(slider1);
-  
-  mNormTransformAngle = (1. - sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius);
+  mNormTransformAngle = (1. - sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius);
   // Restrict the range to [0, 1.]
   mNormTransformAngle < 0. ? mNormTransformAngle = 0.;
 
-  // Update transformAngle and slider, and notify GUI of the change
-  transformAngle = mNormTransformAngle * $pi*0.5;
+  // Update mTransformAngle and slider, and notify GUI of the change
+  mTransformAngle = mNormTransformAngle * $pi*0.5;
   slider3 = mNormTransformAngle*90.;
   slider_automate(slider3);
-  
   calculateMatrix();
+  mHiglightCircle = 1;
+) : (
+  mHiglightCircle = hoverOverInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 );
 
 // Draw points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
+displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, 1);
 
-// Drawing line and interactive circle
-gxColorSetHsl(1.0, 195., 1., 0.4);
-drawLineSegment(gCenterX, gCenterY, posX, posY, 1.);
-posX = gCenterX + gRadius * (1. - mNormTransformAngle) * sin(azimuth);
-posY = gCenterY - gRadius * (1. - mNormTransformAngle) * cos(azimuth);
-drawInteractionCircle(posX, posY, 10.);
+// Calculate absolute position of interaction circle
+mPosX = gCenterX + gRadius * (1. - mNormTransformAngle) * sin(mAzimuth);
+mPosY = gCenterY - gRadius * (1. - mNormTransformAngle) * cos(mAzimuth);
+
+// Draw line from origo to interaction circle
+gxColorSetHsl(1.0, 195., 1., 0.4 + 0.15*mHiglightCircle);
+drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1.);
+
+
+// Draw interaction circle
+drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 
 
 /**********************************************************
@@ -189,12 +200,12 @@ Preprocessing prior to audio vector processing.
 **********************************************************/
 @block
 
-inverseSamplesblock = 1. / samplesblock;
+mInverseSamplesblock = 1. / samplesblock;
 
 // Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
 ii = 0;
 loop(16,
-  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * mInverseSamplesblock;
   ii += 1;
 );
 
