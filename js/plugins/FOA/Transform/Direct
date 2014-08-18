@@ -147,7 +147,6 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
-gxColorSet(1, 1, 1, 1);
 determineGeometry();
 drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
