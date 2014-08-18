@@ -339,6 +339,56 @@ function drawInteractionCircle(aCenterX, aCenterY, aRadius) local(lSquareRadius,
 );
 
 
+
+/********************************************************************
+Graphics Interaction: Test to see if user is click-dragging interaction circle.
+
+returns: boolean flag
+
+In addition the previous mouse_cap value
+need to be stored in order to be used at the next iteration of this test,
+and that saving is the responsibility of the code calling this function.
+********************************************************************/
+function clickingOnInteractionCircle(aPreviousMouseCap, aPosX, aPosY, anInteractionCircleRadius, aClickingAtCircle) local(lDistance, lReturn)
+(
+  lReturn = aClickingAtCircle;
+  
+  // Has mouse cap changed?
+  (mouse_cap != aPreviousMouseCap) ? (
+    (mouse_cap == 1) ? (
+      lDistance = sqrt( (mouse_x - aPosX) * (mouse_x - aPosX) + (mouse_y - aPosY) * (mouse_y - aPosY) );
+      (lDistance <= anInteractionCircleRadius) ? (
+        lReturn = 1;
+      ) : (
+        lReturn = 0;
+      );
+    ) : (
+      lReturn = 0;
+    );
+  );
+  lReturn;
+);
+
+
+/********************************************************************
+Graphics Interaction: Test to see if mouse is hovering over interaction circle.
+
+returns: boolean flag
+********************************************************************/
+function hoverOverInteractionCircle(aPosX, aPosY, anInteractionCircleRadius) local(lDistance, lReturn)
+(
+  // Has mouse cap changed?
+  lDistance = sqrt( (mouse_x - aPosX) * (mouse_x - aPosX) + (mouse_y - aPosY) * (mouse_y - aPosY) );
+  (lDistance <= anInteractionCircleRadius) ? (
+    lReturn = 1;
+  ) : (
+    lReturn = 0;
+  );
+  lReturn;
+);
+
+
+
 /********************************************************************
 Graphics: Draw points illustrating the effect of various transforms
 ********************************************************************/
