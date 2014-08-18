@@ -55,8 +55,57 @@ and GNU General Public License along with this program.  If not, see
 desc: Binaural stereo decoder
 
 
+// Graphics files for CIPIC HRTFs
+filename:0,../lib/ear_photos/Subject_003/003_right_side.jpg
+filename:1,../lib/ear_photos/Subject_008/008_left_side.jpg
+filename:2,../lib/ear_photos/Subject_009/009_left_side.jpg
+filename:3,../lib/ear_photos/Subject_010/0010_left.jpg
+filename:4,../lib/ear_photos/Subject_011/011_right_side.jpg
+filename:5,../lib/ear_photos/Subject_012/012_right_side.jpg
+filename:6,../lib/ear_photos/Subject_015/0015_left.JPG
+filename:7,../lib/ear_photos/Subject_017/0017_right.jpg
+filename:8,../lib/ear_photos/Subject_018/Subject_018_left_side.jpg
+filename:9,../lib/ear_photos/Subject_019/019_left_side.jpg
+filename:10,../lib/ear_photos/Subject_020/0020_left.jpg
+filename:11,../lib/ear_photos/Subject_021/0021_left.jpg
+filename:12,../lib/ear_photos/Subject_027/0027_left.jpg
+filename:13,../lib/ear_photos/Subject_028/0028_left_2.jpg
+filename:14,../lib/ear_photos/Subject_033/0033_left.jpg
+filename:15,../lib/ear_photos/Subject_040/0040_left.jpg
+filename:16,../lib/ear_photos/Subject_044/0044_left.jpg
+filename:17,../lib/ear_photos/Subject_048/0048_left.jpg
+filename:18,../lib/ear_photos/Subject_050/0050_left.jpg
+filename:19,../lib/ear_photos/Subject_051/0051_left.jpg
+filename:20,../lib/ear_photos/Subject_058/0058_left.jpg
+filename:21,../lib/ear_photos/Subject_059/0058_left.jpg
+filename:22,../lib/ear_photos/Subject_060/0060_left.jpg
+filename:23,../lib/ear_photos/Subject_061/0061_left.jpg
+filename:24,../lib/ear_photos/Subject_065/0065_left.jpg
+filename:25,../lib/ear_photos/Subject_119/0119_left.jpg
+filename:26,../lib/ear_photos/Subject_124/0124_left.jpg
+filename:27,../lib/ear_photos/126-none
+filename:28,../lib/ear_photos/Subject_127/0127_left.jpg
+filename:29,../lib/ear_photos/131-none
+filename:30,../lib/ear_photos/Subject_133/0133_left.jpg
+filename:31,../lib/ear_photos/Subject_134/0134_left.jpg
+filename:32,../lib/ear_photos/Subject_135/0135_left.jpg
+filename:33,../lib/ear_photos/Subject_137/0137_left.jpg
+filename:34,../lib/ear_photos/Subject_147/0147_left.jpg
+filename:35,../lib/ear_photos/Subject_148/0148_left.jpg
+filename:36,../lib/ear_photos/Subject_152/0152_left.jpg
+filename:37,../lib/ear_photos/153-none
+filename:38,../lib/ear_photos/Subject_154/0154_left.jpg
+filename:39,../lib/ear_photos/Subject_155/0155_left.jpg
+filename:40,../lib/ear_photos/Subject_156/0156_left.jpg
+filename:41,../lib/ear_photos/Subject_158/0158_left.jpg
+filename:42,../lib/ear_photos/Subject_162/0162_left.jpg
+filename:43,../lib/ear_photos/Subject_163/0163_left.jpg
+filename:44,../lib/ear_photos/165-none
+
 // Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
 import atkKernelLibrary.jsfx-inc
+import atkGraphicsLibrary.jsfx-inc
 
 
 in_pin:W
@@ -80,12 +129,13 @@ Initialisation
 @init
 
 // Allocate slots for file and folder names
-mFilenameW  = 1;
-mFilenameX  = 2;
-mFilenameY  = 3;
-mFilenameZ  = 4;
+// IMPORTANT: These values must not conflict with the numbers of the image files loaded above!
+mFilenameW  = 45;
+mFilenameX  = 46;
+mFilenameY  = 47;
+mFilenameZ  = 48;
 
-mFolderPath = 5;
+mFolderPath = 49;
 
 // Allocate buffer and block locations...
 
@@ -126,6 +176,70 @@ mFftSize               = -1;
 mKernelSize            = -1;
 mFftNewRequired        =  1;
 
+// Create array of filenames for images
+mFileNameArray = 100;
+
+// By default no image exists for the HRTF...
+i = 0;
+loop (106,
+  mFileNameArray[i] = -1;
+  i += 1;
+);
+
+//...but there are some exceptions
+mFileNameArray[10] =  0;
+mFileNameArray[11] =  1;
+mFileNameArray[12] =  2;
+mFileNameArray[13] =  3;
+mFileNameArray[14] =  4;
+mFileNameArray[15] =  5;
+mFileNameArray[16] =  6;
+mFileNameArray[17] =  7;
+mFileNameArray[18] =  8;
+mFileNameArray[19] =  9;
+mFileNameArray[20] = 10;
+mFileNameArray[21] = 11;
+mFileNameArray[22] = 12;
+mFileNameArray[23] = 13;
+mFileNameArray[24] = 14;
+mFileNameArray[25] = 15;
+mFileNameArray[26] = 16;
+mFileNameArray[27] = 17;
+mFileNameArray[28] = 18;
+mFileNameArray[29] = 19;
+mFileNameArray[30] = 20;
+mFileNameArray[31] = 21;
+mFileNameArray[32] = 22;
+mFileNameArray[33] = 23;
+mFileNameArray[34] = 24;
+mFileNameArray[35] = 25;
+mFileNameArray[36] = 26;
+mFileNameArray[37] = 27;
+mFileNameArray[38] = 28;
+mFileNameArray[39] = 29;
+mFileNameArray[40] = 30;
+mFileNameArray[41] = 31;
+mFileNameArray[42] = 32;
+mFileNameArray[43] = 33;
+mFileNameArray[44] = 34;
+mFileNameArray[45] = 35;
+mFileNameArray[46] = 36;
+mFileNameArray[47] = 37;
+mFileNameArray[48] = 38;
+mFileNameArray[49] = 39;
+mFileNameArray[50] = 40;
+mFileNameArray[51] = 41;
+mFileNameArray[52] = 42;
+mFileNameArray[53] = 43;
+mFileNameArray[54] = 44;
+
+i = 0;
+loop(106,
+  (mFileNameArray[i] >= 0) ? (
+    gfx_loadimg(i, mFileNameArray[i]);
+  );
+  i += 1;
+);
 
 
 /********************************************************************
@@ -174,6 +288,7 @@ function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported,
       /***** Slider values 10-54 : CIPIC HRTF *****/
       (aSliderValue < 55) ? (
         
+        lSampleRateIsSupported = 1;
         mVerticalIsSupported = 1;
         mKernelSize = 512;
         
@@ -229,6 +344,7 @@ function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported,
         
         /***** Slider values 55-105 : Listen HRTF *****/
         
+        lSampleRateIsSupported = 1;
         mVerticalIsSupported = 1;
         mKernelSize = 512;
         
@@ -377,6 +493,34 @@ preamp = 2^(slider2/6);
 
 
 /**********************************************************
+Graphics
+**********************************************************/
+@gfx 500 500
+
+gfx_clear;
+determineGeometry();
+
+gfx_getimgdim(mPreviousSliderValue, mWidth, mHeight);
+
+(mWidth > 0) ? (
+  // Display image if it exxists
+  gxPositionSet(gCenterX - 0.5*mWidth, gCenterY - 0.5*mHeight);
+  gfx_blit(mPreviousSliderValue, 1., 0.);
+) : (
+  // Else draw black bakground...
+  gxColorSet(1., 0., 0., 0.);
+  gfx_rect(0, 0, 2*gCenterX, 2*gCenterY);
+  
+  // ...and some text
+  gfx_setfont(1, "Arial", 14);
+  gfx_measurestr("No image available for this HRTF", mWidth, mHeight);
+  gxPositionSet(gCenterX-0.5*mWidth, gCenterY-0.5*mHeight);
+  gxColorSet(1., 1., 1., 1.);
+  gfx_drawstr("No image available for this HRTF");
+);
+
+
+/**********************************************************
 Preprocessing prior to audio vector processing.
 **********************************************************/
 @block
@@ -401,9 +545,7 @@ mFftNewRequired ? (
   
   // Reset current write/read position within the blocks
   mBufferPosition = 0;
-  
-  // TODO: Add slider that provides feedback whether HRTF is supported at this sample rate
-  
+    
   // Convolution kernel is now up to date
   mFftNewRequired = 0; 
 );
