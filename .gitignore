@@ -16,3 +16,6 @@
 
 # User specific files in Xcode project
 xcuserdata
+
+# OSX Installer build folder
+js/installer/OSX/ATK\ for\ Reaper/build
