@@ -72,11 +72,11 @@ Initialisation
 **********************************************************/
 @init
 
-// Flag indicating that the plugin has not been fully initialised yet
-initialised = 0;
+// Flag indicating that the plugin has not been fully mInitialised yet
+mInitialised = 0;
 
-azimuth   = 0;
-elevation = 0.;
+mAzimuth   = 0;
+mElevation = 0.;
 mDrawCenterPoint = 0;   // This depends on whether transform mode affects directioness or not
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
@@ -128,42 +128,42 @@ matrixUnity[15] = 1.;
 matrixMultiplication  (matrixTest,    4, 4, matrixUnity,     4, 8, matrixCounter);
 
 // This only needs to be generated once:
-numDisplayedPoints = 24;
-generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints); 
+mNumDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints); 
 
 function calculateMatrix()
 (
   // Required for graphics
-  cosAzimuth   = cos(azimuth);
-  sinAzimuth   = sin(azimuth);
+  mCosAzimuth   = cos(mAzimuth);
+  mSinAzimuth   = sin(mAzimuth);
 
-  cosElevation = cos(elevation);
-  sinElevation = sin(elevation);
+  mCosElevation = cos(mElevation);
+  mSinElevation = sin(mElevation);
   
   // Generate matrixes
-  generateRotationMatrix(matrixRotate1, (-azimuth));
-  generateTumblelMatrix(matrixTumble1, -elevation);
+  generateRotationMatrix(matrixRotate1, (-mAzimuth));
+  generateTumblelMatrix(matrixTumble1, -mElevation);
   
   // Determine what transform to do
   mode == 0 ? (         // Focus
-    generateFocusMatrix(matrixTransform, transformAngle);
+    generateFocusMatrix(matrixTransform, mTransformAngle);
     mDrawCenterPoint = 0;
   ) : (
     mode == 1 ? (       // Press
-      generatePressMatrix(matrixTransform, transformAngle);
+      generatePressMatrix(matrixTransform, mTransformAngle);
       mDrawCenterPoint = 1;
     ) : (
       mode == 2? (      // Push
-        generatePushMatrix(matrixTransform, transformAngle);
+        generatePushMatrix(matrixTransform, mTransformAngle);
         mDrawCenterPoint = 1;
       ) : (             // Zoom
-        generateZoomMatrix(matrixTransform, transformAngle);
+        generateZoomMatrix(matrixTransform, mTransformAngle);
         mDrawCenterPoint = 0;
       );
     );
   );
-  generateRotationMatrix(matrixRotate2, azimuth);
-  generateTumblelMatrix(matrixTumble2, elevation);
+  generateRotationMatrix(matrixRotate2, mAzimuth);
+  generateTumblelMatrix(matrixTumble2, mElevation);
   
   /* Build processing matrix by performing a series of matrix multiplications
                         result =         left X                   right             */
@@ -173,18 +173,18 @@ function calculateMatrix()
   matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
   
   // Transformation and interpretation of display points
-  matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
-  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
+  matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, mNumDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, mNumDisplayedPoints);
   
-  // Set initial DSP processing coefficients if the plugin has not yet been initialised
-  initialised == 0 ?
+  // Set initial DSP processing coefficients if the plugin has not yet been mInitialised
+  mInitialised == 0 ?
   (
     i = 0;
     loop(16,
       matrixDSP[i] = matrixNewDSP[i];
     );
-    // Now we are fully initialised
-    initialised = 1;
+    // Now we are fully mInitialised
+    mInitialised = 1;
   );
 );
 
@@ -195,10 +195,10 @@ Updated slider value:
 @slider
 
 mode                = slider1;
-azimuth             = slider2 * kDeg2Rad;
-elevation           = slider3 * kDeg2Rad;
+mAzimuth             = slider2 * kDeg2Rad;
+mElevation           = slider3 * kDeg2Rad;
 mNormTransformAngle = slider4 / 90.;
-transformAngle      = slider4 * kDeg2Rad;
+mTransformAngle      = slider4 * kDeg2Rad;
 
 /* --- DEBUG STUFF ---
 debugMode       = slider5;
@@ -278,25 +278,25 @@ debugMode == 0 ?
   determineGeometry();
   drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
-  // Reset azimuth and transformAngle on mouse click
+  // Reset mAzimuth and mTransformAngle on mouse click
   mouse_cap == 1 ?
   (
-    mouseX = mouse_x - gCenterX;
-    mouseY = mouse_y - gCenterY;
+    mMouseX = mouse_x - gCenterX;
+    mMouseY = mouse_y - gCenterY;
     
-    // Update azimuth and slider2 and notify GUI of the change
-    azimuth = atan2(mouseX, -mouseY);
-    slider2 = azimuth * kRad2Deg;
+    // Update mAzimuth and slider2 and notify GUI of the change
+    mAzimuth = atan2(mMouseX, -mMouseY);
+    slider2 = mAzimuth * kRad2Deg;
     slider_automate(slider2);
     
-    // Update transformAngle and slider4 and notify GUI of the change
-    // COMMENT: There is a risk of dividing by zero here (for elevation = 90), but Reaper seems to handle this grazefully.
-    // At 90 deg elevation the GUI has a dead lock and can't be used for changing the degree of transformation, but the slider is still available.
-    mNormTransformAngle = sqrt(mouseX*mouseX + mouseY*mouseY) * gInverseRadius / cos(elevation);
+    // Update mTransformAngle and slider4 and notify GUI of the change
+    // COMMENT: There is a risk of dividing by zero here (for mElevation = 90), but Reaper seems to handle this grazefully.
+    // At 90 deg mElevation the GUI has a dead lock and can't be used for changing the degree of transformation, but the slider is still available.
+    mNormTransformAngle = sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius / cos(mElevation);
     // Restrict the range to [0, 1]
     mNormTransformAngle > 1. ? mNormTransformAngle = 1.;
     
-    transformAngle = mNormTransformAngle * $pi * 0.5;
+    mTransformAngle = mNormTransformAngle * $pi * 0.5;
     slider4 = mNormTransformAngle * 90.;
     slider_automate(slider4);
     
@@ -304,27 +304,27 @@ debugMode == 0 ?
   );
   
   // Draw points illustrating the effect of the transform
-  displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, mDrawCenterPoint);
+  displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, mDrawCenterPoint);
   
   // Draw circle for interaction, map vertical position to saturation, lightness and radius
-  (sinElevation < 0) ? (
-    mSaturation = 1. - 0.25*sinElevation;
+  (mSinElevation < 0) ? (
+    mSaturation = 1. - 0.25*mSinElevation;
     mLightness = 0.4;
   ) : (
     mSaturation = 1.;
-    mLightness = 0.4 + 0.25*sinElevation;
+    mLightness = 0.4 + 0.25*mSinElevation;
   );
   gxColorSetHsl(1.0, 195., mSaturation, mLightness);
   
-  posX = gCenterX + gRadius * mNormTransformAngle * (sinAzimuth * cosElevation);
-  posY = gCenterY - gRadius * mNormTransformAngle * (cosAzimuth * cosElevation);
-  mInteractionCircleRadius = 4. * sinElevation + 11.;
-  drawInteractionCircle(posX, posY, mInteractionCircleRadius);
+  mPosX = gCenterX + gRadius * mNormTransformAngle * (mSinAzimuth * mCosElevation);
+  mPosY = gCenterY - gRadius * mNormTransformAngle * (mCosAzimuth * mCosElevation);
+  mInteractionCircleRadius = 4. * mSinElevation + 11.;
+  drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
     
 /* --- DEBUG STUFF ---  
 ) : (
   // Debug mode can be used to inspect the content of the various matrixes
-  (slider6 > 7) && (slider6 < 13) ? numCols = numDisplayedPoints. : numCols = 4.;
+  (slider6 > 7) && (slider6 < 13) ? numCols = mNumDisplayedPoints. : numCols = 4.;
   postMatrixForDebugging(viewMatrix, 4, numCols);
 );
 /*--- DEBUG STUFF --- */
@@ -335,12 +335,12 @@ Preprocessing prior to audio vector processing.
 **********************************************************/
 @block
 
-inverseSamplesblock = 1. / samplesblock;
+mInverseSamplesblock = 1. / samplesblock;
 
 // Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
 ii = 0;
 loop(16,
-  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * mInverseSamplesblock;
   ii += 1;
 );
 
