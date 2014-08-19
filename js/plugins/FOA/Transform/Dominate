@@ -56,7 +56,7 @@ Initialisation
 @init
 
 // Flag indicating that the plugin has not been fully initialised yet
-initialised = 0;
+mInitialised = 0;
 
 mAzimuth   = 0;
 mElevation = 0.;
@@ -89,6 +89,13 @@ matrixDisplayInterpreted = 1500;
 numDisplayedPoints = 24;
 generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
 
+// Radius of interaction circle
+kInteractionCircleRadius = 10.;
+
+// Initialisation of user interaction parameters
+mPreviousMouseCap = 0;
+mClickingAtCircle = 0;
+
 
 function calculateMatrix()
 (
@@ -118,14 +125,14 @@ function calculateMatrix()
   interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
-  initialised == 0 ?
+  mInitialised == 0 ?
   (
     i = 0;
     loop(16,
       matrixDSP[i] = matrixNewDSP[i];
     );
     // Now we are fully initialised
-    initialised = 1;
+    mInitialised = 1;
   );
 );
 
@@ -150,9 +157,13 @@ Graphics
 determineGeometry();
 drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
-// Reset mAzimuth and transformAngle on mouse click
-mouse_cap == 1 ?
-(
+// Only update plugin parameters if the user click and drag interaction circle
+mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
+// Save current mouse_cap value in order to use in the above test at next iteration
+mPreviousMouseCap = mouse_cap;
+
+
+(mClickingAtCircle) ? (    
   mMouseX = mouse_x - gCenterX;
   mMouseY = mouse_y - gCenterY;
   
@@ -161,18 +172,34 @@ mouse_cap == 1 ?
   slider1 = mAzimuth * kRad2Deg;
   slider_automate(slider1);
   
-  // Update transformAngle and slider3 and notify GUI of the change
-  slider3 = 24. * sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius;
-  // Restrict the range to [0, 24]
-  slider3 > 24. ? slider3 = 24.;
-  mGain    = slider3;
-  slider_automate(slider3);
+  // At (abs(elevation) > 88 degrees) it becomes meaningless to alter the transformation angle
+  (mCosElevation > 0.034899496702501) ? (
+    TEST = 1;
+    // Update transformAngle and slider3 and notify GUI of the change
+    slider3 = 24. * sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius / mCosElevation;
+    // Restrict the range to [0, 24]
+    slider3 > 24. ? slider3 = 24.;
+    mGain    = slider3;
+    slider_automate(slider3);
+  ) : (
+    TEST = 0;
+  );
   
   calculateMatrix();
+  
+  mHiglightCircle = 1;
+) : (
+  mHiglightCircle = hoverOverInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 );
 
 // Draw points illustrating the effect of the transform
 displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
+
+
+// Calculate absolute position of interaction circle
+mPosX = gCenterX + gRadius * slider3 * kInv24 * (mSinAzimuth * mCosElevation);
+mPosY = gCenterY - gRadius * slider3 * kInv24 * (mCosAzimuth * mCosElevation);
+
 
 // Draw circle for interaction, map vertical position to saturation, lightness and radius
 mSinElevation < 0 ? (
@@ -182,24 +209,22 @@ mSinElevation < 0 ? (
   mSaturation = 1.;
   mLightness = 0.4 + 0.25 * mSinElevation;
 );
-gxColorSetHsl(1.0, 195., mSaturation, mLightness);
-posX = gCenterX + gRadius * slider3 * kInv24 * (mSinAzimuth * mCosElevation);
-posY = gCenterY - gRadius * slider3 * kInv24 * (mCosAzimuth * mCosElevation);
-mInteractionCircleRadius = 4. * mSinElevation + 11.;
-drawInteractionCircle(posX, posY, mInteractionCircleRadius);
-    
+gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15*mHiglightCircle);
+mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
+drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
+
 
 /**********************************************************
 Preprocessing prior to audio vector processing.
 **********************************************************/
 @block
 
-inverseSamplesblock = 1. / samplesblock;
+mInverseSamplesblock = 1. / samplesblock;
 
 // Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
 ii = 0;
 loop(16,
-  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * mInverseSamplesblock;
   ii += 1;
 );
 
