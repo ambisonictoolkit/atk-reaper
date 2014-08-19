@@ -200,10 +200,10 @@ function drawBackgroundImage(aSourceWidth, aSourceHeight, aDstLeft, aDstTop, aDs
   lCoordinatelist = 10000;
   
   // Draw background circle
-  gxColorSet(1.0, 0.2, 0.2, 0.2);
+  gxColorSet(1.0, 0.18, 0.18, 0.18);
   gfx_circle(gCenterX, gCenterY, gRadius, 1, 1);
   
-  gxColorSet(1.0, 0.5, 0.5, 0.5);
+  gxColorSet(1.0, 0.35, 0.35, 0.35);
   // Draw circles
   i = 1;
   loop(10,
