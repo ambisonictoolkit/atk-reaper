@@ -129,7 +129,15 @@ matrixMultiplication  (matrixTest,    4, 4, matrixUnity,     4, 8, matrixCounter
 
 // This only needs to be generated once:
 mNumDisplayedPoints = 24;
-generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints); 
+generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
+
+
+// Radius of interaction circle
+kInteractionCircleRadius = 10.;
+
+// Initialisation of user interaction parameters
+mPreviousMouseCap = 0;
+mClickingAtCircle = 0;
 
 function calculateMatrix()
 (
@@ -194,55 +202,55 @@ Updated slider value:
 **********************************************************/
 @slider
 
-mode                = slider1;
+mode                 = slider1;
 mAzimuth             = slider2 * kDeg2Rad;
 mElevation           = slider3 * kDeg2Rad;
-mNormTransformAngle = slider4 / 90.;
+mNormTransformAngle  = slider4 / 90.;
 mTransformAngle      = slider4 * kDeg2Rad;
 
 /* --- DEBUG STUFF ---
 debugMode       = slider5;
 
 slider6 == 0 ? (
-  viewMatrix = matrixRotate1;
+  mViewMatrix = matrixRotate1;
 ) : (
   slider6 == 1 ? (
-    viewMatrix = matrixTumble1;
+    mViewMatrix = matrixTumble1;
   ) : (
     slider6 == 2 ? (
-      viewMatrix = matrixTransform;
+      mViewMatrix = matrixTransform;
     ) : (
       slider6 == 3 ? (
-        viewMatrix = matrixTumble2;
+        mViewMatrix = matrixTumble2;
       ) : (
         slider6 == 4 ? (
-          viewMatrix = matrixRotate2;
+          mViewMatrix = matrixRotate2;
         ) : (
           slider6 == 5 ? (
-            viewMatrix = matrixDSP;
+            mViewMatrix = matrixDSP;
           ) : (
             slider6 == 6 ? (
-              viewMatrix = matrixNewDSP;
+              mViewMatrix = matrixNewDSP;
             ) : (
               slider6 == 7 ? (
-                viewMatrix = matrixInc;
+                mViewMatrix = matrixInc;
               ) : (
                 slider6 == 8 ? (
-                  viewMatrix = matrixDisplayPoints;
+                  mViewMatrix = matrixDisplayPoints;
                 ) : (
                   slider6 == 9 ? (
-                    viewMatrix = matrixDisplayTransformed;
+                    mViewMatrix = matrixDisplayTransformed;
                   ) : (
                     slider6 == 10 ? (
-                      viewMatrix = matrixDisplayInterpreted;
+                      mViewMatrix = matrixDisplayInterpreted;
                     ) : (
                       slider6 == 11 ? (
-                        viewMatrix = matrixCounter;
+                        mViewMatrix = matrixCounter;
                       ) : (
                         slider6 == 12 ? (
-                          viewMatrix = matrixTest;
+                          mViewMatrix = matrixTest;
                         ) : (
-                          viewMatrix = matrixUnity;
+                          mViewMatrix = matrixUnity;
                         );
                       );
                     );
@@ -274,13 +282,15 @@ debugMode == 0 ?
   // This is the regular interactive GUI mode:
   
   // Set colors
-  gxColorSet(1, 1, 1, 1);
   determineGeometry();
   drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
+  
+  // Only update plugin parameters if the user click and drag interaction circle
+  mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
+  // Save current mouse_cap value in order to use in the above test at next iteration
+  mPreviousMouseCap = mouse_cap;
 
-  // Reset mAzimuth and mTransformAngle on mouse click
-  mouse_cap == 1 ?
-  (
+  (mClickingAtCircle) ? (
     mMouseX = mouse_x - gCenterX;
     mMouseY = mouse_y - gCenterY;
     
@@ -301,6 +311,10 @@ debugMode == 0 ?
     slider_automate(slider4);
     
     calculateMatrix();
+    
+    mHiglightCircle = 1;
+  ) : (
+    mHiglightCircle = hoverOverInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
   );
   
   // Draw points illustrating the effect of the transform
@@ -314,18 +328,18 @@ debugMode == 0 ?
     mSaturation = 1.;
     mLightness = 0.4 + 0.25*mSinElevation;
   );
-  gxColorSetHsl(1.0, 195., mSaturation, mLightness);
+  gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15*mHiglightCircle);
   
   mPosX = gCenterX + gRadius * mNormTransformAngle * (mSinAzimuth * mCosElevation);
   mPosY = gCenterY - gRadius * mNormTransformAngle * (mCosAzimuth * mCosElevation);
-  mInteractionCircleRadius = 4. * mSinElevation + 11.;
+  mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
   drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
     
 /* --- DEBUG STUFF ---  
 ) : (
   // Debug mode can be used to inspect the content of the various matrixes
   (slider6 > 7) && (slider6 < 13) ? numCols = mNumDisplayedPoints. : numCols = 4.;
-  postMatrixForDebugging(viewMatrix, 4, numCols);
+  postMatrixForDebugging(mViewMatrix, 4, numCols);
 );
 /*--- DEBUG STUFF --- */
     
