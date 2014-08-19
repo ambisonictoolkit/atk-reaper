@@ -149,7 +149,6 @@ displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
 mPosX = gCenterX + gRadius * (1. - mNormTransformAngle) * sin(mAzimuth);
 mPosY = gCenterY - gRadius * (1. - mNormTransformAngle) * cos(mAzimuth);
 
-// Only draw the white outline around interaction circle when mouse is active
 gxColorSetHsl(1.0, 195., 1., 0.4 + 0.15*mHiglightCircle);
 drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 
