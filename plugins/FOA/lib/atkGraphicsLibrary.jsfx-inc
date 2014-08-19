@@ -435,6 +435,33 @@ function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i
 );
 
 
+
+
+/********************************************************************
+Graphics: Draw points illustrating the effect of various transforms
+
+Similar to the above function, but does not manipulate the color
+********************************************************************/
+function displayTransformedPointsWithCustomColor(aMatrix, aNumPoints) local(i, lPosX, lPosY, lPosZ, lGain, lDirectedness, lSquareSize)
+(
+  i = 0;
+  loop(
+    aNumPoints,
+    lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
+    lPosY = gCenterY - gRadius * aMatrix[i];
+    lPosZ = aMatrix[2 * aNumPoints + i];
+    lGain = aMatrix[3 * aNumPoints + i];
+    
+    // Calculate degree of directedness
+    lDirectedness = sqrt(aMatrix[i]*aMatrix[i] + aMatrix[aNumPoints+i]*aMatrix[aNumPoints+i] + aMatrix[2*aNumPoints+i]*aMatrix[2*aNumPoints+i]);
+        
+    //drawCenteredSquare(lPosX, lPosY, lSquareSize);
+    drawSourceLocation(lPosX, lPosY, lPosZ-1.0, lDirectedness);
+    i += 1;
+  );
+);
+
+
 /********************************************************************
 Graphics: Draw multi-channel level meter
 ********************************************************************/
