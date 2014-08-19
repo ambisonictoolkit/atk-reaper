@@ -408,7 +408,7 @@ In the resulting matrixOut:
 - Row 3 is z position of transformed point
 - Row 4 is gain value in dB for transformed point
 ********************************************************************/
-function interpreteProcessedPoints(aMatrixOut, aMatrixIn, aNumPoints) local(i, lG0square, lG1square, lW, lX, lY, lZ, lAzi, lEle, lOmni, lGgain)
+function interpreteProcessedPoints(aMatrixOut, aMatrixIn, aNumPoints) local(i, lG0square, lG1square, lW, lX, lY, lZ, lAzi, lEle, lOmni, lGain)
 (
   i = 0;
   loop(aNumPoints,
