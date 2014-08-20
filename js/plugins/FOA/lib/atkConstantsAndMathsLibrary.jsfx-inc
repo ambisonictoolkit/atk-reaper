@@ -63,6 +63,8 @@ kSqrt3Div6   = sqrt(3.) / 6.;
 kSqrt6Div3   = sqrt(6.) / 3.;
 kRecSqrt6    = 1. / sqrt(6.);
 
+kCos88       = cos(88.*kDeg2Rad);
+
 
 /*---------------------------------------------------------------------
   Mathematical functions

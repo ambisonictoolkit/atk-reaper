@@ -299,16 +299,17 @@ debugMode == 0 ?
     slider2 = mAzimuth * kRad2Deg;
     slider_automate(slider2);
     
-    // Update mTransformAngle and slider4 and notify GUI of the change
-    // COMMENT: There is a risk of dividing by zero here (for mElevation = 90), but Reaper seems to handle this grazefully.
-    // At 90 deg mElevation the GUI has a dead lock and can't be used for changing the degree of transformation, but the slider is still available.
-    mNormTransformAngle = sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius / cos(mElevation);
-    // Restrict the range to [0, 1]
-    mNormTransformAngle > 1. ? mNormTransformAngle = 1.;
-    
-    mTransformAngle = mNormTransformAngle * $pi * 0.5;
-    slider4 = mNormTransformAngle * 90.;
-    slider_automate(slider4);
+    // At (abs(elevation) > 88 degrees) it becomes meaningless to alter the transformation angle
+    (mCosElevation > kCos88) ? (
+      // Update mTransformAngle and slider4 and notify GUI of the change
+      mNormTransformAngle = sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius / cos(mElevation);
+      // Restrict the range to [0, 1]
+      mNormTransformAngle > 1. ? mNormTransformAngle = 1.;
+      
+      mTransformAngle = mNormTransformAngle * $pi * 0.5;
+      slider4 = mNormTransformAngle * 90.;
+      slider_automate(slider4);
+    );
     
     calculateMatrix();
     
