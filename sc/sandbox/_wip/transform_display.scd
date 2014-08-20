@@ -1,23 +1,27 @@
 (
 // Todo:
 // --add gain labels on every other point
-// add makeup gain slider
-// add matrix subtraction
+// --add makeup gain slider
+// --add matrix subtraction
 // consider annular wedge representations
 // --add circle on original 0,0 point
 // --post min/max gain
-// implement units for tranform (pi, db, receiver index)
-// add azimuth controls to the transforms
-// add option to display directivity as expanding/transparent circle or just proximity to origin
+// --implement units for tranform (pi, db, receiver index)
+// --add azimuth controls to the transforms
+// --add option to display directivity as expanding/transparent circle or just proximity to origin
 // consider a view down positive X axis
-// filter out points <-90dB
-// draw most transparent circles first
-// implement matrix input section as well as "post trasnform matrix"
+// --filter out points <-90dB
+// --draw most transparent circles first
+// --implement matrix input section as well as
+// "post trasnform matrix"
 // add test signal feature
 // add addition
 // add indeces in chain for selecting input and receivers for addition/subtraction
-// make matrix text view a pop-out window
+// --make matrix text view a pop-out window
 // double check how often window needs to be refreshed... maybe just views
+// make controls view grow and shrink the window dynamically
+// play soundfield through the matrix
+// crossfade matrices as parameters are changed
 
 // constants
 var kInvSqrt2 = 1/(2.sqrt);
@@ -26,15 +30,18 @@ var gControls;
 // var xFormDuples = [];
 // functions
 var processPoints, updateMatrix, getXForm, chainXForms, createXForm;
-var createNewXFormView, removeXForm;
+var createNewXFormView, removeXForm, showMatrixWindow;
 
 // drawing vars
-var scrnB, winW, winH, uv, ctlv, codev, pnts, arcH;
+var scrnB, win, winW, winH, uv, ctlv, codev, pnts, arcH, codeWin;
 var degreeSpec, degreeSl, degreeNB, degreePiNB, xFormMenu, xForms;
 var rotSpec, rotSl, rotNB, rotPiNB;
 var selDex, adjustRhos, getColCount, layoutFunc, colors;
 
 var tv, maxGainTxt, minGainTxt;
+var getColor, alphaSpec, gainSpec, colorSpec, gainThresh;
+var dirDisplay = 'size';
+var amp, curXformMatrix, evalTxtView;
 
 // based on Muse AED function plugins
 processPoints = {|xFormedMatrix|
@@ -57,25 +64,31 @@ processPoints = {|xFormedMatrix|
 
 	d_norm = 1 - (d.abs / 0.5pi);
 
+	// amp
+	amp = sqrt((b**2).sum / 2);
+
 	// postf("w,x,y,z: %\naz, el: %\nd_norm: %\n", b.round(0.01), [a, e].round(0.01), d_norm);
 
-	// TODO: get gain from above code, not the old code
-
-	/* -------- old code ----*/
-	#w,x,y,z = xFormedMatrix.getCol(0);
-	az  = atan2(y, x);
-	el  = atan2(z, sqrt(x.squared + y.squared));
-	// Omni transform angle
-	g0square	= w.squared;
-	g1square	= x.squared + y.squared + z.squared;
-	term 		= ((2*g0square) + g1square);
-	(term == 0).if{term = 0.0000000001}; // protect from NaN
-	omni		= asin(( (2*g0square) - g1square) / term);
-
-	// Gain
-	term		= sin(omni);
-	(term <= -1).if{term = -0.99999999}; // protect from NaN
-	gain		= w * sqrt(2 / (1 + term));
+	// // TODO: get gain from above code, not the old code
+	// /* -------- old code ----*/
+	// #w,x,y,z = xFormedMatrix.getCol(0);
+	// az  = atan2(y, x);
+	// el  = atan2(z, sqrt(x.squared + y.squared));
+	// // Omni transform angle
+	// g0square	= w.squared;
+	// g1square	= x.squared + y.squared + z.squared;
+	// term 		= ((2*g0square) + g1square);
+	// (term == 0).if{term = 0.0000000001}; // protect from NaN
+	// omni		= asin(( (2*g0square) - g1square) / term);
+	//
+	// // Gain
+	// term		= sin(omni);
+	// (term <= -1).if{term = -0.99999999}; // protect from NaN
+	// gain		= w * sqrt(2 / (1 + term));
+	//
+	// //debug
+	// "AMP AND GAIN:".postln;
+	// [amp, gain].postln;
 
 	// // Normalise omni to [0,1] range
 	// omni = 2 * omni / pi;
@@ -85,7 +98,8 @@ processPoints = {|xFormedMatrix|
 	// ignore elev for now, implement with Spherical to include elev
 	[
 		// 	Polar(omni, az), gain.abs.ampdb
-		Polar(d_norm, a), gain //.abs.ampdb
+		// Polar(d_norm, a), gain //.abs.ampdb
+		a, e, d_norm, amp
 		// [gain.abs, 0.00000001].maxItem.ampdb // protect from -inf
 	].postln; // debug
 
@@ -120,13 +134,32 @@ chainXForms = {|...xFormCtlPrs|
 	};
 	// mtx * inputMtx;
 	// mtx * (Matrix.newIdentity(4) * -1) * inputMtx
+	curXformMatrix = mtx;
 	mtx
+};
+
+~updateMatrix = { |xfMatrix|
+	"updating from external call".postln;
+	transformedPoints = initPointsMatrices.collect{ |pointMtx|
+		xfMatrix * pointMtx
+	};
+
+	"\n******-------------".postln;
+	// calculate and set aeds var for gui update
+	aeds = transformedPoints.collect{|ptMtx|
+		processPoints.(ptMtx);
+	};
+	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
+	// aeds = aeds.collect({|aed|[aed[0], aed[3].abs.ampdb]});
+	aeds = aeds.collect({|aedg| aedg[3] = aedg[3].abs.ampdb }); // debug: convert to db in processPoints
+	win !? {win.refresh};
 };
 
 updateMatrix = {
 	var xFormDuples = [];
 
 	"in updateMatrix".postln;
+
 	gControls.do{|ctlDict|
 		ctlDict.xform.notNil.if{
 			var ctlStates;
@@ -153,18 +186,15 @@ updateMatrix = {
 		},{ initPointsMatrices } // no transform
 	);
 
-	// transformedPoints = initPointsMatrices.collect{ |pointMtx|
-	// 	(Matrix.newIdentity(4) * -2) * pointMtx;
-	// };
-
 	"\n******-------------".postln;
 	// calculate and set aeds var for gui update
 	aeds = transformedPoints.collect{|ptMtx|
 		processPoints.(ptMtx);
 	};
-	// aeds.collect({|aed|aed[1]}).postln.do(_.postln); // debug: post gains
-	aeds = aeds.collect({|aed|[aed[0], aed[1].abs.ampdb]}); // debug: convert to db in processPoints
-	w.refresh;
+
+	aeds = aeds.collect({|aedg| aedg[3] = aedg[3].abs.ampdb }); // debug: convert to db in processPoints
+
+	win !? {win.refresh};
 };
 
 updateMatrix.(); // initialize
@@ -175,61 +205,130 @@ Drawing
 scrnB = Window.screenBounds;
 winW= 600;
 winH= 600;
-w = Window("soundfield transform", Rect(scrnB.center.x - (winW/2), scrnB.center.y - (winH/2), winW, winH), resizable: true).front;
-// w.layout_(VLayout(
-uv = UserView( w, Rect(0,0, w.view.bounds.width, w.view.bounds.height/2) ).resize_(5).background_(Color.gray.alpha_(0.99));
-ctlv = View( w, Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2) ).resize_(5);
-codev = View();
-// ));
-// uv = UserView();
-// ctlv = View();
+win = Window("soundfield transform",
+	Rect(scrnB.center.x - (winW/2), scrnB.height-winH-45, winW, winH),
+	resizable: true)
+.onClose_({codeWin !? {codeWin.close}}).front;
+
+win.view.palette_(
+	QPalette.dark
+	.setColor(Color.gray, 'base')
+	.setColor(Color.gray, 'alternateBase')
+);
+
+uv = UserView( win, Rect(0,0, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5); //.background_(Color.fromHexString("#003366"));
+
+ctlv = View( win, Rect(0,win.view.bounds.height/2, win.view.bounds.width, win.view.bounds.height/2) ).resize_(5);
+x = ctlv;
 
 // controls
 // xForms = ['push', 'press', 'focus', 'zoom'];
 xForms = IdentityDictionary(know: true).putPairs([
 
-	'push',
-	IdentityDictionary(know: true)
+	'push', IdentityDictionary(know: true)
 	.put( 'controls', [
 		// this order defines the order of arguments passed to the transform matrix
-			'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
-			'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
 		]
 	).put( 'getMatrix',
 		{|deg=0, az=0, el=0| FoaXformerMatrix.newPush(deg, az, el).matrix}
 	),
 
-	'press',
-	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newPressX(deg).matrix} ]),
-	'focus',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newFocusX(deg).matrix} ]),
-	'zoom',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2, 'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newZoomX(deg).matrix} ]),
-	'dominate',		IdentityDictionary(know: true).putPairs(
-		[ 'min', -24, 'max', 24, 'default', 0,
-			'getMatrix', {|gain| FoaXformerMatrix.newDominateX(gain).matrix} ]),
-	'direct',		IdentityDictionary(know: true).putPairs(
-		[ 'min', 0, 'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newDirectX(deg).matrix} ]),
-	'rotate',	IdentityDictionary(know: true).putPairs(
-		[ 'min', 2pi,	'max', -2pi, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newRotate(deg).matrix} ]),
-	'asymmetry',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2,	'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newAsymmetry(deg).matrix} ]),
-	'balance',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -pi/2,	'max', pi/2, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newBalance(deg).matrix} ]),
-	'gain',	IdentityDictionary(know: true).putPairs(
-		[ 'min', -24,	'max', 24, 'default', 0,
-			'getMatrix', {|gainDB| gainDB.dbamp } ]),
-	'subtract', IdentityDictionary(know: true).putPairs(
-		[ 'min', 0,	'max', 0, 'default', 0,
-			'getMatrix', {|deg| FoaXformerMatrix.newBalance(deg)} ]),
+	'press', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newPress(deg, az, el).matrix}
+	),
+
+	'focus', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newFocus(deg, az, el).matrix}
+	),
+
+	'zoom',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newZoom(deg, az, el).matrix}
+	),
+
+	'direct',		IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0, az=0, el=0| FoaXformerMatrix.newDirect(deg, az, el).matrix}
+	),
+
+	'rotate',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Azimuth',	ControlSpec(2pi, -2pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|az=0| FoaXformerMatrix.newRotate(az).matrix}
+	),
+
+	'asymmetry',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0| FoaXformerMatrix.newAsymmetry(deg).matrix}
+	),
+
+	'balance',	IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Degree',	ControlSpec(-pi/2, pi/2, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|deg=0| FoaXformerMatrix.newBalance(deg).matrix}
+	),
+
+	'dominate',		IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+		'Gain',		ControlSpec(-24, 24, default: 0, units: "dB"),
+		'Azimuth',	ControlSpec(pi, -pi, default: 0, units: "pi")
+		]
+	).put( 'getMatrix',
+		{|gain=0, az=0, el=0| FoaXformerMatrix.newDominate(gain, az, el).matrix}
+	),
+
+	'gain',	IdentityDictionary(know: true).put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+			'Gain',		ControlSpec(-24, 24, default: 0, units: "dB")
+		]
+	).put( 'getMatrix',
+		{|gain=0| gain.dbamp }
+	),
+
+	'subtract', IdentityDictionary(know: true)
+	.put( 'controls', [
+		// this order defines the order of arguments passed to the transform matrix
+			'This index',	nil,
+			'from this index',	nil
+		]
+	).put( 'getMatrix',
+		{|subtractIndex, fromIndex| }
+	),
 ]);
 
 // order determines sf processing chain
@@ -288,17 +387,23 @@ createXForm = {
 		.action_(
 			{ |sldr| var val;
 				val = spec.map(sldr.value);
-				nb.value_(val.round(0.001));
+				if(spec.units == "pi",
+					{ nb.value_(val.round(0.001) / pi) },
+					{ nb.value_(val.round(0.001)) }
+				);
 				xfStuff.controlStates[ctlOrder] = val;
 				updateMatrix.();
 			}
-		).orientation_('horizontal')
+		).orientation_('horizontal').maxHeight_(20)
 		.value_(spec.unmap(spec.default));
 
 		nb = NumberBox()
 		.action_(
 			{ |nb| var val;
-				val = nb.value;
+				if(spec.units == "pi",
+					{ val = nb.value * pi; },
+					{ val = nb.value; }
+				);
 				sl.value_(spec.unmap(val));
 				xfStuff.controlStates[ctlOrder] = val;
 				updateMatrix.();
@@ -312,7 +417,7 @@ createXForm = {
 	};
 
 	addMenu = { |selectedName|
-		xFormMenu = PopUpMenu().items_(['-']++xForms.keys)
+		xFormMenu = PopUpMenu().items_(['-']++xForms.asSortedArray.collect{|me|me[0]})
 		.action_({ |mn|
 			if( mn.item != '-', {
 				xfStuff.xform_(mn.item);
@@ -321,7 +426,7 @@ createXForm = {
 				{ xfStuff.xform_(nil) } // nil mutes the transform
 			);
 			updateMatrix.();
-		}).maxWidth_(75).value_(0);
+		}).maxWidth_(95).value_(0);
 
 		layout.add(xFormMenu);
 		selectedName !? { xFormMenu.value_(xFormMenu.items.indexOf(selectedName)) };
@@ -393,169 +498,245 @@ ctlv.layout.add(
 	.margins_([10, 5,5,0])
 );
 ctlv.layout.add(createNewXFormView.());
-ctlv.layout.add( codev.layout_(VLayout(TextView().enterInterpretsSelection_(true))) );
 
-// // tv = View(uv, Rect(3*uv.bounds.width/4, 0, uv.bounds.width/4, uv.bounds.height/2)).layout_(
-// tv = View(uv, Rect(0, 0, uv.bounds.width/4, uv.bounds.height/2)).layout_(
-// 	VLayout(
-// 		Slider().maxWidth_(25),
-// 		Button().maxWidth_(25),
-// 		Slider().maxWidth_(25)
-// 	).setAlignment(1, 'right')
-// );
-// // w.view.onResize_({|winview| tv.bounds_(Rect(3*uv.bounds.width/4, 0, uv.bounds.width/4, uv.bounds.height/2))});
+showMatrixWindow = { |postCurrentMatrix=false|
+	var mwinH = 200;
+	var evalMtxString, postMtxString;
 
-// tv = View(w, uv.bounds);
-tv = View(uv,Rect(0, uv.bounds.height/2, uv.bounds.width,uv.bounds.height/2)).layout_(
+	postMtxString =
+	"The current transform matrix:\n\n" ++
+	"matrix = " ++ curXformMatrix.asString ++
+	";\n\nout = AtkMatrixMix.ar(foaSig, matrix);";
+
+	evalMtxString = "var matrix; \n\n/*set you Matrix here, select all and evaluate, or click Evaluate*/\nmatrix = ;\n\n~updateMatrix.(matrix)";
+
+	codeWin.isNil.if( {
+		codeWin = Window("Evaluate Matrix",
+			Rect(win.bounds.left,
+				scrnB.height - win.bounds.height - mwinH
+				- (2*20) - 25, // (title bar: 20, OS menu bar: 25)
+				win.bounds.width, mwinH))
+		.onClose_({codeWin = nil})
+		.front;
+
+		View(codeWin, Rect(0,0, codeWin.bounds.width, codeWin.bounds.height))
+		.layout_(
+			VLayout(
+				evalTxtView = TextView().enterInterpretsSelection_(true)
+				.string_(postCurrentMatrix.if({postMtxString},{evalMtxString})),
+
+				HLayout(
+					Button().states_([["Evaluate"]])
+					.action_({evalTxtView.string.interpret}),
+					Button().states_([["Reset"]])
+					.action_({evalTxtView.string = evalMtxString}),
+				),
+			)
+		);
+		},{
+			postCurrentMatrix.if({
+				evalTxtView.string = postMtxString;
+			},{
+					evalTxtView.string = evalMtxString;
+			});
+		}
+	);
+};
+
+tv = View(uv,Rect(0, 0, uv.bounds.width,uv.bounds.height)).layout_(
 	HLayout(
 		VLayout(
+			VLayout(
+				maxGainTxt = StaticText().string_("one")
+				.font_(Font('Helvetica', 16)).maxWidth_(180).minHeight_(21),
+				minGainTxt = StaticText().string_("two")
+				.font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
+			),
 			nil,
-			maxGainTxt = StaticText().string_("one").font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
-			minGainTxt = StaticText().string_("two").font_(Font('Helvetica', 16)).maxWidth_(160).minHeight_(21),
+			Button().states_(
+				[["Enter Custom Matrix"]]).action_({|but| showMatrixWindow.() }).maxWidth_(130),
+			Button().states_(
+				[["Post Matrix"]]).action_({|but| showMatrixWindow.(true) }).maxWidth_(130),
 		),
 		VLayout(
-			[ Button()
-				.states_([
-					["Pan Test", Color.black, Color.grey],
-					["Stop test", Color.black, Color.red],
-			]).maxWidth_(65), a: \right],
-			Button().states_([
-				["Continuous", Color.black, Color.grey],["Pulsed", Color.black, Color.green]]),
-			HLayout(
-				StaticText().string_("Period"),
-				NumberBox().maxWidth_(25).value_(5)
-			).setAlignment(0,\right).setAlignment(1,\right),
 			VLayout(
+				StaticText().string_("Directivity Display"),
+				PopUpMenu().items_(['Size and Radius', 'Radius Only'])
+				.action_({|mn|
+					dirDisplay = switch(mn.value, 0,{'size'},1,{'radius'});
+					updateMatrix.();
+				}).maxWidth_(130),
+				nil
+			)
+			.setAlignment(0, \topRight)
+			.setAlignment(1, \topRight),
+			VLayout(
+				Button()
+					.states_([
+						["Pan Test"],
+						["Stop test"],
+				]).maxWidth_(65),
+				Button().states_([
+					["Continuous"],["Pulsed"]]).maxWidth_(70),
 				HLayout(
-					StaticText().string_("Gain").maxHeight_(25),
-					NumberBox().maxWidth_(25)
-				).setAlignment(0, \right).setAlignment(1, \right),
-				// Slider().maxWidth_(150).orientation_(\horizontal)
-			).setAlignment(0,\right) //.setAlignment(1,\right) //.setAlignment(0,\right)
+					StaticText().string_("Period"),
+					NumberBox().maxWidth_(25).value_(5)
+				).setAlignment(0,\right).setAlignment(1,\right),
+				VLayout(
+					HLayout(
+						StaticText().string_("Gain").maxHeight_(25),
+						NumberBox().maxWidth_(25)
+					).setAlignment(0, \right).setAlignment(1, \right),
+					// Slider().maxWidth_(150).orientation_(\horizontal)
+				).setAlignment(0,\right) //.setAlignment(1,\right) //.setAlignment(0,\right)
+			)
+			.setAlignment(0, \bottomRight)
+			.setAlignment(1, \bottomRight)
+			.setAlignment(2, \bottomRight)
+			.setAlignment(3, \bottomRight)
 		)
-		// .setAlignment(0, 'right')
-		.setAlignment(1, 'right') // continuous/pulses buttons
-		.setAlignment(2, 'right')
-		.setAlignment(3, 'right')
 	)
 );
 
-w.view.onResize_({ |winview|
-	uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
-	tv.bounds_(Rect(0, uv.bounds.height/2, uv.bounds.width,uv.bounds.height/2));
+win.view.onResize_({ |winview|
+	uv.bounds_(Rect(0,0, win.view.bounds.width, win.view.bounds.height/2));
+	tv.bounds_(Rect(0, 0, uv.bounds.width,uv.bounds.height));
 });
+
+gainThresh = -90;
+
+alphaSpec = ControlSpec(0.1, 1, warp:5);
+// gainSpec = ControlSpec(-100, 6, 'db');
+gainSpec = ControlSpec(-90, 6, -2);
+colorSpec = ControlSpec(768,0);
+
+getColor = { |gain|
+	var i;
+	i = colorSpec.map(gainSpec.unmap(gain));
+	case
+	{i < 256} {Color.new255(255, i, 0)}
+	{i < 384} {Color.new255(255 - (i-256), 255, 0)}
+	{i < 512} {Color.new255(0, 255, (i-384)*2)}
+	{i < 768} {Color.new255(0, 255 - (i-512), 255)}
+	{i >= 768} {Color.new255(0, 0, 255)}; // catch all
+};
+
 
 /*******************
 Draw the soundfield
 *******************/
 
 uv.drawFunc_({|view|
-	var cen, getColor, circleViewRatio;
-	var alphaSpec, gainSpec, colorSpec, maxMinStr;
-	var testSigPnt;
+	var cen, circleViewRatio, maxMinStr, testSigPnt, azLineClr;
+	var azPnt, drawPnt, omniRad, omniDiam, fullOmni, gainColor, gainPnt;
+	var az, el, dir, gain, aeds_sortOrder;
 
-	ctlv.bounds_(Rect(0,w.view.bounds.height/2, w.view.bounds.width, w.view.bounds.height/2));
-	// uv.bounds_(Rect(0,0, w.view.bounds.width, w.view.bounds.height/2));
-	// tv.bounds_(uv.bounds);
+	ctlv.bounds_(Rect(0,win.view.bounds.height/2, win.view.bounds.width, win.view.bounds.height/2));
+
 	r = uv.bounds.height * 0.02;
 	d = r*2;
 	circleViewRatio = 0.8;
 	arcH = uv.bounds.height * circleViewRatio / 2;	// height of the "fan" arc
+	fullOmni = 2 * arcH;
 
-	// center drawing origin
-	cen = view.bounds.center;
+	cen = view.bounds.center; // center drawing origin
 	Pen.translate(cen.x, cen.y);
-	// draw background "fan"
-	Pen.strokeColor_(Color.red).fillColor_(Color.blue);
-	Pen.fillOval(Rect(r.neg, r.neg, d,d));
-	Pen.strokeOval(Rect(r.neg, r.neg, d,d));
+	// Pen.strokeColor_(Color.red).fillColor_(Color.blue); // draw background "fan"
+	// Pen.fillOval(Rect(r.neg, r.neg, d,d));
+	// Pen.strokeOval(Rect(r.neg, r.neg, d,d));
 	Pen.addAnnularWedge( 0@0, 5, arcH, 0, 2pi );
 	Pen.fillColor_(Color.gray(0.9)).fill;
 
-	alphaSpec = ControlSpec(0.1, 1, warp:3);
-	// gainSpec = ControlSpec(-100, 6, 'db');
-		gainSpec = ControlSpec(-90, 6, -2);
-	colorSpec = ControlSpec(768,0);
+	// background circles
+	Pen.strokeColor_(Color.gray.alpha_(0.2));
+	3.do{|i|
+		var val;
+		val = (i+1 / 3);
+		Pen.strokeOval( Rect(
+			(arcH * val).neg, (arcH * val).neg,
+			arcH*2*val, arcH*2*val
+		));
+	};
 
-	// postf("min gain: %\n", aeds.collect({|me| me[1]}).minItem);
-	// postf("max gain: %\n", aeds.collect({|me| me[1]}).maxItem);
-	// aeds.do(_.postln);
-
-		// draw test signal planewave circle
+	// draw test signal planewave circle
 	testSigPnt = Polar(1.1,rrand(0, 2pi)).asPoint
-		.rotate(pi/2)	// convert ambi to screen coords
-		* Point(1,-1)	// flip Y for drawing
-		* arcH;			// scale normalized points to arcH
+	.rotate(pi/2)	// convert ambi to screen coords
+	* Point(1,-1)	// flip Y for drawing
+	* arcH;			// scale normalized points to arcH
 	Pen.fillColor_(Color.magenta);
 	Pen.fillOval( Rect(testSigPnt.x-r, testSigPnt.y-r, d, d) );
 
-	getColor = { |gain|
-		var i;
-		i = colorSpec.map(gainSpec.unmap(gain));
-		case
-		{i < 256} {Color.new255(255, i, 0)}
-		{i < 384} {Color.new255(255 - (i-256), 255, 0)}
-		{i < 512} {Color.new255(0, 255, (i-384)*2)}
-		{i < 768} {Color.new255(0, 255 - (i-512), 255)}
-		{i >= 768} {Color.new255(0, 0, 255)}; // catch all
+	azLineClr = Color.gray.alpha_(0.2);// line fron center to point
+
+	// get sort order by directivity to draw most transparent first
+	aeds_sortOrder = aeds.collect({|arr| arr[2]}).order;
+	aeds_sortOrder.do{|sortDex, i|
+
+		#az, el, dir, gain = aeds[sortDex];
+
+		(gain > gainThresh).if{
+			omniDiam =	1 - dir * fullOmni;
+			omniDiam =	omniDiam.clip(d, fullOmni);
+			omniRad	=	omniDiam/2;
+
+			gainColor = getColor.(gain);
+
+			// cartesian point in view coordinates
+			azPnt = Point(cos(az), sin(az)) // = Polar(dir, az).asPoint
+			.rotate(pi/2)	// convert ambi to screen coords
+			* Point(1,-1)	// flip Y for drawing
+			* arcH;			// scale normalized points to arcH
+			drawPnt = azPnt * dir;
+
+			// line fron center to point
+			Pen.strokeColor_(azLineClr);
+			Pen.line(drawPnt, 0@0).stroke;
+
+			// directivity circle
+
+			switch(dirDisplay,
+				'size',{
+					Pen.fillColor_(gainColor.alpha_(alphaSpec.map(dir)));
+					Pen.fillOval( Rect(drawPnt.x-omniRad, drawPnt.y-omniRad, omniDiam, omniDiam) );
+					gainPnt = azPnt * 1.15; // scale in/out toward/away from origin
+				},
+				'radius', {
+					Pen.fillColor_(gainColor);
+					Pen.fillOval( Rect(drawPnt.x-r, drawPnt.y-r, d, d) );
+					gainPnt = drawPnt * dir.linlin(0,1,1.75,1.15); // scale in/out toward/away from origin
+				}
+			);
+
+			// gain labels
+			Pen.fillColor_(gainColor.alpha_(1));
+			QPen.stringCenteredIn(
+				gain.round(0.1).asString,
+				Rect(gainPnt.x-(r*10), gainPnt.y-(r*10), d*10, d*10)
+			);
+		}
 	};
 
-	aeds.do{|pntGainArr, i|
-		var drawPnt, polar, gain, omniRad, omniDiam, fullOmni, gainColor, gainLabelColor, gainPnt;
-		#polar, gain = pntGainArr;
-		fullOmni = 2 * arcH;
-		omniDiam = 1-polar.rho * fullOmni;
-		omniDiam = omniDiam.clip(d, fullOmni);
-		omniRad= omniDiam/2;
+	// original 0 deg azimuth point circle ---
+	#az, el, dir, gain = aeds[0];
+	omniDiam = 1 - dir * fullOmni;
+	omniDiam = omniDiam.clip(d, fullOmni);
+	omniRad= omniDiam/2;
+	azPnt = Point(cos(az), sin(az)) // = Polar(dir, az).asPoint
+	.rotate(pi/2)	// convert ambi to screen coords
+	* Point(1,-1)	// flip Y for drawing
+	* arcH;			// scale normalized points to arcH
+	drawPnt = azPnt * dir;
 
-		gainColor = getColor.(gain);
-		// gainLabelColor = getColor.(gain + 3);
-		// cartesian point in view coordinates
-		drawPnt = polar.asPoint
-		.rotate(pi/2)	// convert ambi to screen coords
-		* Point(1,-1)	// flip Y for drawing
-		* arcH;			// scale normalized points to arcH
-		// original 0deg azimuth point circle
-		if( i==0, {
-			Pen.strokeColor_(Color.fromHexString("#CC0000"));
-			Pen.strokeOval( Rect(drawPnt.x-r, drawPnt.y-r, d, d) );
-		});
-		// line fron center to point
-		Pen.strokeColor_(Color.gray.alpha_(0.5));
-		Pen.line(drawPnt, 0@0).stroke;
-		// directivity circle
-		Pen.fillColor_(gainColor.alpha_(alphaSpec.map(polar.rho)));
-		Pen.fillOval( Rect(drawPnt.x-omniRad, drawPnt.y-omniRad, omniDiam, omniDiam) );
-		// gain labels
-		gainPnt = polar.rho = 1;
-		gainPnt = gainPnt.asPoint.rotate(pi/2)
-		// flip y for screen bounds and
-		// scale in/out toward/away from origin, >1 outside circle
-		// * Point(0.4,-0.4)
-		* Point(1.15,-1.15)
-		* arcH;
-		Pen.fillColor_(gainColor.alpha_(1));
-		QPen.stringCenteredIn(gain.round(0.1).asString, Rect(gainPnt.x-(r*10), gainPnt.y-(r*10), d*10, d*10));
-	};
+	Pen.strokeColor = Color.fromHexString("#CC0000");
+	Pen.width = 3;
+	Pen.strokeOval( Rect(drawPnt.x-r, drawPnt.y-r, d, d) );
+	// --- original 0 deg azimuth point circle
 
-	// // draw min/max gain
-	// maxMinStr = format("Max Gain: %\nMin Gain: %",
-	// 	aeds.collect({|me| me[1]}).maxItem.round(0.1),
-	// 	aeds.collect({|me| me[1]}).minItem.round(0.1)
-	// );
-	// Pen.translate(cen.x.neg, cen.y.neg);
-	// Pen.fillColor_(Color.black);
-	// Pen.font_(Font('Helvetica', 20));
-	// QPen.stringCenteredIn(
-	// 	maxMinStr,
-	// 	Rect(0,0,uv.bounds.width/3, ctlv.bounds.height)
-	// );
-
-	maxGainTxt.string_(format("Max Gain:  %", aeds.collect({|me| me[1]}).maxItem.round(0.1)));
-	minGainTxt.string_(format("Min Gain:   %", aeds.collect({|me| me[1]}).minItem.round(0.1)));
+	maxGainTxt.string_(format("Max Gain:  %", aeds.collect({|me| me[3]}).maxItem.round(0.1)));
+	minGainTxt.string_(format("Min Gain:   %", aeds.collect({|me| me[3]}).minItem.round(0.1)));
 });
 
-w.refresh;
+win.refresh;
 )
 
 

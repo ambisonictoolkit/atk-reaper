@@ -20,13 +20,31 @@ from muse import *
 #from filters import *
 #from transforms import *
 
-from muse.hoa import *
+#import muse.hoa as hoa
+#from hoa.encoders import *
+##from muse.hoa.constants import *
+
+#from muse.hoa import *
+#from muse.hoa.encoders import *
+#from muse.hoa.constants import *
+
+from muse.hoa.hoa_encoders import *
+
+from muse.hoa.hoa_encoders import ordering_to_lm_dict
+from muse.hoa.hoa_encoders import lm_to_ordering_dict
+from muse.hoa.hoa_encoders import lm_to_normal_dict
+
+
+#from muse.hoa import *
+#from constants import *
 
 from numpy.polynomial import Chebyshev as T
 from numpy.polynomial import Legendre as L
 from numpy import math
 #from math import factorial
 from scipy.misc import factorial
+
+from numpy.linalg.linalg import pinv
 
 
 # import muse defined constants
@@ -220,7 +238,7 @@ def decoder_E(order = 1, dec_type = 'basic', dim = 2):
 
 
 # decoder_matching_gain     : calculate gain to 'match' decoder types
-def decoder_matching_gain(order = 1, dec_type = 'basic', dim = 3, \
+def decoder_matching_gain(order = 1, dec_type = 'basic', dim = 2, \
     match = 'amp', num_spkrs = nan):
     """
     Args:
@@ -266,9 +284,9 @@ def decoder_matching_gain(order = 1, dec_type = 'basic', dim = 3, \
 
 
 #=========================
-# Decoding - Matricies
+# Decoding - Matricies (utilities)
 
-def order_gains_matrix(order = 1, dec_type = 'basic', dim = 3):
+def order_gains_matrix(order = 1, dec_type = 'basic', dim = 2):
     """    
     Args:
         - order      : Ambisonic order, e.g., 1, 2, 3...
@@ -295,3 +313,299 @@ def order_gains_matrix(order = 1, dec_type = 'basic', dim = 3):
         )[acn_to_lm(arange((M+1)**2))[0]])
 
     return res
+    
+
+def resize_order_matrix(order_in, order_out):
+    """    
+    Args:
+        - order_in   : Ambisonic order, e.g., 1, 2, 3...
+
+        - order_out  : Ambisonic order, e.g., 1, 2, 3...
+
+
+    Resize Ambisonic order:
+        order_in > order_out --> discard harmonics
+        order_in < order_out --> insert zeros
+    
+    Returns matrix.
+    """
+    M_in = order_in
+    M_out = order_out
+    
+    nchans_in = (M_in+1)**2
+    nchans_out = (M_out+1)**2
+    
+    res = eye(nchans_out, nchans_in)
+    
+    return res
+
+
+def zero_order_matrix(order_in, order_out):
+    """
+    Args:
+        - order_in   : Ambisonic order, e.g., 1, 2, 3...
+
+        - order_out  : Ambisonic order, e.g., 1, 2, 3...
+
+
+    Zero (truncate) Ambisonic order:
+        order_in > order_out --> insert zeros
+        order_in < order_out --> invalid, returns identity matrix
+    
+    Returns (square) matrix.
+    """
+    M_in = order_in
+    M_out = order_out
+    
+    nchans_in = (M_in+1)**2
+    nchans_out = (M_out+1)**2
+    
+    if nchans_out > nchans_in:
+        nchans_out = nchans_in
+    
+    res = diag(
+        concatenate((
+            ones(nchans_out),
+            zeros(nchans_in - nchans_out)
+        ))
+    )
+    
+    return res
+
+
+def peri_to_panto_matrix(order, ordering = 'acn'):
+    """
+    Args:
+        - order     : Ambisonic order, e.g., 1, 2, 3...
+        - ordering  : 'acn', 'sid', 'fuma'
+
+
+    Discard periphonic (3D) harmonics. No (cylindrical) weighting
+    is applied.
+    
+    Returns matrix.
+    """
+    M = order
+    
+    nchans_in = (M+1)**2
+    
+    l, m = ordering_to_lm_dict[ordering](arange(nchans_in))
+    
+    res = identity(nchans_in)[((l == abs(m)))]
+
+    return res
+
+
+def panto_to_peri_matrix(order, ordering = 'acn'):
+    """
+    Args:
+        - order   : Ambisonic order, e.g., 1, 2, 3...
+        - ordering  : 'acn', 'sid', 'fuma'
+
+
+    Insert periphonic (3D) harmonics, as zeros. No (spherical) weighting
+    is applied.
+    
+    Returns matrix.
+    """
+    M = order
+    
+    res = transpose(peri_to_panto_matrix(M, ordering))
+
+    return res
+
+
+def zero_peri_matrix(order):
+    """
+    Args:
+        - order   : Ambisonic order, e.g., 1, 2, 3...
+
+
+    Zero periphonic (3D) harmonics. No (cylindrical) weighting
+    is applied.
+    
+    Returns (square) matrix.
+    """
+    M = order
+    
+    l, m = acn_to_lm(arange((M+1)**2))
+    
+    res = diag((l == abs(m)).astype(int))
+
+    return res
+
+
+#=========================
+# Decoding - Matricies (decoders)
+
+def panto_pinv_decoding_matrix(directions, order = 1, dec_type = 'basic', \
+    match = 'amp'):
+    """
+    Args:
+        - direction : [[azimuth, elevation], ... ]
+    
+        - order      : Ambisonic order, e.g., 1, 2, 3...
+
+        - dec_type   : Decoder type
+                        'basic'      --> basic, velocity, rV
+                        'energy'     --> energy, rE
+                        'controlled' --> controlled opposites, in phase
+                            
+        - match      : Decoder matching criteria
+                        'amp'    --> amplitude
+                        'rms'    --> RMS (Gerzon / classic)
+                        'energy' --> energy
+
+    Returns pseudo-inverse matrix Ambisonic decoder.
+    """
+
+    dim = 2 # 2D
+    num_spkrs = len(directions)
+    
+    N_in = order
+
+    # calculate decoder order (N_out)
+    if num_spkrs >= (2*N_in + 1):
+        N_out = N_in
+    else:
+        N_out = (num_spkrs - 1) / 2
+
+    # --------------------------------
+    # prototype encoding matrix (('acn'), ('sn3d'))
+    encoding_matrix = planewave_matrix(
+        array([directions]),
+        N_out
+    )
+        
+    # discard 3D harmonics
+    encoding_matrix = mmul(
+        encoding_matrix,
+        peri_to_panto_matrix(N_out)
+    )
+    
+    # decoder: pseudo inverse - via pinv()
+    decoding_matrix = pinv(encoding_matrix)
+    
+    # (re-)insert 3D harmonics
+    decoding_matrix = mmul(
+        peri_to_panto_matrix(N_out),
+        decoding_matrix
+    )
+    
+    # apply order gains - for decoder type
+    decoding_matrix = mmul(
+        order_gains_matrix(N_out, dec_type, dim),
+        decoding_matrix
+    )
+    
+    # apply matching gain
+    decoding_matrix = decoder_matching_gain(
+        N_out,
+        dec_type,
+        dim,
+        match,
+        num_spkrs
+        ) * decoding_matrix
+        
+    # expand to match input order (if necessary)
+    if N_out != N_in:
+        decoding_matrix = mmul(
+            resize_order_matrix(N_in, N_out),
+            decoding_matrix
+        )
+    
+    return decoding_matrix
+
+
+def panto_sad_decoding_matrix(directions, order = 1, dec_type = 'basic', \
+    match = 'amp'):
+    """
+    Args:
+        - direction : [[azimuth, elevation], ... ]
+    
+        - order      : Ambisonic order, e.g., 1, 2, 3...
+
+        - dec_type   : Decoder type
+                        'basic'      --> basic, velocity, rV
+                        'energy'     --> energy, rE
+                        'controlled' --> controlled opposites, in phase
+                            
+        - match      : Decoder matching criteria
+                        'amp'    --> amplitude
+                        'rms'    --> RMS (Gerzon / classic)
+                        'energy' --> energy
+
+    Returns projection, aka 'simple Ambisonic decoder' (SAD),
+    matrix Ambisonic decoder.
+    """
+
+    dim = 2 # 2D
+    num_spkrs = len(directions)
+
+    N_in = order
+
+    # calculate decoder order (N_out)
+    if num_spkrs >= (2*N_in + 1):
+        N_out = N_in
+    else:
+        N_out = (num_spkrs - 1) / 2
+
+    # --------------------------------
+    # prototype encoding matrix (('acn'), ('sn3d'))
+    encoding_matrix = planewave_matrix(
+        array([directions]),
+        N_out
+    )
+        
+    # convert to n2d scaling - for projection
+    encoding_matrix = mmul(
+        encoding_matrix,
+        encoding_convert_matrix(
+            (('acn'), ('sn3d')),
+            (('acn'), ('n2d')),
+            N_out
+        )
+    )
+    
+    # zero 3D harmonics
+    encoding_matrix = mmul(
+        encoding_matrix,
+        zero_peri_matrix(N_out)
+    )
+    
+    # transpose and scale
+    decoding_matrix = (transpose(encoding_matrix)) / num_spkrs
+    
+    # convert to n2d scaling - for input
+    decoding_matrix = mmul(
+        encoding_convert_matrix(
+            (('acn'), ('sn3d')),
+            (('acn'), ('n2d')),
+            N_out
+        ),
+        decoding_matrix
+    )    
+
+    # apply order gains - for decoder type
+    decoding_matrix = mmul(
+        order_gains_matrix(N_out, dec_type, dim),
+        decoding_matrix
+    )
+    
+    # apply matching gain
+    decoding_matrix = decoder_matching_gain(
+        N_out,
+        dec_type,
+        dim,
+        match,
+        num_spkrs
+        ) * decoding_matrix
+    
+    # expand to match input order (if necessary)
+    if N_out != N_in:
+        decoding_matrix = mmul(
+            resize_order_matrix(N_in, N_out),
+            decoding_matrix
+        )
+    
+    return decoding_matrix
