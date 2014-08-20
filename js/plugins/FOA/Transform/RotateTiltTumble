@@ -59,8 +59,8 @@ Initialisation
 // Graphics constants:
 mInteractionCircleRadius = 11.;
 
-// Flag indicating that the plugin has not been fully initialised yet
-initialised = 0;
+// Flag indicating that the plugin has not been fully mInitialised yet
+mInitialised = 0;
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate    = 1000;
@@ -81,14 +81,14 @@ matrixDisplayTransformed = 1400;
 matrixDisplayInterpreted = 1500;
 
 // This only needs to be generated once:
-numDisplayedPoints = 24;
-generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints); 
+mNumDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints); 
 
 function calculateCoefficients()
 (
-  generateRotationMatrix(matrixRotate, rotateAngle);
-  generateTiltlMatrix(matrixTilt,  tiltAngle);
-  generateTumblelMatrix(matrixTumble,  tumbleAngle);
+  generateRotationMatrix(matrixRotate, mRotateAngle);
+  generateTiltlMatrix(matrixTilt,  mTiltAngle);
+  generateTumblelMatrix(matrixTumble,  mTumbleAngle);
   
   /* Build processing matrix by performing a series of matrix multiplications
                         result =         left X                   right             */
@@ -96,29 +96,29 @@ function calculateCoefficients()
   matrixMultiplication  (matrixNewDSP,   4, 4, matrixTumble,      4, 4, matrixTemp);
   
   /* Transformation and interpretation of display points */
-  matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
-  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
+  matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, mNumDisplayedPoints, matrixDisplayPoints);
+  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, mNumDisplayedPoints);
   
-  // Set initial DSP processing coefficients if the plugin has not yet been initialised
-  initialised == 0 ?
+  // Set initial DSP processing coefficients if the plugin has not yet been mInitialised
+  mInitialised == 0 ?
   (
     i = 0;
     loop(16,
       matrixDSP[i] = matrixNewDSP[i];
     );
-    // Now we are fully initialised
-    initialised = 1;
+    // Now we are fully mInitialised
+    mInitialised = 1;
   );
   
   // The following are used for graphics processing:
-  cosRotation = cos(rotateAngle);
-  sinRotation = sin(rotateAngle);
+  mCosRotation = cos(mRotateAngle);
+  mSinRotation = sin(mRotateAngle);
   
-  cosTilt = cos(tiltAngle);
-  sinTilt = sin(tiltAngle);
+  mCosTilt = cos(mTiltAngle);
+  mSinTilt = sin(mTiltAngle);
   
-  cosTumble = cos(tumbleAngle);
-  sinTumble = sin(tumbleAngle);
+  mCosTumble = cos(mTumbleAngle);
+  mSinTumble = sin(mTumbleAngle);
 );
 
 /**********************************************************
@@ -126,9 +126,9 @@ Updated slider value:
 **********************************************************/
 @slider
 
-rotateAngle = slider1 * kDeg2Rad;
-tiltAngle   = slider2 * kDeg2Rad;
-tumbleAngle = slider3 * kDeg2Rad;
+mRotateAngle = slider1 * kDeg2Rad;
+mTiltAngle   = slider2 * kDeg2Rad;
+mTumbleAngle = slider3 * kDeg2Rad;
 
 calculateCoefficients();
 
@@ -140,34 +140,34 @@ Custom graphic interface
 
 // First we deal with mouse interactions:
 
-// Mouse drag: Update rotateAngle
+// Mouse drag: Update mRotateAngle
 mouse_cap == 1 ?
 (
-  mouseX = mouse_x - gCenterX;
-  mouseY = mouse_y - gCenterY;
-  rotateAngle = atan2(mouseX, -mouseY);
-  slider1 = rotateAngle * kRad2Deg;
+  mMouseX = mouse_x - gCenterX;
+  mMouseY = mouse_y - gCenterY;
+  mRotateAngle = atan2(mMouseX, -mMouseY);
+  slider1 = mRotateAngle * kRad2Deg;
   
   // Notify GUI that rotation has changed, and update coefficients
   slider_automate(slider1);
   calculateCoefficients();
 );
 
-// SHIFT + mouse drag: Update tiltAngle
+// SHIFT + mouse drag: Update mTiltAngle
 mouse_cap == 9 ?
 (
-  mouseX = mouse_x - gCenterX;
+  mMouseX = mouse_x - gCenterX;
   
-  mouseX > gRadius ? (
-    mouseX = gRadius
+  mMouseX > gRadius ? (
+    mMouseX = gRadius
   ) : (
-    mouseX < -gRadius ? (
-      mouseX = -gRadius
+    mMouseX < -gRadius ? (
+      mMouseX = -gRadius
     );
   );
   
-  tiltAngle = mouseX  * $pi / gRadius;
-  slider2 = tiltAngle * kRad2Deg;
+  mTiltAngle = mMouseX  * $pi / gRadius;
+  slider2 = mTiltAngle * kRad2Deg;
   
   // Notify GUI/automation that tilt has changed, and update coefficients
   slider_automate(slider2);
@@ -175,18 +175,18 @@ mouse_cap == 9 ?
 );
 
 
-// CMD + mouse: Update tumbleAngle
+// CMD + mouse: Update mTumbleAngle
 mouse_cap == 5 ?
 (
-  mouseY = gCenterY - mouse_y;
-  mouseY > gRadius ? (
-    mouseY = gRadius
+  mMouseY = gCenterY - mouse_y;
+  mMouseY > gRadius ? (
+    mMouseY = gRadius
   ) : (
-    mouseY < -gRadius ? mouseY = -gRadius;
+    mMouseY < -gRadius ? mMouseY = -gRadius;
   );
-  mouseY = mouseY * $pi / gRadius;
-  tumbleAngle = mouseY;
-  slider3 = tumbleAngle * kRad2Deg;
+  mMouseY = mMouseY * $pi / gRadius;
+  mTumbleAngle = mMouseY;
+  slider3 = mTumbleAngle * kRad2Deg;
   
   // Notify GUI/automation that tumble has changed, and update coefficients
   slider_automate(slider3);
@@ -201,37 +201,37 @@ drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadiu
 
 
 // TILT: Draw plane illustrating the effect of the tilt transform, the plane is darker when upside down
-cosTilt < 0 ?
+mCosTilt < 0 ?
 (
   gxColorSetHsl(1.0, 195, 1.0, 0.25);
 ) :
 ( 
   gxColorSetHsl(1.0, 195., 1.0, 0.4);
 );
-tiltDeltaX = gRadius * cosTilt;
-tiltDeltaY = gRadius * sinTilt * 0.1;
-radiusFraction = 0.2 * gRadius;
+mTiltDeltaX = gRadius * mCosTilt;
+mTiltDeltaY = gRadius * mSinTilt * 0.1;
+mRadiusFraction = 0.2 * gRadius;
 
-drawQuadrangleOutline(gCenterX - tiltDeltaX - 0.5, gCenterY - radiusFraction - tiltDeltaY - 0.5,
-                      gCenterX + tiltDeltaX - 0.5, gCenterY - radiusFraction + tiltDeltaY - 0.5,
-                      gCenterX + tiltDeltaX - 0.5, gCenterY + radiusFraction - tiltDeltaY - 0.5,
-                      gCenterX - tiltDeltaX - 0.5, gCenterY + radiusFraction + tiltDeltaY - 0.5, 
+drawQuadrangleOutline(gCenterX - mTiltDeltaX - 0.5, gCenterY - mRadiusFraction - mTiltDeltaY - 0.5,
+                      gCenterX + mTiltDeltaX - 0.5, gCenterY - mRadiusFraction + mTiltDeltaY - 0.5,
+                      gCenterX + mTiltDeltaX - 0.5, gCenterY + mRadiusFraction - mTiltDeltaY - 0.5,
+                      gCenterX - mTiltDeltaX - 0.5, gCenterY + mRadiusFraction + mTiltDeltaY - 0.5, 
                       1.);
 
-drawQuadrangleOutline(gCenterX - tiltDeltaX + 0.5, gCenterY - radiusFraction - tiltDeltaY + 0.5,
-                      gCenterX + tiltDeltaX + 0.5, gCenterY - radiusFraction + tiltDeltaY + 0.5,
-                      gCenterX + tiltDeltaX + 0.5, gCenterY + radiusFraction - tiltDeltaY + 0.5,
-                      gCenterX - tiltDeltaX + 0.5, gCenterY + radiusFraction + tiltDeltaY + 0.5, 
+drawQuadrangleOutline(gCenterX - mTiltDeltaX + 0.5, gCenterY - mRadiusFraction - mTiltDeltaY + 0.5,
+                      gCenterX + mTiltDeltaX + 0.5, gCenterY - mRadiusFraction + mTiltDeltaY + 0.5,
+                      gCenterX + mTiltDeltaX + 0.5, gCenterY + mRadiusFraction - mTiltDeltaY + 0.5,
+                      gCenterX - mTiltDeltaX + 0.5, gCenterY + mRadiusFraction + mTiltDeltaY + 0.5, 
                       1.);
                       
-drawQuadrangleOutline(gCenterX - tiltDeltaX, gCenterY - radiusFraction - tiltDeltaY,
-                      gCenterX + tiltDeltaX, gCenterY - radiusFraction + tiltDeltaY,
-                      gCenterX + tiltDeltaX, gCenterY + radiusFraction - tiltDeltaY,
-                      gCenterX - tiltDeltaX, gCenterY + radiusFraction + tiltDeltaY, 
+drawQuadrangleOutline(gCenterX - mTiltDeltaX, gCenterY - mRadiusFraction - mTiltDeltaY,
+                      gCenterX + mTiltDeltaX, gCenterY - mRadiusFraction + mTiltDeltaY,
+                      gCenterX + mTiltDeltaX, gCenterY + mRadiusFraction - mTiltDeltaY,
+                      gCenterX - mTiltDeltaX, gCenterY + mRadiusFraction + mTiltDeltaY, 
                       1.); 
 
 // TUMBLE: Draw plane illustrating the effect of the tumble transform, the plane is darker when upside down
-cosTumble < 0 ?
+mCosTumble < 0 ?
 (
   gxColorSetHsl(1.0, 195, 1.0, 0.25);
 ) : 
@@ -240,61 +240,61 @@ cosTumble < 0 ?
   
 );
 
-tumbleDeltaX = gRadius * sinTumble * 0.1;
-tumbleDeltaY = gRadius * cosTumble;
+mTumbleDeltaX = gRadius * mSinTumble * 0.1;
+mTumbleDeltaY = gRadius * mCosTumble;
 
-drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX-0.5, gCenterY - tumbleDeltaY-0.5,
-                      gCenterX - radiusFraction + tumbleDeltaX-0.5, gCenterY + tumbleDeltaY-0.5,
-                      gCenterX + radiusFraction - tumbleDeltaX-0.5, gCenterY + tumbleDeltaY-0.5,
-                      gCenterX + radiusFraction + tumbleDeltaX-0.5, gCenterY - tumbleDeltaY-0.5,
+drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX-0.5, gCenterY - mTumbleDeltaY-0.5,
+                      gCenterX - mRadiusFraction + mTumbleDeltaX-0.5, gCenterY + mTumbleDeltaY-0.5,
+                      gCenterX + mRadiusFraction - mTumbleDeltaX-0.5, gCenterY + mTumbleDeltaY-0.5,
+                      gCenterX + mRadiusFraction + mTumbleDeltaX-0.5, gCenterY - mTumbleDeltaY-0.5,
                       1.);
 
-drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX+0.5, gCenterY - tumbleDeltaY+0.5,
-                      gCenterX - radiusFraction + tumbleDeltaX+0.5, gCenterY + tumbleDeltaY+0.5,
-                      gCenterX + radiusFraction - tumbleDeltaX+0.5, gCenterY + tumbleDeltaY+0.5,
-                      gCenterX + radiusFraction + tumbleDeltaX+0.5, gCenterY - tumbleDeltaY+0.5,
+drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX+0.5, gCenterY - mTumbleDeltaY+0.5,
+                      gCenterX - mRadiusFraction + mTumbleDeltaX+0.5, gCenterY + mTumbleDeltaY+0.5,
+                      gCenterX + mRadiusFraction - mTumbleDeltaX+0.5, gCenterY + mTumbleDeltaY+0.5,
+                      gCenterX + mRadiusFraction + mTumbleDeltaX+0.5, gCenterY - mTumbleDeltaY+0.5,
                       1.);
 
-drawQuadrangleOutline(gCenterX - radiusFraction - tumbleDeltaX, gCenterY - tumbleDeltaY,
-                      gCenterX - radiusFraction + tumbleDeltaX, gCenterY + tumbleDeltaY,
-                      gCenterX + radiusFraction - tumbleDeltaX, gCenterY + tumbleDeltaY,
-                      gCenterX + radiusFraction + tumbleDeltaX, gCenterY - tumbleDeltaY,
+drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX, gCenterY - mTumbleDeltaY,
+                      gCenterX - mRadiusFraction + mTumbleDeltaX, gCenterY + mTumbleDeltaY,
+                      gCenterX + mRadiusFraction - mTumbleDeltaX, gCenterY + mTumbleDeltaY,
+                      gCenterX + mRadiusFraction + mTumbleDeltaX, gCenterY - mTumbleDeltaY,
                       1.);
 
 // Draw points illustrating the combined effect of the transforms
-displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
+displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, 0);
 
 
 // ROTATION: Draw indicator with grey inner circle
 gxColorSetHsl(1.0, 195., 1.0, 0.4);
-drawInteractionCircle(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, mInteractionCircleRadius);
+drawInteractionCircle(gCenterX + gRadius* mSinRotation, gCenterY - gRadius*mCosRotation, mInteractionCircleRadius);
 gxColorSet(1.0, 0.8, 0.8, 0.8);
-drawInteractionCircle(gCenterX + gRadius* sinRotation, gCenterY - gRadius*cosRotation, mInteractionCircleRadius-7);
+drawInteractionCircle(gCenterX + gRadius* mSinRotation, gCenterY - gRadius*mCosRotation, mInteractionCircleRadius-7);
 gxColorSetHsl(1.0, 195., 1.0, 0.4);
 
 // TILT: Draw indicator with gray horisontal inner line, it is shifted slightly upwards in order to avoid intial overlap with tumble indicator
-drawInteractionCircle(gCenterX + tiltAngle * kRad2Norm * gRadius, gCenterY-25., mInteractionCircleRadius);
+drawInteractionCircle(gCenterX + mTiltAngle * kRad2Norm * gRadius, gCenterY-25., mInteractionCircleRadius);
 
 gxColorSet(1.0, 0.8, 0.8, 0.8);
-drawLineSegment(gCenterX + tiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. - 1,
-                gCenterX + tiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. - 1, 1);
-drawLineSegment(gCenterX + tiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. + 1,
-                gCenterX + tiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. + 1, 1);
-drawLineSegment(gCenterX + tiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25.,
-                gCenterX + tiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25., 1);
+drawLineSegment(gCenterX + mTiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. - 1,
+                gCenterX + mTiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. - 1, 1);
+drawLineSegment(gCenterX + mTiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. + 1,
+                gCenterX + mTiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. + 1, 1);
+drawLineSegment(gCenterX + mTiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25.,
+                gCenterX + mTiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25., 1);
 gxColorSetHsl(1.0, 195., 1.0, 0.4);
 
 // TUMBLE: Draw indicator with grey inner vertical line
 gxColorSetHsl(1.0, 195., 1.0, 0.4);
-drawInteractionCircle(gCenterX, gCenterY - tumbleAngle * kRad2Norm * gRadius, mInteractionCircleRadius);
+drawInteractionCircle(gCenterX, gCenterY - mTumbleAngle * kRad2Norm * gRadius, mInteractionCircleRadius);
 
 gxColorSet(1.0, 0.8, 0.8, 0.8);
-drawLineSegment(gCenterX,       gCenterY - tumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
-                gCenterX,       gCenterY - tumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
-drawLineSegment(gCenterX - 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
-                gCenterX - 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
-drawLineSegment(gCenterX + 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
-                gCenterX + 1.0, gCenterY - tumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
+drawLineSegment(gCenterX,       gCenterY - mTumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
+                gCenterX,       gCenterY - mTumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
+drawLineSegment(gCenterX - 1.0, gCenterY - mTumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
+                gCenterX - 1.0, gCenterY - mTumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
+drawLineSegment(gCenterX + 1.0, gCenterY - mTumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
+                gCenterX + 1.0, gCenterY - mTumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
 gxColorSetHsl(1.0, 195., 1.0, 0.4);
 
 
@@ -304,26 +304,26 @@ Preprocessing prior to audio vector processing.
 @block
 
 /*
-inverseSamplesblock = 1. / samplesblock;
+mInverseSamplesblock = 1. / samplesblock;
 
 // Linear ramp to new coefficient values over the vector to prevent clicks
-incCosRotation = (cosRotation - cosRotationDspCoeff) * inverseSamplesblock;
-incSinRotation = (sinRotation - sinRotationDspCoeff) * inverseSamplesblock;
+incCosRotation = (mCosRotation - mCosRotationDspCoeff) * mInverseSamplesblock;
+incSinRotation = (mSinRotation - mSinRotationDspCoeff) * mInverseSamplesblock;
 
-incCosTilt  = (cosTilt - cosTiltDspCoeff) * inverseSamplesblock;
-incSinTilt = (sinTilt - sinTiltDspCoeff) * inverseSamplesblock;
+incCosTilt  = (mCosTilt - mCosTiltDspCoeff) * mInverseSamplesblock;
+incSinTilt = (mSinTilt - mSinTiltDspCoeff) * mInverseSamplesblock;
 
-incCosTumble = (cosTumble - cosTumbleDspCoeff) * inverseSamplesblock;
-incSinTumble = (sinTumble - sinTumbleDspCoeff) * inverseSamplesblock;
+incCosTumble = (mCosTumble - mCosTumbleDspCoeff) * mInverseSamplesblock;
+incSinTumble = (mSinTumble - mSinTumbleDspCoeff) * mInverseSamplesblock;
 
 */
 
-inverseSamplesblock = 1. / samplesblock;
+mInverseSamplesblock = 1. / samplesblock;
 
 // Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
 ii = 0;
 loop(16,
-  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * inverseSamplesblock;
+  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * mInverseSamplesblock;
   ii += 1;
 );
 
@@ -335,14 +335,14 @@ Calculate audio sample
 
 /*
 // Increment matric coefficients for linear interpolation
-cosRotationDspCoeff = cosRotationDspCoeff + incCosRotation;
-sinRotationDspCoeff = sinRotationDspCoeff + incSinRotation;
+mCosRotationDspCoeff = mCosRotationDspCoeff + incCosRotation;
+mSinRotationDspCoeff = mSinRotationDspCoeff + incSinRotation;
 
-cosTiltDspCoeff = cosTiltDspCoeff + incCosTilt;
-sinTiltDspCoeff = sinTiltDspCoeff + incSinTilt;
+mCosTiltDspCoeff = mCosTiltDspCoeff + incCosTilt;
+mSinTiltDspCoeff = mSinTiltDspCoeff + incSinTilt;
 
-cosTumbleDspCoeff = cosTumbleDspCoeff + incCosTumble;
-sinTumbleDspCoeff = sinTumbleDspCoeff + incSinTumble;
+mCosTumbleDspCoeff = mCosTumbleDspCoeff + incCosTumble;
+mSinTumbleDspCoeff = mSinTumbleDspCoeff + incSinTumble;
 
 // w remains unchanged, so we don't need to change spl0
 //spl0 = spl0;
@@ -351,21 +351,21 @@ sinTumbleDspCoeff = sinTumbleDspCoeff + incSinTumble;
 x = spl1;
 y = spl2;
 // We use SpatDIF (navigational) coordinate system rather than mathematical.
-// Hence we need to invert sign of sinRotation as compared to Malham's formula.
-spl1 =  x * cosRotationDspCoeff + y * sinRotationDspCoeff;
-spl2 = -x * sinRotationDspCoeff + y * cosRotationDspCoeff;
+// Hence we need to invert sign of mSinRotation as compared to Malham's formula.
+spl1 =  x * mCosRotationDspCoeff + y * mSinRotationDspCoeff;
+spl2 = -x * mSinRotationDspCoeff + y * mCosRotationDspCoeff;
 
 // Tilt only affects y and z:
 y = spl2;
 z = spl3;
-spl2 = y * cosTiltDspCoeff - z * sinTiltDspCoeff;
-spl3 = y * sinTiltDspCoeff + z * cosTiltDspCoeff;
+spl2 = y * mCosTiltDspCoeff - z * mSinTiltDspCoeff;
+spl3 = y * mSinTiltDspCoeff + z * mCosTiltDspCoeff;
 
 // Tumble only affects x and z:
 x = spl1;
 z = spl3;
-spl1 = x * cosTumbleDspCoeff - z * sinTumbleDspCoeff;
-spl3 = x * sinTumbleDspCoeff + z * cosTumbleDspCoeff;
+spl1 = x * mCosTumbleDspCoeff - z * mSinTumbleDspCoeff;
+spl3 = x * mSinTumbleDspCoeff + z * mCosTumbleDspCoeff;
 */
 
 ii = 0;
