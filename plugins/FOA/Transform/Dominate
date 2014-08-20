@@ -173,16 +173,13 @@ mPreviousMouseCap = mouse_cap;
   slider_automate(slider1);
   
   // At (abs(elevation) > 88 degrees) it becomes meaningless to alter the transformation angle
-  (mCosElevation > 0.034899496702501) ? (
-    TEST = 1;
+  (mCosElevation > kCos88) ? (
     // Update transformAngle and slider3 and notify GUI of the change
     slider3 = 24. * sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius / mCosElevation;
     // Restrict the range to [0, 24]
     slider3 > 24. ? slider3 = 24.;
     mGain    = slider3;
     slider_automate(slider3);
-  ) : (
-    TEST = 0;
   );
   
   calculateMatrix();
