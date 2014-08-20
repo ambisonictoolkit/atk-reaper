@@ -65,7 +65,7 @@ out_pin:Y
 out_pin:Z
 
 slider1:0<0,1,1{Near Field Compensation, Introduce Proximity Effect}>Mode
-slider2:5<0.10,5,0.01>Distance (in meters)
+slider2:5<0.10,5,0.001>Distance (in meters)
 
 
 /**********************************************************
