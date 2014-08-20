@@ -133,7 +133,7 @@ generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
 
 
 // Radius of interaction circle
-kInteractionCircleRadius = 10.;
+kInteractionCircleRadius = 11.;
 
 // Initialisation of user interaction parameters
 mPreviousMouseCap = 0;

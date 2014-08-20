@@ -133,7 +133,7 @@ matrixMirrorNonRotated[17] = sin(-$pi*0.5);
 matrixMirrorNonRotated[23] = 0;
 
 // Radius of interaction circle
-kInteractionCircleRadius = 10.;
+kInteractionCircleRadius = 11.;
 
 // Initialisation of user interaction parameters
 mPreviousMouseCap = 0;
