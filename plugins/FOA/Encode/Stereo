@@ -61,6 +61,14 @@ matrixInc       = 1240;
 // Flag indicating that the plugin has not been fully initialised yet
 mInitialised = 0;
 
+// Radius of interaction circle
+kInteractionCircleRadius = 11.;
+
+// Initialisation of user interaction parameters
+mPreviousMouseCap = 0;
+mClickingAtCircle = 0;
+
+
 function calculateCoefficients()
 (
   // Interaction point:
@@ -110,8 +118,16 @@ Custom graphic interface
 determineGeometry();
 drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
+mInteractionCircleRadius = kInteractionCircleRadius;
+
+// Only update plugin parameters if the user click and drag interaction circle
+mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
+// Save current mouse_cap value in order to use in the above test at next iteration
+mPreviousMouseCap = mouse_cap;
+
+
 // Reset azimuth and spread on mouse click
-mouse_cap == 1 ?
+mClickingAtCircle ?
 (
   mMouseY = mouse_y - gCenterY;
   slider1 = -180. * (mMouseY / gRadius);
@@ -128,12 +144,15 @@ mouse_cap == 1 ?
   slider_automate(slider1);
   mAzimuth = slider1 * 0.5 * kDeg2Rad;
   calculateCoefficients();
+  
+  mHiglightCircle = 1;
+) : (
+  mHiglightCircle = hoverOverInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 );
 
 
 mPosX = gCenterX;
 mPosY = gCenterY - 2 * gRadius * mAzimuth / $pi;
-mInteractionCircleRadius = 11.;
 
 // Draw arc indicating spread
 gxColorSetHsl(1.0, 48., 1.0, 0.5);
@@ -145,7 +164,7 @@ drawLineSegment(gCenterX, gCenterY, gCenterX+mSinAzi*gRadius, gCenterY-mCosAzi*g
 
 
 // Draw circle for interaction
-gxColorSetHsl(1.0, 195., 1.0, 0.4);
+gxColorSetHsl(1.0, 195., 1.0, 0.4 + 0.15*mHiglightCircle);
 drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);
 drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 
