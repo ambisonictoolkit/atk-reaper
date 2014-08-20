@@ -46,9 +46,9 @@ out_pin:Y
 out_pin:Z
 
 // Slider range is set to [-360,360] rather than [-180, 180] for more flexible scripting of rotating movements
-slider1:0<-180,180,1>Rotate (mouse)
-slider2:0<-180,180,1>Tilt (shift + mouse)
-slider3:0<-180,180,1>Tumble (cmd + mouse)
+slider1:0<-180,180,0.1>Rotate (mouse)
+slider2:0<-180,180,0.1>Tilt (mouse)
+slider3:0<-180,180,0.1>Tumble (mouse)
 
 
 /**********************************************************
@@ -82,7 +82,17 @@ matrixDisplayInterpreted = 1500;
 
 // This only needs to be generated once:
 mNumDisplayedPoints = 24;
-generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints); 
+generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
+
+// Radius of interaction circle
+mInteractionCircleRadius = 11.;
+
+// Initialisation of user interaction parameters
+mPreviousMouseCap = 0;
+
+mClickingAtRotateCircle = 0;
+mClickingAtTiltCircle   = 0;
+mClickingAtTumbleCircle = 0;
 
 function calculateCoefficients()
 (
@@ -138,11 +148,20 @@ Custom graphic interface
 **********************************************************/
 @gfx 500 500
 
-// First we deal with mouse interactions:
+// Track geometry and draw background
+determineGeometry();
+drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
-// Mouse drag: Update mRotateAngle
-mouse_cap == 1 ?
+
+// --- MOUSE INTERACTION - there are 7 possible cases
+
+mClickingAtRotateCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosRotateX, mPosRotateY, mInteractionCircleRadius, mClickingAtRotateCircle);
+
+mClickingAtRotateCircle ?
 (
+  // --- Case 1: Click-dragging rotation circle
+  
+  // Update mRotateAngle
   mMouseX = mouse_x - gCenterX;
   mMouseY = mouse_y - gCenterY;
   mRotateAngle = atan2(mMouseX, -mMouseY);
@@ -151,62 +170,124 @@ mouse_cap == 1 ?
   // Notify GUI that rotation has changed, and update coefficients
   slider_automate(slider1);
   calculateCoefficients();
-);
-
-// SHIFT + mouse drag: Update mTiltAngle
-mouse_cap == 9 ?
-(
-  mMouseX = mouse_x - gCenterX;
   
-  mMouseX > gRadius ? (
-    mMouseX = gRadius
-  ) : (
-    mMouseX < -gRadius ? (
-      mMouseX = -gRadius
+  // No other interaction circles should be active or highlighted
+  mClickingAtTiltCircle   = 0;
+  mClickingAtTumbleCircle = 0;
+  
+  mHiglightRotateCircle   = 1;
+  mHiglightTiltCircle     = 0;
+  mHiglightTumbleCircle   = 0;
+) :
+(  
+  mClickingAtTiltCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosTiltX, mPosTiltY, mInteractionCircleRadius, mClickingAtTiltCircle);
+  
+  mClickingAtTiltCircle ?
+  (
+    // --- Case 2: Click-dragging tilt circle
+    
+    mMouseX = mouse_x - gCenterX;
+  
+    mMouseX > gRadius ? (
+      mMouseX = gRadius
+    ) :
+    (
+      mMouseX < -gRadius ? (
+        mMouseX = -gRadius
+      );
+    );
+  
+    mTiltAngle = mMouseX  * $pi / gRadius;
+    slider2 = mTiltAngle * kRad2Deg;
+  
+    // Notify GUI/automation that tilt has changed, and update coefficients
+    slider_automate(slider2);
+    calculateCoefficients();
+    
+    // No other interaction circles should be active or highlighted
+    
+    // mClickingAtRotateCircle has been set earlier on
+    mClickingAtTumbleCircle = 0;
+    
+    mHiglightRotateCircle   = 0;
+    mHiglightTiltCircle     = 1;
+    mHiglightTumbleCircle   = 0;
+  ) :
+  (
+    mClickingAtTumbleCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosTumbleX, mPosTumbleY, mInteractionCircleRadius, mClickingAtTumbleCircle);
+    
+    mClickingAtTumbleCircle ?
+    (
+      // --- Case 3: Click-dragging tumble circle
+      
+      mMouseY = gCenterY - mouse_y;
+      mMouseY > gRadius ? (
+        mMouseY = gRadius
+      ) : (
+        mMouseY < -gRadius ? mMouseY = -gRadius;
+      );
+      mMouseY = mMouseY * $pi / gRadius;
+      mTumbleAngle = mMouseY;
+      slider3 = mTumbleAngle * kRad2Deg;
+  
+      // Notify GUI/automation that tumble has changed, and update coefficients
+      slider_automate(slider3);
+      calculateCoefficients();
+      
+      // No other interaction circles should be active or highlighted
+      
+      // mClickingAtRotateCircle has been set earlier on
+      // mClickingAtTumbleCircle has been set earlier on
+    
+      mHiglightRotateCircle = 0;
+      mHiglightTiltCircle   = 0;
+      mHiglightTumbleCircle = 1;
+    ) : (
+      mHiglightRotateCircle = hoverOverInteractionCircle(mPosRotateX, mPosRotateY, mInteractionCircleRadius);
+      
+      mHiglightRotateCircle ?
+      (  
+        // --- Case 4: Hovering over rotation circle
+        
+        // No other interaction circles should be highlighted
+        mHiglightTiltCircle   = 0;
+        mHiglightTumbleCircle = 0;
+      ) :
+      (
+        mHiglightTiltCircle = hoverOverInteractionCircle(mPosTiltX, mPosTiltY, mInteractionCircleRadius);
+        
+        mHiglightTiltCircle ?
+        (  
+          // --- Case 5: Hovering over tilt circle
+          
+          // No other interaction circles should be highlighted
+          
+          // mHiglightRotateCircle has been set already
+          mHiglightTumbleCircle = 0;
+        ) : (
+          // --- Case 6: Hovering over tumble circle AND // Case 7: Mouse is neither click-dragging nor hovering
+          
+          mHiglightTumbleCircle = hoverOverInteractionCircle(mPosTumbleX, mPosTumbleY, mInteractionCircleRadius);
+        );
+      ); 
     );
   );
-  
-  mTiltAngle = mMouseX  * $pi / gRadius;
-  slider2 = mTiltAngle * kRad2Deg;
-  
-  // Notify GUI/automation that tilt has changed, and update coefficients
-  slider_automate(slider2);
-  calculateCoefficients();
 );
 
-
-// CMD + mouse: Update mTumbleAngle
-mouse_cap == 5 ?
-(
-  mMouseY = gCenterY - mouse_y;
-  mMouseY > gRadius ? (
-    mMouseY = gRadius
-  ) : (
-    mMouseY < -gRadius ? mMouseY = -gRadius;
-  );
-  mMouseY = mMouseY * $pi / gRadius;
-  mTumbleAngle = mMouseY;
-  slider3 = mTumbleAngle * kRad2Deg;
-  
-  // Notify GUI/automation that tumble has changed, and update coefficients
-  slider_automate(slider3);
-  calculateCoefficients();
-);
+// Save current mouse_cap value in order to use in the above tests at next iteration
+mPreviousMouseCap = mouse_cap;
 
 
-// Track geometry and draw background
-gxColorSet(1, 1, 1, 1);
-determineGeometry();
-drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
 
+// --- TILT TRANSFORMATION PLANE
 
-// TILT: Draw plane illustrating the effect of the tilt transform, the plane is darker when upside down
+// The plane is darker when upside down
 mCosTilt < 0 ?
 (
-  gxColorSetHsl(1.0, 195, 1.0, 0.25);
+  gxColorSetHsl(1.0, 195, 1.0, 0.25 + 0.15*mHiglightTiltCircle);
 ) :
 ( 
-  gxColorSetHsl(1.0, 195., 1.0, 0.4);
+  gxColorSetHsl(1.0, 195., 1.0, 0.4 + 0.15*mHiglightTiltCircle);
 );
 mTiltDeltaX = gRadius * mCosTilt;
 mTiltDeltaY = gRadius * mSinTilt * 0.1;
@@ -230,13 +311,15 @@ drawQuadrangleOutline(gCenterX - mTiltDeltaX, gCenterY - mRadiusFraction - mTilt
                       gCenterX - mTiltDeltaX, gCenterY + mRadiusFraction + mTiltDeltaY, 
                       1.); 
 
-// TUMBLE: Draw plane illustrating the effect of the tumble transform, the plane is darker when upside down
+// --- TUMBLE TRANSFORMATION PLANE
+
+// The plane is darker when upside down
 mCosTumble < 0 ?
 (
-  gxColorSetHsl(1.0, 195, 1.0, 0.25);
+  gxColorSetHsl(1.0, 195, 1.0, 0.25 + 0.15*mHiglightTumbleCircle);
 ) : 
 (
-  gxColorSetHsl(1.0, 195., 1.0, 0.4);
+  gxColorSetHsl(1.0, 195., 1.0, 0.4 + 0.15*mHiglightTumbleCircle);
   
 );
 
@@ -265,37 +348,56 @@ drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX, gCenterY - mTu
 displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, 0);
 
 
-// ROTATION: Draw indicator with grey inner circle
-gxColorSetHsl(1.0, 195., 1.0, 0.4);
-drawInteractionCircle(gCenterX + gRadius* mSinRotation, gCenterY - gRadius*mCosRotation, mInteractionCircleRadius);
-gxColorSet(1.0, 0.8, 0.8, 0.8);
-drawInteractionCircle(gCenterX + gRadius* mSinRotation, gCenterY - gRadius*mCosRotation, mInteractionCircleRadius-7);
-gxColorSetHsl(1.0, 195., 1.0, 0.4);
+// --- TUMBLE INTERACTION CIRCLE
+//TUMBLE: Draw indicator with grey inner vertical line
+mPosTumbleX = gCenterX;
+mPosTumbleY = gCenterY - mTumbleAngle * kRad2Norm * gRadius;
 
-// TILT: Draw indicator with gray horisontal inner line, it is shifted slightly upwards in order to avoid intial overlap with tumble indicator
+gxColorSetHsl(1.0, 195., 1.0, 0.4 + 0.15*mHiglightTumbleCircle);
+drawInteractionCircle(mPosTumbleX, mPosTumbleY, mInteractionCircleRadius);
+
+gxColorSetHsl(1.0, 195., 1.0, 0.4);
+gxColorSet(1.0, 0.8, 0.8, 0.8);
+drawLineSegment(mPosTumbleX,       mPosTumbleY - mInteractionCircleRadius + 5,
+                mPosTumbleX,       mPosTumbleY + mInteractionCircleRadius - 5, 1);
+drawLineSegment(mPosTumbleX - 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
+                mPosTumbleX - 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1);
+drawLineSegment(mPosTumbleX + 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
+                mPosTumbleX + 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1);
+
+
+// --- TILT INTERACTION CIRCLE (we need to draw the circles so that Rotation is on top)
+
+// Absolute position of circle.
+// Y position is concstant and shifted slightly upwards from center in order to avoid intial overlap with tumble indicator
+mPosTiltX = gCenterX + mTiltAngle * kRad2Norm * gRadius;
+mPosTiltY = gCenterY-25.;
+
+gxColorSetHsl(1.0, 195., 1.0, 0.4 + 0.15*mHiglightTiltCircle);
 drawInteractionCircle(gCenterX + mTiltAngle * kRad2Norm * gRadius, gCenterY-25., mInteractionCircleRadius);
 
+// Draw grey horisontal inner line
 gxColorSet(1.0, 0.8, 0.8, 0.8);
-drawLineSegment(gCenterX + mTiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. - 1,
-                gCenterX + mTiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. - 1, 1);
-drawLineSegment(gCenterX + mTiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25. + 1,
-                gCenterX + mTiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25. + 1, 1);
-drawLineSegment(gCenterX + mTiltAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5, gCenterY-25.,
-                gCenterX + mTiltAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, gCenterY-25., 1);
-gxColorSetHsl(1.0, 195., 1.0, 0.4);
+drawLineSegment(mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY - 1,
+                mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY - 1, 1);
+drawLineSegment(mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY + 1,
+                mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY + 1, 1);
+drawLineSegment(mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY,
+                mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY, 1);
+                
+                
+ // --- ROTATION INTERACTION CIRCLE
 
-// TUMBLE: Draw indicator with grey inner vertical line
-gxColorSetHsl(1.0, 195., 1.0, 0.4);
-drawInteractionCircle(gCenterX, gCenterY - mTumbleAngle * kRad2Norm * gRadius, mInteractionCircleRadius);
+ // Absolute position of interaction circle
+ mPosRotateX = gCenterX + gRadius * mSinRotation;
+ mPosRotateY = gCenterY - gRadius * mCosRotation;
 
-gxColorSet(1.0, 0.8, 0.8, 0.8);
-drawLineSegment(gCenterX,       gCenterY - mTumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
-                gCenterX,       gCenterY - mTumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
-drawLineSegment(gCenterX - 1.0, gCenterY - mTumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
-                gCenterX - 1.0, gCenterY - mTumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
-drawLineSegment(gCenterX + 1.0, gCenterY - mTumbleAngle * kRad2Norm * gRadius - mInteractionCircleRadius + 5,
-                gCenterX + 1.0, gCenterY - mTumbleAngle * kRad2Norm * gRadius + mInteractionCircleRadius - 5, 1);
-gxColorSetHsl(1.0, 195., 1.0, 0.4);
+ gxColorSetHsl(1.0, 195., 1.0, 0.4 + 0.15*mHiglightRotateCircle);
+ drawInteractionCircle(mPosRotateX, mPosRotateY, mInteractionCircleRadius);
+
+ // Draw inner gray circle
+ gxColorSet(1.0, 0.8, 0.8, 0.8);
+ drawInteractionCircle(mPosRotateX, mPosRotateY, mInteractionCircleRadius-7);
 
 
 /**********************************************************
