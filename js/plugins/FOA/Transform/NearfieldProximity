@@ -128,7 +128,7 @@ wc = (2*$pi * freq) * sampleDuration;
 // Filter coefficient depends on mode
 (mMode == 0) ?
  (  // MODE 0: Near field compensation
-   a0 = 1 / (sqrt((cos(wc) * -2.) + 2.) + 1);
+   a0 = 1 / (sqrt((cos(wc) * (-2.)) + 2.) + 1);
    
    // W is passed straight out...
    spl0 = spl0;
@@ -148,7 +148,7 @@ wc = (2*$pi * freq) * sampleDuration;
  )
  :
  (  // MODE 1: Proximity
-   a0 = 1 + sqrt((cos(wc) * -2.) + 2.);
+   a0 = 1 + sqrt((cos(wc) * (-2.)) + 2.);
 
    // W is passed straight out...
    spl0 = spl0;
