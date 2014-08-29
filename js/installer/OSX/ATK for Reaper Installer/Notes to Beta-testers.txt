@@ -1,0 +1,125 @@
+Thanks for checking out Ambisonic Toolkit for Reaper!
+Below is some information that might be of use.
+
+
+
+FIRST OF: A QUEST FOR OSX USERS:
+================================
+
+The installer package is not code signed by Apple. Could you please help me checking
+out if this prevents it from running if securiy is set to allow only applications
+from Apple and identified users?
+
+You find the settings to control it here:
+
+Apple Menu > System Preferences > Security & Privacy > Allow Apps downloaded from Anywhere
+
+
+
+FEEDBACK, SUGGESTIONS AND BUG REPORTS
+=====================================
+
+For the time being, the easiest is to just e-mail feedback to me at:
+
+trond.lossius@bek.no
+
+Alternatively you can use the JS plugins issue tracker:
+
+- http://www.ambisonictoolkit.net/wiki/tiki-view_tracker.php?trackerId=6
+
+If you end up using the plugins for some project, I would be more
+than interested to know.
+
+
+INSTALLING ON WINDOWS
+=====================
+
+1) Start reaper
+2) From the Options menu choose "Show REAPER resource path in explorer/finder"
+3) Unzip the ATK for Reaper archive.
+4) 
+
+WHAT GETS INSTALLED WHERE (OSX)?
+================================
+
+All files are installed into various folders in your home library folder:
+
+~/Library/Application Support/ATK
+~/Library/Application Support/Reaper/Effects/ATK
+
+and an alias (or rather a symlink for the technically inclined)
+
+~/Library/Application Support/Reaper/Data/ATK
+ (the symlink points to ~/Library/Application Support/ATK)
+
+If you are also using Ambisonic Toolkit with SuperCollider,
+the convolution kernels are installed in the same place and
+have the exact same content, so I do not expect you to
+experience any conflicts.
+
+If you want to take a look at the installed files and do not see the 
+Library folder in Finder,  please press the ALT button while clicking
+the "Go" menu in Finder. The Library folder will show up as an 
+additional option.
+
+
+
+NEED SOME SOUND FILES TO PLAY AROUND?
+=====================================
+
+You can find a collection of sound files here:
+
+http://www.ambisonictoolkit.net/wiki/tiki-index.php?page=Downloads
+
+
+Additional sound files can be grabbed from these fine sources:
+
+- http://ambisonia.com/
+- http://www.freesound.org/browse/tags/B-format/
+- http://www.surround-library.com/ (commercial library ambisonic sound effects)
+- http://www.spheric-collection.com/ (commercial library ambisonic sound effects)
+
+And most of the catalogue of Nimbus records are UHJ recordings:
+
+- http://www.wyastone.co.uk/
+
+
+
+KNOWN ISSUES AND LIMITATONS:
+============================
+
+Encoders:
+
+* Diffuser encoder: Only works if the Reaper project is set to one of 
+  the following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
+* Spreader encoder: Only works if the Reaper project is set to one of
+  the following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
+* SuperStereo encoder: Only works if the Reaper project is set to one
+  of the following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
+* UHJ encoder: Only works if the Reaper project is set to one of the
+  following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
+* ZoomH2: Not yet implemented.
+
+Transformers:
+
+(no known issues)
+
+Decoders:
+
+
+* Binaural decoder: The Cipic and Listen HRTFs only work if the Reaper
+  project is set to 44100 Hz sample rate.
+* Diametric: Not yet implemented.
+* Periphonic: Not yet implemented.
+* UHJ decoder: Only works if the Reaper project is set to one of the
+  following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
+* Quad: K and shelf filter remains to be implemented.
+* Pantophonic: K and shelf filter remains to be implemented.
+
+
+CHANGELOG
+=========
+
+Version 1.0.b1:
+
+- First beta release
