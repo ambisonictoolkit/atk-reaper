@@ -31245,7 +31245,7 @@
 																					<key>GID</key>
 																					<integer>80</integer>
 																					<key>PATH</key>
-																					<string>../../../plugins/FOA/Decode/Pantophonic</string>
+																					<string>../../../plugins/FOA/Decode/Pantophonic2D</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -34580,7 +34580,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>1.0</string>
+				<string>1.0.b1</string>
 			</dict>
 			<key>UUID</key>
 			<string>067B57DA-F5DD-49E6-B026-2BF5EA888DD8</string>
