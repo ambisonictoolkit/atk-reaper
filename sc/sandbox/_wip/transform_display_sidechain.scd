@@ -43,7 +43,7 @@ var getColor, alphaSpec, gainSpec, colorSpec, gainThresh;
 var dirDisplay = 'size';
 var amp, curXformMatrix, evalTxtView;
 
-var xfWin, chainv, abcs;
+var xfWin, chainv, abcs, getXMtxByKey;
 
 
 initPointsMatrices = numPoints.collect{|i|
@@ -79,42 +79,47 @@ processPoints = {|xFormedMatrix|
 	// postf("w,x,y,z: %\naz, el: %\nd_norm: %\n", b.round(0.01), [a, e].round(0.01), d_norm);
 
 	// ignore elev for now, implement with Spherical to include elev
-	[a, e, d_norm, amp].postln; // debug
+	//[a, e, d_norm, amp].postln; // debug
 	[a, e, d_norm, amp]; // return
 };
 
-chainXForms = {|...xFormCtlPrs|
+chainXForms = {
 	var mtx;
-	//debug
-	"in chainXForms".postln;
-	xFormCtlPrs.postln;
+	"in chainXForms".postln; // debug
 
-	mtx = Matrix.newIdentity(4); // init original input soundfield
+	chainControls.do{|chain| chain.postln}; //debug
 
-	xFormCtlPrs.do{ |xNameDeg, i|
-		var name, ctlVals;
-		#name, ctlVals = xNameDeg;
+	chainControls.do{ |chain, i|
+		chain.do{ |ctlDict, j|
 
-		// (name != 'subtract').if({
-			// tranform via matrix multiplication
-			//mtx = xForms[name]['getMatrix'].(*ctlVals) * mtx;
+			if( (i == 0) and: (j == 0),
+				// init original input soundfield for first chain matrix result
+				{	mtx = Matrix.newIdentity(4) },
+				{
+					ctlDict.xform.notNil.if{
+						var ctlStates, name, ctlVals;
 
-		// pass in preceding soundfield followed by the control values for the transform operation, in order
-		mtx = xForms[name]['getMatrix'].(mtx, *ctlVals);
+						ctlStates = ctlDict.controlStates;
+						(ctlStates.size == 0).if{"transform control states aren't assigned!".error};
 
-		// store resulting matrix by index
-		chainControls[chainDex][i].put('mtx', mtx);
+						name = ctlDict.xform;
+						ctlVals = ctlStates.indices.collect({ |dex| ctlStates[dex] });
 
-	// },{ // subtract
-	// 	mtx = Matrix.newIdentity(4) + (mtx * -1);
-	// 	// mtx = mtx/2;
-	// });
+						// pass in preceding soundfield followed by the control
+						// values for the transform operation, in order
+						mtx = xForms[name]['getMatrix'].(mtx, *ctlVals);
+
+						// store resulting matrix by index
+						ctlDict.put('mtx', mtx);
+					};
+			});
+		}
 	};
 
-	// mtx * inputMtx;
-	// mtx * (Matrix.newIdentity(4) * -1) * inputMtx
+	// Note: the output soundfield will always be the result of the
+	// last transform of the last transform chain
 	curXformMatrix = mtx;
-	mtx
+	mtx // return the transform matrix
 };
 
 // for use in custom matrix window
@@ -135,48 +140,41 @@ chainXForms = {|...xFormCtlPrs|
 };
 
 updateMatrix = { |whichMatrix = 'display'|
-	var xFormDuples = [], xformMtx;;
+	var xformMtx;
 
 	"in updateMatrix".postln;
 
 	switch( whichMatrix,
 		// update the matrix chain
 		'chain', {
-			chainControls.do{ |chain, i|
-				chain.do{ |ctlDict|
-					ctlDict.xform.notNil.if{
-						var ctlStates;
-						ctlStates = ctlDict.controlStates;
-						(ctlStates.size == 0).if{"trasform control states aren't assigned!".error};
-						xFormDuples = xFormDuples.add([
-							ctlDict.xform,
-							ctlStates.indices.collect{|dex| ctlStates[dex] }
-						]);
-					};
-				}
-			};
+			// calculate the transform matrix from the chain
+			xformMtx = chainXForms.();
+			transformedPoints = initPointsMatrices.collect{ |pointMtx| xformMtx * pointMtx };
 		},
 		// update the single matrix in "Display Transform"
 		'display', {
-			displayControl.xform.notNil.if{
-				var ctlStates;
+			displayControl.xform.notNil.if({
+				var name, ctlStates, ctlVals, mtx;
+
+				name = displayControl.xform;
 				ctlStates = displayControl.controlStates;
 				(ctlStates.size == 0).if{"trasform control states aren't assigned!".error};
-				xFormDuples = xFormDuples.add([
-					displayControl.xform,
-					ctlStates.indices.collect{|dex| ctlStates[dex] }
-				]);
-			};
-		}
-	);
 
-	"found these duples: ".post; xFormDuples.postln;
-	(xFormDuples.size > 0).if({
-		// calculate the transform matrix from the chain
-		xformMtx = chainXForms.(*xFormDuples);
-		transformedPoints = initPointsMatrices.collect{ |pointMtx| xformMtx * pointMtx };
-		},{
-			transformedPoints = initPointsMatrices } // no transform
+				ctlVals = ctlStates.indices.collect({|dex| ctlStates[dex] });
+
+				mtx = Matrix.newIdentity(4); // init original input soundfield
+				// pass in preceding soundfield followed by the control values for
+				// the transform operation, in order
+				xformMtx = xForms[name]['getMatrix'].(mtx, *ctlVals);
+
+				transformedPoints = initPointsMatrices.collect{ |pointMtx|
+					xformMtx * pointMtx
+				};
+				curXformMatrix = xformMtx;
+				},{
+					transformedPoints = initPointsMatrices; // no transform
+			});
+		}
 	);
 
 	"\n******-------------".postln;
@@ -343,10 +341,10 @@ xForms = IdentityDictionary(know: true).putPairs([
 		'this index',	nil,
 		'amount',		ControlSpec(-inf, 0, warp: \db, default: 0, units: "dB")
 		]
-	).put( 'getMatrix',{ |receiverMtx, subtrIndex, amountDB|
+	).put( 'getMatrix',{ |receiverMtx, subtrKey, amountDB|
 		var subMtx;
-		subMtx = chainControls[subtrIndex].mtx;
-		subMtx ?? {"matrix to 'subtract' not found".error}
+		subMtx = getXMtxByKey.(subtrKey);
+		subMtx ?? {"matrix to 'subtract' not found".error};
 		receiverMtx + (subMtx * -1 * amountDB.dbamp);
 		}
 	),
@@ -357,9 +355,9 @@ xForms = IdentityDictionary(know: true).putPairs([
 		'from this index',	nil,
 		'amount',		ControlSpec(-inf, 0, warp: \db, default: 0, units: "dB")
 		]
-	).put( 'getMatrix', { | subtrMtx, receiverDex, amountDB|
+	).put( 'getMatrix', { | subtrMtx, receiverKey, amountDB|
 		var receiver;
-		receiver = chainControls[receiverDex].mtx;
+		receiver = getXMtxByKey.(receiverKey);
 		receiver ?? {"receiver of 'subtract from' not found".error};
 		receiver + (subtrMtx * -1 * amountDB.dbamp);
 		}
@@ -371,10 +369,10 @@ xForms = IdentityDictionary(know: true).putPairs([
 		'this index',	nil,
 		'amount',		ControlSpec(-inf, 0, warp: \db, default: 0, units: "dB")
 		]
-	).put( 'getMatrix', { |receiverMtx, addIndex, amountDB|
+	).put( 'getMatrix', { |receiverMtx, addKey, amountDB|
 		var addMtx;
-		addMtx = chainControls[addIndex].mtx;
-		addMtx ?? {"matrix to 'add' not found".error}
+		addMtx = getXMtxByKey.(addKey);
+		addMtx ?? {"matrix to 'add' not found".error};
 		receiverMtx + (addMtx * amountDB.dbamp);
 		}
 	),
@@ -385,9 +383,9 @@ xForms = IdentityDictionary(know: true).putPairs([
 		'this index',	nil,
 		'amount',		ControlSpec(-inf, 0, warp: \db, default: 0, units: "dB")
 		]
-	).put( 'getMatrix', { | addMtx, receiverDex, amountDB|
+	).put( 'getMatrix', { | addMtx, receiverKey, amountDB|
 		var receiver;
-		receiver = chainControls[receiverDex].mtx;
+		receiver = getXMtxByKey.(receiverKey);
 		receiver ?? {"receiver of 'add to' not found".error};
 		receiver + (addMtx * amountDB.dbamp);
 		}
@@ -409,6 +407,7 @@ initNewXForm = { |target = 'chain'|
 	view.layout_(layout);
 	xfStuff.view = view;
 	xfStuff.layout = layout;
+
 
 	// when selecting a new control from the dropdown menu
 	rebuildControls = { |xfName|
@@ -549,7 +548,20 @@ removeXForm = {|dict|
 // order determines sf processing chain
 // list can grow with inserted items and shrink when removed
 // First list added in for the first chain
-chainControls = List().add(List());
+chainControls = List().add(
+	// add the first chain
+	List().add(
+		// add the first "transform", just an identity matrix
+		IdentityDictionary(know: true).putPairs([
+			'view', View().layout_(
+				HLayout(
+					StaticText().string_("Input Soundfield")
+			).margins_([10,0,10,3])),
+			'xform', 'Input Soundfield',
+			'mtx', Matrix.newIdentity(4) // initialize soundfield matrix
+		])
+	)
+);
 displayControl = initNewXForm.('display');
 updateMatrix.('display'); // initialize
 abcs = ['A','B','C','D','E','F','G','H','I','J'];
@@ -563,19 +575,18 @@ ctlv.layout.add(displayControl.view);
 
 // add label row to chainv layout
 chainv.layout.add(
-	HLayout(
-		StaticText().string_("Transform").maxWidth_(60), 20,
-		StaticText().string_("Degree of Tranform").minWidth_(150), 280,
-		HLayout(
-			StaticText().string_("remove").minWidth_(50),
-			StaticText().string_("add").maxWidth_(30) //, a: \right],
-		)
-	)
+	HLayout(StaticText().string_("Chain A").align_(\center))
 	// .setAlignment(1, \right).setAlignment(2, \right).setAlignment(3, \right)
 	.margins_([10, 5,5,0])
 );
 
-chainv.layout.add(createNewXFormView.());
+
+// add input soundfield row
+chainv.layout.add( chainControls[0][0].view );
+
+chainv.layout.add(
+	createNewXFormView.( chainControls[0][0].view )
+);
 
 
 showMatrixWindow = { |postCurrentMatrix=false|
