@@ -1,0 +1,21 @@
+<!-- TEST -->
+<style TYPE="text/css">
+p, li {
+	font-size: 16px;
+}
+h1 {
+  font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
+  text-align: center;
+}
+h2 {
+  font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
+}
+a {
+  font-size: 16px;
+  color: red;
+}
+h1.thirdparties, h2.thirdparties, p.thirdparties {
+	color: gray;
+}
+</style>
+<!-- END TEST -->

@@ -1,8 +1,5 @@
 #! /bin/bash
 
-# Build installer package
-/usr/local/bin/packagesbuild -v "ATK for Reaper/ATK for Reaper.pkgproj"
-
 # Remove prior disk image if present
 test -f "ATK for Reaper.dmg" && rm "ATK for Reaper.dmg"
 
@@ -10,7 +7,16 @@ test -f "ATK for Reaper.dmg" && rm "ATK for Reaper.dmg"
 test -f "ATK for Reaper/build/LGPL.html" && rm "ATK for Reaper/build/LGPL.html"
 test -f "ATK for Reaper/build/readme.html" && rm "ATK for Reaper/build/readme.html"
 cp "../../license & readme/LGPL.html" "ATK for Reaper/build/LGPL.html"
-cp "../../license & readme/readme.html" "ATK for Reaper/build/readme.html"
+
+pandoc \
+	-f markdown \
+	-t html \
+	-H "../../license & readme/styles.css" \
+	-o "ATK for Reaper/build/readme.html" \
+	"../../license & readme/readme.md"
+
+# Build installer package
+/usr/local/bin/packagesbuild -v "ATK for Reaper/ATK for Reaper.pkgproj"
 
 # Create disk image using https://github.com/andreyvit/yoursway-create-dmg
 ./yoursway-create-dmg/create-dmg \
