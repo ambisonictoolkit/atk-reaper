@@ -34755,7 +34755,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>../../../license &amp; readme/readme.html</string>
+							<string>build/readme.html</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
