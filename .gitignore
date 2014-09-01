@@ -19,3 +19,6 @@ xcuserdata
 
 # OSX Installer build folder
 js/installer/OSX/ATK\ for\ Reaper/build
+
+# OSX installer disk image
+js/installer/OSX/ATK\ for\ Reaper.dmg
