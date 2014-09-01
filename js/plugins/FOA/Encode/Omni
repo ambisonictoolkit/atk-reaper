@@ -40,6 +40,10 @@ and GNU General Public License along with this program.  If not, see
 
 desc: Encode mono signal as omnidirectional soundfield
 
+// Import library with shared functions
+import atkConstantsAndMathsLibrary.jsfx-inc
+
+
 in_pin:M
 
 out_pin:W
