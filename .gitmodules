@@ -1,0 +1,4 @@
+[submodule "js/installer/OSX/yoursway-create-dmg"]
+	path = js/installer/OSX/yoursway-create-dmg
+	url = https://github.com/andreyvit/yoursway-create-dmg.git
+	branch = master
