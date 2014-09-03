@@ -24,7 +24,7 @@ pandoc \
     --background "../../graphics/atk screenshot.png" \
     --icon-size 96 \
     --icon "ATK for Reaper.mpkg" 110 205 \
-    --icon "LGPL.html" 220 205 \
-    --icon "readme.html" 330 205 \
+    --icon "LGPL.html" 240 205 \
+    --icon "readme.html" 370 205 \
     --volname "ATK for Reaper" "ATK for Reaper.dmg" \
     "ATK for Reaper/build/"

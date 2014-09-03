@@ -22,3 +22,6 @@ js/installer/OSX/ATK\ for\ Reaper/build
 
 # OSX installer disk image
 js/installer/OSX/ATK\ for\ Reaper.dmg
+
+js/installer/Windows/ATK\ for\ Reaper
+js/installer/Windows/ATK\ for\ Reaper.zip
