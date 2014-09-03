@@ -1,3 +1,9 @@
+<div id="container">
+  <div id="content">
+
+ATK for Reaper : Read Me
+========================
+
 This is the Ambisonic Toolkit (ATK) as a JSFX plugin suite for Reaper.
 It can be used with Reaper on OSX and Windows, and can also be used with
 other VST hosts on the Windows platform using the ReaJS plugin. ReaJS is
@@ -46,14 +52,14 @@ Windows
 1. Start Reaper.
 2. From the Options menu choose "Show REAPER resource path in explorer/finder".
 3. Unzip the ATK for Reaper archive.
-4. Follow the instructions suggested by folder names.
+4. Follow the instructions suggested by the folder names in the unzipped archive. If the Data and Effects folders already contains ATK subfolder from a previous install, these can safely be deleted before copying.
 
 &nbsp;
 
-OSX: What Gets Installed Where?
--------------------------------
+Mac OSX
+-------
 
-All files are installed into the following two folders in your home library folder:
+When you run the installer, the required files are installed into the following two folders in your home library folder:
 
     ~/Library/Application Support/ATK
     ~/Library/Application Support/Reaper/Effects/ATK
@@ -134,7 +140,7 @@ Known Issues and Limitatons:
 
 **Transformers:**
 
-(no known issues)
+* The proximity effect plugin does not seem to have any effect, apart from extreme gain clipping as the distance goes to zero.
 
 &nbsp;
 
@@ -154,17 +160,14 @@ Known Issues and Limitatons:
 Reporting issues
 ----------------
 
-For issues pertaining to the ATK for Reaper plugins, please e-mail [trond.lossius@bek.no](mailto:trond.lossius@bek.no).
-
-&nbsp;
-
+For issues pertaining to the ATK for Reaper plugins, please e-mail [trond.lossius@bek.no](mailto:trond.lossius@bek.no). 
 Alternatively you can use the JS plugins issue tracker:
 
 * [http://www.ambisonictoolkit.net/wiki/tiki-view_tracker.php?trackerId=6](http://www.ambisonictoolkit.net/wiki/tiki-view_tracker.php?trackerId=6)
 
 &nbsp;
 
-If you end up using the plugins for some project, we would be more
+If you use the plugins for some project, we would be more
 than interested to know! You can either mail us information, or add it
 to the wiki at:
 
@@ -182,8 +185,9 @@ Version 1.0.b2
 * Fixed issue where multi-channel matrix-based decoders could blow up when used on 2-channel (stereo) tracks.
 * Fixed issue that prevented Omni encoder from producing sound.
 * OSX installer is now distributed as disk image.
+* Creation of Zip archive for Windows distribution is automoated using a Terminal script.
 * Info for beta testers has been merged into this readme document.
-* This Readme file is now versioned and maintained as markdown document, and converted to html by instaler script using [Pandoc](http://johnmacfarlane.net/pandoc/).
+* This Readme file is now versioned and maintained as markdown document, and converted to html by instaler script using [Pandoc](http://johnmacfarlane.net/pandoc/). A minimum of CSS is used for it to look OK as a stand-alone HTML document as well as in the OSX installer.
 
 &nbsp;
 
@@ -355,3 +359,5 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
+  </div> <!-- id="content" -->
+</div> <!-- id="container" -->

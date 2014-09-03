@@ -1,0 +1,94 @@
+#! /bin/bash
+
+# Remove previous installer folder
+if [ -d "ATK for Reaper/" ]; then
+  rm -rf "ATK for Reaper/"
+fi
+
+# Remove previous zipped file
+test -f "ATK for Reaper.zip" && rm "ATK for Reaper.zip"
+
+mkdir "ATK for Reaper"
+
+# Copy convolution kernels
+mkdir "ATK for Reaper/Copy content to Data"
+mkdir "ATK for Reaper/Copy content to Data/ATK"
+cp -r ~/Library/Application\ Support/ATK/kernels "ATK for Reaper/Copy content to Data/ATK" 
+
+
+# Make folders as required for plugins
+mkdir "ATK for Reaper/Copy content to Effects"
+mkdir "ATK for Reaper/Copy content to Effects/ATK"
+mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA"
+mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode"
+mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode"
+mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/lib"
+mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform"
+
+
+# Copy decoders
+cp "../../plugins/FOA/Decode/5_0" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/5_0"
+cp "../../plugins/FOA/Decode/Binaural" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Binaural"
+cp "../../plugins/FOA/Decode/BtoA" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/BtoA"
+cp "../../plugins/FOA/Decode/Mono" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Mono"
+cp "../../plugins/FOA/Decode/Pantophonic2D" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Pantophonic2D"
+cp "../../plugins/FOA/Decode/PsychoShelf" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/PsychoShelf"
+cp "../../plugins/FOA/Decode/Quad" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Quad"
+cp "../../plugins/FOA/Decode/Stereo" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Stereo"
+cp "../../plugins/FOA/Decode/UHJ" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/UHJ"
+
+
+# Copy encoders
+cp "../../plugins/FOA/Encode/5_0" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/5_0"
+cp "../../plugins/FOA/Encode/7_0" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/7_0"
+cp "../../plugins/FOA/Encode/AtoB" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/AtoB"
+cp "../../plugins/FOA/Encode/Diffuser" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Diffuser"
+cp "../../plugins/FOA/Encode/Omni" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Omni"
+cp "../../plugins/FOA/Encode/Pantophonic2D" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Pantophonic2D"
+cp "../../plugins/FOA/Encode/Periphonic3D" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Periphonic3D"
+cp "../../plugins/FOA/Encode/Planewave" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Planewave"
+cp "../../plugins/FOA/Encode/Quad" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Quad"
+cp "../../plugins/FOA/Encode/Spreader" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Spreader"
+cp "../../plugins/FOA/Encode/Stereo" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Stereo"
+cp "../../plugins/FOA/Encode/SuperStereo" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/SuperStereo"
+cp "../../plugins/FOA/Encode/UHJ" "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/UHJ"
+
+
+# Copy library files
+cp "../../plugins/FOA/lib/atkConstantsAndMathsLibrary.jsfx-inc" "ATK for Reaper/Copy content to Effects/ATK/FOA/lib/atkConstantsAndMathsLibrary.jsfx-inc"
+cp "../../plugins/FOA/lib/atkGraphicsLibrary.jsfx-inc" "ATK for Reaper/Copy content to Effects/ATK/FOA/lib/atkGraphicsLibrary.jsfx-inc"
+cp "../../plugins/FOA/lib/atkKernelLibrary.jsfx-inc" "ATK for Reaper/Copy content to Effects/ATK/FOA/lib/atkKernelLibrary.jsfx-inc"
+cp "../../plugins/FOA/lib/atkMatrixLibrary.jsfx-inc" "ATK for Reaper/Copy content to Effects/ATK/FOA/lib/atkMatrixLibrary.jsfx-inc"
+
+
+# Copy ear images to lib
+cp -r "../../plugins/FOA/lib/ear_photos" "ATK for Reaper/Copy content to Effects/ATK/FOA/lib"
+
+
+# Copy transformers
+cp "../../plugins/FOA/Transform/Direct" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/Direct"
+cp "../../plugins/FOA/Transform/DirectO" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/DirectO"
+cp "../../plugins/FOA/Transform/Dominate" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/Dominate"
+cp "../../plugins/FOA/Transform/FocusPressPushZoom" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/FocusPressPushZoom"
+cp "../../plugins/FOA/Transform/Mirror" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/Mirror"
+cp "../../plugins/FOA/Transform/MirrorO" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/MirrorO"
+cp "../../plugins/FOA/Transform/NearfieldProximity" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/NearfieldProximity"
+cp "../../plugins/FOA/Transform/RotateTiltTumble" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/RotateTiltTumble"
+
+
+# Readme and license
+cp "../../license & readme/LGPL.html" "ATK for Reaper/LGPL.html"
+
+pandoc \
+	-f markdown \
+	-t html \
+	-H "../../license & readme/styles.css" \
+	-o "ATK for Reaper/readme.html" \
+	"../../license & readme/readme.md"
+
+
+# Remove all '*.DS_Store' files
+find "ATK for Reaper" -name '*.DS_Store' -type f -delete
+
+# Zip folder
+zip -r "ATK for Reaper.zip" "ATK for Reaper"
