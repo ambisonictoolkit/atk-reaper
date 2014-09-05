@@ -179,15 +179,20 @@ to the wiki at:
 List of Changes
 ---------------
 
+Version 1.0.b3
+
+* Fixed issue where multi-channel matrix-based decoders could blow up when used on 2-channel (stereo) tracks.
+* Encode/UHJ: Corrected description of plugin in GUI
+* Decode/Binaural: Improving text describing in GUI of this plugin
+
 Version 1.0.b2
 
 * Fixed issue where matrix-based transform plugins could blow up when used on 2-channel (stereo) tracks.
-* Fixed issue where multi-channel matrix-based decoders could blow up when used on 2-channel (stereo) tracks.
 * Fixed issue that prevented Omni encoder from producing sound.
 * OSX installer is now distributed as disk image.
 * Creation of Zip archive for Windows distribution is automoated using a Terminal script.
 * Info for beta testers has been merged into this readme document.
-* This Readme file is now versioned and maintained as markdown document, and converted to html by instaler script using [Pandoc](http://johnmacfarlane.net/pandoc/). A minimum of CSS is used for it to look OK as a stand-alone HTML document as well as in the OSX installer.
+* This Readme file is now versioned and maintained as markdown document, and converted to html by installer script using [Pandoc](http://johnmacfarlane.net/pandoc/). A minimum of CSS is used for it to look OK as a stand-alone HTML document as well as in the OSX installer.
 
 &nbsp;
 
