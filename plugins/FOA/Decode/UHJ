@@ -253,6 +253,10 @@ mBufferPosition >= chunksize ?
 
 mBufferPosition2 = mBufferPosition*2;
 
+// Prevent possible blow up if track is 2 channels only and spl2 and spl3 are un-ininitiated.
+(num_ch == 2) ? (
+  spl2 = 0.;
+);
 
 // Buffer incoming audio as real value, set imaginary value to zero:
 

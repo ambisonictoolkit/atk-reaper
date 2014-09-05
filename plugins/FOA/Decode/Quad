@@ -83,6 +83,11 @@ wIn = spl0;
 xIn = spl1;
 yIn = spl2;
 
+// Prevent possible blow ups if track has 2 channels only (as spl2 might then be un-ininitiated)
+(num_ch == 2) ? (
+  yIn = 0.;
+);
+
 // Matrix multiplication with input signal.
 
 // Front (left and right), z signal is ignored

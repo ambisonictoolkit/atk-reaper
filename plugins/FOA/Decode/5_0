@@ -94,6 +94,12 @@ xIn = spl1;
 yIn = spl2;
 zIn = spl3;
 
+// Some transforms blow up if track is 2 channels only as spl2 and spl3 might be un-ininitiated
+(num_ch == 2) ? (
+  yIn = 0.;
+  zIn = 0.;
+);
+
 // Matrix multiplication with input signal.
 
 // Front (left and right)

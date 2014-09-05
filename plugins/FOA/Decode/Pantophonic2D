@@ -97,6 +97,12 @@ wIn = spl0;
 xIn = spl1;
 yIn = spl2;
 
+
+// Prevent potential blow up if track is 2 channels only and spl2 is un-ininitiated.
+(num_ch == 2) ? (
+  yIn = 0.;
+);
+
 // Matrix multiplication with input signal, 2D so z can be ignored.
 
 spl0  = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2];
