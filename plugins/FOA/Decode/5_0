@@ -35,7 +35,7 @@ Three-dimensional Sound Fields," PhD Thesis, University of Derby, Derby, 2004.
 ---------------------------------------------------------------------
 */
 
-desc: Bruce Wiggins optimised ITU 5.0 decoders
+desc: Bruce Wiggins optimised ITU 5.0 decoders (L - R - C - LFE - SL - SR)
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

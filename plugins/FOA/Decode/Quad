@@ -30,7 +30,7 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Quadrophonic decoder
+desc: Quadrophonic decoder (L - R - C - LFE - SL - SR)
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

@@ -28,7 +28,7 @@ and GNU General Public License along with this program.  If not, see
 */
 
 
-desc: Rotate a first order ambisonic signal (B-format) around the z, x and y axes.
+desc: Rotate a first order ambisonic signal (B-format) around the z, x and y axes
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

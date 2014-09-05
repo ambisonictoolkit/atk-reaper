@@ -27,7 +27,7 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: A to B format encoder for a variety of tetrahedral orientations and W channel weights.
+desc: A to B format encoder for a variety of tetrahedral orientations and W channel weights
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

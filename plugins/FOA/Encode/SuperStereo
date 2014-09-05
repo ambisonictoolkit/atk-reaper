@@ -29,7 +29,7 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Ambisonic Super Stereo encoder.
+desc: Ambisonic Super Stereo encoder
 
 
 // Import library with shared functions
