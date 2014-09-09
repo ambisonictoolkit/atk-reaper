@@ -184,6 +184,8 @@ Version 1.0.b3
 * Fixed issue where multi-channel matrix-based decoders could blow up when used on 2-channel (stereo) tracks.
 * Encode/UHJ: Corrected description of plugin in GUI
 * Decode/Binaural: Improving text describing in GUI of this plugin
+* Decode/5_0: Text description now provides information on output channels
+* Decode/Quad: Text description now provides information on output channels
 
 Version 1.0.b2
 
