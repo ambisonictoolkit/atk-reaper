@@ -180,6 +180,15 @@ Calculate audio sample
 **********************************************************/
 @sample
 
+// If less then 32 channels, prevent spurious high values due to uninitialised channel signals
+(num_ch < 32) ? (
+  i = num_ch;
+  loop (32 - num_ch,
+    spl(i) = 0.;
+    i += 1;
+  );
+);
+
 sIn[0]  = spl0;
 sIn[1]  = spl1;
 sIn[2]  = spl2;

@@ -156,6 +156,15 @@ Calculate audio sample
 **********************************************************/
 @sample
 
+// If less then 8 channels, prevent spurious high values due to uninitialised channel signals
+(num_ch < 8) ? (
+  i = num_ch;
+  loop (8 - num_ch,
+    spl(i) = 0.;
+    i += 1;
+  );
+);
+
 inL    = spl0;
 inR    = spl1;
 inC    = spl2;

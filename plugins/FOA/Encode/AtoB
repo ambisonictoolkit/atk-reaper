@@ -76,6 +76,16 @@ invertMatrix(matrixDSP);
 Calculate audio sample
 **********************************************************/
 @sample
+
+// If less then 4 channels, prevent spurious high values due to uninitialised channel signals
+(num_ch < 4) ? (
+  i = num_ch;
+  loop (4 - num_ch,
+    spl(i) = 0.;
+    i += 1;
+  );
+);
+
 wIn = spl0;
 xIn = spl1;
 yIn = spl2;
