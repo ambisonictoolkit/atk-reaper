@@ -24,6 +24,7 @@ mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode"
 mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode"
 mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/lib"
 mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform"
+mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Utils"
 
 
 # Copy decoders
@@ -75,6 +76,8 @@ cp "../../plugins/FOA/Transform/MirrorO" "ATK for Reaper/Copy content to Effects
 cp "../../plugins/FOA/Transform/NearfieldProximity" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/NearfieldProximity"
 cp "../../plugins/FOA/Transform/RotateTiltTumble" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/RotateTiltTumble"
 
+# Copy utilities
+cp "../../plugins/FOA/Transform/Direct" "ATK for Reaper/Copy content to Effects/ATK/FOA/Utils/4channels"
 
 # Readme and license
 cp "../../license & readme/LGPL.html" "ATK for Reaper/LGPL.html"

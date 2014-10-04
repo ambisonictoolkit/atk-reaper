@@ -1,0 +1,87 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2014
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: 4 channels
+  
+  Extract 4 channels from a multichannel (up to 10) signal.
+  This utility can be used to extract the 4-channel A- or B-format
+  signal from a sound file containing additional channels,
+  e.g. recorded using a portable harddisk recorder.
+
+---------------------------------------------------------------------
+*/
+
+
+desc: Extract 4 channel A- or B-format signal from multichannel recording (max 10 ch)
+
+slider1:0<0,6,0{1-4, 2-5, 3-6, 4-7, 5-8, 6-9, 7-10}>Use channels
+
+in_pin:1
+in_pin:2
+in_pin:3
+in_pin:4
+in_pin:5
+in_pin:6
+in_pin:7
+in_pin:8
+in_pin:9
+in_pin:10
+
+out_pin:A
+out_pin:B
+out_pin:C
+out_pin:D
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+mChannelOffset = slider1
+
+@sample
+
+// If less then 10 channels, prevent spurious high values due to uninitialised channel signals
+(num_ch < 10) ? (
+  i = num_ch;
+  loop (10 - num_ch,
+    spl(i) = 0.;
+    i += 1;
+  );
+);
+
+spl0  = spl(mChannelOffset);
+spl1  = spl(mChannelOffset + 1);
+spl2  = spl(mChannelOffset + 2);
+spl3  = spl(mChannelOffset + 3);
+
+// Prevent audio from leaking through
+spl4  = 0.;
+spl5  = 0.;
+spl6  = 0.;
+spl7  = 0.;
+spl8  = 0.;
+spl9  = 0.;
+spl10 = 0.;
