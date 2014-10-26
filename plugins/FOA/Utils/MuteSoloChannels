@@ -1,0 +1,89 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2014
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: MuteSoloChannels
+  
+  Mute or solo individual channels within a four-channel track.
+  This can be useful for monitoring effect processing within a 
+  B-format =>BtoA => 4xFX => AtoB => B-format
+  signal processing chain.
+
+---------------------------------------------------------------------
+*/
+
+
+desc: Mute or solo individual channels of a four-channel track
+
+slider1:0<0,3,0{None, Mute, Solo}>Channel 1
+slider2:0<0,3,0{None, Mute, Solo}>Channel 2
+slider3:0<0,3,0{None, Mute, Solo}>Channel 3
+slider4:0<0,3,0{None, Mute, Solo}>Channel 4
+
+in_pin:1
+in_pin:2
+in_pin:3
+in_pin:4
+
+out_pin:1
+out_pin:2
+out_pin:3
+out_pin:4
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+// Are any channels soloed?
+((slider1 == 2) || (slider2 == 2) || (slider3 == 2) || (slider4 == 2)) ? (
+  (slider1 == 2) ? (gain0 = 1) : (gain0 = 0);
+  (slider2 == 2) ? (gain1 = 1) : (gain1 = 0);
+  (slider3 == 2) ? (gain2 = 1) : (gain2 = 0);
+  (slider4 == 2) ? (gain3 = 1) : (gain3 = 0);
+) : (
+  // Mute any muted channels
+  gain0 = 1 - slider1;
+  gain1 = 1 - slider2;
+  gain2 = 1 - slider3;
+  gain3 = 1 - slider4;
+);
+
+@sample
+
+// If less then 4 channels, prevent spurious high values due to uninitialised channel signals
+(num_ch < 4) ? (
+  i = num_ch;
+  loop (4 - num_ch,
+    spl(i) = 0.;
+    i += 1;
+  );
+);
+
+spl0  = spl0 * gain0;
+spl1  = spl1 * gain1;
+spl2  = spl2 * gain2;
+spl3  = spl3 * gain3;
+
+

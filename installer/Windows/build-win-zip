@@ -25,6 +25,7 @@ mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode"
 mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/lib"
 mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform"
 mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA/Utils"
+mkdir "ATK for Reaper/Copy content to presets"
 
 
 # Copy decoders
@@ -77,7 +78,11 @@ cp "../../plugins/FOA/Transform/NearfieldProximity" "ATK for Reaper/Copy content
 cp "../../plugins/FOA/Transform/RotateTiltTumble" "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/RotateTiltTumble"
 
 # Copy utilities
-cp "../../plugins/FOA/Transform/Direct" "ATK for Reaper/Copy content to Effects/ATK/FOA/Utils/4channels"
+cp "../../plugins/FOA/Utils/4channels" "ATK for Reaper/Copy content to Effects/ATK/FOA/Utils/4channels"
+cp "../../plugins/FOA/Utils/MuteSoloChannels" "ATK for Reaper/Copy content to Effects/ATK/FOA/Utils/MuteSoloChannels"
+
+# Copy presets
+cp "../../presets/js-ATK_FOA_Utils_MuteSoloChannels.ini" "ATK for Reaper/Copy content to presets/js-ATK_FOA_Utils_MuteSoloChannels.ini"
 
 # Readme and license
 cp "../../license & readme/LGPL.html" "ATK for Reaper/LGPL.html"

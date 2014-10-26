@@ -34,6 +34,10 @@ def copyPluginsToReaper
     # Copy plugins
     `cp -r "../plugins/" "#{pluginFolderPath}"`
     `cp -r "../test-plugins/" "#{testPluginFolderPath}"`
+    
+    # Copy presets
+    presetFolderPath = File.expand_path("~") + "/Library/Application Support/REAPER/presets"
+    `cp -r "../presets/" "#{presetFolderPath}"`
   end
   
   if win?
