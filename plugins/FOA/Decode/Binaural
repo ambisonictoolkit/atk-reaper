@@ -263,7 +263,7 @@ function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported,
         mKernelSize = 512;
       ) : (
         ((srate == 88200) || (srate == 96000)) ? (
-          mKernelSize = 1014;
+          mKernelSize = 1024;
         ) : (
           (srate == 192000) ? (
             mKernelSize = 2048;
