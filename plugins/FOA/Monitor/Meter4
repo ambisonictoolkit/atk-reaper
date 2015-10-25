@@ -26,7 +26,8 @@ and GNU General Public License along with this program.  If not, see
   Display instant sound level for 4 channel surround signal
 */
 
-desc: Instant level meter for 4 channel surround signal
+desc: ATK FOA Monitor Meter4
+// Instant level meter for 4 channel surround signal
 
 // Graphics file
 filename:0,../lib/GainSlider.png

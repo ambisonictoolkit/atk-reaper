@@ -29,7 +29,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Ambisonic Super Stereo encoder
+desc: ATK FOA Encode SuperStereo
+// Ambisonic Super Stereo encoder
 
 
 // Import library with shared functions

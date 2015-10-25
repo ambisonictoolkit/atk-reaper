@@ -29,8 +29,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-
-desc: Adjust FOA soundfield directivity across arbitrary plane
+desc: ATK FOA Transform Direct
+// Adjust FOA soundfield directivity across arbitrary plane
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

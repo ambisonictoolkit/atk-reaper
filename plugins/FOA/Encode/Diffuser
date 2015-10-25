@@ -27,7 +27,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Frequency diffusion mono encoder
+desc: ATK FOA Encode Diffuser
+// Frequency diffusion mono encoder
 
 
 // Import library with shared functions

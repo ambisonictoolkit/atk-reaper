@@ -28,7 +28,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Stereo decoder
+desc: ATK FOA Decode Stereo
+// Stereo decoder
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

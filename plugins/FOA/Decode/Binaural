@@ -52,7 +52,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Binaural decoder for headphone listening
+desc: ATK FOA Decode Binaural
+// Binaural decoder for headphone listening
 
 
 // Graphics files for CIPIC HRTFs

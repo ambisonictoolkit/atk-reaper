@@ -32,8 +32,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-
-desc: Mute or solo individual channels of a four-channel track
+desc: ATK FOA Utility MuteSoloChannels
+// Mute or solo individual channels of a four-channel track
 
 slider1:0<0,3,0{None, Mute, Solo}>Channel 1
 slider2:0<0,3,0{None, Mute, Solo}>Channel 2

@@ -29,8 +29,8 @@ and GNU General Public License along with this program.  If not, see
 */
 
 
-
-desc: Displays instant values for incoming signal, before silencing
+desc: ATK Test DisplayValues
+// Displays instant values for incoming signal, before silencing
 
 in_pin:W
 in_pin:X

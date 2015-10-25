@@ -30,7 +30,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Encode a mono signal as a directional (planewave) soundfield
+desc: ATK FOA Encode Planewave
+// Encode a mono signal as a directional (planewave) soundfield
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

@@ -28,7 +28,8 @@ and GNU General Public License along with this program.  If not, see
 */
 
 
-desc: Mirror sound field across origo (this plugin has no parameters)
+desc: ATK FOA Transform MirrorO
+// Mirror sound field across origo (this plugin has no parameters)
 
 in_pin:W
 in_pin:X

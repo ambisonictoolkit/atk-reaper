@@ -50,8 +50,8 @@ This plugin wraps the ATK classes NearFieldCompensation and Proximity
 ---------------------------------------------------------------------
 */
 
-
-desc: Apply nearfield compensation filtering to a first order ambisonic signal (B-format)
+desc: ATK FOA Transform NearfieldProximity
+// Apply nearfield compensation filtering to a first order ambisonic signal (B-format)
 
 
 in_pin:W

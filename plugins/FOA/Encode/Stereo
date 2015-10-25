@@ -30,7 +30,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Encode a stereo signal as two directional planewaves
+desc: ATK FOA Encode Stereo
+// Encode a stereo signal as two directional planewaves
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

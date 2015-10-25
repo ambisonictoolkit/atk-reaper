@@ -28,7 +28,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Psychoacoustic shelf filter
+desc: ATK FOA Decode PsycoShelf 
+// Psychoacoustic shelf filter
 
 in_pin:W
 in_pin:X

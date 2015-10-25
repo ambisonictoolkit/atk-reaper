@@ -32,7 +32,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Frequency spreading mono encoder
+desc: ATK FOA Encode Spreader
+// Frequency spreading mono encoder
 
 
 // Import library with shared functions

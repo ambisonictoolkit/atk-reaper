@@ -29,7 +29,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Ambisonic UHJ encoder
+desc: ATK FOA Encode UHJ Stereo
+// Ambisonic UHJ encoder
 
 
 // Import library with shared functions

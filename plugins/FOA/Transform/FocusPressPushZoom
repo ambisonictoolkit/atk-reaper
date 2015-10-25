@@ -37,7 +37,8 @@ For regular use of the plugin the debug code is commented out in the same way as
 --- DEBUG STUFF --- */
 
 
-desc: First Order Ambisonic focus, press, push and zoom transformer
+desc: ATK FOA Transform FocusPressPullZoom
+// First Order Ambisonic focus, press, push and zoom transformer
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

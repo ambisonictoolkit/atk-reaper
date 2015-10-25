@@ -30,7 +30,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Pantophonic (2D) regular polygon decoder
+desc: ATK FOA Decode Pantophonic 2D
+// Pantophonic (2D) regular polygon decoder
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

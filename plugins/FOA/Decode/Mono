@@ -28,7 +28,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Mono decoder - synthesises a single microphone
+desc: ATK FOA Decode Mono
+// Mono decoder - synthesises a single microphone
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

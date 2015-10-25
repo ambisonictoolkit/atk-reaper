@@ -32,7 +32,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Quadraphonic encoder (L - R - SL - SR)
+desc: ATK FOA Encode Quadraphonic
+// Quadraphonic encoder (L - R - SL - SR)
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

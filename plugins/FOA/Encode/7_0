@@ -32,7 +32,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: 7_0 encoder (L - R - C - LFE - SL - SR - SBL - SBR)
+desc: ATK FOA Encode 7_0
+// 7_0 encoder (L - R - C - LFE - SL - SR - SBL - SBR)
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

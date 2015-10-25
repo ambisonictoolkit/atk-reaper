@@ -31,7 +31,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: 5_0 encoder (L - R - C - LFE - SL - SR)
+desc: ATK FOA Encode 5_0
+// 5_0 encoder (L - R - C - LFE - SL - SR)
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

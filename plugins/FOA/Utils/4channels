@@ -32,8 +32,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-
-desc: Extract 4 channel A- or B-format signal from multichannel recording (max 10 ch)
+desc: ATK FOA Utility Extract4Channels
+// Extract 4 channel A- or B-format signal from multichannel recording (max 10 ch)
 
 slider1:0<0,6,0{1-4, 2-5, 3-6, 4-7, 5-8, 6-9, 7-10}>Use channels
 

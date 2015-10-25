@@ -27,8 +27,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-
-desc: Mirror sound field across an arbitrary plane.
+desc: ATK FOA Transform Mirror
+// Mirror sound field across an arbitrary plane.
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

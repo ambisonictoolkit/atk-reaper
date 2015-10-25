@@ -28,7 +28,8 @@ and GNU General Public License along with this program.  If not, see
 */
 
 
-desc: Apply dominance to a first order ambisonic signal along an arbitrary axis
+desc: ATK FOA Transform Dominate
+// Apply dominance to a first order ambisonic signal along an arbitrary axis
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

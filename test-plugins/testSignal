@@ -28,8 +28,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-
-desc: Generates 4-channel static (DC) signal for testing purposes
+desc: ATK Test TestSignal
+// Generates 4-channel static (DC) signal for testing purposes
 
 in_pin:W
 in_pin:X

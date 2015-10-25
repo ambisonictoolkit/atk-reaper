@@ -28,8 +28,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-
-desc: Adjust soundfield directivity of first order ambisonic signal across the origin
+desc: ATK FOA Transform DirectO
+// Adjust soundfield directivity of first order ambisonic signal across the origin
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc

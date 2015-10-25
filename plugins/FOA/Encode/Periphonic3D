@@ -32,7 +32,8 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
-desc: Periphonic (3D) dual ring, regular cylindrical encoder
+desc: ATK FOA Encode Periphonic 3D
+// Periphonic (3D) dual ring, regular cylindrical encoder
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc
