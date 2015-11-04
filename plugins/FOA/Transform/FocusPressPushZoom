@@ -37,7 +37,7 @@ For regular use of the plugin the debug code is commented out in the same way as
 --- DEBUG STUFF --- */
 
 
-desc: ATK FOA Transform FocusPressPullZoom
+desc: ATK FOA Transform FocusPressPushZoom
 // First Order Ambisonic focus, press, push and zoom transformer
 
 // Import library with shared functions
