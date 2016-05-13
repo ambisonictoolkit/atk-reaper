@@ -6,14 +6,14 @@ test -f "ATK for Reaper.dmg" && rm "ATK for Reaper.dmg"
 # Copy readme and license into build folder
 test -f "ATK for Reaper/build/LGPL.html" && rm "ATK for Reaper/build/LGPL.html"
 test -f "ATK for Reaper/build/readme.html" && rm "ATK for Reaper/build/readme.html"
-cp "../../license & readme/LGPL.html" "ATK for Reaper/build/LGPL.html"
+cp "../../license.html" "ATK for Reaper/build/license.html"
 
 pandoc \
 	-f markdown \
 	-t html \
-	-H "../../license & readme/styles.css" \
+	-H "../shared/license & readme/styles.css" \
 	-o "ATK for Reaper/build/readme.html" \
-	"../../license & readme/readme.md"
+	"../../readme.md"
 
 # Build installer package
 /usr/local/bin/packagesbuild -v "ATK for Reaper/ATK for Reaper.pkgproj"
@@ -21,10 +21,10 @@ pandoc \
 # Create disk image using https://github.com/andreyvit/yoursway-create-dmg
 ./yoursway-create-dmg/create-dmg \
     --window-size 500 500 \
-    --background "../../graphics/atk screenshot.png" \
+    --background "../shared/graphics/atk screenshot.png" \
     --icon-size 96 \
     --icon "ATK for Reaper.mpkg" 110 205 \
-    --icon "LGPL.html" 240 205 \
+    --icon "license.html" 240 205 \
     --icon "readme.html" 370 205 \
     --volname "ATK for Reaper" "ATK for Reaper.dmg" \
     "ATK for Reaper/build/"
