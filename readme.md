@@ -42,7 +42,7 @@ Installing
 Requirements
 ------------
 
-* ATK for Reaper requires [Reaper 4.75 or above](http://reaper.fm).
+* ATK for Reaper requires [Reaper 5.0 or above](http://reaper.fm).
 
 &nbsp;
 
@@ -94,7 +94,7 @@ Need Some Sound Files to Play Around With?
 
 You can find a collection of sound files here:
 
-* [http://www.ambisonictoolkit.net/wiki/tiki-index.php?page=Downloads](http://www.ambisonictoolkit.net/wiki/tiki-index.php?page=Downloads)
+* [http://www.ambisonictoolkit.net/download/recordings/](http://www.ambisonictoolkit.net/download/recordings/)
 
 &nbsp;
 
@@ -118,58 +118,11 @@ And most of the catalogue of Nimbus Records are UHJ recordings:
 Feedback and Bug Reports
 ========================
 
-&nbsp;
+Known issues are logged at [GitHub](https://github.com/ambisonictoolkit/atk-reaper/issues).
 
+If you experience problems or have questions pertaining to the ATK for Reaper plugins, please create an issue in the [ATK-Reaper issue tracker](https://github.com/ambisonictoolkit/atk-reaper/issues).
 
-Known Issues and Limitatons:
-----------------------------
-
-**Encoders:**
-
-* Diffuser encoder: Only works if the Reaper project is set to one of 
-  the following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
-* Spreader encoder: Only works if the Reaper project is set to one of
-  the following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
-* SuperStereo encoder: Only works if the Reaper project is set to one
-  of the following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
-* UHJ encoder: Only works if the Reaper project is set to one of the
-  following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
-* ZoomH2: Not yet implemented.
-
-&nbsp;
-
-**Transformers:**
-
-* The proximity effect plugin does not seem to have any effect, apart from extreme gain clipping as the distance goes to zero.
-* All effects with custom GUIs can be made more CPU efficient by only redrawing the GUI when it has changed. This holds true for encoders and decoders as well.
-
-&nbsp;
-
-**Decoders:**
-
-* Binaural decoder: The Cipic and Listen HRTFs only work if the Reaper
-  project is set to 44100 Hz sample rate.
-* Diametric: Not yet implemented.
-* Periphonic: Not yet implemented.
-* UHJ decoder: Only works if the Reaper project is set to one of the
-  following sample rates: 44100, 48000, 88200, 96000 or 192000 Hz.
-* Quad: K and shelf filter remains to be implemented.
-* Pantophonic: K and shelf filter remains to be implemented.
-
-&nbsp;
-
-Reporting issues
-----------------
-
-For issues pertaining to the ATK for Reaper plugins, please e-mail [trond.lossius@bek.no](mailto:trond.lossius@bek.no). 
-Alternatively you can use the JS plugins issue tracker:
-
-* [http://www.ambisonictoolkit.net/wiki/tiki-view_tracker.php?trackerId=6](http://www.ambisonictoolkit.net/wiki/tiki-view_tracker.php?trackerId=6)
-
-&nbsp;
-
-If you use the plugins for some project, please let us know! You can either [mail us](mailto:trond.lossius@bek.no), or [add information
-to the wiki](http://www.ambisonictoolkit.net/wiki/tiki-index.php?page=Examples).
+If you use the plugins for some project, please [let us know](mailto:info[at]ambisonictoolkit.net). We [plan on](https://github.com/ambisonictoolkit/ambisonictoolkit.github.io/issues/9) adding a gallery of example artistic and reative projects that make use of the Ambisonic Toolkit.
 
 &nbsp;
 
@@ -177,6 +130,9 @@ to the wiki](http://www.ambisonictoolkit.net/wiki/tiki-index.php?page=Examples).
 List of Changes
 ---------------
 
+Version 1.0.0.b7
+
+* The repository has been refactored and moved to [Github](https://github.com/ambisonictoolkit/atk-reaper). If you experience problems with the installers in this version, [please let us know](https://github.com/ambisonictoolkit/atk-reaper/issues).
 
 Version 1.0.b6
 
