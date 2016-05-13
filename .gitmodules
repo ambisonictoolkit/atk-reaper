@@ -1,0 +1,3 @@
+[submodule "installer/OSX/yoursway-create-dmg"]
+	path = installer/OSX/yoursway-create-dmg
+	url = https://github.com/andreyvit/create-dmg.git
