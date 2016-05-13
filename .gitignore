@@ -1,0 +1,8 @@
+# OSX Installer build folder
+installer/OSX/ATK\ for\ Reaper/build
+
+# OSX installer disk image
+installer/OSX/ATK\ for\ Reaper.dmg
+
+installer/Windows/ATK\ for\ Reaper
+installer/Windows/ATK\ for\ Reaper.zip
