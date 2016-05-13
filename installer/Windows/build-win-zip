@@ -13,7 +13,11 @@ mkdir "ATK for Reaper"
 # Copy convolution kernels
 mkdir "ATK for Reaper/Copy content to Data"
 mkdir "ATK for Reaper/Copy content to Data/ATK"
-cp -r ~/Library/Application\ Support/ATK/kernels "ATK for Reaper/Copy content to Data/ATK" 
+cp -r ../shared/atk-kernels "ATK for Reaper/Copy content to Data/ATK"
+mv "ATK for Reaper/Copy content to Data/ATK/atk-kernels" "ATK for Reaper/Copy content to Data/ATK/kernels"
+# Remove the hidden .git folder from the copied kernels folder
+rm -rf "ATK for Reaper/Copy content to Data/ATK/kernels/.git"
+
 
 
 # Make folders as required for plugins
@@ -85,14 +89,14 @@ cp "../../plugins/FOA/Utils/MuteSoloChannels" "ATK for Reaper/Copy content to Ef
 cp "../../presets/js-ATK_FOA_Utils_MuteSoloChannels.ini" "ATK for Reaper/Copy content to presets/js-ATK_FOA_Utils_MuteSoloChannels.ini"
 
 # Readme and license
-cp "../../license & readme/LGPL.html" "ATK for Reaper/LGPL.html"
+cp "../../license.html" "ATK for Reaper"
 
 pandoc \
 	-f markdown \
 	-t html \
-	-H "../../license & readme/styles.css" \
+	-H "../shared/license & readme/styles.css" \
 	-o "ATK for Reaper/readme.html" \
-	"../../license & readme/readme.md"
+	"../../readme.md"
 
 
 # Remove all '*.DS_Store' files
