@@ -1,3 +1,9 @@
 [submodule "installer/OSX/yoursway-create-dmg"]
 	path = installer/OSX/yoursway-create-dmg
 	url = https://github.com/andreyvit/create-dmg.git
+[submodule "installer/shared/atk-sounds"]
+	path = installer/shared/atk-sounds
+	url = https://github.com/ambisonictoolkit/atk-sounds
+[submodule "installer/shared/atk-kernels"]
+	path = installer/shared/atk-kernels
+	url = https://github.com/ambisonictoolkit/atk-kernels
