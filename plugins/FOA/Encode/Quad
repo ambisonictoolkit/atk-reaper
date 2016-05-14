@@ -91,7 +91,7 @@ Custom graphic interface
 @gfx 500 500
 
 determineGeometry();
-drawBackgroundImage(800, 800, gCenterX - gRadius, gCenterY - gRadius, 2 * gRadius, 2 * gRadius);
+drawBackgroundImage();
 
 mDeltaX = gRadius * mCosAzi;
 mDeltaY = gRadius * mSinAzi;

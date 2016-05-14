@@ -192,13 +192,10 @@ function drawLineSegment(aPosition1x, aPosition1y, aPosition2x, aPosition2y, anA
 
 
 /********************************************************************
-Graphics: Draw background image based on ICST ambimonitor
+Graphics: Draw background image similar to ICST ambimonitor
 ********************************************************************/
-function drawBackgroundImage(aSourceWidth, aSourceHeight, aDstLeft, aDstTop, aDstWidth, aDstHeight) local(lCoordinatelist, i, lDeltaX, lDeltaY)
+function drawBackgroundImage() local(i, lDeltaX, lDeltaY)
 (
-  // Setting memory slot for local array
-  lCoordinatelist = 10000;
-  
   // Draw background circle
   gxColorSet(1.0, 0.18, 0.18, 0.18);
   gfx_circle(gCenterX, gCenterY, gRadius, 1, 1);
@@ -482,7 +479,7 @@ local (decibel, deltaX, hideSectionWidth, i, left,
   top              = 10;
   stripWidth       = gfx_w - 20;
   stripTotalHeight = gfx_h - 20;
-  drawBackgroundImage(661, 1, left, top, stripWidth, stripTotalHeight);
+  //drawBackgroundImage(661, 1, left, top, stripWidth, stripTotalHeight);
 
   // Geometry for channel strips - if more than 4 channels they are grouped as pairs
   numChannels > 4 ? (

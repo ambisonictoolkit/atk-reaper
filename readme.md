@@ -132,7 +132,9 @@ List of Changes
 
 Version 1.0.0.b7
 
-* The repository has been refactored and moved to [Github](https://github.com/ambisonictoolkit/atk-reaper). If you experience problems with the installers in this version, [please let us know](https://github.com/ambisonictoolkit/atk-reaper/issues).
+* Refactoring (these changes should not affect the behaviour of plugins):
+    * The repository has been moved to [Github](https://github.com/ambisonictoolkit/atk-reaper). If you experience problems with the installers in this version, [please let us know](https://github.com/ambisonictoolkit/atk-reaper/issues).
+    * Removed redundant arguments from `drawBackgroundImage()` function - #16.
 
 Version 1.0.b6
 
