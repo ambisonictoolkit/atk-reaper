@@ -33,6 +33,10 @@ file, encouraging DRY (don't repeat yourself)
 ********************************************************************/
 @init
 
+// Constants used by peak meters in decoders
+kNumLeds        = 13;
+kDecibelsPerLed = 3;
+
 
 /********************************************************************
 Graphics: Set drawing color
@@ -167,6 +171,68 @@ function gainToColor(aGain, aGainLowLimit, aGainHighLimit, aVerticalOffset) loca
 
 
 /********************************************************************
+Graphics: Colours for peak level metering LEDs
+********************************************************************/
+function setInactiveColour()
+(
+  gxColorSet(1., 0.376471, 0.384314, 0.4);
+);
+
+function setColdColour()
+(
+  gxColorSet(1., 0., 0.6, 0.003922);
+);
+
+function setTepidColour()
+(
+  gxColorSet(1., 0.6, 0.733333, 0.003922);
+);
+
+function setWarmColour()
+(
+  gxColorSet(1., 0.854902, 0.854902, 0.);
+);
+
+function setHotColour()
+(
+  gxColorSet(1., 1., 0.6, 0.003922);
+);
+
+function setOverloadColour()
+(
+  gxColorSet(1., 1., 0., 0.);
+);
+
+function setLedColour(aGain, aCount) local(lRefColour)
+(
+  lRefColour = 1.5 -aCount*kDecibelsPerLed;
+  (lRefColour > 0.) ? (lRefColour = 0);
+  
+  (aGain<lRefColour) ? (
+    setInactiveColour();
+  ) : (
+    (lRefColour >= 0.) ? (
+      setOverloadColour();
+    ) : (
+      (lRefColour > (-3*kDecibelsPerLed)) ? (
+        setHotColour();
+      ) : (
+        (lRefColour > (-6*kDecibelsPerLed)) ? (
+          setWarmColour();
+        ) : (
+          (lRefColour > (-9*kDecibelsPerLed)) ? (
+            setTepidColour();
+          ) : (
+            setColdColour();
+          );
+        );
+      );
+    );
+  );
+);
+
+
+/********************************************************************
 Graphics: Determine geometry
 ********************************************************************/
 function determineGeometry()
@@ -219,6 +285,45 @@ function drawBackgroundImage() local(i, lDeltaX, lDeltaY)
 );
 
 
+
+/********************************************************************
+Graphics: Draw background image based on ICST ambimonitor
+********************************************************************/
+function drawLEDBackgroundImage() local(i, lDeltaX, lDeltaY)
+(
+  // Draw background circle
+  gxColorSet(1.0, 0.18, 0.18, 0.18);
+  gfx_circle(gCenterX, gCenterY, gRadius, 1, 1);
+  
+  // Black hole in midle
+  gxColorSet(1.0, 0.1, 0.1, 0.1);
+  //gfx_circle(gCenterX, gCenterY, gRadius*0.15, 1, 1);
+  
+  // Circle outlines
+  gxColorSet(1.0, 0.35, 0.35, 0.35);
+  gfx_circle(gCenterX, gCenterY, 0.15*gRadius, 0, 1);
+  gfx_circle(gCenterX, gCenterY, 1.0*gRadius, 0, 1);
+  
+  /*
+  gxColorSet(1.0, 0.35, 0.35, 0.35);
+  
+  // Draw circles
+  i = 1;
+  loop(10,
+    gfx_circle(gCenterX, gCenterY, 0.1*i*gRadius, 0, 1);
+    i += 1;
+  );
+  
+  // Draw lines for every 30 degrees
+  i = 0;
+  loop(6,
+    lDeltaX = gRadius * cos($pi*i/6);
+    lDeltaY = gRadius * sin($pi*i/6);
+    drawLineSegment(gCenterX - lDeltaX, gCenterY - lDeltaY, gCenterX + lDeltaX, gCenterY + lDeltaY, 1);
+    i += 1;
+  );
+  */
+);
 
 
 

@@ -68,8 +68,63 @@ Initialisation
 **********************************************************/
 @init
 
-// Setting memory locations for 4x4 matrix as 1D array
-matrixDSP       = 1000;
+kMaxNumSpeakers = 16;
+// kDecibelsPerLed = 3;
+
+// Memory allocations 
+mMatrixDSP       = 1000;     // 16x4 matrix as 1D array
+mAngles          = 2000;     // Azimuth angles for GUI display
+mLedCoordinates  = 3000;     // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
+
+function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lAngleInc, lLedRadius, lLedRadInc, lLedCount)
+(
+  i = 0;
+  
+  // Angles in degrees
+  lAngleInc = 360./mNumSpeakers;
+  lAngleLo  = 90. -            0.5*mSpeakerLayout*lAngleInc + 0.5*mAngularDistance;
+  lAngleMid = 90. + (0.5. - (0.5*mSpeakerLayout))*lAngleInc;
+  lAngleHi  = 90. + (1.0  - (0.5*mSpeakerLayout))*lAngleInc - 0.5*mAngularDistance;
+  
+  // Converted to radians
+  lAngleInc = lAngleInc * kDeg2Rad;
+  lAngleLo  = lAngleLo  * kDeg2Rad;
+  lAngleMid = lAngleMid * kDeg2Rad;
+  lAngleHi  = lAngleHi  * kDeg2Rad;  
+  
+  lLedRadInc = (0.8*gRadius) / (2*kNumLeds+1);
+  lLedCount = 0;
+  
+  loop(mNumSpeakers,
+    mAngles[i] = lAngleMid;
+    lLedRadius = gRadius * 0.2;
+    loop(kNumLeds,
+      
+      // LED coordinates as convex poygon
+      
+      // Inner points;
+      mLedCoordinates[lLedCount]     =  gCenterX + cos(lAngleLo) * lLedRadius;
+      mLedCoordinates[lLedCount + 1] =  gCenterY - sin(lAngleLo) * lLedRadius;
+      mLedCoordinates[lLedCount + 2] =  gCenterX + cos(lAngleHi) * lLedRadius;
+      mLedCoordinates[lLedCount + 3] =  gCenterY - sin(lAngleHi) * lLedRadius;
+      lLedRadius += lLedRadInc;
+      
+      // Outer points
+      
+      mLedCoordinates[lLedCount + 4] =  gCenterX + cos(lAngleHi) * lLedRadius;
+      mLedCoordinates[lLedCount + 5] =  gCenterY - sin(lAngleHi) * lLedRadius;
+      mLedCoordinates[lLedCount + 6] =  gCenterX + cos(lAngleLo) * lLedRadius;
+      mLedCoordinates[lLedCount + 7] =  gCenterY - sin(lAngleLo) * lLedRadius;
+      lLedRadius += lLedRadInc;
+      
+      lLedCount += 8;
+    );
+    i += 1;
+    lAngleLo  += lAngleInc;
+    lAngleMid += lAngleInc;
+    lAngleHi  += lAngleInc;
+  );
+);
 
 
 /**********************************************************
@@ -80,12 +135,64 @@ Updated slider value:
 // Round off in case user types in a decimal value
 mNumSpeakers   = floor(slider1+0.5);
 slider1 = mNumSpeakers;
+mAngularDistance = 360./(2.*mNumSpeakers);
 slider_automate(slider1);
 
 mSpeakerLayout = slider2;
 
 // Generate 16 x 4 decoding matrix
-generateDecodePantoMatrix(matrixDSP, mNumSpeakers, mSpeakerLayout);
+generateDecodePantoMatrix(mMatrixDSP, mNumSpeakers, mSpeakerLayout);
+
+// Calculate coordinates for level metering
+calculateLedCoordinates();
+
+
+
+/**********************************************************
+Graphics
+**********************************************************/
+@gfx 500 500
+gfx_setfont(1,"Verdana", 14);
+
+determineGeometry();
+gRadius -= 30;              // Reduce circle radius
+drawLEDBackgroundImage();
+
+mLedCount = 0;
+TEST_Gain = 0.;
+
+i=0;
+loop(mNumSpeakers,
+  
+  // Speaker numbers
+  gxColorSet(1.0, 0.35, 0.35, 0.35);
+  sprintf(mString, "%d", i+1); 
+  gfx_measurestr(mString,w,h);
+  gfx_x = gCenterX + (gRadius+18)*cos(mAngles[i]) - 0.5*w;
+  gfx_y = gCenterY - (gRadius+18)*sin(mAngles[i]) - 0.5*h;
+  gfx_drawstr(mString);
+  
+  
+  mLedGain = 0.5*kDecibelsPerLed;
+  j = 0;
+  loop(kNumLeds,
+    setLedColour(TEST_Gain, j);
+    gfx_triangle(
+      mLedCoordinates[mLedCount],
+      mLedCoordinates[mLedCount + 1],
+      mLedCoordinates[mLedCount + 2],
+      mLedCoordinates[mLedCount + 3],
+      mLedCoordinates[mLedCount + 4],
+      mLedCoordinates[mLedCount + 5],
+      mLedCoordinates[mLedCount + 6],
+      mLedCoordinates[mLedCount + 7]
+    );
+    mLedCount += 8;
+    j += 1;
+    TEST_Gain -= 0.2;
+  );
+  i += 1;
+);
 
 
 /**********************************************************
@@ -106,26 +213,26 @@ yIn = spl2;
 
 // Matrix multiplication with input signal, 2D so z can be ignored.
 
-spl0  = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2];
-spl1  = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6];
+spl0  = wIn * mMatrixDSP[0]  + xIn * mMatrixDSP[1]  + yIn * mMatrixDSP[2];
+spl1  = wIn * mMatrixDSP[4]  + xIn * mMatrixDSP[5]  + yIn * mMatrixDSP[6];
       
-spl2  = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10];
-spl3  = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14];
+spl2  = wIn * mMatrixDSP[8]  + xIn * mMatrixDSP[9]  + yIn * mMatrixDSP[10];
+spl3  = wIn * mMatrixDSP[12] + xIn * mMatrixDSP[13] + yIn * mMatrixDSP[14];
       
-spl4  = wIn * matrixDSP[16] + xIn * matrixDSP[17] + yIn * matrixDSP[18];
-spl5  = wIn * matrixDSP[20] + xIn * matrixDSP[21] + yIn * matrixDSP[22];
+spl4  = wIn * mMatrixDSP[16] + xIn * mMatrixDSP[17] + yIn * mMatrixDSP[18];
+spl5  = wIn * mMatrixDSP[20] + xIn * mMatrixDSP[21] + yIn * mMatrixDSP[22];
       
-spl6  = wIn * matrixDSP[24] + xIn * matrixDSP[25] + yIn * matrixDSP[26];
-spl7  = wIn * matrixDSP[28] + xIn * matrixDSP[29] + yIn * matrixDSP[30];
+spl6  = wIn * mMatrixDSP[24] + xIn * mMatrixDSP[25] + yIn * mMatrixDSP[26];
+spl7  = wIn * mMatrixDSP[28] + xIn * mMatrixDSP[29] + yIn * mMatrixDSP[30];
 
-spl8  = wIn * matrixDSP[32] + xIn * matrixDSP[33] + yIn * matrixDSP[34];
-spl9  = wIn * matrixDSP[36] + xIn * matrixDSP[37] + yIn * matrixDSP[38];
+spl8  = wIn * mMatrixDSP[32] + xIn * mMatrixDSP[33] + yIn * mMatrixDSP[34];
+spl9  = wIn * mMatrixDSP[36] + xIn * mMatrixDSP[37] + yIn * mMatrixDSP[38];
 
-spl10 = wIn * matrixDSP[40] + xIn * matrixDSP[41] + yIn * matrixDSP[42];
-spl11 = wIn * matrixDSP[44] + xIn * matrixDSP[45] + yIn * matrixDSP[46];
+spl10 = wIn * mMatrixDSP[40] + xIn * mMatrixDSP[41] + yIn * mMatrixDSP[42];
+spl11 = wIn * mMatrixDSP[44] + xIn * mMatrixDSP[45] + yIn * mMatrixDSP[46];
 
-spl12 = wIn * matrixDSP[48] + xIn * matrixDSP[49] + yIn * matrixDSP[50];
-spl13 = wIn * matrixDSP[52] + xIn * matrixDSP[53] + yIn * matrixDSP[54];
+spl12 = wIn * mMatrixDSP[48] + xIn * mMatrixDSP[49] + yIn * mMatrixDSP[50];
+spl13 = wIn * mMatrixDSP[52] + xIn * mMatrixDSP[53] + yIn * mMatrixDSP[54];
 
-spl14 = wIn * matrixDSP[56] + xIn * matrixDSP[57] + yIn * matrixDSP[58];
-spl15 = wIn * matrixDSP[60] + xIn * matrixDSP[61] + yIn * matrixDSP[62];
+spl14 = wIn * mMatrixDSP[56] + xIn * mMatrixDSP[57] + yIn * mMatrixDSP[58];
+spl15 = wIn * mMatrixDSP[60] + xIn * mMatrixDSP[61] + yIn * mMatrixDSP[62];
