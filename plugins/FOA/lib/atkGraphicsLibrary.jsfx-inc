@@ -90,7 +90,6 @@ function hls_value(aN1, aN2, aHue)
 );
 
 
-
 /********************************************************************
 Graphics: Set color based on hsl values
 ********************************************************************/
@@ -247,6 +246,16 @@ function determineGeometry()
 
 
 /********************************************************************
+Graphics: Returns 1 if geometry has changed, else 0
+********************************************************************/
+function geometryHasChanged(aPrewWidth, aPrevHeight)
+(
+  // Return result
+  (aPrewWidth != gfx_w || aPrevHeight != gfx_h);
+);
+
+
+/********************************************************************
 Graphics: Draw line segment
 ********************************************************************/
 function drawLineSegment(aPosition1x, aPosition1y, aPosition2x, aPosition2y, anAntiAliasing)
@@ -287,10 +296,14 @@ function drawBackgroundImage() local(i, lDeltaX, lDeltaY)
 
 
 /********************************************************************
-Graphics: Draw background image based on ICST ambimonitor
+Graphics: Draw background image for LED peak meter
 ********************************************************************/
 function drawLEDBackgroundImage() local(i, lDeltaX, lDeltaY)
 (
+  // Manually clear framebuffer
+  gxColorSet(1.0, 0., 0., 0.);
+  gfx_rect(0,0,gfx_w,gfx_h);
+  
   // Draw background circle
   gxColorSet(1.0, 0.18, 0.18, 0.18);
   gfx_circle(gCenterX, gCenterY, gRadius, 1, 1);
@@ -303,28 +316,59 @@ function drawLEDBackgroundImage() local(i, lDeltaX, lDeltaY)
   gxColorSet(1.0, 0.35, 0.35, 0.35);
   gfx_circle(gCenterX, gCenterY, 0.15*gRadius, 0, 1);
   gfx_circle(gCenterX, gCenterY, 1.0*gRadius, 0, 1);
-  
-  /*
-  gxColorSet(1.0, 0.35, 0.35, 0.35);
-  
-  // Draw circles
-  i = 1;
-  loop(10,
-    gfx_circle(gCenterX, gCenterY, 0.1*i*gRadius, 0, 1);
-    i += 1;
-  );
-  
-  // Draw lines for every 30 degrees
-  i = 0;
-  loop(6,
-    lDeltaX = gRadius * cos($pi*i/6);
-    lDeltaY = gRadius * sin($pi*i/6);
-    drawLineSegment(gCenterX - lDeltaX, gCenterY - lDeltaY, gCenterX + lDeltaX, gCenterY + lDeltaY, 1);
-    i += 1;
-  );
-  */
 );
 
+
+/********************************************************************
+Graphics: Draw peak meter LEDs for one speaker
+********************************************************************/
+function drawSpkrLEDs(aGain, aSpkr, lLedCoordinates) local(lLedCount, i)
+(
+  i = 0;
+  lLedCount = 8*kNumLeds*aSpkr;
+  loop(kNumLeds,
+    setLedColour(aGain, i);
+    gfx_triangle(
+      lLedCoordinates[lLedCount],
+      lLedCoordinates[lLedCount + 1],
+      lLedCoordinates[lLedCount + 2],
+      lLedCoordinates[lLedCount + 3],
+      lLedCoordinates[lLedCount + 4],
+      lLedCoordinates[lLedCount + 5],
+      lLedCoordinates[lLedCount + 6],
+      lLedCoordinates[lLedCount + 7]
+    );
+    lLedCount += 8;
+    i += 1;
+  );
+);
+
+
+/********************************************************************
+Graphics: Set font used to display speaker position
+********************************************************************/
+function setSpeakerPositionFont()
+(
+  gfx_setfont(1,"Verdana", 13);
+);
+
+
+/********************************************************************
+Graphics: Draw speaker position in peak level meters
+********************************************************************/
+function drawSpeakerPositiion(aX, aY, aStr) local(lW, lH)
+(
+  gxColorSet(1.0, 0.18, 0.18, 0.18);
+  gfx_circle(aX, aY, 14, 1, 1);
+  gxColorSet(1.0, 0.35, 0.35, 0.35);
+  gfx_circle(aX, aY, 14, 0, 1);
+  
+  gxColorSet(1.0, 0.7, 0.7, 0.7);
+  gfx_measurestr(aStr, lW, lH);
+  gfx_x = aX - 0.5*lW;
+  gfx_y = aY - 0.5*lH;
+  gfx_drawstr(aStr);
+);
 
 
 /********************************************************************

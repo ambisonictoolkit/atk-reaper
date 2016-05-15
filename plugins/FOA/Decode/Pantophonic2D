@@ -76,6 +76,10 @@ mMatrixDSP       = 1000;     // 16x4 matrix as 1D array
 mAngles          = 2000;     // Azimuth angles for GUI display
 mLedCoordinates  = 3000;     // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
 
+// Prevent auto clear of each frame (since we only draw when the frame changes)
+gfx_clear=-1;
+
+
 function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lAngleInc, lLedRadius, lLedRadInc, lLedCount)
 (
   i = 0;
@@ -127,6 +131,13 @@ function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lA
 );
 
 
+function sliderHasChanged()
+(
+  // Return result
+  (slider1 != mPrevSlider1 || slider2 != mPrevSlider2);
+);
+
+
 /**********************************************************
 Updated slider value:
 **********************************************************/
@@ -152,45 +163,34 @@ calculateLedCoordinates();
 Graphics
 **********************************************************/
 @gfx 500 500
-gfx_setfont(1,"Verdana", 14);
 
 determineGeometry();
 gRadius -= 30;              // Reduce circle radius
-drawLEDBackgroundImage();
 
-mLedCount = 0;
-TEST_Gain = 0.;
+// Only refresh background when needed
+(geometryHasChanged(mPrevWidth, mPrevHeight) || sliderHasChanged()) ? (
+  drawLEDBackgroundImage();
+  setSpeakerPositionFont();
+  calculateLedCoordinates();
+  i=0;
+  loop(mNumSpeakers,
+    sprintf(spkStr, "%d", i+1);
+    drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[i]), gCenterY - (gRadius+20)*sin(mAngles[i]), spkStr);
+    i += 1;
+  );
+  mPrevWidth   = gfx_w;
+  mPrevHeight  = gfx_h;
+  mPrevSlider1 = slider1;
+  mPrevSlider2 = slider2;
+);
 
+TEST_Gain = 0.5*kDecibelsPerLed;
+
+// Draw LEDs for all speakers
 i=0;
 loop(mNumSpeakers,
-  
-  // Speaker numbers
-  gxColorSet(1.0, 0.35, 0.35, 0.35);
-  sprintf(mString, "%d", i+1); 
-  gfx_measurestr(mString,w,h);
-  gfx_x = gCenterX + (gRadius+18)*cos(mAngles[i]) - 0.5*w;
-  gfx_y = gCenterY - (gRadius+18)*sin(mAngles[i]) - 0.5*h;
-  gfx_drawstr(mString);
-  
-  
-  mLedGain = 0.5*kDecibelsPerLed;
-  j = 0;
-  loop(kNumLeds,
-    setLedColour(TEST_Gain, j);
-    gfx_triangle(
-      mLedCoordinates[mLedCount],
-      mLedCoordinates[mLedCount + 1],
-      mLedCoordinates[mLedCount + 2],
-      mLedCoordinates[mLedCount + 3],
-      mLedCoordinates[mLedCount + 4],
-      mLedCoordinates[mLedCount + 5],
-      mLedCoordinates[mLedCount + 6],
-      mLedCoordinates[mLedCount + 7]
-    );
-    mLedCount += 8;
-    j += 1;
-    TEST_Gain -= 0.2;
-  );
+  drawSpkrLEDs(TEST_Gain, i, mLedCoordinates);
+  TEST_Gain -= kDecibelsPerLed;
   i += 1;
 );
 
