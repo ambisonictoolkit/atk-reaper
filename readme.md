@@ -135,6 +135,9 @@ Version 1.0.0.b7
 * Refactoring (these changes should not affect the behaviour of plugins):
     * The repository has been moved to [Github](https://github.com/ambisonictoolkit/atk-reaper). If you experience problems with the installers in this version, [please let us know](https://github.com/ambisonictoolkit/atk-reaper/issues).
     * Removed redundant arguments from `drawBackgroundImage()` function - #16.
+* New features:
+    * The 5_0_ decoder now has a GUI for level metering and display of speaker positions
+    * The Pantohponic 2D decoder now has a GUI for level metering and display of speaker positions
 
 Version 1.0.b6
 
