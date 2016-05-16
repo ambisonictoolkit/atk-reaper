@@ -214,7 +214,7 @@ mPeakScalar = pow( 0.5, 1.0/(mPeakScalar * srate));
 /**********************************************************
 Graphics
 **********************************************************/
-@gfx 350 350
+@gfx 500 500
 
 determineGeometry();
 gRadius -= 30;              // Reduce circle radius
