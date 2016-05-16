@@ -34,7 +34,7 @@ file, encouraging DRY (don't repeat yourself)
 @init
 
 // Constants used by peak meters in decoders
-kNumLeds        = 13;
+kNumLeds        = 19;
 kDecibelsPerLed = 3;
 
 
@@ -177,14 +177,24 @@ function setInactiveColour()
   gxColorSet(1., 0.376471, 0.384314, 0.4);
 );
 
+function setArticColour()
+(
+  gxColorSet(1., 0., 0.3, 0.6);
+);
+
+function setFrostyColour()
+(
+  gxColorSet(1., 0., 0.4, 0.3);
+);
+
 function setColdColour()
 (
-  gxColorSet(1., 0., 0.6, 0.003922);
+  gxColorSet(1., 0., 0.6, 0.);
 );
 
 function setTepidColour()
 (
-  gxColorSet(1., 0.6, 0.733333, 0.003922);
+  gxColorSet(1., 0.6, 0.733333, 0.);
 );
 
 function setWarmColour()
@@ -194,7 +204,7 @@ function setWarmColour()
 
 function setHotColour()
 (
-  gxColorSet(1., 1., 0.6, 0.003922);
+  gxColorSet(1., 1., 0.6, 0.);
 );
 
 function setOverloadColour()
@@ -222,7 +232,15 @@ function setLedColour(aGain, aCount) local(lRefColour)
           (lRefColour > (-9*kDecibelsPerLed)) ? (
             setTepidColour();
           ) : (
-            setColdColour();
+            (lRefColour > (-12*kDecibelsPerLed)) ? (
+              setColdColour();
+            ) : (
+              (lRefColour > (-15*kDecibelsPerLed)) ? (
+                setFrostyColour();
+              ) : (
+                setArticColour();
+              );
+            );
           );
         );
       );
