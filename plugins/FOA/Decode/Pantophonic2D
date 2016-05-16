@@ -193,8 +193,9 @@ mSpeakerLayout = slider2;
 // Generate 16 x 4 decoding matrix
 generateDecodePantoMatrix(mMatrixDSP, mNumSpeakers, mSpeakerLayout);
 
-// Calculate coordinates for level metering
-calculateLedCoordinates();
+// Clear peak buffers
+memset(mPeaks, 0., mNumSpeakers);
+memset(mDisplayPeaks, 0., mNumSpeakers);
 
 (slider3 == 0) ? (mPeakScalar = 0.02) :
 (slider3 == 1) ? (mPeakScalar = 0.03) :
