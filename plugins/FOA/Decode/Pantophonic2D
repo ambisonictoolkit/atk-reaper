@@ -21,6 +21,17 @@ and GNU General Public License along with this program.  If not, see
 <http://www.gnu.org/licenses/>.
 
 
+
+Additional Credits:
+
+The idea for the GUI is based on the HOA Library hoa.2D.meter~object:
+https://github.com/CICM/HoaLibrary-Max
+
+Peak level metering is based on code by Phil Burke:
+http://musicdsp.org/showArchiveComment.php?ArchiveID=19
+
+
+
 ---------------------------------------------------------------------
   Class: quad
   A quadrophonic decoder
@@ -28,16 +39,6 @@ and GNU General Public License along with this program.  If not, see
   Pantophonic (2D) regular polygon decoder.
   
 ---------------------------------------------------------------------
-*/
-
-
-/* Credits:
-
-The idea for the GUI is based on the HOA Library hoa.2D.meter~object:
-https://github.com/CICM/HoaLibrary-Max
-
-Peak level metering is based on code by Phil Burke:
-http://musicdsp.org/showArchiveComment.php?ArchiveID=19
 */
 
 
@@ -81,8 +82,6 @@ Initialisation
 **********************************************************/
 @init
 
-// Refresh rate in sec
-kRefreshRate = 0.05;
 
 kMaxNumSpeakers = 16;
 // kDecibelsPerLed = 3;
@@ -109,11 +108,10 @@ memCount += kMaxNumSpeakers;
 memset(mPeaks,0,kMaxNumSpeakers);
 memset(mDisplayPeaks,0,kMaxNumSpeakers);
 
-// Prevent auto clear of each frame (since we only draw when the frame changes)
-gfx_clear=-1;
-
-// gfx updates
-mRefreshSampCount;
+// Graphics
+gfx_clear=-1;           // Prevent auto clear of each frame
+kRefreshRate = 0.05;    // Refresh rate in sec
+mRefreshSampCount = 0;
 mDoRefresh = 1;
 
 
