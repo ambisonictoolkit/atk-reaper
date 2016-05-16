@@ -78,27 +78,21 @@ kMaxNumSpeakers = 5;
 
 // Memory allocations
 memCount   = 1024;
-TEST_COUNT_0 = memCount;
 
 matrixDSP = memCount;   //  for 8x4 matrix as 1D array
 memCount  += 32;
-TEST_COUNT_1 = memCount;
 
 mAngles = memCount;
 memCount += kMaxNumSpeakers;
-TEST_COUNT_2 = memCount;
 
 mLedCoordinates = memCount;
 memCount += 2*4*kNumLeds*kMaxNumSpeakers; // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
-TEST_COUNT_3 = memCount;
  
 mPeaks = memCount;
 memCount += kMaxNumSpeakers+1; // Also reserving slot for unused LFE
-TEST_COUNT_4 = memCount;
 
 mDisplayPeaks = memCount;
 memCount += kMaxNumSpeakers+1; // Also reserving slot for unused LFE
-TEST_COUNT_5 = memCount;
 
 // Zero max peak values at start
 memset(mPeaks,0,kMaxNumSpeakers+1);
@@ -314,17 +308,3 @@ loop(6,
   
   ispl += 1;
 );
-
-TEST_PEAK_0 = mPeaks[0];
-TEST_PEAK_1 = mPeaks[1];
-TEST_PEAK_2 = mPeaks[2];
-TEST_PEAK_3 = mPeaks[3];
-TEST_PEAK_4 = mPeaks[4];
-TEST_PEAK_5 = mPeaks[5];
-
-TEST_DISP_PEAK_0 = mDisplayPeaks[0];
-TEST_DISP_PEAK_1 = mDisplayPeaks[1];
-TEST_DISP_PEAK_2 = mDisplayPeaks[2];
-TEST_DISP_PEAK_3 = mDisplayPeaks[3];
-TEST_DISP_PEAK_4 = mDisplayPeaks[4];
-TEST_DISP_PEAK_5 = mDisplayPeaks[5];
