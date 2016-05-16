@@ -30,6 +30,17 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
+
+/* Credits:
+
+The idea for the GUI is based on the HOA Library hoa.2D.meter~object:
+https://github.com/CICM/HoaLibrary-Max
+
+Peak level metering is based on code by Phil Burke:
+http://musicdsp.org/showArchiveComment.php?ArchiveID=19
+*/
+
+
 desc: ATK FOA Decode Pantophonic 2D
 // Pantophonic (2D) regular polygon decoder
 
@@ -62,22 +73,48 @@ out_pin:16
 
 slider1:4<3,16,1>Number of speakers
 slider2:0<0,1,1{Flat, Point}>Speaker orientation
+slider3:5<0,10,1{20 ms, 30 ms, 50 ms, 100 ms, 200 ms, 300 ms, 500 ms, 1 sec, 3 sec, 6 secs}>Peak level decay half time
+
 
 /**********************************************************
 Initialisation
 **********************************************************/
 @init
 
+// Refresh rate in sec
+kRefreshRate = 0.05;
+
 kMaxNumSpeakers = 16;
 // kDecibelsPerLed = 3;
 
 // Memory allocations 
-mMatrixDSP       = 1000;     // 16x4 matrix as 1D array
-mAngles          = 2000;     // Azimuth angles for GUI display
-mLedCoordinates  = 3000;     // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
+memCount   = 1024;
+
+mMatrixDSP = memCount; // kMaxNumSpeakers x 4 matrix as 1D array
+memCount   += kMaxNumSpeakers*4;
+
+mAngles  = memCount; // Azimuth angles for GUI display
+memCount += kMaxNumSpeakers;
+
+mLedCoordinates = memCount;
+memCount += 2*4*kNumLeds*kMaxNumSpeakers; // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
+ 
+mPeaks = memCount;
+memCount += kMaxNumSpeakers;
+
+mDisplayPeaks = memCount;
+memCount += kMaxNumSpeakers;
+
+// Zero max peak values at start
+memset(mPeaks,0,kMaxNumSpeakers);
+memset(mDisplayPeaks,0,kMaxNumSpeakers);
 
 // Prevent auto clear of each frame (since we only draw when the frame changes)
 gfx_clear=-1;
+
+// gfx updates
+mRefreshSampCount;
+mDoRefresh = 1;
 
 
 function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lAngleInc, lLedRadius, lLedRadInc, lLedCount)
@@ -102,6 +139,7 @@ function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lA
   loop(mNumSpeakers,
     mAngles[i] = lAngleMid;
     lLedRadius = gRadius * 0.2;
+  // Return result
     loop(kNumLeds,
       
       // LED coordinates as convex poygon
@@ -131,9 +169,9 @@ function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lA
 );
 
 
+// Full redraw required if sliders 1 or 2 change
 function sliderHasChanged()
 (
-  // Return result
   (slider1 != mPrevSlider1 || slider2 != mPrevSlider2);
 );
 
@@ -145,7 +183,10 @@ Updated slider value:
 
 // Round off in case user types in a decimal value
 mNumSpeakers   = floor(slider1+0.5);
+// Make sure we can't have more channels than the track has, but num_ch ALWAYS inits to zero....how annoying.
+(num_ch>0) ? (mNumSpeakers = max(2,min(num_ch, mNumSpeakers));) :
 slider1 = mNumSpeakers;
+
 mAngularDistance = 360./(2.*mNumSpeakers);
 slider_automate(slider1);
 
@@ -157,12 +198,24 @@ generateDecodePantoMatrix(mMatrixDSP, mNumSpeakers, mSpeakerLayout);
 // Calculate coordinates for level metering
 calculateLedCoordinates();
 
+(slider3 == 0) ? (mPeakScalar = 0.02) :
+(slider3 == 1) ? (mPeakScalar = 0.03) :
+(slider3 == 2) ? (mPeakScalar = 0.05) :
+(slider3 == 3) ? (mPeakScalar = 0.10) :
+(slider3 == 4) ? (mPeakScalar = 0.20) :
+(slider3 == 5) ? (mPeakScalar = 0.30) :
+(slider3 == 6) ? (mPeakScalar = 0.50) :
+(slider3 == 7) ? (mPeakScalar = 1.00) :
+(slider3 == 8) ? (mPeakScalar = 3.00) :
+(slider3 == 9) ? (mPeakScalar = 6.00);
+
+mPeakScalar = pow( 0.5, 1.0/(mPeakScalar * srate));
 
 
 /**********************************************************
 Graphics
 **********************************************************/
-@gfx 500 500
+@gfx 350 350
 
 determineGeometry();
 gRadius -= 30;              // Reduce circle radius
@@ -172,11 +225,11 @@ gRadius -= 30;              // Reduce circle radius
   drawLEDBackgroundImage();
   setSpeakerPositionFont();
   calculateLedCoordinates();
-  i=0;
+  igfx=0;
   loop(mNumSpeakers,
-    sprintf(spkStr, "%d", i+1);
-    drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[i]), gCenterY - (gRadius+20)*sin(mAngles[i]), spkStr);
-    i += 1;
+    sprintf(spkStr, "%d", igfx+1);
+    drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[igfx]), gCenterY - (gRadius+20)*sin(mAngles[igfx]), spkStr);
+    igfx += 1;
   );
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;
@@ -184,16 +237,29 @@ gRadius -= 30;              // Reduce circle radius
   mPrevSlider2 = slider2;
 );
 
-TEST_Gain = 0.5*kDecibelsPerLed;
-
 // Draw LEDs for all speakers
-i=0;
-loop(mNumSpeakers,
-  drawSpkrLEDs(TEST_Gain, i, mLedCoordinates);
-  TEST_Gain -= kDecibelsPerLed;
-  i += 1;
+(mDoRefresh) ? (
+  igfx=0;
+  loop(mNumSpeakers,
+    drawSpkrLEDs(amp2db(mDisplayPeaks[igfx]), igfx, mLedCoordinates);
+    mDisplayPeaks[igfx] = 0.;
+    igfx += 1;
+  );
+  mRefreshSampCount = 0;
+  mDoRefresh = 0;
 );
 
+
+/**********************************************************
+Audio block pre-processing
+**********************************************************/
+@block
+
+(mRefreshSampCount > kRefreshRate*srate) ? (
+  mDoRefresh = 1;
+) : (
+  mRefreshSampCount += samplesblock;
+);
 
 /**********************************************************
 Calculate audio sample
@@ -236,3 +302,22 @@ spl13 = wIn * mMatrixDSP[52] + xIn * mMatrixDSP[53] + yIn * mMatrixDSP[54];
 
 spl14 = wIn * mMatrixDSP[56] + xIn * mMatrixDSP[57] + yIn * mMatrixDSP[58];
 spl15 = wIn * mMatrixDSP[60] + xIn * mMatrixDSP[61] + yIn * mMatrixDSP[62];
+
+// Peak monitoring
+ispl = 0;
+loop(mNumSpeakers,
+  input = spl(ispl);
+  output = mPeaks[ispl];
+  input = abs(input);
+
+  // When we hit a peak, ride the peak to the top, else exponential decay
+  ( input >= output ) ? (output = input) : (output = output * mPeakScalar);
+  mPeaks[ispl] = output;
+  mDisplayPeaks[ispl] = max(mDisplayPeaks[ispl], output);
+  
+  /* ext_nodenorm is not set in init. Hence we have denorm added to the input signal, 
+     and do not have to bother about denorm issues here.
+  */
+  
+  ispl += 1;
+);
