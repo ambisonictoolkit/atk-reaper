@@ -227,6 +227,8 @@ geometryHasChanged(mPrevWidth, mPrevHeight) ? (
 
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;
+  
+  mDoRefresh = 1;
 );
 
 // Draw LEDs for all speakers

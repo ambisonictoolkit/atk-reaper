@@ -181,12 +181,8 @@ Updated slider value:
 
 // Round off in case user types in a decimal value
 mNumSpeakers   = floor(slider1+0.5);
-// Make sure we can't have more channels than the track has, but num_ch ALWAYS inits to zero....how annoying.
-(num_ch>0) ? (mNumSpeakers = max(2,min(num_ch, mNumSpeakers));) :
-slider1 = mNumSpeakers;
 
 mAngularDistance = 360./(2.*mNumSpeakers);
-slider_automate(slider1);
 
 mSpeakerLayout = slider2;
 
@@ -216,6 +212,14 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
+// Make sure we can't have more channels than the track has
+// (Code resides here rather than in slider section in order to take action as soon as we know num_ch)
+(num_ch>0) ? (
+  mNumSpeakers = max(2, min(num_ch, mNumSpeakers));
+  slider1 = mNumSpeakers;
+  slider_automate(slider1);
+);
+
 determineGeometry();
 gRadius -= 30;              // Reduce circle radius
 
@@ -234,6 +238,8 @@ gRadius -= 30;              // Reduce circle radius
   mPrevHeight  = gfx_h;
   mPrevSlider1 = slider1;
   mPrevSlider2 = slider2;
+  
+  mDoRefresh = 1;
 );
 
 // Draw LEDs for all speakers

@@ -231,6 +231,8 @@ gRadius -= 30;              // Reduce circle radius
   mPrevWidth    = gfx_w;
   mPrevHeight   = gfx_h;
   mPrevDegAngle = mDegAngle;
+  
+  mDoRefresh = 1;
 );
 
 // Draw LEDs for all speakers
