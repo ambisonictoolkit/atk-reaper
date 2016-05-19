@@ -137,6 +137,7 @@ Version 1.0.0.b7
     * Removed redundant arguments from `drawBackgroundImage()` function - #16.
 * New features:
     * Stereo, Quadrophonic, 5_0 and Pantohponic 2D decoders: Added GUI for level metering and display of speaker positions/channel numbering
+    * New decoder: Periphonic 3D - 3D dual ring, regular cylindrical decoder, with GUI for level metering and display of speaker positions/channel numbering
 
 Version 1.0.b6
 

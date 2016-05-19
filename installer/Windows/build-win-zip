@@ -38,6 +38,7 @@ cp "../../plugins/FOA/Decode/Binaural" "ATK for Reaper/Copy content to Effects/A
 cp "../../plugins/FOA/Decode/BtoA" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/BtoA"
 cp "../../plugins/FOA/Decode/Mono" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Mono"
 cp "../../plugins/FOA/Decode/Pantophonic2D" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Pantophonic2D"
+cp "../../plugins/FOA/Decode/Periphonic3D" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Periphonic3D"
 cp "../../plugins/FOA/Decode/PsychoShelf" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/PsychoShelf"
 cp "../../plugins/FOA/Decode/Quad" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Quad"
 cp "../../plugins/FOA/Decode/Stereo" "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Stereo"
