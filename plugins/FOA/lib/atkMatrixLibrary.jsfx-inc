@@ -389,39 +389,32 @@ function generateDecodePeriphonicMatrix(aMatrix, aNumChannelPairs, anElevation, 
   lDeltaAngle = 2.0 * $pi / aNumChannelPairs;
   
   (aSpeakerLayout == 0) ? (
-    lAngle = $pi / aNumChannelPairs;
+    //lAngle = $pi / aNumChannelPairs;
+    lAngle = lDeltaAngle*0.5;
   ) :
   (
     lAngle = 0.;
-  );
-  
-  // Clear the whole matrix:
-  N = 2*4*aNumChannelPairs;
-  i = 0;
-  loop(N,
-    aMatrix[i] = 0.0;
-    i += 1;
   );
   
   // Set the appropriate number of channels:
   i = 0;
   // Upper ring
   loop(aNumChannelPairs,
-    aMatrix[4*i    ]  =  lG0;
-    aMatrix[4*i + 1]  =  cos(lAngle)*cos(anElevation);
-    aMatrix[4*i + 2]  =  sin(lAngle)*cos(anElevation);
-    aMatrix[4*i + 3]  =  sin(anElevation);
+    aMatrix[i    ]  =  lG0;
+    aMatrix[i + 1]  =  cos(lAngle)*cos(anElevation);
+    aMatrix[i + 2]  =  sin(lAngle)*cos(anElevation);
+    aMatrix[i + 3]  =  sin(anElevation);
     lAngle += lDeltaAngle;
-    i += 1;
+    i += 4;
   );
   // Lower ring
   loop(aNumChannelPairs,
-    aMatrix[4*i    ]  =  lG0;
-    aMatrix[4*i + 1]  =  cos(lAngle)*cos(-anElevation);
-    aMatrix[4*i + 2]  =  sin(lAngle)*cos(-anElevation);
-    aMatrix[4*i + 3]  =  sin(-anElevation);
+    aMatrix[i    ]  =  lG0;
+    aMatrix[i + 1]  =  cos(lAngle)*cos(-anElevation);
+    aMatrix[i + 2]  =  sin(lAngle)*cos(-anElevation);
+    aMatrix[i + 3]  =  sin(-anElevation);
     lAngle += lDeltaAngle;
-    i += 1;
+    i += 4;
   );
 );
 

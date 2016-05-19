@@ -217,7 +217,7 @@ mNumSpeakers     = 2*mNumSpeakerPairs;
 
 mAngularDistance = 360./(2.*mNumSpeakerPairs);
 
-mElevation = slider2;
+mElevation = slider2 * kDeg2Rad;
 
 mSpeakerLayout = slider3;
 
@@ -264,7 +264,7 @@ gRadius -= 30;              // Reduce circle radius
   drawPeriphonicLEDBackgroundImage();
   setSpeakerPositionFont();
   calculateLedCoordinates();
-  igfx=0;
+  igfx=mNumSpeakerPairs-1;
   loop(mNumSpeakerPairs,
     // Upper speakers
     sprintf(spkStr, "%d", igfx+1);
@@ -274,8 +274,23 @@ gRadius -= 30;              // Reduce circle radius
     sprintf(spkStr, "%d", igfx+1+mNumSpeakerPairs);
     drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[igfx]), gCenterYLower - (gRadius+20)*sin(mAngles[igfx]), spkStr);
     
-    igfx += 1;
+    igfx -= 1;
   );
+  
+  gfx_x = gCenterX -      (gRadius+26);
+  gfx_y = gCenterYUpper - (gRadius+26);
+  gfx_drawstr("Upper");
+  gfx_x = gCenterX -      (gRadius+26);
+  gfx_y = gCenterYUpper - (gRadius+10);
+  gfx_drawstr("ring");
+  
+  gfx_x = gCenterX -      (gRadius+26);
+  gfx_y = gCenterYLower - (gRadius+26);
+  gfx_drawstr("Lower");
+  gfx_x = gCenterX -      (gRadius+26);
+  gfx_y = gCenterYLower - (gRadius+10);
+  gfx_drawstr("ring");
+  
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;
   mPrevSlider1 = slider1;
