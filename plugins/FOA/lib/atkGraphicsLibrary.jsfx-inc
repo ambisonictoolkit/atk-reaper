@@ -264,6 +264,20 @@ function determineGeometry()
 
 
 /********************************************************************
+Graphics: Determine geometry for periphonic 3D DISPLAY
+********************************************************************/
+function determinePeriphonicGeometry()
+(
+  gCenterX   = gfx_w * 0.5;
+  gCenterYUpper = gfx_h * 0.25;
+  gCenterYLower = gfx_h * 0.75;
+
+  gCenterX < gCenterYUpper ? gRadius = gCenterX : gRadius = gCenterYUpper;
+  gRadius = gRadius - 10;
+  gInverseRadius = 1. / gRadius;
+);
+
+/********************************************************************
 Graphics: Returns 1 if geometry has changed, else 0
 ********************************************************************/
 function geometryHasChanged(aPrewWidth, aPrevHeight)
@@ -334,6 +348,33 @@ function drawLEDBackgroundImage() local(i, lDeltaX, lDeltaY)
   gxColorSet(1.0, 0.35, 0.35, 0.35);
   gfx_circle(gCenterX, gCenterY, 0.15*gRadius, 0, 1);
   gfx_circle(gCenterX, gCenterY, 1.0*gRadius, 0, 1);
+);
+
+
+/********************************************************************
+Graphics: Draw background image for LED peak meter
+********************************************************************/
+function drawPeriphonicLEDBackgroundImage() local(i, lDeltaX, lDeltaY)
+(
+  // Manually clear framebuffer
+  gxColorSet(1.0, 0., 0., 0.);
+  gfx_rect(0,0,gfx_w,gfx_h);
+  
+  // Draw background circles
+  gxColorSet(1.0, 0.18, 0.18, 0.18);
+  gfx_circle(gCenterX, gCenterYUpper, gRadius, 1, 1); // Upper
+  gfx_circle(gCenterX, gCenterYLower, gRadius, 1, 1); // Lower
+  
+  // Black hole in midle
+  gxColorSet(1.0, 0.1, 0.1, 0.1);
+  //gfx_circle(gCenterX, gCenterY, gRadius*0.15, 1, 1);
+  
+  // Circle outlines
+  gxColorSet(1.0, 0.35, 0.35, 0.35);
+  gfx_circle(gCenterX, gCenterYUpper, 0.15*gRadius, 0, 1);
+  gfx_circle(gCenterX, gCenterYUpper, 1.0*gRadius, 0, 1);
+  gfx_circle(gCenterX, gCenterYLower, 0.15*gRadius, 0, 1);
+  gfx_circle(gCenterX, gCenterYLower, 1.0*gRadius, 0, 1);
 );
 
 

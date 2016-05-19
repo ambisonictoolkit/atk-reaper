@@ -343,10 +343,10 @@ function generateDecodeQuadMatrix(aMatrix, anAngle) local(lG0, lG1, lG2, lAngle)
 
 
 /********************************************************************
-Matrix: Generate 4 x 16 matrix for optimised quadrophonic decoding.
-  Channel configuration: L - R - C - LFE - Ls - Rs - LsB - RsB
+Matrix: Generate 4 x 16 matrix for pantophonic decoding.
+  Channel configuration: Counter-clockwise from front or front left
 ********************************************************************/
-function generateDecodePantoMatrix(aMatrix, aNumSpeakers, aSpeakerLayout) local(lG0, lAngle, lDeltaAngle)
+function generateDecodePantoMatrix(aMatrix, aNumSpeakers, aSpeakerLayout) local(lG0, lAngle, lDeltaAngle, i)
 (
 	lG0 = kInvSqrt2;
   lDeltaAngle = 2.0 * $pi / aNumSpeakers;
@@ -372,6 +372,54 @@ function generateDecodePantoMatrix(aMatrix, aNumSpeakers, aSpeakerLayout) local(
     aMatrix[4*i + 1]  =  cos(lAngle);
     aMatrix[4*i + 2]  =  sin(lAngle);
     // aMatrix[4*i + 3]  =  0.0; // This is already cleared
+    lAngle += lDeltaAngle;
+    i += 1;
+  );
+);
+
+
+/********************************************************************
+Matrix: Generate 4 x 32 matrix for dual ring, regular cylindrical decoding.
+  Speakers are in anti-clockwise order, beginning with the top ring.
+  The position of the first speaker is either centre or left of centre.
+********************************************************************/
+function generateDecodePeriphonicMatrix(aMatrix, aNumChannelPairs, anElevation, aSpeakerLayout) local(lG0, lAngle, lDeltaAngle, i, N)
+(  
+  lG0 = kInvSqrt2;
+  lDeltaAngle = 2.0 * $pi / aNumChannelPairs;
+  
+  (aSpeakerLayout == 0) ? (
+    lAngle = $pi / aNumChannelPairs;
+  ) :
+  (
+    lAngle = 0.;
+  );
+  
+  // Clear the whole matrix:
+  N = 2*4*aNumChannelPairs;
+  i = 0;
+  loop(N,
+    aMatrix[i] = 0.0;
+    i += 1;
+  );
+  
+  // Set the appropriate number of channels:
+  i = 0;
+  // Upper ring
+  loop(aNumChannelPairs,
+    aMatrix[4*i    ]  =  lG0;
+    aMatrix[4*i + 1]  =  cos(lAngle)*cos(anElevation);
+    aMatrix[4*i + 2]  =  sin(lAngle)*cos(anElevation);
+    aMatrix[4*i + 3]  =  sin(anElevation);
+    lAngle += lDeltaAngle;
+    i += 1;
+  );
+  // Lower ring
+  loop(aNumChannelPairs,
+    aMatrix[4*i    ]  =  lG0;
+    aMatrix[4*i + 1]  =  cos(lAngle)*cos(-anElevation);
+    aMatrix[4*i + 2]  =  sin(lAngle)*cos(-anElevation);
+    aMatrix[4*i + 3]  =  sin(-anElevation);
     lAngle += lDeltaAngle;
     i += 1;
   );

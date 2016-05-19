@@ -33,17 +33,17 @@ http://musicdsp.org/showArchiveComment.php?ArchiveID=19
 
 
 ---------------------------------------------------------------------
-  Class: panto
-  A pantophonic decoder
+  Class: periphonic
+  A periphonic 3D decoder
   
-  Pantophonic (2D) regular polygon decoder.
+  Periphonic (3D) dual ring, regular cylindrical decoder
   
 ---------------------------------------------------------------------
 */
 
 
-desc: ATK FOA Decode Pantophonic 2D
-// Pantophonic (2D) regular polygon decoder
+desc: ATK FOA Decode Periphonic 3D
+// Periphonic (3D) dual ring, regular cylindrical decoder
 
 // Import library with shared functions
 import atkConstantsAndMathsLibrary.jsfx-inc
@@ -71,10 +71,28 @@ out_pin:13
 out_pin:14
 out_pin:15
 out_pin:16
+out_pin:17
+out_pin:18
+out_pin:19
+out_pin:20
+out_pin:21
+out_pin:22
+out_pin:23
+out_pin:24
+out_pin:25
+out_pin:26
+out_pin:27
+out_pin:28
+out_pin:29
+out_pin:30
+out_pin:31
+out_pin:32
 
-slider1:4<3,16,1>Number of speakers
-slider2:0<0,1,1{Flat, Point}>Speaker orientation
-slider3:5<0,10,1{20 ms, 30 ms, 50 ms, 100 ms, 200 ms, 300 ms, 500 ms, 1 sec, 3 sec, 6 secs}>Peak level decay half time
+
+slider1:4<3,16,1>Number of speaker pairs
+slider2:35<0,90,0.1>Elevation
+slider3:0<0,1,1{Flat, Point}>Speaker orientation
+slider4:5<0,10,1{20 ms, 30 ms, 50 ms, 100 ms, 200 ms, 300 ms, 500 ms, 1 sec, 3 sec, 6 secs}>Peak level decay half time
 
 
 /**********************************************************
@@ -82,8 +100,8 @@ Initialisation
 **********************************************************/
 @init
 
-
-kMaxNumSpeakers = 16;
+kMaxNumSpeakerPairs = 16;
+kMaxNumSpeakers = 2*kMaxNumSpeakerPairs;
 // kDecibelsPerLed = 3;
 
 // Memory allocations 
@@ -93,7 +111,7 @@ mMatrixDSP = memCount; // kMaxNumSpeakers x 4 matrix as 1D array
 memCount   += kMaxNumSpeakers*4;
 
 mAngles  = memCount; // Azimuth angles for GUI display
-memCount += kMaxNumSpeakers;
+memCount += kMaxNumSpeakerPairs;
 
 mLedCoordinates = memCount;
 memCount += 2*4*kNumLeds*kMaxNumSpeakers; // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
@@ -115,12 +133,12 @@ mRefreshSampCount = 0;
 mDoRefresh = 1;
 
 
-function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lAngleInc, lLedRadius, lLedRadInc, lLedCount)
+function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lAngleInc, lLedRadius, lLedRadInc, lLedCountUpper, lLedCountLower)
 (
   i = 0;
   
   // Angles in degrees
-  lAngleInc = 360./mNumSpeakers;
+  lAngleInc = 360./mNumSpeakerPairs;
   lAngleLo  = 90. -            0.5*mSpeakerLayout*lAngleInc + 0.5*mAngularDistance;
   lAngleMid = 90. + (0.5. - (0.5*mSpeakerLayout))*lAngleInc;
   lAngleHi  = 90. + (1.0  - (0.5*mSpeakerLayout))*lAngleInc - 0.5*mAngularDistance;
@@ -132,32 +150,46 @@ function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lA
   lAngleHi  = lAngleHi  * kDeg2Rad;  
   
   lLedRadInc = (0.8*gRadius) / (2*kNumLeds+1);
-  lLedCount = 0;
+  lLedCountUpper = 0;
+  lLedCountLower = 8*mNumSpeakerPairs*kNumLeds;
   
-  loop(mNumSpeakers,
+  loop(mNumSpeakerPairs,
     mAngles[i] = lAngleMid;
     lLedRadius = gRadius * 0.2;
-  // Return result
     loop(kNumLeds,
       
       // LED coordinates as convex poygon
       
-      // Inner points;
-      mLedCoordinates[lLedCount]     =  gCenterX + cos(lAngleLo) * lLedRadius;
-      mLedCoordinates[lLedCount + 1] =  gCenterY - sin(lAngleLo) * lLedRadius;
-      mLedCoordinates[lLedCount + 2] =  gCenterX + cos(lAngleHi) * lLedRadius;
-      mLedCoordinates[lLedCount + 3] =  gCenterY - sin(lAngleHi) * lLedRadius;
+      // Upper circle, inner points;
+      mLedCoordinates[lLedCountUpper]     =  gCenterX      + cos(lAngleLo) * lLedRadius;
+      mLedCoordinates[lLedCountUpper + 1] =  gCenterYUpper - sin(lAngleLo) * lLedRadius;
+      mLedCoordinates[lLedCountUpper + 2] =  gCenterX      + cos(lAngleHi) * lLedRadius;
+      mLedCoordinates[lLedCountUpper + 3] =  gCenterYUpper - sin(lAngleHi) * lLedRadius;
+      
+      // Lower circle, inner points;
+      mLedCoordinates[lLedCountLower]     =  gCenterX      + cos(lAngleLo) * lLedRadius;
+      mLedCoordinates[lLedCountLower + 1] =  gCenterYLower - sin(lAngleLo) * lLedRadius;
+      mLedCoordinates[lLedCountLower + 2] =  gCenterX      + cos(lAngleHi) * lLedRadius;
+      mLedCoordinates[lLedCountLower + 3] =  gCenterYLower - sin(lAngleHi) * lLedRadius;
+      
       lLedRadius += lLedRadInc;
       
-      // Outer points
+      // Upper circle, outer points
+      mLedCoordinates[lLedCountUpper + 4] =  gCenterX      + cos(lAngleHi) * lLedRadius;
+      mLedCoordinates[lLedCountUpper + 5] =  gCenterYUpper - sin(lAngleHi) * lLedRadius;
+      mLedCoordinates[lLedCountUpper + 6] =  gCenterX      + cos(lAngleLo) * lLedRadius;
+      mLedCoordinates[lLedCountUpper + 7] =  gCenterYUpper - sin(lAngleLo) * lLedRadius;
       
-      mLedCoordinates[lLedCount + 4] =  gCenterX + cos(lAngleHi) * lLedRadius;
-      mLedCoordinates[lLedCount + 5] =  gCenterY - sin(lAngleHi) * lLedRadius;
-      mLedCoordinates[lLedCount + 6] =  gCenterX + cos(lAngleLo) * lLedRadius;
-      mLedCoordinates[lLedCount + 7] =  gCenterY - sin(lAngleLo) * lLedRadius;
+      // Lower circle, outer points
+      mLedCoordinates[lLedCountLower + 4] =  gCenterX      + cos(lAngleHi) * lLedRadius;
+      mLedCoordinates[lLedCountLower + 5] =  gCenterYLower - sin(lAngleHi) * lLedRadius;
+      mLedCoordinates[lLedCountLower + 6] =  gCenterX      + cos(lAngleLo) * lLedRadius;
+      mLedCoordinates[lLedCountLower + 7] =  gCenterYLower - sin(lAngleLo) * lLedRadius;
+      
       lLedRadius += lLedRadInc;
       
-      lLedCount += 8;
+      lLedCountUpper += 8;
+      lLedCountLower += 8;
     );
     i += 1;
     lAngleLo  += lAngleInc;
@@ -180,29 +212,32 @@ Updated slider value:
 @slider
 
 // Round off in case user types in a decimal value
-mNumSpeakers   = floor(slider1+0.5);
+mNumSpeakerPairs = floor(slider1+0.5);
+mNumSpeakers     = 2*mNumSpeakerPairs;
 
-mAngularDistance = 360./(2.*mNumSpeakers);
+mAngularDistance = 360./(2.*mNumSpeakerPairs);
 
-mSpeakerLayout = slider2;
+mElevation = slider2;
 
-// Generate 16 x 4 decoding matrix
-generateDecodePantoMatrix(mMatrixDSP, mNumSpeakers, mSpeakerLayout);
+mSpeakerLayout = slider3;
+
+// Generate decoding matrix
+generateDecodePeriphonicMatrix(mMatrixDSP, mNumSpeakerPairs, mElevation, mSpeakerLayout);
 
 // Clear peak buffers
 memset(mPeaks, 0., mNumSpeakers);
 memset(mDisplayPeaks, 0., mNumSpeakers);
 
-(slider3 == 0) ? (mPeakScalar = 0.02) :
-(slider3 == 1) ? (mPeakScalar = 0.03) :
-(slider3 == 2) ? (mPeakScalar = 0.05) :
-(slider3 == 3) ? (mPeakScalar = 0.10) :
-(slider3 == 4) ? (mPeakScalar = 0.20) :
-(slider3 == 5) ? (mPeakScalar = 0.30) :
-(slider3 == 6) ? (mPeakScalar = 0.50) :
-(slider3 == 7) ? (mPeakScalar = 1.00) :
-(slider3 == 8) ? (mPeakScalar = 3.00) :
-(slider3 == 9) ? (mPeakScalar = 6.00);
+(slider4 == 0) ? (mPeakScalar = 0.02) :
+(slider4 == 1) ? (mPeakScalar = 0.03) :
+(slider4 == 2) ? (mPeakScalar = 0.05) :
+(slider4 == 3) ? (mPeakScalar = 0.10) :
+(slider4 == 4) ? (mPeakScalar = 0.20) :
+(slider4 == 5) ? (mPeakScalar = 0.30) :
+(slider4 == 6) ? (mPeakScalar = 0.50) :
+(slider4 == 7) ? (mPeakScalar = 1.00) :
+(slider4 == 8) ? (mPeakScalar = 3.00) :
+(slider4 == 9) ? (mPeakScalar = 6.00);
 
 mPeakScalar = pow( 0.5, 1.0/(mPeakScalar * srate));
 
@@ -210,34 +245,42 @@ mPeakScalar = pow( 0.5, 1.0/(mPeakScalar * srate));
 /**********************************************************
 Graphics
 **********************************************************/
-@gfx 500 500
+@gfx 400 800
 
 // Make sure we can't have more channels than the track has
 // (Code resides here rather than in slider section in order to take action as soon as we know num_ch)
 (num_ch>0) ? (
-  mNumSpeakers = max(2, min(num_ch, mNumSpeakers));
-  slider1 = mNumSpeakers;
+  mNumSpeakers = max(3, min(num_ch, mNumSpeakers));
+  mNumSpeakerPairs = mNumSpeakers/2;
+  slider1 = mNumSpeakerPairs;
   slider_automate(slider1);
 );
 
-determineGeometry();
+determinePeriphonicGeometry();
 gRadius -= 30;              // Reduce circle radius
 
 // Only refresh background when needed
 (geometryHasChanged(mPrevWidth, mPrevHeight) || sliderHasChanged()) ? (
-  drawLEDBackgroundImage();
+  drawPeriphonicLEDBackgroundImage();
   setSpeakerPositionFont();
   calculateLedCoordinates();
   igfx=0;
-  loop(mNumSpeakers,
+  loop(mNumSpeakerPairs,
+    // Upper speakers
     sprintf(spkStr, "%d", igfx+1);
-    drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[igfx]), gCenterY - (gRadius+20)*sin(mAngles[igfx]), spkStr);
+    drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[igfx]), gCenterYUpper - (gRadius+20)*sin(mAngles[igfx]), spkStr);
+    
+    // Lower speakers
+    sprintf(spkStr, "%d", igfx+1+mNumSpeakerPairs);
+    drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[igfx]), gCenterYLower - (gRadius+20)*sin(mAngles[igfx]), spkStr);
+    
     igfx += 1;
   );
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;
   mPrevSlider1 = slider1;
   mPrevSlider2 = slider2;
+  mPrevSlider3 = slider3;
   
   mDoRefresh = 1;
 );
@@ -275,38 +318,30 @@ Calculate audio sample
 wIn = spl0;
 xIn = spl1;
 yIn = spl2;
+zIn = spl3;
 
 
 // Prevent potential blow up if track is 2 channels only and spl2 is un-ininitiated.
 (num_ch == 2) ? (
   yIn = 0.;
+  zIn = 0.;
 );
 
-// Matrix multiplication with input signal, 2D so z can be ignored.
+// Zero all channels
+ispl = 0;
+loop((kMaxNumSpeakers),
+  spl(ispl) = 0;
+  ispl += 1;
+);
 
-spl0  = wIn * mMatrixDSP[0]  + xIn * mMatrixDSP[1]  + yIn * mMatrixDSP[2];
-spl1  = wIn * mMatrixDSP[4]  + xIn * mMatrixDSP[5]  + yIn * mMatrixDSP[6];
-      
-spl2  = wIn * mMatrixDSP[8]  + xIn * mMatrixDSP[9]  + yIn * mMatrixDSP[10];
-spl3  = wIn * mMatrixDSP[12] + xIn * mMatrixDSP[13] + yIn * mMatrixDSP[14];
-      
-spl4  = wIn * mMatrixDSP[16] + xIn * mMatrixDSP[17] + yIn * mMatrixDSP[18];
-spl5  = wIn * mMatrixDSP[20] + xIn * mMatrixDSP[21] + yIn * mMatrixDSP[22];
-      
-spl6  = wIn * mMatrixDSP[24] + xIn * mMatrixDSP[25] + yIn * mMatrixDSP[26];
-spl7  = wIn * mMatrixDSP[28] + xIn * mMatrixDSP[29] + yIn * mMatrixDSP[30];
-
-spl8  = wIn * mMatrixDSP[32] + xIn * mMatrixDSP[33] + yIn * mMatrixDSP[34];
-spl9  = wIn * mMatrixDSP[36] + xIn * mMatrixDSP[37] + yIn * mMatrixDSP[38];
-
-spl10 = wIn * mMatrixDSP[40] + xIn * mMatrixDSP[41] + yIn * mMatrixDSP[42];
-spl11 = wIn * mMatrixDSP[44] + xIn * mMatrixDSP[45] + yIn * mMatrixDSP[46];
-
-spl12 = wIn * mMatrixDSP[48] + xIn * mMatrixDSP[49] + yIn * mMatrixDSP[50];
-spl13 = wIn * mMatrixDSP[52] + xIn * mMatrixDSP[53] + yIn * mMatrixDSP[54];
-
-spl14 = wIn * mMatrixDSP[56] + xIn * mMatrixDSP[57] + yIn * mMatrixDSP[58];
-spl15 = wIn * mMatrixDSP[60] + xIn * mMatrixDSP[61] + yIn * mMatrixDSP[62];
+// Matrix multiplication with input signal.
+ispl = 0;
+isplMatrix = 0;
+loop(mNumSpeakers,
+  spl(ispl) = wIn * mMatrixDSP[isplMatrix]  + xIn * mMatrixDSP[isplMatrix+1]  + yIn * mMatrixDSP[isplMatrix+2]  + zIn * mMatrixDSP[isplMatrix+3];
+  ispl       += 1;
+  isplMatrix += 4;
+);
 
 // Peak monitoring
 ispl = 0;
