@@ -219,12 +219,12 @@ geometryHasChanged(mPrevWidth, mPrevHeight) ? (
   setSpeakerPositionFont();
   calculateCoordinates();
 
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[0]), gCenterY - (gRadius+20)*sin(mAngles[0]), "1");
+  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[4]), gCenterY - (gRadius+20)*sin(mAngles[4]), "6");
+  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[3]), gCenterY - (gRadius+20)*sin(mAngles[3]), "5");
   drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[1]), gCenterY - (gRadius+20)*sin(mAngles[1]), "2");
   drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[2]), gCenterY - (gRadius+20)*sin(mAngles[2]), "3");
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[3]), gCenterY - (gRadius+20)*sin(mAngles[3]), "5");
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[4]), gCenterY - (gRadius+20)*sin(mAngles[4]), "6");
-
+  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[0]), gCenterY - (gRadius+20)*sin(mAngles[0]), "1");
+  
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;
   

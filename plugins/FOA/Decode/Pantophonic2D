@@ -228,11 +228,11 @@ gRadius -= 30;              // Reduce circle radius
   drawLEDBackgroundImage();
   setSpeakerPositionFont();
   calculateLedCoordinates();
-  igfx=0;
+  igfx=mNumSpeakers-1;
   loop(mNumSpeakers,
     sprintf(spkStr, "%d", igfx+1);
     drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[igfx]), gCenterY - (gRadius+20)*sin(mAngles[igfx]), spkStr);
-    igfx += 1;
+    igfx -= 1;
   );
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;

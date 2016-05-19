@@ -223,11 +223,12 @@ gRadius -= 30;              // Reduce circle radius
   setSpeakerPositionFont();
   calculateCoordinates();
 
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[0]), gCenterY - (gRadius+20)*sin(mDisplayAngles[0]), "1");
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[1]), gCenterY - (gRadius+20)*sin(mDisplayAngles[1]), "2");
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[2]), gCenterY - (gRadius+20)*sin(mDisplayAngles[2]), "5");
   drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[3]), gCenterY - (gRadius+20)*sin(mDisplayAngles[3]), "6");
-
+  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[2]), gCenterY - (gRadius+20)*sin(mDisplayAngles[2]), "5");
+  
+  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[1]), gCenterY - (gRadius+20)*sin(mDisplayAngles[1]), "2");
+  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[0]), gCenterY - (gRadius+20)*sin(mDisplayAngles[0]), "1");
+  
   mPrevWidth    = gfx_w;
   mPrevHeight   = gfx_h;
   mPrevDegAngle = mDegAngle;
