@@ -277,6 +277,7 @@ gRadius -= 30;              // Reduce circle radius
     igfx -= 1;
   );
   
+  // Draw titles
   gfx_x = gCenterX -      (gRadius+26);
   gfx_y = gCenterYUpper - (gRadius+26);
   gfx_drawstr("Upper");
@@ -290,6 +291,24 @@ gRadius -= 30;              // Reduce circle radius
   gfx_x = gCenterX -      (gRadius+26);
   gfx_y = gCenterYLower - (gRadius+10);
   gfx_drawstr("ring");
+  
+  // Illustrate elevation angle
+  xPos1 = gCenterX + 0.75*gRadius;
+  yPos1 = gCenterY;
+  xPos2 = gCenterX + 1.25*gRadius;
+  yPos2 = gCenterY;
+  drawLineSegment(xPos1, yPos1, xPos2, yPos2, 1);
+
+  xPos2 = gCenterX + (0.75 + 0.5 * cos(mElevation))* gRadius;
+  yPos2 = gCenterY         - 0.5 * sin(mElevation)  * gRadius;
+  drawLineSegment(xPos1, yPos1, xPos2, yPos2, 1);
+  
+  xPos2 = gCenterX + (0.75 + 0.5 * cos(mElevation))* gRadius;
+  yPos2 = gCenterY         + 0.5 * sin(mElevation)  * gRadius;
+  drawLineSegment(xPos1, yPos1, xPos2, yPos2, 1);
+  
+  gfx_arc(xPos1, yPos1, 0.22  * gRadius, $pi*0.5, $pi*0.5-mElevation, 1.);
+  gfx_arc(xPos1, yPos1, 0.18 * gRadius, $pi*0.5, $pi*0.5+mElevation, 1.);
   
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;

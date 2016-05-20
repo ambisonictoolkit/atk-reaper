@@ -268,8 +268,9 @@ Graphics: Determine geometry for periphonic 3D DISPLAY
 ********************************************************************/
 function determinePeriphonicGeometry()
 (
-  gCenterX   = gfx_w * 0.5;
+  gCenterX      = gfx_w * 0.5;
   gCenterYUpper = gfx_h * 0.25;
+  gCenterY      = gfx_h * 0.5;
   gCenterYLower = gfx_h * 0.75;
 
   gCenterX < gCenterYUpper ? gRadius = gCenterX : gRadius = gCenterYUpper;
