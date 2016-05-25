@@ -1,3 +1,6 @@
+# OSX Desktop Service Store
+.DS_Store
+
 # OSX Installer build folder
 installer/OSX/ATK\ for\ Reaper/build
 
