@@ -27,7 +27,7 @@ technique.
 We hope you enjoy the ATK!
 
 For more information please visit the [Ambisonic Toolkit
-website](http:ambisonictoolkit.net/) or send us an
+website](http:www.ambisonictoolkit.net/) or send us an
 [e-mail](mailto:info[at]ambisonictoolkit.net).
 
 &nbsp;
@@ -79,12 +79,12 @@ that points to:
 &nbsp;
 
 If you are using Ambisonic Toolkit with SuperCollider as well,
-the convolution kernels are installed in the same place and have 
+the convolution kernels are installed in the same place and have
 the exact same content. We do not expect this to cause any conflicts.
 
-If you want to take a look at the installed files and do not see the 
+If you want to take a look at the installed files and do not see the
 Library folder in Finder, please press the ALT button while clicking
-the "Go" menu in Finder. The Library folder will show up as an 
+the "Go" menu in Finder. The Library folder will show up as an
 additional option.
 
 &nbsp;
@@ -122,7 +122,7 @@ Known issues are logged at [GitHub](https://github.com/ambisonictoolkit/atk-reap
 
 If you experience problems or have questions pertaining to the ATK for Reaper plugins, please create an issue in the [ATK-Reaper issue tracker](https://github.com/ambisonictoolkit/atk-reaper/issues).
 
-If you use the plugins for some project, please [let us know](mailto:info[at]ambisonictoolkit.net). We [plan on](https://github.com/ambisonictoolkit/ambisonictoolkit.github.io/issues/9) adding a gallery of example artistic and reative projects that make use of the Ambisonic Toolkit.
+If you use the plugins for some project, please [let us know](mailto:info[at]ambisonictoolkit.net). We [plan on](https://github.com/ambisonictoolkit/ambisonictoolkit.github.io/issues/9) adding a gallery of example artistic and creative projects that make use of the Ambisonic Toolkit.
 
 &nbsp;
 
@@ -194,7 +194,7 @@ Trond Lossius, 2014.
 
 * J Anderson : [[e-mail]](mailto:j.anderson[at]ambisonictoolkit.net)
 * J Parmenter : [[e-mail]](mailto:j.parmenter[at]ambisonictoolkit.net)
-* T Lossius : [[e-mail]](trond.lossius[at]bek.no)
+* T Lossius : [[e-mail]](mailto:trond.lossius[at]bek.no)
 
 &nbsp;
 
@@ -202,10 +202,9 @@ The port of ATK as a set of Reaper JS plugins by Trond Lossius is
 supported by [BEK, Bergen Centre for Electronic Arts](www.bek.no).
 
 The filter kernels distributed with the Ambisonic Toolkit are licensed
-under a Creative Commons Attribution-Share Alike 3.0 Unported License and
+under a Creative Commons Attribution-Share Alike 3.0 Unported [(CC BY-SA 3.0)](http://creativecommons.org/licenses/by-sa/3.0/) License and
 are copyright the Ambisonic Toolkit Community and Joseph Anderson,
-2011.\
- <http://creativecommons.org/licenses/by-sa/3.0/>
+2011.
 
 &nbsp;
 
@@ -221,7 +220,7 @@ Diametric Decoder Theorem (DDT) decoding
 
 Support for Gerzon's Diametric Decoder Theorem (DDT) decoding algorithm
 is derived from Aaron Heller's Octave code available at:
-http:www.ai.sri.com/ajh/ambisonics/
+http://www.ai.sri.com/ajh/ambisonics/
 
 Benjamin, et al., "Localization in Horizontal-Only Ambisonic Systems"
 Preprint from AES-121, 10/2006, San Francisco
@@ -234,8 +233,8 @@ Anderson](mailto:j.anderson[at]ambisonictoolkit.net).
 Irregular array decoding
 ------------------------
 
-Irregular array decoding coefficients (5.0, 7.0) are kindly provided by
-Bruce Wiggins: http:www.brucewiggins.co.uk/
+Irregular array decoding coefficients (5.0) are kindly provided by
+Bruce Wiggins: http://www.brucewiggins.co.uk/
 
 B. Wiggins, "An Investigation into the Real-time Manipulation and
 Control of Three-dimensional Sound Fields," PhD Thesis, University of
