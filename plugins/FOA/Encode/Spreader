@@ -54,7 +54,7 @@ slider2:3<0,5,1{0: Low, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12: High}>  Number of
  When project sample rate is changed, the current audio driver will use this sample rate
  If the sample rate is not supported by the current audio driver, the change will be ignored.
 */
-slider3:5<0,10,1{8000 - Not supported, 11025 - Not supported, 16000 - Not supported, 22050 - Not supported, 24000 - Not supported, 44100, 48000, 88200, 96000, 176400 - Not supported, 192000}>Processing Sample Rate
+slider3:5<0,10,1{8000 - Not supported, 11025 - Not supported, 16000 - Not supported, 22050 - Not supported, 24000 - Not supported, 44100, 48000, 88200, 96000, 176400, 192000}>Processing Sample Rate
 
 
 /**********************************************************
