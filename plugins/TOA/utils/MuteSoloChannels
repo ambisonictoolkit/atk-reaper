@@ -1,0 +1,212 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2014
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: MuteSoloChannels
+  
+  Mute or solo individual channels within a 20-channel track.
+  This can be useful for monitoring effect processing within a 
+  TOA B-format =>BtoA => 20xFX => AtoB => TOA B-format
+  signal processing chain.
+
+---------------------------------------------------------------------
+*/
+
+desc: ATK TOA Utility MuteSoloChannels
+// Mute or solo individual channels of a 20-channel track
+
+slider1:0<0,3,0{None, Mute, Solo}>Channel 1
+slider2:0<0,3,0{None, Mute, Solo}>Channel 2
+slider3:0<0,3,0{None, Mute, Solo}>Channel 3
+slider4:0<0,3,0{None, Mute, Solo}>Channel 4
+slider5:0<0,3,0{None, Mute, Solo}>Channel 5
+slider6:0<0,3,0{None, Mute, Solo}>Channel 6
+slider7:0<0,3,0{None, Mute, Solo}>Channel 7
+slider8:0<0,3,0{None, Mute, Solo}>Channel 8
+slider9:0<0,3,0{None, Mute, Solo}>Channel 9
+slider10:0<0,3,0{None, Mute, Solo}>Channel 10
+slider11:0<0,3,0{None, Mute, Solo}>Channel 11
+slider12:0<0,3,0{None, Mute, Solo}>Channel 12
+slider13:0<0,3,0{None, Mute, Solo}>Channel 13
+slider14:0<0,3,0{None, Mute, Solo}>Channel 14
+slider15:0<0,3,0{None, Mute, Solo}>Channel 15
+slider16:0<0,3,0{None, Mute, Solo}>Channel 16
+slider17:0<0,3,0{None, Mute, Solo}>Channel 17
+slider18:0<0,3,0{None, Mute, Solo}>Channel 18
+slider19:0<0,3,0{None, Mute, Solo}>Channel 19
+slider20:0<0,3,0{None, Mute, Solo}>Channel 20
+
+
+in_pin:1
+in_pin:2
+in_pin:3
+in_pin:4
+in_pin:5
+in_pin:6
+in_pin:7
+in_pin:8
+in_pin:9
+in_pin:10
+
+in_pin:11
+in_pin:12
+in_pin:13
+in_pin:14
+in_pin:15
+in_pin:16
+in_pin:17
+in_pin:18
+in_pin:19
+in_pin:20
+
+
+out_pin:1
+out_pin:2
+out_pin:3
+out_pin:4
+out_pin:5
+out_pin:6
+out_pin:7
+out_pin:8
+out_pin:9
+out_pin:10
+
+out_pin:11
+out_pin:12
+out_pin:13
+out_pin:14
+out_pin:15
+out_pin:16
+out_pin:17
+out_pin:18
+out_pin:19
+out_pin:20
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+// Are any channels soloed?
+(
+  (slider1  == 2) || 
+  (slider2  == 2) || 
+  (slider3  == 2) || 
+  (slider4  == 2) || 
+  (slider5  == 2) || 
+  (slider6  == 2) || 
+  (slider7  == 2) || 
+  (slider8  == 2) || 
+  (slider9  == 2) || 
+  (slider10 == 2) || 
+  (slider11 == 2) || 
+  (slider12 == 2) || 
+  (slider13 == 2) || 
+  (slider14 == 2) || 
+  (slider15 == 2) || 
+  (slider16 == 2) || 
+  (slider17 == 2) || 
+  (slider18 == 2) || 
+  (slider19 == 2) || 
+  (slider20 == 2)
+) ? (
+  (slider1  == 2) ? (gain0  = 1) : (gain0  = 0);
+  (slider2  == 2) ? (gain1  = 1) : (gain1  = 0);
+  (slider3  == 2) ? (gain2  = 1) : (gain2  = 0);
+  (slider4  == 2) ? (gain3  = 1) : (gain3  = 0);  
+  (slider5  == 2) ? (gain4  = 1) : (gain4  = 0);
+  (slider6  == 2) ? (gain5  = 1) : (gain5  = 0);
+  (slider7  == 2) ? (gain6  = 1) : (gain6  = 0);
+  (slider8  == 2) ? (gain7  = 1) : (gain7  = 0);  
+  (slider9  == 2) ? (gain8  = 1) : (gain8  = 0);
+  (slider10 == 2) ? (gain9  = 1) : (gain9  = 0);
+  
+  (slider11 == 2) ? (gain10 = 1) : (gain10 = 0);
+  (slider12 == 2) ? (gain11 = 1) : (gain11 = 0);
+  (slider13 == 2) ? (gain12 = 1) : (gain12 = 0);
+  (slider14 == 2) ? (gain13 = 1) : (gain13 = 0);
+  (slider15 == 2) ? (gain14 = 1) : (gain14 = 0);
+  (slider16 == 2) ? (gain15 = 1) : (gain15 = 0);
+  (slider17 == 2) ? (gain16 = 1) : (gain16 = 0);
+  (slider18 == 2) ? (gain17 = 1) : (gain17 = 0);
+  (slider19 == 2) ? (gain18 = 1) : (gain18 = 0);
+  (slider20 == 2) ? (gain19 = 1) : (gain19 = 0);
+) : (
+  // Mute any muted channels
+  gain0  = 1 - slider1;
+  gain1  = 1 - slider2;
+  gain2  = 1 - slider3;
+  gain3  = 1 - slider4;
+  gain4  = 1 - slider5;
+  gain5  = 1 - slider6;
+  gain6  = 1 - slider7;
+  gain7  = 1 - slider8;
+  gain8  = 1 - slider9;
+  gain9  = 1 - slider10;
+  
+  gain10 = 1 - slider11;
+  gain11 = 1 - slider12;
+  gain12 = 1 - slider13;
+  gain13 = 1 - slider14;
+  gain14 = 1 - slider15;
+  gain15 = 1 - slider16;
+  gain16 = 1 - slider17;
+  gain17 = 1 - slider18;
+  gain18 = 1 - slider19;
+  gain19 = 1 - slider20;
+);
+
+@sample
+
+// If less then 4 channels, prevent spurious high values due to uninitialised channel signals
+(num_ch < 4) ? (
+  i = num_ch;
+  loop (4 - num_ch,
+    spl(i) = 0.;
+    i += 1;
+  );
+);
+
+spl0   = spl0  * gain0;
+spl1   = spl1  * gain1;
+spl2   = spl2  * gain2;
+spl3   = spl3  * gain3;
+spl4   = spl4  * gain4;
+spl5   = spl5  * gain5;
+spl6   = spl6  * gain6;
+spl7   = spl7  * gain7;
+spl8   = spl8  * gain8;
+spl9   = spl9  * gain9;
+
+spl10  = spl10 * gain10;
+spl11  = spl11 * gain11;
+spl12  = spl12 * gain12;
+spl13  = spl13 * gain13;
+spl14  = spl14 * gain14;
+spl15  = spl15 * gain15;
+spl16  = spl16 * gain16;
+spl17  = spl17 * gain17;
+spl18  = spl18 * gain18;
+spl19  = spl19 * gain19;
+
