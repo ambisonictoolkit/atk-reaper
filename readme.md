@@ -130,6 +130,12 @@ If you use the plugins for some project, please [let us know](mailto:info[at]amb
 List of Changes
 ---------------
 
+Version 1.0.0.b8
+
+* Updated to install atk-kernels v. 1.2.1.
+* UHJ and Spreader encoders: Now support all sample rates equal to or higher than 44.1 kHz. (issues #20, #29, #30)
+* Binaural decoder: CIPIC and Listen HRTFs now work woth all samle rates equal to or higher than 44.1 kHz (issues #18, #29, #32, #33).
+
 Version 1.0.0.b7
 
 * Refactoring (these changes should not affect the behaviour of plugins):
