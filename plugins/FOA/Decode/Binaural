@@ -248,51 +248,45 @@ Get folderpath to impulse responses
 ********************************************************************/
 function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported, lHrtf)
 (
-  (aSliderValue < 10) ? (
+  // Determine if current sample rate is supported
+  lSampleRateIsSupported = isThisSampleRateSupported();
+  
+  (lSampleRateIsSupported) ? (
     
-    // Spherical HRTFs are provided at a number of sample rates
-    lSampleRateIsSupported = isThisSampleRateSupported();
-    (lSampleRateIsSupported) ? (
-      
-      /***** Slider values 0-9 : Spherical HRTF *****/
-      
-      // Spherical HRTFs are horisontal only
-      mVerticalIsSupported = 0;
-      
-      // Kernel size depends on sample rate
-      ((srate == 44100) || (srate == 48000)) ? (
-        mKernelSize = 512;
+    // Kernel size depends on sample rate
+    ((srate == 44100) || (srate == 48000)) ? (
+      mKernelSize = 512;
+    ) : (
+      ((srate == 88200) || (srate == 96000)) ? (
+        mKernelSize = 1024;
       ) : (
-        ((srate == 88200) || (srate == 96000)) ? (
-          mKernelSize = 1024;
-        ) : (
-          ((srate == 176400) || (srate == 192000)) ? (
-            mKernelSize = 2048;
-          );
+        ((srate == 176400) || (srate == 192000)) ? (
+          mKernelSize = 2048;
         );
       );
-      
-      lHrtf = aSliderValue;
-      
-      sprintf(aFolderPath, "ATK/kernels/FOA/decoders/spherical/%i/%i/%04d/", srate, mKernelSize, lHrtf);
-    ) : (
-      // Current sample rate is not supported
-      sprintf(aFolderPath, "/No HRTF available/");
-      mKernelSize = 0;
-      mVerticalIsSupported = 0;
     );
-  ) : (
     
-    // CIPIC and Listen are only supported for 44100 Hz
-    (srate == 44100) ? (
+    /***** Slider values 0-9 : Spherical HRTF *****/ 
+    (aSliderValue < 10) ? (
+      (
+        // Vertical property, spherical HRTFs are horisontal only
+        mVerticalIsSupported = 0; 
+        
+        // HRTF ID
+        lHrtf = aSliderValue;
+        
+        // Path to HRTF files
+        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/spherical/%i/%i/%04d/", srate, mKernelSize, lHrtf);
+      );
+    
+    /***** Slider values 10-54 : CIPIC HRTF *****/
+    ) : (aSliderValue < 55) ? (
       
-      /***** Slider values 10-54 : CIPIC HRTF *****/
-      (aSliderValue < 55) ? (
-        
-        lSampleRateIsSupported = 1;
+      (
+        // Vertical property
         mVerticalIsSupported = 1;
-        mKernelSize = 512;
         
+        // HRTF ID
         (aSliderValue == 10) ? (lHrtf =   3) :
         (aSliderValue == 11) ? (lHrtf =   8) :
         (aSliderValue == 12) ? (lHrtf =   9) :
@@ -339,16 +333,17 @@ function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported,
         (aSliderValue == 53) ? (lHrtf = 163) :
         (aSliderValue == 54) ? (lHrtf = 165);
         
-        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/cipic/44100/512/%04d/", lHrtf);
-        
-      ) : (
-        
-        /***** Slider values 55-105 : Listen HRTF *****/
-        
-        lSampleRateIsSupported = 1;
+        // Path to HRTF files
+        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/cipic/%i/%i/%04d/", srate, mKernelSize, lHrtf);
+      );
+    
+    /***** Slider values 55-105 : Listen HRTF *****/
+    ) : (
+      (
+        // Vertical property
         mVerticalIsSupported = 1;
-        mKernelSize = 512;
         
+        // HRTF ID
         (aSliderValue ==  55) ? (lHrtf = 1002) :
         (aSliderValue ==  56) ? (lHrtf = 1003) :
         (aSliderValue ==  57) ? (lHrtf = 1004) :
@@ -401,17 +396,16 @@ function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported,
         (aSliderValue == 104) ? (lHrtf = 1058) :
         (aSliderValue == 105) ? (lHrtf = 1059);
         
-        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/listen/44100/512/%04d/", lHrtf);
+        // Path to HRTF files
+        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/listen/%i/%i/%04d/", srate, mKernelSize, lHrtf);
       );
-    ) : (
-      
-      // CIPIC and Listen do not support current sample rate
-      lSampleRateIsSupported = 0;
-      
-      sprintf(aFolderPath, "/No HRTF available/");
-      mKernelSize = 0;
-      mVerticalIsSupported = 0;
     );
+  ) : (
+ 
+    // Current sample rate is not supported
+    sprintf(aFolderPath, "/No HRTF available/");
+    mKernelSize = 0;
+    mVerticalIsSupported = 0;
   );
   
   // Return value
