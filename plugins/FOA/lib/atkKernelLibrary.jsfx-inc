@@ -41,15 +41,13 @@ function isThisSampleRateSupported() local(lFlag)
 (
   lFlag = 0;
   
-  // Sample rates below 44100 are not currently supported
+  // Sample rates below 44100 are not supported
   
   ((srate|0) ==  44100) ? lFlag = 1;
   ((srate|0) ==  48000) ? lFlag = 1;
   ((srate|0) ==  88200) ? lFlag = 1;
   ((srate|0) ==  96000) ? lFlag = 1;
-  
-  // Sample rate 176400 is not currently supported
-  
+  ((srate|0) == 176400) ? lFlag = 1;
   ((srate|0) == 192000) ? lFlag = 1;
   
   // Return flag value
