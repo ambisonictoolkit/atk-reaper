@@ -80,6 +80,137 @@ file, encouraging DRY (don't repeat yourself)
 @init
 
 
+/******************************************************* 
+MATRIX
+======
+
+M x N matrix.
+
+Description
+-----------
+
+The matrix object initializes a m x n matrix.
+It takes the number of rows and columns as argument.
+
+A number of methods set matrix values as appropriate for various
+ambisonic encoders and decoders. 
+
+It must be used with a variable name as prefix (object oriented).
+
+Initializer
+-----------
+
+#### matrix(rows, cols) ####
+
+Initializes a matrix with `rows` number of rows and `cols`number of cols.
+
+NOTE: This object assigns memory using CookDSP calls, and requires CookDSP to
+be used throughout the plugin for memory assignments.
+
+Methods
+-------
+
+#### matrix_clear() ####
+
+Sets all cell values to 0.
+
+#### function matrix_read_from_file(aFilePath) ####
+
+Reads a matrix from disk. The matrix file should be in mosl.txt format as
+specified in the atk-matrices repository.
+
+Returns an error status code upon completion:
+
+0: No error.
+1: Unable to read file. File does not exist or it is not a readable text file.
+2: Incompatible matrix sizes.
+3: File does not contain enough cell values.
+
+Example
+-------
+
+    TODO
+
+********************************************************/
+
+
+
+function matrix(aRows, aCols)
+(
+  this.maxNumRows = this.numRows = floor(max(aRows, 0.));
+  this.MaxNumCols = this.numCols = floor(max(aCols, 0.));
+  this.cell = memalloc(aRows*aCols);
+  this.matrix_clear()
+);
+
+
+function matrix_clear() local(i)
+(
+  i = 0;
+  loop(this.maxNumRows*this.maxNumCols,
+    this.cell[i] = 0.,
+    i += 1;
+  );
+);
+
+
+function matrix_read_from_file(aFilePath) local(lFileHandle, lRows, lCols, lErr, i, j)
+(
+  lFileHandle = file_open(aFilePath);
+
+  lErr = 0;
+  // Read matrix if file is valid
+  lFileHandle > 0 && file_text(lFileHandle) ? (
+    
+    // Get matrix dimensions
+    file_avail(mFileHandle) ? file_var(mFileHandle,lRows) : mReadError = 1;
+    file_avail(mFileHandle) ? file_var(mFileHandle,lCols) : mReadError = 1;
+    
+    // Are matrix sizes compatible?
+    ((lRows < 0) || (lRows > this.maxNumRows) || (lCols < 0) || (lCols > this.maxNumCols)) ? (lErr = 2);
+    
+    !lErr ? (
+      this.matrix_clear;
+      
+      this.numRows = floor(lRows);
+      this.numCols = floor(lCols);
+      
+      // Read cell values
+      i = 0;
+      loop(mMatrixRows,
+        j = 0;
+        loop(mMatrixCols,
+          file_avail(lFileHandle) ? file_var(lFileHandle,this.cell[i*this.maxNumRows + j]) : (lErr = 3);
+          j += 1;
+        );
+        i += 1;
+      );
+    );
+  
+    
+  ) : lErr = 1;
+
+  // CLose file when done
+  file_close(lFileHandle);
+  
+  // Return error status
+  lErr;
+);
+
+
+
+
+
+
+
+/********************************************************************
+
+TODO: Methods in the rest of this file have not yet been refactored
+to be object-oriented.
+
+********************************************************************/
+
+
 /********************************************************************
 Matrix: Generate 4 x 8 matrix for equal 5.0 decoding. 
   Channel configuration: L - R - C - LFE - SL - SR - SBL - SBR
