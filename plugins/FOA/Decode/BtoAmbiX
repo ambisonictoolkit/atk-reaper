@@ -1,0 +1,115 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: BtoAmbiX
+  B to A format decoder
+---------------------------------------------------------------------
+*/
+
+desc: ATK FOA Decode BtoAmbiX
+// B to A format decoder for a variety of tetrahedral orientations and W channel weights
+
+// Import library with shared functions
+import ../../libraries/atk/atk.jsfx-inc
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:1
+out_pin:2
+out_pin:3
+out_pin:4
+
+slider1:0<0,1,0{ACN SN3D, ACN N3D}>Target format
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Setting memory locations for 4x4 matrix as 1D array
+matrixDSP = 1000;
+mFilePath = 1;
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+(slider1 == 0) ? (
+  strcpy(mFilePath, "ATK/matrices/FOA/decoders/acn-sn3d1.mosl.txt");
+) : (
+  strcpy(mFilePath, "ATK/matrices/FOA/decoders/acn-n3d1.mosl.txt");
+);
+
+mFileHandle = file_open(mFilePath);
+
+mReadError = 0;
+// Read matrix if file is valid
+mFileHandle > 0 && file_text(mFileHandle) ? (
+    
+  // Get matrix dimensions
+  file_avail(mFileHandle) ? file_var(mFileHandle,mMatrixRows) : mReadError = 1;
+  file_avail(mFileHandle) ? file_var(mFileHandle,mMatrixCols) : mReadError = 1;
+  
+  // Read cell values
+  cellCount = 0;
+  loop(mMatrixRows,
+    loop(mMatrixCols,
+      file_avail(mFileHandle) ? file_var(mFileHandle,matrixDSP[cellCount]) : mReadError = 1;
+      cellCount += 1;
+    );
+  );
+) : mReadError = 1;
+
+// CLose file when done
+file_close(mFileHandle);
+
+
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Prevent potential blow up if track is 2 channels only and spl2 and spl3 are un-ininitiated.
+(num_ch == 2) ? (
+  yIn = 0.;
+  zIn = 0.;
+);
+
+// Matrix multiplication with input signal:
+spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
+spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+spl2 = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
+spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];
