@@ -10,3 +10,6 @@
 [submodule "installer/shared/atk-matrices"]
 	path = installer/shared/atk-matrices
 	url = https://github.com/ambisonictoolkit/atk-matrices.git
+[submodule "plugins/libraries/cookdsp"]
+	path = plugins/libraries/cookdsp
+	url = https://github.com/belangeo/cookdsp.git
