@@ -30,7 +30,7 @@ desc: ATK FOA Monitor Meter8
 // Instant level meter for 8 channel surround signal
 
 // Graphics file
-filename:0,../lib/GainSlider.png
+filename:0,../../libraries/atk/GainSlider.png
 //filename:0,HorizontalBackground.png
 
 // Import library with shared functions
