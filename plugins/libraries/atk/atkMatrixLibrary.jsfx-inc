@@ -100,9 +100,13 @@ It must be used with a variable name as prefix (object oriented).
 Initializer
 -----------
 
-#### matrix(rows, cols) ####
+#### matrix(maxNumRows, maxNumCols) ####
 
-Initializes a matrix with `rows` number of rows and `cols`number of cols.
+Initializes a matrix with `maxNumRows` number of rows and `maxNumCols`number of cols.
+If the matrix is to be rescaled dynamically, the initial size need to be set to the 
+highest possible numbr of rows and columns that the matrix might have. Initially the
+matrix will be set to have the dimension provided by these two arguments. The matrix
+can be resized to a smaller dimension using the matrix_set_size method.
 
 NOTE: This object assigns memory using CookDSP calls, and requires CookDSP to
 be used throughout the plugin for memory assignments.
@@ -114,6 +118,18 @@ Methods
 
 Sets all cell values to 0.
 
+
+#### matrix_set_size(aRows, aCols) ####
+
+Resize the matrix. The matrix can not be resized beyond the upper dimension bounds set
+when first initiated. The resized matrix will be cleared.
+
+Returns an error status code upon completion:
+
+0: No error
+1: Requested dimension is outside the bounds set upon initialisation of the matrix
+
+
 #### function matrix_read_from_file(aFilePath) ####
 
 Reads a matrix from disk. The matrix file should be in mosl.txt format as
@@ -121,10 +137,10 @@ specified in the atk-matrices repository.
 
 Returns an error status code upon completion:
 
-0: No error.
-1: Unable to read file. File does not exist or it is not a readable text file.
-2: Incompatible matrix sizes.
-3: File does not contain enough cell values.
+0: No error
+1: Unable to read file. File does not exist or it is not a readable text file
+2: Incompatible matrix sizes
+3: File does not contain enough cell values
 
 Example
 -------
@@ -135,62 +151,79 @@ Example
 
 
 
-function matrix(aRows, aCols)
+function matrix(aMaxNumRows, amaxNumCols) local (lSize)
 (
-  this.maxNumRows = this.numRows = floor(max(aRows, 0.));
-  this.MaxNumCols = this.numCols = floor(max(aCols, 0.));
-  this.cell = memalloc(aRows*aCols);
-  this.matrix_clear()
+  this.maxNumRows = this.numRows = floor(max(aMaxNumRows, 1.));
+  this.MaxNumCols = this.numCols = floor(max(amaxNumCols, 1.));
+  this.maxNumOfCells = this.maxNumRows * this.MaxNumCols;
+  
+  this.cell = memalloc(this.numOfCells);
+  // No need to clear, as memalloc initiates cell values to 0.0
 );
 
 
 function matrix_clear() local(i)
 (
   i = 0;
-  loop(this.maxNumRows*this.maxNumCols,
-    this.cell[i] = 0.,
+  loop(this.maxNumOfCells,
+    this.cell[i] = 0.;
     i += 1;
   );
 );
 
 
+function matrix_set_size(aRows, aCols) local (lErr)
+(
+  lErr = 0;
+  
+  aRows = floor(aRows);
+  aCols = floor(aCols);
+  
+  // Are matrix sizes compatible?
+  ((aRows < 1) || (aRows > this.maxNumRows) || (aCols < 1) || (aCols > this.maxNumCols)) ? (lErr = 1);
+  
+  !lErr ? (
+    this.matrix_clear;
+    
+    this.numRows = aRows;
+    this.numCols = aCols;
+    
+    matrix_clear();
+  );
+  
+  // Return error status
+  lErr;
+);
+
+
 function matrix_read_from_file(aFilePath) local(lFileHandle, lRows, lCols, lErr, i, j)
 (
-  lFileHandle = file_open(aFilePath);
-
   lErr = 0;
+  
+  lFileHandle = file_open(aFilePath);
+  
   // Read matrix if file is valid
-  lFileHandle > 0 && file_text(lFileHandle) ? (
+  (lFileHandle > 0 && file_text(lFileHandle)) ? (
     
-    // Get matrix dimensions
-    file_avail(mFileHandle) ? file_var(mFileHandle,lRows) : mReadError = 1;
-    file_avail(mFileHandle) ? file_var(mFileHandle,lCols) : mReadError = 1;
+    // Get matrix dimensions and resize, set status flag if this fails
+    file_avail(lFileHandle) ? file_var(lFileHandle,lRows) : lErr = 2;
+    file_avail(lFileHandle) ? file_var(lFileHandle,lCols) : lErr = 2;
+    this.matrix_set_size(lRows, lCols) ? lErr = 2;
     
-    // Are matrix sizes compatible?
-    ((lRows < 0) || (lRows > this.maxNumRows) || (lCols < 0) || (lCols > this.maxNumCols)) ? (lErr = 2);
-    
+    // Read cell values
     !lErr ? (
-      this.matrix_clear;
-      
-      this.numRows = floor(lRows);
-      this.numCols = floor(lCols);
-      
-      // Read cell values
       i = 0;
-      loop(mMatrixRows,
+      loop(this.numRows,
         j = 0;
-        loop(mMatrixCols,
-          file_avail(lFileHandle) ? file_var(lFileHandle,this.cell[i*this.maxNumRows + j]) : (lErr = 3);
+        loop(this.numCols,
+          file_avail(lFileHandle) ? file_var(lFileHandle, this.cell[i*this.maxNumRows + j]) : (lErr = 3);
           j += 1;
         );
         i += 1;
       );
     );
-  
-    
   ) : lErr = 1;
-
-  // CLose file when done
+  
   file_close(lFileHandle);
   
   // Return error status

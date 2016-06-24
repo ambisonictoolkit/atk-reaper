@@ -23,12 +23,12 @@ and GNU General Public License along with this program.  If not, see
 
 ---------------------------------------------------------------------
   Class: BtoAmbiX
-  B to A format decoder
+  B to AmbiX format decoder
 ---------------------------------------------------------------------
 */
 
 desc: ATK FOA Decode BtoAmbiX
-// B to A format decoder for a variety of tetrahedral orientations and W channel weights
+// B-format to AmbiX format decoder
 
 // Import library with shared functions
 import ../../libraries/atk/atk.jsfx-inc
@@ -51,8 +51,10 @@ Initialisation
 **********************************************************/
 @init
 
-// Setting memory locations for 4x4 matrix as 1D array
-matrixDSP = 1000;
+// Setting up 4x4 matrix
+mMatrixDSP.matrix(4, 4);
+
+// Slot for filename
 mFilePath = 1;
 
 
@@ -67,30 +69,7 @@ Updated slider value:
   strcpy(mFilePath, "ATK/matrices/FOA/decoders/acn-n3d1.mosl.txt");
 );
 
-mFileHandle = file_open(mFilePath);
-
-mReadError = 0;
-// Read matrix if file is valid
-mFileHandle > 0 && file_text(mFileHandle) ? (
-    
-  // Get matrix dimensions
-  file_avail(mFileHandle) ? file_var(mFileHandle,mMatrixRows) : mReadError = 1;
-  file_avail(mFileHandle) ? file_var(mFileHandle,mMatrixCols) : mReadError = 1;
-  
-  // Read cell values
-  cellCount = 0;
-  loop(mMatrixRows,
-    loop(mMatrixCols,
-      file_avail(mFileHandle) ? file_var(mFileHandle,matrixDSP[cellCount]) : mReadError = 1;
-      cellCount += 1;
-    );
-  );
-) : mReadError = 1;
-
-// CLose file when done
-file_close(mFileHandle);
-
-
+mFileReadingErrorStatus = mMatrixDSP.matrix_read_from_file(mFilePath);
 
 
 /**********************************************************
@@ -109,7 +88,7 @@ zIn = spl3;
 );
 
 // Matrix multiplication with input signal:
-spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
-spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
-spl2 = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
-spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];
+spl0 = wIn * mMatrixDSP.cell[0]  + xIn * mMatrixDSP.cell[1]  + yIn * mMatrixDSP.cell[2]  + zIn * mMatrixDSP.cell[3];
+spl1 = wIn * mMatrixDSP.cell[4]  + xIn * mMatrixDSP.cell[5]  + yIn * mMatrixDSP.cell[6]  + zIn * mMatrixDSP.cell[7];
+spl2 = wIn * mMatrixDSP.cell[8]  + xIn * mMatrixDSP.cell[9]  + yIn * mMatrixDSP.cell[10] + zIn * mMatrixDSP.cell[11];
+spl3 = wIn * mMatrixDSP.cell[12] + xIn * mMatrixDSP.cell[13] + yIn * mMatrixDSP.cell[14] + zIn * mMatrixDSP.cell[15];
