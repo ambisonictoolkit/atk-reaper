@@ -40,10 +40,10 @@ For regular use of the plugin the debug code is commented out in the same way as
 desc: ATK FOA Transform FocusPressPushZoom
 // First Order Ambisonic focus, press, push and zoom transformer
 
-// Import library with shared functions
-import atkConstantsAndMathsLibrary.jsfx-inc
-import atkMatrixLibrary.jsfx-inc
-import atkGraphicsLibrary.jsfx-inc
+
+// Import library with shared functions, also imports cookdsp
+import ../../libraries/atk/atk.jsfx-inc
+
 
 in_pin:W
 in_pin:X

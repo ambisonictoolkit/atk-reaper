@@ -41,8 +41,9 @@ and GNU General Public License along with this program.  If not, see
 desc: ATK FOA Encode Omni
 // Encode mono signal as omnidirectional soundfield
 
-// Import library with shared functions
-import atkConstantsAndMathsLibrary.jsfx-inc
+
+// Import library with shared functions, also imports cookdsp
+import ../../libraries/atk/atk.jsfx-inc
 
 
 in_pin:M

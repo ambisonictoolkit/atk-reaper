@@ -30,7 +30,7 @@ and GNU General Public License along with this program.  If not, see
 desc: ATK FOA Decode BtoAmbiX
 // B-format to AmbiX format decoder
 
-// Import library with shared functions
+// Import library with shared functions, also imports cookdsp
 import ../../libraries/atk/atk.jsfx-inc
 
 in_pin:W

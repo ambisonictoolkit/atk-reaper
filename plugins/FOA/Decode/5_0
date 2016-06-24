@@ -46,10 +46,9 @@ http://musicdsp.org/showArchiveComment.php?ArchiveID=19
 desc: ATK FOA Decode 5_0
 // Bruce Wiggins optimised ITU 5.0 decoders (L - R - C - LFE - SL - SR)
 
-// Import library with shared functions
-import atkConstantsAndMathsLibrary.jsfx-inc
-import atkMatrixLibrary.jsfx-inc
-import atkGraphicsLibrary.jsfx-inc
+// Import library with shared functions, also imports cookdsp
+import ../../libraries/atk/atk.jsfx-inc
+
 
 in_pin:W
 in_pin:X

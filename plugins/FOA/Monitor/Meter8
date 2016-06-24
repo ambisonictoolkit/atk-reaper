@@ -33,10 +33,10 @@ desc: ATK FOA Monitor Meter8
 filename:0,../../libraries/atk/GainSlider.png
 //filename:0,HorizontalBackground.png
 
-// Import library with shared functions
-import atkConstantsAndMathsLibrary.jsfx-inc
-import atkMatrixLibrary.jsfx-inc
-import atkGraphicsLibrary.jsfx-inc
+
+// Import library with shared functions, also imports cookdsp
+import ../../libraries/atk/atk.jsfx-inc
+
 
 in_pin:1
 in_pin:2

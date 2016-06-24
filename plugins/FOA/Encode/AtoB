@@ -30,10 +30,10 @@ and GNU General Public License along with this program.  If not, see
 desc: ATK FOA Encode AtoB
 // A to B format encoder for a variety of tetrahedral orientations and W channel weights
 
-// Import library with shared functions
-import atkConstantsAndMathsLibrary.jsfx-inc
-import atkMatrixLibrary.jsfx-inc
-import atkGraphicsLibrary.jsfx-inc
+
+// Import library with shared functions, also imports cookdsp
+import ../../libraries/atk/atk.jsfx-inc
+
 
 in_pin:A
 in_pin:B

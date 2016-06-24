@@ -103,10 +103,9 @@ filename:42,../../libraries/atk/ear_photos/Subject_162/0162_left.jpg
 filename:43,../../libraries/atk/ear_photos/Subject_163/0163_left.jpg
 filename:44,../../libraries/atk/ear_photos/165-none
 
-// Import library with shared functions
-import atkConstantsAndMathsLibrary.jsfx-inc
-import atkKernelLibrary.jsfx-inc
-import atkGraphicsLibrary.jsfx-inc
+
+// Import library with shared functions, also imports cookdsp
+import ../../libraries/atk/atk.jsfx-inc
 
 
 in_pin:W

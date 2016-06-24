@@ -31,8 +31,8 @@ desc: ATK FOA Encode Diffuser
 // Frequency diffusion mono encoder
 
 
-// Import library with shared functions
-import atkKernelLibrary.jsfx-inc
+// Import library with shared functions, also imports cookdsp
+import ../../libraries/atk/atk.jsfx-inc
 
 
 in_pin:M

@@ -31,8 +31,8 @@ desc: ATK FOA Decode UHJ Stereo
 // Ambisonic UHJ stereo decoder
 
 
-// Import library with shared functions
-import atkKernelLibrary.jsfx-inc
+// Import library with shared functions, also imports cookdsp
+import ../../libraries/atk/atk.jsfx-inc
 
 
 in_pin:W
