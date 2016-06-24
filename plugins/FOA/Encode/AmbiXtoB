@@ -1,0 +1,94 @@
+/*
+Copyright the ATK Community and Joseph Anderson, Josh Parmenter, Trond Lossius, 2013
+
+               J Anderson     j.anderson[at]ambisonictoolkit.net
+               J Parmenter    j.parmenter[at]ambisonictoolkit.net
+               T Lossius      trond.lossius[at]bek.no
+
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+and GNU General Public License along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+---------------------------------------------------------------------
+  Class: BtoAmbiX
+  AmbiX to B-format encoder
+---------------------------------------------------------------------
+*/
+
+desc: ATK FOA Encode AmbiXtoB
+// AmbiX to B-format encoder
+
+// Import library with shared functions
+import ../../libraries/atk/atk.jsfx-inc
+
+in_pin:W
+in_pin:X
+in_pin:Y
+in_pin:Z
+
+out_pin:1
+out_pin:2
+out_pin:3
+out_pin:4
+
+slider1:0<0,1,0{ACN SN3D, ACN N3D}>Source format
+
+
+/**********************************************************
+Initialisation
+**********************************************************/
+@init
+
+// Setting up 4x4 matrix
+mMatrixDSP.matrix(4, 4);
+
+// Slot for filename
+mFilePath = 1;
+
+
+/**********************************************************
+Updated slider value:
+**********************************************************/
+@slider
+
+(slider1 == 0) ? (
+  strcpy(mFilePath, "ATK/matrices/FOA/encoders/acn-sn3d1.mosl.txt");
+) : (
+  strcpy(mFilePath, "ATK/matrices/FOA/encoders/acn-n3d1.mosl.txt");
+);
+
+mFileReadingErrorStatus = mMatrixDSP.matrix_read_from_file(mFilePath);
+
+
+/**********************************************************
+Calculate audio sample
+**********************************************************/
+@sample
+wIn = spl0;
+xIn = spl1;
+yIn = spl2;
+zIn = spl3;
+
+// Prevent potential blow up if track is 2 channels only and spl2 and spl3 are un-ininitiated.
+(num_ch == 2) ? (
+  yIn = 0.;
+  zIn = 0.;
+);
+
+// Matrix multiplication with input signal:
+spl0 = wIn * mMatrixDSP.cell[0]  + xIn * mMatrixDSP.cell[1]  + yIn * mMatrixDSP.cell[2]  + zIn * mMatrixDSP.cell[3];
+spl1 = wIn * mMatrixDSP.cell[4]  + xIn * mMatrixDSP.cell[5]  + yIn * mMatrixDSP.cell[6]  + zIn * mMatrixDSP.cell[7];
+spl2 = wIn * mMatrixDSP.cell[8]  + xIn * mMatrixDSP.cell[9]  + yIn * mMatrixDSP.cell[10] + zIn * mMatrixDSP.cell[11];
+spl3 = wIn * mMatrixDSP.cell[12] + xIn * mMatrixDSP.cell[13] + yIn * mMatrixDSP.cell[14] + zIn * mMatrixDSP.cell[15];
