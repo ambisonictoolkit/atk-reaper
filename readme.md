@@ -132,9 +132,18 @@ List of Changes
 
 Version 1.0.0.b8
 
-* Updated to install atk-kernels v. 1.2.1.
-* UHJ and Spreader encoders: Now support all sample rates equal to or higher than 44.1 kHz. (issues #20, #29, #30)
-* Binaural decoder: CIPIC and Listen HRTFs now work woth all samle rates equal to or higher than 44.1 kHz (issues #18, #29, #32, #33).
+* Refactoring (these changes should not affect the behaviour of plugins):
+    * Updated to install atk-kernels v. 1.2.1.
+    * ATK for Reaper now uses v. 0.3 of the CookDSP library by Olivier Bélanger: https://github.com/belangeo/cookdsp
+    * Introducing ATK library header file, simplifies maintenance of libraries and library dependencies.
+    * Have started to implement matrix library as object-oriented classes, adding new feature to read matrix file from disk. This is used for the AmbiX encoders and decoders.
+* New features:
+    * New encoder: AmbiXtoB - encodes a first order AmbiX format signal to FuMa B-format for further processing in Ambisonic Tooit. Supports 3DN and S3DN.
+    * New decoder: BtoAmbiX - decodes a FuMa B-format (used for processing in Ambisonic Tooit) to first order AmbiX format. Supports 3DN and S3DN. S3DN is used to author ambisonic sound files for Google VR 360° videos.
+    * UHJ and Spreader encoders: Now support all sample rates equal to or higher than 44.1 kHz (issues #20, #29, #30).
+    * Binaural decoder: CIPIC and Listen HRTFs now work woth all samle rates equal to or higher than 44.1 kHz (issues #18, #29, #32, #33).
+* On a side note:
+    * A new repository has been set up providing [a set of example Ambisonic Toolkit Reaper projects](https://github.com/ambisonictoolkit/atk-reaper-examples). This will soon be available from the ATK web site as a separate download.
 
 Version 1.0.0.b7
 
