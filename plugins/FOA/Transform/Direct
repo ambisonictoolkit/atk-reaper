@@ -47,7 +47,7 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
-slider1:0<-180,180,0.1>Azimuth (mouse)
+slider1:0<180,-180,0.1>Azimuth (mouse)
 slider2:0<-90,90,0.1>Elevation
 slider3:0<0,90,0.1>Degree of transformation (mouse)
 
@@ -99,7 +99,7 @@ mClickingAtCircle = 0;
 function calculateMatrix()
 (  
   // Generate matrixes
-  generateRotationMatrix(matrixRotate1, (-mAzimuth));
+  generateRotationMatrix(matrixRotate1, -mAzimuth);
   generateTumblelMatrix(matrixTumble1, -mElevation);
   generateDirectMatrix(matrixTransform, mTransformAngle);
   generateRotationMatrix(matrixRotate2, mAzimuth);
@@ -159,7 +159,7 @@ mPreviousMouseCap = mouse_cap;
   mMouseX = mouse_x - gCenterX;
   mMouseY = mouse_y - gCenterY;
   
-  mAzimuth = atan2(mMouseX, -mMouseY);
+  mAzimuth = atan2(-mMouseX, -mMouseY);
 
   // Update slider2 and notify GUI of the change  
   slider1 = mAzimuth * kRad2Deg;
@@ -182,7 +182,7 @@ mPreviousMouseCap = mouse_cap;
 displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, 1);
 
 // Calculate absolute position of interaction circle
-mPosX = gCenterX + gRadius * (1. - mNormTransformAngle) * sin(mAzimuth);
+mPosX = gCenterX - gRadius * (1. - mNormTransformAngle) * sin(mAzimuth);
 mPosY = gCenterY - gRadius * (1. - mNormTransformAngle) * cos(mAzimuth);
 
 // Draw line from origo to interaction circle
