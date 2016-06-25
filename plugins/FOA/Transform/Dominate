@@ -46,7 +46,7 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
-slider1:0<-180,180,0.1>Azimuth (mouse)
+slider1:0<180,-180,0.1>Azimuth (mouse)
 slider2:0<-90,90,0.1>Elevation
 slider3:0<-0.,24.,0.05>Gain increase in dB (mouse)
 
@@ -169,7 +169,7 @@ mPreviousMouseCap = mouse_cap;
   mMouseY = mouse_y - gCenterY;
   
   // Update mAzimuth and slider1 and notify GUI of the change
-  mAzimuth = atan2(mMouseX, -mMouseY);
+  mAzimuth = atan2(-mMouseX, -mMouseY);
   slider1 = mAzimuth * kRad2Deg;
   slider_automate(slider1);
   
@@ -195,7 +195,7 @@ displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
 
 
 // Calculate absolute position of interaction circle
-mPosX = gCenterX + gRadius * slider3 * kInv24 * (mSinAzimuth * mCosElevation);
+mPosX = gCenterX - gRadius * slider3 * kInv24 * (mSinAzimuth * mCosElevation);
 mPosY = gCenterY - gRadius * slider3 * kInv24 * (mCosAzimuth * mCosElevation);
 
 
