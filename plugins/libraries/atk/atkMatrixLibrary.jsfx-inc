@@ -1130,23 +1130,24 @@ function generatePushMatrix(aMatrix, anAngle) local(lG0, lG1)
 /********************************************************************
 Matrix: Generate 1st order 4x4 matrix for rotation transformation
 ********************************************************************/
-function generateRotationMatrix(aMatrix, anAngle)
+function generateRotationMatrix(aMatrix, anAngle) local(lCosAngle, lSinAngle)
 (
-  // We use SpatDIF (navigational) coordinate system rather than mathematical.
+  lCosAngle = cos(anAngle);
+  lSinAngle = sin(anAngle);
   
   aMatrix[0]  = 1.;
   aMatrix[1]  = 0.;
   aMatrix[2]  = 0.;
   aMatrix[3]  = 0.;
   
-  aMatrix[4]  = 0.;
-  aMatrix[5]  = cos(anAngle);
-  aMatrix[6]  = sin(anAngle);
-  aMatrix[7]  = 0.;
+  aMatrix[4]  =  0.;
+  aMatrix[5]  =  lCosAngle;
+  aMatrix[6]  = -lSinAngle;
+  aMatrix[7]  =  0.;
   
   aMatrix[8]  = 0.;
-  aMatrix[9]  = -aMatrix[6];
-  aMatrix[10] =  aMatrix[5];
+  aMatrix[9]  =  lSinAngle;
+  aMatrix[10] =  lCosAngle;
   aMatrix[11] = 0.;
   
   aMatrix[12] = 0.;
