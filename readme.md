@@ -132,16 +132,44 @@ List of Changes
 
 Version 1.0.0.b8
 
-* Refactoring (these changes should not affect the behaviour of plugins):
-    * Updated to install atk-kernels v. 1.2.1.
-    * ATK for Reaper now uses v. 0.3 of the CookDSP library by Olivier Bélanger: https://github.com/belangeo/cookdsp
-    * Introducing ATK library header file, simplifies maintenance of libraries and library dependencies.
-    * Have started to implement matrix library as object-oriented classes, adding new feature to read matrix file from disk. This is used for the AmbiX encoders and decoders.
+**IMPORTANT: This version breaks backwards compatibility regarding how azimuth angles are described in encoders, tranformsers and decoders.**
+
+Azimuth angles are now defined to be positive in the counter-clockwise direction. The new azimuth convention aligns with standard ambisonic conventions, and description of azimuths is now consistent between the SuperCollider and Reaper implementations of ATK. 
+
+This is a change from prior beta-versions up to and including v.1.0.0.b7, and unfortunately it breaks backwards compatibility. As an example a planewave encoding done using previous beta verison now will be mirrored between left and right.
+
+When we initially set out to make the Reaper port of ATK, we wanted this new design from the start. However, due to limitations in Reaper version 4 we had to implement azimuth as positive in clockwise rather than counter-clockwise direction. This was disussed in the paper [ATK Reaper: The Ambisonic Toolkit as JSFX plugins](http://www.ambisonictoolkit.net/assets/files/2014-ICMC-ATK-Reaper.pdf) by T. Lossius and J. Anderson, presented at the joint ICMC/SMC conference in Athens in 2014:
+
+> Due to current limitations in the Reaper JSFX API, there are some considerations to be made with respect to description of azimuths. The desired behaviour is that azimuths increase anti-clockwise. At the same time it is also preferable that for sources coming from the front half circle, moving the azimuth slider to the right results in the direction of the sound also moving clockwise to the right, similar to what happens when moving a regular stereo pan pot. The Harpex and Blue Ripple plugins both functions this way. In order to achieve this, horizontal azimuth sliders will need to be implemented with increasing values to the left. This is however currently not supported in Reaper JSFX, and for the time being ATK for Reaper uses azimuth values described according to a navigational coordinate system. If Reaper in the future is updated to support sliders with increasing values to the left, this design decision is likely to be reconsidered, and changed to use acoustic conventions.
+
+REAPER v.5 added support for JSFX sliders with increasing values to the left, and hence this change is now being implemented. This implied changes to the following plugins:
+
+* Changed (breaks backwards compatibility)
+    * Encoders
+        * Planewave encoder now has positive azimuth in counter-clockwise direction (issue #34)
+    * Transforms
+        * Direct transform now has positive azimuth in counter-clockwise direction (issue #35)
+        * Dominate transform now has positive azimuth in counter-clockwise direction (issue #36)
+        * FocusPressPullZoom transform now has positive azimuth in counter-clockwise direction (issue #37)
+        * Mirror transform now has positive azimuth in counter-clockwise direction (issue #38)
+    * Decoders:
+        * Mono decoder now has positive azimuth in counter-clockwise direction (issue #40)
+
+If you need to maintain Reaper projects created using ATK for Reaper beta versions prior to 1.0.0.b8, you can insert a mirror transform 
+
+**Other changes in this version**
+
 * New features:
     * New encoder: AmbiXtoB - encodes a first order AmbiX format signal to FuMa B-format for further processing in Ambisonic Tooit. Supports 3DN and S3DN.
     * New decoder: BtoAmbiX - decodes a FuMa B-format (used for processing in Ambisonic Tooit) to first order AmbiX format. Supports 3DN and S3DN. S3DN is used to author ambisonic sound files for Google VR 360° videos.
-    * UHJ and Spreader encoders: Now support all sample rates equal to or higher than 44.1 kHz (issues #20, #29, #30).
+    * Spreader encoder: Now support all sample rates equal to or higher than 44.1 kHz (issues #20, #30).
+    * UHJ encoders: Now support all sample rates equal to or higher than 44.1 kHz (issues #20, #31).
     * Binaural decoder: CIPIC and Listen HRTFs now work woth all samle rates equal to or higher than 44.1 kHz (issues #18, #29, #32, #33).
+* Refactoring (these changes should not affect the behaviour of plugins):
+    * Updated to install atk-kernels v. 1.2.1.
+    * ATK for Reaper now uses v. 0.3 of the CookDSP library by Olivier Bélanger: https://github.com/belangeo/cookdsp
+    * Introducing ATK library header file, simplifies maintenance of libraries and library dependencies (issue #39).
+    * Have started to implement matrix library as object-oriented classes, adding new feature to read matrix file from disk. This is used for the AmbiX encoders and decoders.
 * On a side note:
     * A new repository has been set up providing [a set of example Ambisonic Toolkit Reaper projects](https://github.com/ambisonictoolkit/atk-reaper-examples). This will soon be available from the ATK web site as a separate download.
 
