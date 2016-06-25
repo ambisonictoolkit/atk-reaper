@@ -45,7 +45,7 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
-slider1:0<-180,180,0.1>Azimuth (mouse)
+slider1:0<180,-180,0.1>Azimuth (mouse)
 slider2:0<-90,90,0.1>Elevation
 
 
@@ -275,7 +275,7 @@ mPreviousMouseCap = mouse_cap;
   mMouseY = mouse_y - gCenterY;
   
   // Update mAzimuth and slider2 and notify GUI of the change
-  mAzimuth = atan2(mMouseX, -mMouseY);
+  mAzimuth = atan2(-mMouseX, -mMouseY);
   slider1 = mAzimuth * kRad2Deg;
   slider_automate(slider1);
   
@@ -380,7 +380,7 @@ postAfter();
 //gxColorSet(0.5, 1.0 + 0.3 * mSinElevation, 0.5 * mSinElevation, 0.5 * mSinElevation);
 //setInteractionColor(0);
 gxColorSetHsl(1.0, 195., 1., 0.4 + 0.15*mHiglightCircle);
-mPosX = gCenterX + gRadius * slider4 * (mSinAzimuth * mCosElevation);
+mPosX = gCenterX - gRadius * slider4 * (mSinAzimuth * mCosElevation);
 mPosY = gCenterY - gRadius * slider4 * (mCosAzimuth * mCosElevation);
 
 // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
