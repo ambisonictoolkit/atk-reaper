@@ -258,6 +258,22 @@ Third Party Notices
 
 &nbsp;
 
+CookDSP
+-------
+
+ATK for Reaper makes use of the [CookDSP library](http://ajaxsoundstudio.com/software/cookdsp/) by Olivier Bélanger.
+
+CookDSP is copyright (c) - 2014 - Olivier Belanger.
+Permission to use, copy, modify, and/or distribute this
+software for any purpose with or without fee is hereby
+granted, provided that the above copyright notice and this
+permission notice appear in all copies. CookDSP IS PROVIDED
+"AS IS", WITHOUT WARRANTY OF ANY KIND FROM THE AUTHOR.
+
+
+
+&nbsp;
+
 Diametric Decoder Theorem (DDT) decoding
 ----------------------------------------
 
