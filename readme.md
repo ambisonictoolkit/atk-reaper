@@ -1,8 +1,7 @@
 <div id="container">
   <div id="content">
 
-ATK for Reaper : Read Me
-========================
+# ATK for Reaper : Read Me
 
 This is the Ambisonic Toolkit (ATK) as a JSFX plugin suite for Reaper.
 It can be used with Reaper on OSX and Windows, and can also be used with
@@ -34,20 +33,17 @@ website](http:www.ambisonictoolkit.net/) or send us an
 
 &nbsp;
 
-Installing
-==========
+# Installing
 
 &nbsp;
 
-Requirements
-------------
+## Requirements
 
 * ATK for Reaper requires [Reaper 5.0 or above](http://reaper.fm).
 
 &nbsp;
 
-Windows
--------
+## Windows
 
 1. Start Reaper.
 2. From the Options menu choose "Show REAPER resource path in explorer/finder".
@@ -56,13 +52,14 @@ Windows
 
 &nbsp;
 
-Mac OSX
--------
+## Mac OSX
 
-When you run the installer, the required files are installed into the following two folders in your home library folder:
+When you run the installer, the required files are installed into the following folders in your home library folder:
 
     ~/Library/Application Support/ATK
+    ~/Library/Application Support/Reaper/ColorThemes
     ~/Library/Application Support/Reaper/Effects/ATK
+    ~/Library/Application Support/Reaper/presets
 
 &nbsp;
 
@@ -89,8 +86,7 @@ additional option.
 
 &nbsp;
 
-Need Some Sound Files to Play Around With?
-------------------------------------------
+## Need Some Sound Files to Play Around With?
 
 You can find a collection of sound files here:
 
@@ -115,8 +111,7 @@ And most of the catalogue of Nimbus Records are UHJ recordings:
 
 &nbsp;
 
-Feedback and Bug Reports
-========================
+# Feedback and Bug Reports
 
 Known issues are logged at [GitHub](https://github.com/ambisonictoolkit/atk-reaper/issues).
 
@@ -127,10 +122,11 @@ If you use the plugins for some project, please [let us know](mailto:info[at]amb
 &nbsp;
 
 
-List of Changes
----------------
+# List of Changes
 
-Version 1.0.0.b8 - 2016-07-24
+## Version 1.0.0.b8
+
+*Released 2016-07-24*
 
 **IMPORTANT: This version breaks backwards compatibility regarding how azimuth angles are described in encoders, tranformsers and decoders.**
 
@@ -159,7 +155,8 @@ If you need to maintain Reaper projects created using ATK for Reaper beta versio
 
 **Other changes in this version**
 
-* New features:
+* New features
+    * New Reaper-theme, provided by Michael McCrea - When selecting the MultiChanMix theme in Reaper, two new Track Mixer Panel Layouts are available with larger multi-channel level meters (issue #23).
     * New encoder: AmbiXtoB - encodes a first order AmbiX format signal to FuMa B-format for further processing in Ambisonic Tooit. Supports 3DN and S3DN.
     * New decoder: BtoAmbiX - decodes a FuMa B-format (used for processing in Ambisonic Tooit) to first order AmbiX format. Supports 3DN and S3DN. S3DN is used to author ambisonic sound files for Google VR 360° videos.
     * Spreader encoder: Now support all sample rates equal to or higher than 44.1 kHz (issues #20, #30).
@@ -167,13 +164,15 @@ If you need to maintain Reaper projects created using ATK for Reaper beta versio
     * Binaural decoder: CIPIC and Listen HRTFs now work woth all samle rates equal to or higher than 44.1 kHz (issues #18, #29, #32, #33).
 * Refactoring (these changes should not affect the behaviour of plugins):
     * Updated to install atk-kernels v. 1.2.1.
+    * Installs atk-matrices, so far used for AmbiX conversions.
     * ATK for Reaper now uses v. 0.3 of the CookDSP library by Olivier Bélanger: https://github.com/belangeo/cookdsp
     * Introducing ATK library header file, simplifies maintenance of libraries and library dependencies (issue #39).
     * Have started to implement matrix library as object-oriented classes, adding new feature to read matrix file from disk. This is used for the AmbiX encoders and decoders.
 * On a side note:
     * A new repository has been set up providing [a set of example Ambisonic Toolkit Reaper projects](https://github.com/ambisonictoolkit/atk-reaper-examples). This will soon be available from the ATK web site as a separate download.
 
-Version 1.0.0.b7 - 2016-05-23
+## Version 1.0.0.b7
+*Released 2016-05-23*
 
 * Refactoring (these changes should not affect the behaviour of plugins):
     * The repository has been moved to [Github](https://github.com/ambisonictoolkit/atk-reaper). If you experience problems with the installers in this version, [please let us know](https://github.com/ambisonictoolkit/atk-reaper/issues).
@@ -182,11 +181,13 @@ Version 1.0.0.b7 - 2016-05-23
     * Stereo, Quadrophonic, 5_0 and Pantohponic 2D decoders: Added GUI for level metering and display of speaker positions/channel numbering
     * New decoder: Periphonic 3D - 3D dual ring, regular cylindrical decoder, with GUI for level metering and display of speaker positions/channel numbering
 
-Version 1.0.0.b6 - 2015-11-04
+## Version 1.0.0.b6
+*Released 2015-11-04*
 
 * In Reaper 5 the name of the plugins are retrieved from the desc field rather than filename. The desc field of these plugins was previously used to provide documentation on the plugin. Now it has been changed to have more useful names of the plugins.
 
-Version 1.0.b5 - 2015-08-07
+## Version 1.0.b5
+*Released 2015-08-07*
 
 * Added new utils plugin: MuteSoloChannels - can be used to mute or solo individula channels of a four-channel track. This can be useful when monitoring effect processing of signals within a Bformat => BtoA => SoundFXs => AtoB => B-format signal processing chain.
 * The 4channels plugins is now properly installed on Windows.
@@ -194,13 +195,15 @@ Version 1.0.b5 - 2015-08-07
 * Fixed bug in binaural decoder that would prevent the use of Spherical HRTFs at 88.2kHz and 96khz. Thanks to Juan Pampin for pointing this out!
 * Resolved: JS plugin automation data generated by GUI is not always properly recorded. This was a bug in Reaper, and was fixed in Reaper 4.75. Issue on the Reaper issue tracker:  http://forum.cockos.com/showthread.php?t=147151
 
-Version 1.0.b4
+## Version 1.0.b4
+*Released 2014-10-04*
 
 * New utility plugin "4channels": Can be used to extract 4-channel A- or B-format recording from sound file with additional channels, e.g. recorded in the field using a portable recorder such as Tascam DR680 or Sound Devices 788T.
 * Fixed an issue where matrix-based encoders could cause very loud signals if used on a track with insufficient number of channels.
 
 
-Version 1.0.b3
+## Version 1.0.b3
+*Released 2014-09-09*
 
 * Fixed issue where multi-channel matrix-based decoders could blow up when used on 2-channel (stereo) tracks.
 * Encode/UHJ: Corrected description of plugin in GUI
@@ -208,7 +211,8 @@ Version 1.0.b3
 * Decode/5_0: Text description now provides information on output channels
 * Decode/Quad: Text description now provides information on output channels
 
-Version 1.0.b2
+## Version 1.0.b2
+*Released 2014-09-3*
 
 * Fixed issue where matrix-based transform plugins could blow up when used on 2-channel (stereo) tracks.
 * Fixed issue that prevented Omni encoder from producing sound.
@@ -219,7 +223,8 @@ Version 1.0.b2
 
 &nbsp;
 
-Version 1.0.b1:
+## Version 1.0.b1:
+*Released 2014-08-29*
 
 * First beta release.
 
@@ -227,8 +232,7 @@ Version 1.0.b1:
 
 &nbsp;
 
-Credits
-=======
+# Credits
 
 &nbsp;
 
@@ -253,13 +257,11 @@ are copyright the Ambisonic Toolkit Community and Joseph Anderson,
 
 &nbsp;
 
-Third Party Notices
-===================
+# Third Party Notices
 
 &nbsp;
 
-CookDSP
--------
+## CookDSP
 
 ATK for Reaper makes use of the [CookDSP library](http://ajaxsoundstudio.com/software/cookdsp/) by Olivier Bélanger.
 
@@ -274,8 +276,7 @@ permission notice appear in all copies. CookDSP IS PROVIDED
 
 &nbsp;
 
-Diametric Decoder Theorem (DDT) decoding
-----------------------------------------
+## Diametric Decoder Theorem (DDT) decoding
 
 Support for Gerzon's Diametric Decoder Theorem (DDT) decoding algorithm
 is derived from Aaron Heller's Octave code available at:
@@ -289,8 +290,7 @@ Anderson](mailto:j.anderson[at]ambisonictoolkit.net).
 
 &nbsp;
 
-Irregular array decoding
-------------------------
+## Irregular array decoding
 
 Irregular array decoding coefficients (5.0) are kindly provided by
 Bruce Wiggins: http://www.brucewiggins.co.uk/
@@ -301,8 +301,7 @@ Derby, Derby, 2004.
 
 &nbsp;
 
-CIPIC HRTF Database (University of California)
-----------------------------------------------
+## CIPIC HRTF Database (University of California)
 
 V. R. Algazi, R. O. Duda, D. M. Thompson, and C. Avendano, "The CIPIC
 HRTF Database," in Proceedings of the 2001 IEEE ASSP Workshop on
@@ -313,7 +312,7 @@ Applications of Signal Processing to Audio and Acoustics, New Paltz, NY,
 Available: <http://interface.cipic.ucdavis.edu/sound/hrtf.html>.
 [Accessed: 07-Jul-2011].
 
-**CIPIC Notices:**
+### CIPIC Notices:
 
 Copyright (c) 2001 The Regents of the University of California. All
 Rights Reserved
@@ -348,14 +347,13 @@ of California 1 Shields Avenue Davis, CA 95616-8553
 
 &nbsp;
 
-Listen HRTF Database (IRCAM)
-----------------------------
+## Listen HRTF Database (IRCAM)
 
 "LISTEN HRTF DATABASE." [Online]. Available:
 <http://recherche.ircam.fr/equipes/salles/listen/>. [Accessed:
 07-Jul-2011].
 
-**IRCAM Notices:**
+### IRCAM Notices:
 
 Copyright (c) 2002 IRCAM (Institut de Recherche et Coordination
 Acoustique/Musique). All Rights Reserved
@@ -373,8 +371,7 @@ Olivier Warusfel, Room Acoustics Team, IRCAM 1, place Igor Stravinsky
 
 &nbsp;
 
-MESA GLU Library
-----------------
+## MESA GLU Library
 
 Code for calculating the inverse of a 4x4 matrix is based on the MESA
 implementation of the GLU library: <http://www.mesa3d.org/>
