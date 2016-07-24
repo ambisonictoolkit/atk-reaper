@@ -124,11 +124,19 @@ If you use the plugins for some project, please [let us know](mailto:info[at]amb
 
 # List of Changes
 
-## Version 1.0.0.b8
+## Version 1.0.0.b9
 
 *Released 2016-07-24*
 
 **IMPORTANT: This version breaks backwards compatibility regarding how azimuth angles are described in encoders, tranformsers and decoders.**
+
+**It also breaks backwards compatibility with respect to channel configurations for the Quad Decoder.**
+
+*Quad decoder*
+
+The Quad decoder now returns 4 channels only: L - R - Ls - Rs. Refer to the discussion in issue [#26](https://github.com/ambisonictoolkit/atk-reaper/issues/26) for further details.
+
+*Azimuth angles*
 
 Azimuth angles are now defined to be positive in the counter-clockwise direction. The new azimuth convention aligns with standard ambisonic conventions, and description of azimuths is now consistent between the SuperCollider and Reaper implementations of ATK. 
 

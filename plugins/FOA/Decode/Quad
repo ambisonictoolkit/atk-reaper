@@ -41,7 +41,7 @@ http://musicdsp.org/showArchiveComment.php?ArchiveID=19
 */
 
 desc: ATK FOA Decode Quadrophonic
-// Quadrophonic decoder (L - R - C - LFE - SL - SR)
+// Quadrophonic decoder (L - R - SL - SR)
 
 
 // Import library with shared functions, also imports cookdsp
@@ -55,12 +55,8 @@ in_pin:Z
 
 out_pin:L
 out_pin:R
-out_pin:C
-out_pin:LFE
 out_pin:SL
 out_pin:SR
-out_pin:SBL
-out_pin:SBR
 
 slider1:45<0,90,1>Angle
 slider2:5<0,10,1{20 ms, 30 ms, 50 ms, 100 ms, 200 ms, 300 ms, 500 ms, 1 sec, 3 sec, 6 secs}>Peak level decay half time
@@ -76,8 +72,8 @@ kMaxNumSpeakers = 4;
 // Memory allocations
 memCount   = 1024;
 
-matrixDSP = memCount;   //  for 8x4 matrix as 1D array
-memCount  += 8*4;
+matrixDSP = memCount;   //  for 4x4 matrix as 1D array
+memCount  += 4*4;
 
 mDisplayAngles = memCount;
 memCount += kMaxNumSpeakers;
@@ -86,14 +82,14 @@ mLedCoordinates = memCount;
 memCount += 2*4*kNumLeds*kMaxNumSpeakers; // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
  
 mPeaks = memCount;
-memCount += kMaxNumSpeakers+2; // Also reserving slot for unused C and LFE
+memCount += kMaxNumSpeakers; // Also reserving slot for unused C and LFE
 
 mDisplayPeaks = memCount;
-memCount += kMaxNumSpeakers+2; // Also reserving slot for unused C and LFE
+memCount += kMaxNumSpeakers; // Also reserving slot for unused C and LFE
 
 // Zero max peak values at start
-memset(mPeaks,0,kMaxNumSpeakers+2);
-memset(mDisplayPeaks,0,kMaxNumSpeakers+2);
+memset(mPeaks,0,kMaxNumSpeakers);
+memset(mDisplayPeaks,0,kMaxNumSpeakers);
 
 // Graphics
 gfx_clear=-1;           // Prevent auto clear of each frame
@@ -223,8 +219,8 @@ gRadius -= 30;              // Reduce circle radius
   setSpeakerPositionFont();
   calculateCoordinates();
 
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[3]), gCenterY - (gRadius+20)*sin(mDisplayAngles[3]), "6");
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[2]), gCenterY - (gRadius+20)*sin(mDisplayAngles[2]), "5");
+  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[3]), gCenterY - (gRadius+20)*sin(mDisplayAngles[3]), "4");
+  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[2]), gCenterY - (gRadius+20)*sin(mDisplayAngles[2]), "3");
   
   drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[1]), gCenterY - (gRadius+20)*sin(mDisplayAngles[1]), "2");
   drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[0]), gCenterY - (gRadius+20)*sin(mDisplayAngles[0]), "1");
@@ -240,10 +236,10 @@ gRadius -= 30;              // Reduce circle radius
 (mDoRefresh) ? (
   drawSpkrLEDs(amp2db(mDisplayPeaks[0]), 0, mLedCoordinates);
   drawSpkrLEDs(amp2db(mDisplayPeaks[1]), 1, mLedCoordinates);
-  drawSpkrLEDs(amp2db(mDisplayPeaks[4]), 2, mLedCoordinates);
-  drawSpkrLEDs(amp2db(mDisplayPeaks[5]), 3, mLedCoordinates);
+  drawSpkrLEDs(amp2db(mDisplayPeaks[2]), 2, mLedCoordinates);
+  drawSpkrLEDs(amp2db(mDisplayPeaks[3]), 3, mLedCoordinates);
 
-  memset(mDisplayPeaks, 0., 6.);
+  memset(mDisplayPeaks, 0., 4.);
   mRefreshSampCount = 0;
   mDoRefresh = 0;
 );
@@ -281,20 +277,15 @@ yIn = spl2;
 // Front (left and right), z signal is ignored
 spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2];
 spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6];
-// Center and LFE are muted
-spl2 = 0.;
-spl3 = 0.;
+
 // SL and SR, , z signal is ignored
-spl4 = wIn * matrixDSP[16]  + xIn * matrixDSP[17]  + yIn * matrixDSP[18];
-spl5 = wIn * matrixDSP[20]  + xIn * matrixDSP[21]  + yIn * matrixDSP[22];
-// SBL and SBR are muted.
-spl6 = 0.;
-spl7 = 0.;
+spl2 = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10];
+spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14];
 
 
 // Peak monitoring
 ispl = 0;
-loop(6,
+loop(4,
   input = spl(ispl);
   output = mPeaks[ispl];
   input = abs(input);
