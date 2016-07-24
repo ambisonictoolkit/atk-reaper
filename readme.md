@@ -130,7 +130,7 @@ If you use the plugins for some project, please [let us know](mailto:info[at]amb
 List of Changes
 ---------------
 
-Version 1.0.0.b8
+Version 1.0.0.b8 - 2016-07-24
 
 **IMPORTANT: This version breaks backwards compatibility regarding how azimuth angles are described in encoders, tranformsers and decoders.**
 
@@ -173,7 +173,7 @@ If you need to maintain Reaper projects created using ATK for Reaper beta versio
 * On a side note:
     * A new repository has been set up providing [a set of example Ambisonic Toolkit Reaper projects](https://github.com/ambisonictoolkit/atk-reaper-examples). This will soon be available from the ATK web site as a separate download.
 
-Version 1.0.0.b7
+Version 1.0.0.b7 - 2016-05-23
 
 * Refactoring (these changes should not affect the behaviour of plugins):
     * The repository has been moved to [Github](https://github.com/ambisonictoolkit/atk-reaper). If you experience problems with the installers in this version, [please let us know](https://github.com/ambisonictoolkit/atk-reaper/issues).
@@ -182,7 +182,7 @@ Version 1.0.0.b7
     * Stereo, Quadrophonic, 5_0 and Pantohponic 2D decoders: Added GUI for level metering and display of speaker positions/channel numbering
     * New decoder: Periphonic 3D - 3D dual ring, regular cylindrical decoder, with GUI for level metering and display of speaker positions/channel numbering
 
-Version 1.0.b6
+Version 1.0.0.b6 - 2015-11-04
 
 * In Reaper 5 the name of the plugins are retrieved from the desc field rather than filename. The desc field of these plugins was previously used to provide documentation on the plugin. Now it has been changed to have more useful names of the plugins.
 
