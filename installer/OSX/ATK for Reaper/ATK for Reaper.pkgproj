@@ -75246,22 +75246,6 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>../../shared/atk-matrices/README</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>420</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>80</integer>
-															<key>PATH</key>
 															<string>../../shared/atk-matrices/README.md</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
@@ -77202,6 +77186,39 @@
 										<dict>
 											<key>CHILDREN</key>
 											<array>
+												<dict>
+													<key>CHILDREN</key>
+													<array>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>80</integer>
+															<key>PATH</key>
+															<string>../../shared/ColorThemes/MultiChanMix.ReaperThemeZip</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+													</array>
+													<key>GID</key>
+													<integer>80</integer>
+													<key>PATH</key>
+													<string>ColorThemes</string>
+													<key>PATH_TYPE</key>
+													<integer>0</integer>
+													<key>PERMISSIONS</key>
+													<integer>493</integer>
+													<key>TYPE</key>
+													<integer>2</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
 												<dict>
 													<key>CHILDREN</key>
 													<array/>

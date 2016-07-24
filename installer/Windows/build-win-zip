@@ -23,6 +23,7 @@ rm -rf "ATK for Reaper/Copy content to Data/ATK/matrices/.git"
 
 
 # Make folders as required for plugins
+mkdir "ATK for Reaper/Copy content to ColorThemes"
 mkdir "ATK for Reaper/Copy content to Effects"
 mkdir "ATK for Reaper/Copy content to Effects/ATK"
 mkdir "ATK for Reaper/Copy content to Effects/ATK/FOA"
@@ -34,6 +35,10 @@ mkdir "ATK for Reaper/Copy content to Effects/ATK/libraries"
 mkdir "ATK for Reaper/Copy content to Effects/ATK/libraries/atk"
 mkdir "ATK for Reaper/Copy content to Effects/ATK/libraries/cookdsp"
 mkdir "ATK for Reaper/Copy content to presets"
+
+
+# Copy multichannel REAPER theme
+cp "../shared/ColorThemes/MultiChanMix.ReaperThemeZip"					"ATK for Reaper/Copy content to ColorThemes/MultiChanMix.ReaperThemeZip"
 
 
 # Copy decoders
