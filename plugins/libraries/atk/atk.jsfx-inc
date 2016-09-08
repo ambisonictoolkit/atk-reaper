@@ -42,10 +42,24 @@ and GNU General Public License along with this program.  If not, see
 ---------------------------------------------------------------------
 */
 
+
 /* The CookDSP library by Olivier Bélanger adds a number of useful features.
    https://github.com/belangeo/cookdsp
  */
-import ../cookdsp/cookdsp.jsfx-inc
+//import ../cookdsp/cookdsp.jsfx-inc
+
+// Import select cookdsp library files
+
+/* Math functions */
+import cookdsp/mmath.jsfx-inc
+
+/* Utility functions */
+import cookdsp/memalloc.jsfx-inc
+import cookdsp/scaling.jsfx-inc
+
+
+
+// Import ATK library files
 
 /* Constants and maths */
 import atkConstantsAndMathsLibrary.jsfx-inc
@@ -62,4 +76,6 @@ import atkGraphicsLibrary.jsfx-inc
 
 @init
 
-ATK_VERSION = 1.0008;
+COOKDSP_VERSION = 0.3;
+
+ATK_VERSION = 1.0010;
