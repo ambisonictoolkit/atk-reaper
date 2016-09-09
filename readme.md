@@ -131,6 +131,7 @@ If you use the plugins for some project, please [let us know](mailto:info[at]amb
 * Added pre-install script to OSX installer that erase earlier versions of the `REAPER/Effects/ATK` folder, preventing possible conflicts when a newer version is installed on top of an older one (issue #47).
 * Loading only the parts of CookDSP that are actually used, speeding up plugin load time on Windows (isse #46)
 * Fixed bug where stereo encoder would encode left channel to the right and vica versa (issue #56)
+* Fixing issue where rotation angle got mixed up in RotateTiltTumble transform plugin (issue #51)
 
 ## Version 1.0.0.b9
 

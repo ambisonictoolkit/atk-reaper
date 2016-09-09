@@ -46,7 +46,7 @@ out_pin:Y
 out_pin:Z
 
 // Slider range is set to [-360,360] rather than [-180, 180] for more flexible scripting of rotating movements
-slider1:0<-180,180,0.1>Rotate (mouse)
+slider1:0<180,-180,0.1>Rotate (mouse)
 slider2:0<-180,180,0.1>Tilt (mouse)
 slider3:0<-180,180,0.1>Tumble (mouse)
 
@@ -164,7 +164,7 @@ mClickingAtRotateCircle ?
   // Update mRotateAngle
   mMouseX = mouse_x - gCenterX;
   mMouseY = mouse_y - gCenterY;
-  mRotateAngle = atan2(mMouseX, -mMouseY);
+  mRotateAngle = atan2(-mMouseX, -mMouseY);
   slider1 = mRotateAngle * kRad2Deg;
   
   // Notify GUI that rotation has changed, and update coefficients
@@ -389,7 +389,7 @@ drawLineSegment(mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY,
  // --- ROTATION INTERACTION CIRCLE
 
  // Absolute position of interaction circle
- mPosRotateX = gCenterX + gRadius * mSinRotation;
+ mPosRotateX = gCenterX - gRadius * mSinRotation;
  mPosRotateY = gCenterY - gRadius * mCosRotation;
 
  gxColorSetHsl(1.0, 195., 1.0, 0.4 + 0.15*mHiglightRotateCircle);
