@@ -83,8 +83,8 @@ function calculateCoefficients()
   matrixNewDSP[2] =  mCosAzi;
   matrixNewDSP[3] =  mCosAzi;
   // Y
-  matrixNewDSP[4] = -mSinAzi;
-  matrixNewDSP[5] =  mSinAzi;
+  matrixNewDSP[4] =  mSinAzi;
+  matrixNewDSP[5] = -mSinAzi;
   // Z
   matrixNewDSP[6] =  0.;
   matrixNewDSP[7] =  0.;
