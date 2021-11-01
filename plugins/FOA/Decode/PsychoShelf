@@ -91,7 +91,7 @@ implementing linear interpolation to new values.
 
 inverseSamplesblock = 1. / samplesblock;
 
-wc = tan(pi * mFreq * inverseSamplesblock);
+wc = tan($pi * mFreq * inverseSamplesblock);
 c = (wc - 1.0) / (wc + 1.0);
 
 // 0 order coefficients
