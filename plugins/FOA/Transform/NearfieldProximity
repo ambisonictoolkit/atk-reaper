@@ -122,7 +122,9 @@ Calculate audio sample
 // denorm performance issues with respect to the recursive values y1x, y1y and y1z
 distanceDSP += distanceInc;
 
-freq = 53.0 / distanceDSP;
+// Speed of sound equals 343 m/s, ref. issue 76
+// https://github.com/ambisonictoolkit/atk-reaper/issues/76
+freq = 54.59014548052 / distanceDSP;
 wc = (2*$pi * freq) * sampleDuration;
 
 // Filter coefficient depends on mode
