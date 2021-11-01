@@ -139,9 +139,9 @@ function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lA
   
   // Angles in degrees
   lAngleInc = 360./mNumSpeakerPairs;
-  lAngleLo  = 90. -            0.5*mSpeakerLayout*lAngleInc + 0.5*mAngularDistance;
-  lAngleMid = 90. + (0.5. - (0.5*mSpeakerLayout))*lAngleInc;
-  lAngleHi  = 90. + (1.0  - (0.5*mSpeakerLayout))*lAngleInc - 0.5*mAngularDistance;
+  lAngleLo  = 90. -          0.5 * mSpeakerLayout   * lAngleInc + 0.5 * mAngularDistance;
+  lAngleMid = 90. + ( 0.5 - (0.5 * mSpeakerLayout)) * lAngleInc;
+  lAngleHi  = 90. + ( 1.0 - (0.5 * mSpeakerLayout)) * lAngleInc - 0.5 * mAngularDistance;
   
   // Converted to radians
   lAngleInc = lAngleInc * kDeg2Rad;
