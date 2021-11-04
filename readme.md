@@ -124,14 +124,34 @@ If you use the plugins for some project, please [let us know](mailto:info[at]amb
 
 # List of Changes
 
+## Version 1.0.0.b11
+
+*Released 2021-11-04*
+
+Another maintenance release, ensuring compatibiility with Reaper v. 6.38
+
+* Pantophonic2D and Periphonic3D decoders now work with Reaper vv.6.38 - [#75](https://github.com/ambisonictoolkit/atk-reaper/issues/75)
+* Fixed typo in PsychoShelf filter, but the filter remains unstable - [#78](https://github.com/ambisonictoolkit/atk-reaper/issues/78)
+* Speed of sound corrected from 333 to 343 m/s in Proximity and Near Field transforms - [#76](https://github.com/ambisonictoolkit/atk-reaper/issues/76)
+
+Under the hood updates:
+
+* macOS installer disk image built using more recent version of create-dmg (1.0.9)
+* Updated atk-matrices to v. 1.0.0
+* Updated cookdsp library to v. 0.5 - [#74](https://github.com/ambisonictoolkit/atk-reaper/issues/74)
+
 ## Version 1.0.0.b10
+
+*Released 2016-09-12*
 
 **Changes in this version**
 
-* Added pre-install script to OSX installer that erase earlier versions of the `REAPER/Effects/ATK` folder, preventing possible conflicts when a newer version is installed on top of an older one (issue #47).
-* Loading only the parts of CookDSP that are actually used, speeding up plugin load time on Windows (isse #46)
-* Fixed bug where stereo encoder would encode left channel to the right and vica versa (issue #56)
-* Fixing issue where rotation angle got mixed up in RotateTiltTumble transform plugin (issue #51)
+This is mostly a mainenance release fixing a number of issues introduced or discovered in beta 9.
+
+* Added pre-install script to OSX installer that erases earlier versions of the `REAPER/Effects/ATK` folder, preventing possible conflicts when a newer version is installed on top of an older one (issue #47).
+* Loading only the parts of CookDSP that are actually used, speeding up plugin load time on Windows (isse #46).
+* Fixed bug where stereo encoder would encode left channel to the right and vica versa (issue #56).
+* Fixing issue where rotation angle got mixed up in RotateTiltTumble transform plugin (issue #51).
 
 ## Version 1.0.0.b9
 
