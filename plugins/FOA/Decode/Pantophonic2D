@@ -109,6 +109,7 @@ memset(mPeaks,0,kMaxNumSpeakers);
 memset(mDisplayPeaks,0,kMaxNumSpeakers);
 
 // Graphics
+gfx_ext_retina = 1;
 gfx_clear=-1;           // Prevent auto clear of each frame
 kRefreshRate = 0.05;    // Refresh rate in sec
 mRefreshSampCount = 0;
@@ -221,17 +222,20 @@ Graphics
 );
 
 determineGeometry();
-gRadius -= 30;              // Reduce circle radius
+
+// Reduce circle radius
+gRadius -= 30 * gfx_ext_retina;
 
 // Only refresh background when needed
-(geometryHasChanged(mPrevWidth, mPrevHeight) || sliderHasChanged()) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || sliderHasChanged() ) ? (
   drawLEDBackgroundImage();
   setSpeakerPositionFont();
   calculateLedCoordinates();
+  mDeltaSpeakerPos = 20 * gfx_ext_retina;
   igfx=mNumSpeakers-1;
   loop(mNumSpeakers,
-    sprintf(spkStr, "%d", igfx+1);
-    drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[igfx]), gCenterY - (gRadius+20)*sin(mAngles[igfx]), spkStr);
+    sprintf( spkStr, "%d", igfx + 1 );
+    drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ igfx ] ), gCenterY - ( gRadius + mDeltaSpeakerPos  ) * sin( mAngles[ igfx ] ), spkStr );
     igfx -= 1;
   );
   mPrevWidth   = gfx_w;
@@ -246,8 +250,8 @@ gRadius -= 30;              // Reduce circle radius
 (mDoRefresh) ? (
   igfx=0;
   loop(mNumSpeakers,
-    drawSpkrLEDs(amp2db(mDisplayPeaks[igfx]), igfx, mLedCoordinates);
-    mDisplayPeaks[igfx] = 0.;
+    drawSpkrLEDs(amp2db( mDisplayPeaks[ igfx ] ), igfx, mLedCoordinates );
+    mDisplayPeaks[ igfx ] = 0.;
     igfx += 1;
   );
   mRefreshSampCount = 0;

@@ -62,8 +62,8 @@ matrixInc       = 1240;
 // Flag indicating that the plugin has not been fully initialised yet
 mInitialised = 0;
 
-// Radius of interaction circle
-kInteractionCircleRadius = 11.;
+// Initiate graphics
+gfx_ext_retina = 1;
 
 // Initialisation of user interaction parameters
 mPreviousMouseCap = 0;
@@ -119,7 +119,7 @@ Custom graphic interface
 determineGeometry();
 drawBackgroundImage();
 
-mInteractionCircleRadius = kInteractionCircleRadius;
+mInteractionCircleRadius = 11. * gfx_ext_retina;
 
 // Only update plugin parameters if the user click and drag interaction circle
 mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
@@ -165,7 +165,7 @@ drawLineSegment(gCenterX, gCenterY, gCenterX+mSinAzi*gRadius, gCenterY-mCosAzi*g
 
 
 // Draw circle for interaction
-gxColorSetHsl(1.0, 195., 1.0, 0.4 + 0.15*mHiglightCircle);
+gxColorSetHsl(1.0, 195., 1.0, 0.4 + 0.15 * mHiglightCircle);
 drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);
 drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 

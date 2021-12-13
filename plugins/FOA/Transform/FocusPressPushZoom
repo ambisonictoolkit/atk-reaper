@@ -132,9 +132,8 @@ matrixMultiplication  (matrixTest,    4, 4, matrixUnity,     4, 8, matrixCounter
 mNumDisplayedPoints = 24;
 generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
 
-
-// Radius of interaction circle
-kInteractionCircleRadius = 11.;
+// Initiate graphics
+gfx_ext_retina = 1;
 
 // Initialisation of user interaction parameters
 mPreviousMouseCap = 0;
@@ -285,6 +284,9 @@ debugMode == 0 ?
   // Set colors
   determineGeometry();
   drawBackgroundImage();
+  
+  // Radius of interaction circle
+  kInteractionCircleRadius = 11. * gfx_ext_retina;
   
   // Only update plugin parameters if the user click and drag interaction circle
   mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);

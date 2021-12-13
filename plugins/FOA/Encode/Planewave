@@ -62,6 +62,8 @@ matrixInc       = 1240;
 // Flag indicating that the plugin has not been fully initialised yet
 mInitialised = 0;
 
+// Initiate graphics
+gfx_ext_retina = 1;
 function calculateCoefficients()
 (
   // Interaction point:
@@ -135,7 +137,7 @@ gxColorSetHsl(1.0, 195., mSaturation, mLightness);
 
 mPosX = gCenterX - gRadius * (mSinAzi * mCosEle);
 mPosY = gCenterY - gRadius * (mCosAzi * mCosEle);
-mInteractionCircleRadius = 4. * mSinEle + 11.;
+mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
 
 drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);
 drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);

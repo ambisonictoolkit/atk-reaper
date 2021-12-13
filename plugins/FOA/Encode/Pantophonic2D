@@ -102,6 +102,9 @@ function calculateEncodeMatrix()
   );
 );
 
+// Initiate graphics
+gfx_ext_retina = 1;
+
 
 /**********************************************************
 Updated slider value:
@@ -136,7 +139,7 @@ gainToColor(0., -24., 6., 0.);
 );
 
 loop(mNumSpeakers,
-  drawSourceLocation(gCenterX - gRadius*sin(mSpeakerAzi),  gCenterY - gRadius*cos(mSpeakerAzi),  0., 1.);
+  drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ),  gCenterY - gRadius * cos( mSpeakerAzi ),  0., 1.);
   mSpeakerAzi += mSpeakerAziDelta;
 );
 

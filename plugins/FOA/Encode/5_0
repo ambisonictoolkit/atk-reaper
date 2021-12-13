@@ -101,6 +101,9 @@ matrixDSP[21] =  0.;
 matrixDSP[22] =  0.;
 matrixDSP[23] =  0.;
 
+// Initiate graphics
+gfx_ext_retina = 1;
+
 
 /**********************************************************
 Custom graphic interface

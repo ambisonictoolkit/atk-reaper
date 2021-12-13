@@ -92,6 +92,7 @@ memset(mPeaks,0,kMaxNumSpeakers);
 memset(mDisplayPeaks,0,kMaxNumSpeakers);
 
 // Graphics
+gfx_ext_retina = 1;
 gfx_clear=-1;           // Prevent auto clear of each frame
 kRefreshRate = 0.05;    // Refresh rate in sec
 mRefreshSampCount = 0;
@@ -211,19 +212,22 @@ Graphics
 @gfx 500 500
 
 determineGeometry();
-gRadius -= 30;              // Reduce circle radius
+
+// Reduce circle radius
+gRadius -= 30 * gfx_ext_retina;
 
 // Only refresh background when needed
-(geometryHasChanged(mPrevWidth, mPrevHeight) || (mDegAngle != mPrevDegAngle)) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( mDegAngle != mPrevDegAngle ) ) ? (
   drawLEDBackgroundImage();
   setSpeakerPositionFont();
   calculateCoordinates();
-
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[3]), gCenterY - (gRadius+20)*sin(mDisplayAngles[3]), "4");
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[2]), gCenterY - (gRadius+20)*sin(mDisplayAngles[2]), "3");
   
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[1]), gCenterY - (gRadius+20)*sin(mDisplayAngles[1]), "2");
-  drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mDisplayAngles[0]), gCenterY - (gRadius+20)*sin(mDisplayAngles[0]), "1");
+  mSpeakerDist = gRadius + 20. * gfx_ext_retina;
+
+  drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mDisplayAngles[ 3 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 3 ] ), "4" );
+  drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mDisplayAngles[ 2 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 2 ] ), "3" );
+  drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mDisplayAngles[ 1 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 1 ] ), "2" );
+  drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mDisplayAngles[ 0 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 0 ] ), "1" );
   
   mPrevWidth    = gfx_w;
   mPrevHeight   = gfx_h;
@@ -233,13 +237,13 @@ gRadius -= 30;              // Reduce circle radius
 );
 
 // Draw LEDs for all speakers
-(mDoRefresh) ? (
-  drawSpkrLEDs(amp2db(mDisplayPeaks[0]), 0, mLedCoordinates);
-  drawSpkrLEDs(amp2db(mDisplayPeaks[1]), 1, mLedCoordinates);
-  drawSpkrLEDs(amp2db(mDisplayPeaks[2]), 2, mLedCoordinates);
-  drawSpkrLEDs(amp2db(mDisplayPeaks[3]), 3, mLedCoordinates);
+( mDoRefresh ) ? (
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 0 ] ), 0, mLedCoordinates );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 1 ] ), 1, mLedCoordinates );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 2 ] ), 2, mLedCoordinates );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 3 ] ), 3, mLedCoordinates );
 
-  memset(mDisplayPeaks, 0., 4.);
+  memset( mDisplayPeaks, 0., 4. );
   mRefreshSampCount = 0;
   mDoRefresh = 0;
 );

@@ -258,7 +258,7 @@ function determineGeometry()
   gCenterY = gfx_h * 0.5;
 
   gCenterX < gCenterY ? gRadius = gCenterX : gRadius = gCenterY;
-  gRadius = gRadius - 10;
+  gRadius = gRadius - 10. * gfx_ext_retina;
   gInverseRadius = 1. / gRadius;
 );
 
@@ -409,19 +409,20 @@ Graphics: Set font used to display speaker position
 ********************************************************************/
 function setSpeakerPositionFont()
 (
-  gfx_setfont(1,"Verdana", 13);
+  gfx_setfont(1,"Verdana", 13. * gfx_ext_retina);
 );
 
 
 /********************************************************************
 Graphics: Draw speaker position in peak level meters
 ********************************************************************/
-function drawSpeakerPositiion(aX, aY, aStr) local(lW, lH)
+function drawSpeakerPositiion(aX, aY, aStr) local(lW, lH, lRadius)
 (
+  lRadius = 14 * gfx_ext_retina;
   gxColorSet(1.0, 0.18, 0.18, 0.18);
-  gfx_circle(aX, aY, 14, 1, 1);
+  gfx_circle(aX, aY, lRadius, 1, 1);
   gxColorSet(1.0, 0.35, 0.35, 0.35);
-  gfx_circle(aX, aY, 14, 0, 1);
+  gfx_circle(aX, aY, lRadius, 0, 1);
   
   gxColorSet(1.0, 0.7, 0.7, 0.7);
   gfx_measurestr(aStr, lW, lH);
@@ -470,18 +471,21 @@ function drawCenteredSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRadius
 /********************************************************************
 Graphics: Draw centered filled-in square
 ********************************************************************/
-function drawSourceLocation(aCenterX, aCenterY, aPosZ, aDirectedness) local(lRadius, lAlpha, lRed, lGreen, lBlue)
+function drawSourceLocation( aCenterX, aCenterY, aPosZ, aDirectedness ) local(lRadius, lAlpha, lRed, lGreen, lBlue, lMinSourceRadius)
 (
   lAlpha = gfx_a;
+  
   // Calculate radius and transparency
-  lRadius = (1. - aDirectedness) * (gRadius-6.) + + 2.5*aPosZ + 6.;
+  lMinSourceRadius = 6. * gfx_ext_retina;
+  lRadius = ( 1. - aDirectedness ) * ( gRadius - lMinSourceRadius ) + 2.5 * aPosZ * gfx_ext_retina + lMinSourceRadius ;
+  
   // We use the square of lDirectedness for alpha so that it gets more rapidly transparent when the circle grows.
   // This looks better in the GUIs, as it doesn't get completely clogged by many almost non-transparent circles.
-  gfx_a = ((aDirectedness*aDirectedness*0.9) + 0.1)*lAlpha;
+  gfx_a = ( ( aDirectedness * aDirectedness * 0.9 ) + 0.1 ) * lAlpha;
   
   // Draw circle
 	
-  gfx_circle(aCenterX,aCenterY,lRadius,1,1);
+  gfx_circle( aCenterX, aCenterY, lRadius, 1, 1 );
   gfx_a = lAlpha;
 );
 
@@ -491,7 +495,7 @@ Graphics: Draw centered filled-in square
 ********************************************************************/
 function drawSourceLocationCenter(aCenterX, aCenterY) local(lRadius)
 (
-  gfx_circle(aCenterX,aCenterY,3,1,1);
+  gfx_circle( aCenterX, aCenterY, 3 * gfx_ext_retina , 1, 1 );
 );
 
 
@@ -598,7 +602,7 @@ function hoverOverInteractionCircle(aPosX, aPosY, anInteractionCircleRadius) loc
 /********************************************************************
 Graphics: Draw points illustrating the effect of various transforms
 ********************************************************************/
-function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i, lPosX, lPosY, lPosZ, lGain, lDirectedness, lSquareSize)
+function displayTransformedPoints( aMatrix, aNumPoints, aDrawCenterPoint ) local(i, lPosX, lPosY, lPosZ, lGain, lDirectedness, lSquareSize)
 (
   // Draw transparent circles indicating the location and directedness of each source after the transform
   // TODO: Also take z value into account in this visualisation?
@@ -611,7 +615,7 @@ function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i
     lGain = aMatrix[3 * aNumPoints + i];
     
     // Calculate degree of directedness
-    lDirectedness = sqrt(aMatrix[i]*aMatrix[i] + aMatrix[aNumPoints+i]*aMatrix[aNumPoints+i] + aMatrix[2*aNumPoints+i]*aMatrix[2*aNumPoints+i]);
+    lDirectedness = sqrt( aMatrix[ i ] * aMatrix[ i ] + aMatrix[ aNumPoints + i ] * aMatrix[ aNumPoints + i ] + aMatrix[ 2 * aNumPoints + i ] * aMatrix[ 2 * aNumPoints + i ] );
     
     // Size, saturation and luminocity depends on posZ
     lSquareSize = 2. * lPosZ + 8.;
@@ -619,7 +623,7 @@ function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i
     
     //drawCenteredSquare(lPosX, lPosY, lSquareSize);
     //(lGain >= -70.) ? (
-      drawSourceLocation(lPosX, lPosY, lPosZ, lDirectedness);
+      drawSourceLocation( lPosX, lPosY, lPosZ, lDirectedness );
       //);
     i += 1;
   );
@@ -633,7 +637,7 @@ function displayTransformedPoints(aMatrix, aNumPoints, aDrawCenterPoint) local(i
         lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
         lPosY = gCenterY - gRadius * aMatrix[i];
         gxColorSet(0.25, 0., 0., 0.);
-        drawSourceLocationCenter(lPosX, lPosY);
+        drawSourceLocationCenter( lPosX, lPosY );
         i += 1;
       );
     );
@@ -659,10 +663,10 @@ function displayTransformedPointsWithCustomColor(aMatrix, aNumPoints) local(i, l
     lGain = aMatrix[3 * aNumPoints + i];
     
     // Calculate degree of directedness
-    lDirectedness = sqrt(aMatrix[i]*aMatrix[i] + aMatrix[aNumPoints+i]*aMatrix[aNumPoints+i] + aMatrix[2*aNumPoints+i]*aMatrix[2*aNumPoints+i]);
+    lDirectedness = sqrt( aMatrix[ i ] * aMatrix[ i ] + aMatrix[ aNumPoints + i ]  * aMatrix[ aNumPoints + i ] + aMatrix[ 2 * aNumPoints + i ] * aMatrix[ 2 * aNumPoints + i ] );
         
     //drawCenteredSquare(lPosX, lPosY, lSquareSize);
-    drawSourceLocation(lPosX, lPosY, lPosZ-1.0, lDirectedness);
+    drawSourceLocation( lPosX, lPosY, lPosZ-1.0, lDirectedness );
     i += 1;
   );
 );

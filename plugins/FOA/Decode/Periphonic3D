@@ -127,6 +127,7 @@ memset(mPeaks,0,kMaxNumSpeakers);
 memset(mDisplayPeaks,0,kMaxNumSpeakers);
 
 // Graphics
+gfx_ext_retina = 1;
 gfx_clear=-1;           // Prevent auto clear of each frame
 kRefreshRate = 0.05;    // Refresh rate in sec
 mRefreshSampCount = 0;
@@ -257,58 +258,53 @@ Graphics
 );
 
 determinePeriphonicGeometry();
-gRadius -= 30;              // Reduce circle radius
+gRadius -= 30 * gfx_ext_retina;              // Reduce circle radius
 
 // Only refresh background when needed
-(geometryHasChanged(mPrevWidth, mPrevHeight) || sliderHasChanged()) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || sliderHasChanged()) ? (
   drawPeriphonicLEDBackgroundImage();
   setSpeakerPositionFont();
   calculateLedCoordinates();
   igfx=mNumSpeakerPairs-1;
-  loop(mNumSpeakerPairs,
+  mSpeakerDist = gRadius + 20. * gfx_ext_retina;
+  loop( mNumSpeakerPairs,
     // Upper speakers
-    sprintf(spkStr, "%d", igfx+1);
-    drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[igfx]), gCenterYUpper - (gRadius+20)*sin(mAngles[igfx]), spkStr);
+    sprintf( spkStr, "%d", igfx+1 );
+    drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mAngles[ igfx ] ), gCenterYUpper - mSpeakerDist * sin( mAngles[ igfx ] ), spkStr );
     
     // Lower speakers
-    sprintf(spkStr, "%d", igfx+1+mNumSpeakerPairs);
-    drawSpeakerPositiion(gCenterX + (gRadius+20)*cos(mAngles[igfx]), gCenterYLower - (gRadius+20)*sin(mAngles[igfx]), spkStr);
+    sprintf( spkStr, "%d", igfx + 1 + mNumSpeakerPairs );
+    drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mAngles[ igfx ] ), gCenterYLower - mSpeakerDist * sin( mAngles[ igfx ] ), spkStr );
     
     igfx -= 1;
   );
   
   // Draw titles
-  gfx_x = gCenterX -      (gRadius+26);
-  gfx_y = gCenterYUpper - (gRadius+26);
-  gfx_drawstr("Upper");
-  gfx_x = gCenterX -      (gRadius+26);
-  gfx_y = gCenterYUpper - (gRadius+10);
-  gfx_drawstr("ring");
+  gfx_x = gCenterX -      ( gRadius + 26 * gfx_ext_retina);
+  gfx_y = gCenterYUpper - ( gRadius + 22 * gfx_ext_retina);
+  gfx_drawstr("Upper Ring");
   
-  gfx_x = gCenterX -      (gRadius+26);
-  gfx_y = gCenterYLower - (gRadius+26);
-  gfx_drawstr("Lower");
-  gfx_x = gCenterX -      (gRadius+26);
-  gfx_y = gCenterYLower - (gRadius+10);
-  gfx_drawstr("ring");
+  gfx_x = gCenterX -      ( gRadius + 26 * gfx_ext_retina);
+  gfx_y = gCenterYLower - ( gRadius + 22 * gfx_ext_retina);
+  gfx_drawstr("Lower Ring");
   
   // Illustrate elevation angle
-  xPos1 = gCenterX + 0.75*gRadius;
+  xPos1 = gCenterX + 0.75 * gRadius;
   yPos1 = gCenterY;
-  xPos2 = gCenterX + 1.25*gRadius;
+  xPos2 = gCenterX + 1.25 * gRadius;
   yPos2 = gCenterY;
-  drawLineSegment(xPos1, yPos1, xPos2, yPos2, 1);
+  drawLineSegment( xPos1, yPos1, xPos2, yPos2, 1 );
 
-  xPos2 = gCenterX + (0.75 + 0.5 * cos(mElevation))* gRadius;
-  yPos2 = gCenterY         - 0.5 * sin(mElevation)  * gRadius;
+  xPos2 = gCenterX + ( 0.75 + 0.5 * cos( mElevation ) ) * gRadius;
+  yPos2 = gCenterY          - 0.5 * sin( mElevation )   * gRadius;
+  drawLineSegment( xPos1, yPos1, xPos2, yPos2, 1 );
+  
+  xPos2 = gCenterX + ( 0.75 + 0.5 * cos( mElevation ) ) * gRadius;
+  yPos2 = gCenterY          + 0.5 * sin( mElevation )   * gRadius;
   drawLineSegment(xPos1, yPos1, xPos2, yPos2, 1);
   
-  xPos2 = gCenterX + (0.75 + 0.5 * cos(mElevation))* gRadius;
-  yPos2 = gCenterY         + 0.5 * sin(mElevation)  * gRadius;
-  drawLineSegment(xPos1, yPos1, xPos2, yPos2, 1);
-  
-  gfx_arc(xPos1, yPos1, 0.22  * gRadius, $pi*0.5, $pi*0.5-mElevation, 1.);
-  gfx_arc(xPos1, yPos1, 0.18 * gRadius, $pi*0.5, $pi*0.5+mElevation, 1.);
+  gfx_arc( xPos1, yPos1, 0.22 * gRadius, $pi * 0.5, $pi * 0.5 - mElevation, 1. );
+  gfx_arc( xPos1, yPos1, 0.18 * gRadius, $pi * 0.5, $pi * 0.5 + mElevation, 1. );
   
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;
@@ -323,8 +319,8 @@ gRadius -= 30;              // Reduce circle radius
 (mDoRefresh) ? (
   igfx=0;
   loop(mNumSpeakers,
-    drawSpkrLEDs(amp2db(mDisplayPeaks[igfx]), igfx, mLedCoordinates);
-    mDisplayPeaks[igfx] = 0.;
+    drawSpkrLEDs( amp2db(mDisplayPeaks[ igfx ] ), igfx, mLedCoordinates );
+    mDisplayPeaks[ igfx ] = 0.;
     igfx += 1;
   );
   mRefreshSampCount = 0;
@@ -337,7 +333,7 @@ Audio block pre-processing
 **********************************************************/
 @block
 
-(mRefreshSampCount > kRefreshRate*srate) ? (
+( mRefreshSampCount > kRefreshRate * srate ) ? (
   mDoRefresh = 1;
 ) : (
   mRefreshSampCount += samplesblock;
@@ -379,10 +375,10 @@ loop(mNumSpeakers,
 
 // Peak monitoring
 ispl = 0;
-loop(mNumSpeakers,
-  input = spl(ispl);
-  output = mPeaks[ispl];
-  input = abs(input);
+loop( mNumSpeakers,
+  input  = spl( ispl );
+  output = mPeaks[ ispl ];
+  input  = abs( input );
 
   // When we hit a peak, ride the peak to the top, else exponential decay
   ( input >= output ) ? (output = input) : (output = output * mPeakScalar);

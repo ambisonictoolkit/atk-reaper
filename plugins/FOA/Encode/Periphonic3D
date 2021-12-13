@@ -127,6 +127,9 @@ function calculateEncodeMatrix()
   );
 );
 
+// Initiate graphics
+gfx_ext_retina = 1;
+
 
 /**********************************************************
 Updated slider value:
@@ -164,15 +167,15 @@ gainToColor(0., -24., 6., -mSinEle);
   mSpeakerAzi = 0.;
 );
 
-loop(mNumSpeakerPairs,
-  drawSourceLocation(gCenterX - gRadius*sin(mSpeakerAzi)*mCosEle,  gCenterY - gRadius*cos(mSpeakerAzi)*mCosEle,  mSinEle, 1.);
+loop( mNumSpeakerPairs,
+  drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ) * mCosEle,  gCenterY - gRadius * cos( mSpeakerAzi ) * mCosEle,  mSinEle, 1. );
   mSpeakerAzi += mSpeakerAziDelta;
 );
 
-gainToColor(0., -24., 6., mSinEle);
+gainToColor( 0., -24., 6., mSinEle );
 
-loop(mNumSpeakerPairs,
-  drawSourceLocation(gCenterX - gRadius*sin(mSpeakerAzi)*mCosEle,  gCenterY - gRadius*cos(mSpeakerAzi)*mCosEle,  -mSinEle, 1.);
+loop( mNumSpeakerPairs,
+  drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ) * mCosEle,  gCenterY - gRadius * cos( mSpeakerAzi ) * mCosEle,  -mSinEle, 1. );
   mSpeakerAzi += mSpeakerAziDelta;
 );
 
@@ -184,44 +187,44 @@ Calculate audio sample
 // If less then 32 channels, prevent spurious high values due to uninitialised channel signals
 (num_ch < 32) ? (
   i = num_ch;
-  loop (32 - num_ch,
-    spl(i) = 0.;
+  loop ( 32 - num_ch,
+    spl( i ) = 0.;
     i += 1;
   );
 );
 
-sIn[0]  = spl0;
-sIn[1]  = spl1;
-sIn[2]  = spl2;
-sIn[3]  = spl3;
-sIn[4]  = spl4;
-sIn[5]  = spl5;
-sIn[6]  = spl6;
-sIn[7]  = spl7;
-sIn[8]  = spl8;
-sIn[9]  = spl9;
-sIn[10] = spl10;
-sIn[11] = spl11;
-sIn[12] = spl12;
-sIn[13] = spl13;
-sIn[14] = spl14;
-sIn[15] = spl15;
-sIn[16] = spl16;
-sIn[17] = spl17;
-sIn[18] = spl18;
-sIn[19] = spl19;
-sIn[20] = spl20;
-sIn[21] = spl21;
-sIn[22] = spl22;
-sIn[23] = spl23;
-sIn[24] = spl24;
-sIn[25] = spl25;
-sIn[26] = spl26;
-sIn[27] = spl27;
-sIn[28] = spl28;
-sIn[29] = spl29;
-sIn[30] = spl30;
-sIn[31] = spl31;
+sIn[  0 ] = spl0;
+sIn[  1 ] = spl1;
+sIn[  2 ] = spl2;
+sIn[  3 ] = spl3;
+sIn[  4 ] = spl4;
+sIn[  5 ] = spl5;
+sIn[  6 ] = spl6;
+sIn[  7 ] = spl7;
+sIn[  8 ] = spl8;
+sIn[  9 ] = spl9;
+sIn[ 10 ] = spl10;
+sIn[ 11 ] = spl11;
+sIn[ 12 ] = spl12;
+sIn[ 13 ] = spl13;
+sIn[ 14 ] = spl14;
+sIn[ 15 ] = spl15;
+sIn[ 16 ] = spl16;
+sIn[ 17 ] = spl17;
+sIn[ 18 ] = spl18;
+sIn[ 19 ] = spl19;
+sIn[ 20 ] = spl20;
+sIn[ 21 ] = spl21;
+sIn[ 22 ] = spl22;
+sIn[ 23 ] = spl23;
+sIn[ 24 ] = spl24;
+sIn[ 25 ] = spl25;
+sIn[ 26 ] = spl26;
+sIn[ 27 ] = spl27;
+sIn[ 28 ] = spl28;
+sIn[ 29 ] = spl29;
+sIn[ 30 ] = spl30;
+sIn[ 31 ] = spl31;
 
 spl0 = 0.;
 spl1 = 0.;
