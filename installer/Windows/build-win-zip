@@ -13,10 +13,10 @@ mkdir "ATK for Reaper"
 # Copy ATK matrices and convolution kernels
 mkdir "ATK for Reaper/Copy content to Data"
 mkdir "ATK for Reaper/Copy content to Data/ATK"
-cp -r ../shared/atk-kernels												"ATK for Reaper/Copy content to Data/ATK"
-cp -r ../shared/atk-matrices											"ATK for Reaper/Copy content to Data/ATK"
-mv "ATK for Reaper/Copy content to Data/ATK/atk-kernels" 				"ATK for Reaper/Copy content to Data/ATK/kernels"
-mv "ATK for Reaper/Copy content to Data/ATK/atk-matrices" 				"ATK for Reaper/Copy content to Data/ATK/matrices"
+cp -r ../shared/atk-kernels                                             "ATK for Reaper/Copy content to Data/ATK"
+cp -r ../shared/atk-matrices                                            "ATK for Reaper/Copy content to Data/ATK"
+mv "ATK for Reaper/Copy content to Data/ATK/atk-kernels"                "ATK for Reaper/Copy content to Data/ATK/kernels"
+mv "ATK for Reaper/Copy content to Data/ATK/atk-matrices"               "ATK for Reaper/Copy content to Data/ATK/matrices"
 # Remove hidden .git folders from the copied submodules
 rm -rf "ATK for Reaper/Copy content to Data/ATK/kernels/.git"
 rm -rf "ATK for Reaper/Copy content to Data/ATK/matrices/.git"
@@ -38,82 +38,83 @@ mkdir "ATK for Reaper/Copy content to presets"
 
 
 # Copy multichannel REAPER theme
-cp "../shared/ColorThemes/MultiChanMix.ReaperThemeZip"					"ATK for Reaper/Copy content to ColorThemes/MultiChanMix.ReaperThemeZip"
+cp "../shared/ColorThemes/MultiChanMix.ReaperThemeZip"                  "ATK for Reaper/Copy content to ColorThemes/MultiChanMix.ReaperThemeZip"
 
 
 # Copy decoders
-cp "../../plugins/FOA/Decode/5_0"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/5_0"
-cp "../../plugins/FOA/Decode/Binaural"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Binaural"
-cp "../../plugins/FOA/Decode/BtoA"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/BtoA"
-cp "../../plugins/FOA/Decode/BtoAmbiX"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/BtoAmbiX"
-cp "../../plugins/FOA/Decode/Mono"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Mono"
-cp "../../plugins/FOA/Decode/Pantophonic2D"								"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Pantophonic2D"
-cp "../../plugins/FOA/Decode/Periphonic3D"								"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Periphonic3D"
-cp "../../plugins/FOA/Decode/PsychoShelf"								"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/PsychoShelf"
-cp "../../plugins/FOA/Decode/Quad"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Quad"
-cp "../../plugins/FOA/Decode/Stereo"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Stereo"
-cp "../../plugins/FOA/Decode/UHJ"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/UHJ"
+cp "../../plugins/FOA/Decode/5_0"                                       "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/5_0"
+cp "../../plugins/FOA/Decode/Binaural"                                  "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Binaural"
+cp "../../plugins/FOA/Decode/BtoA"                                      "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/BtoA"
+cp "../../plugins/FOA/Decode/BtoAmbiX"                                  "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/BtoAmbiX"
+cp "../../plugins/FOA/Decode/Mono"                                      "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Mono"
+cp "../../plugins/FOA/Decode/Pantophonic2D"                             "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Pantophonic2D"
+cp "../../plugins/FOA/Decode/Periphonic3D"                              "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Periphonic3D"
+cp "../../plugins/FOA/Decode/PsychoShelf"                               "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/PsychoShelf"
+cp "../../plugins/FOA/Decode/Quad"                                      "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Quad"
+cp "../../plugins/FOA/Decode/Stereo"                                    "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/Stereo"
+cp "../../plugins/FOA/Decode/UHJ"                                       "ATK for Reaper/Copy content to Effects/ATK/FOA/Decode/UHJ"
 
 
 # Copy encoders
-cp "../../plugins/FOA/Encode/5_0"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/5_0"
-cp "../../plugins/FOA/Encode/7_0"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/7_0"
-cp "../../plugins/FOA/Encode/AmbiXtoB"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/AmbiXtoB"
-cp "../../plugins/FOA/Encode/AtoB"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/AtoB"
-cp "../../plugins/FOA/Encode/Diffuser"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Diffuser"
-cp "../../plugins/FOA/Encode/Omni"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Omni"
-cp "../../plugins/FOA/Encode/Pantophonic2D"								"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Pantophonic2D"
-cp "../../plugins/FOA/Encode/Periphonic3D"								"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Periphonic3D"
-cp "../../plugins/FOA/Encode/Planewave"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Planewave"
-cp "../../plugins/FOA/Encode/Quad"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Quad"
-cp "../../plugins/FOA/Encode/Spreader"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Spreader"
-cp "../../plugins/FOA/Encode/Stereo"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Stereo"
-cp "../../plugins/FOA/Encode/SuperStereo"								"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/SuperStereo"
-cp "../../plugins/FOA/Encode/UHJ"										"ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/UHJ"
+cp "../../plugins/FOA/Encode/5_0"                                       "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/5_0"
+cp "../../plugins/FOA/Encode/7_0"                                       "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/7_0"
+cp "../../plugins/FOA/Encode/AmbiXtoB"                                  "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/AmbiXtoB"
+cp "../../plugins/FOA/Encode/AtoB"                                      "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/AtoB"
+cp "../../plugins/FOA/Encode/Diffuser"                                  "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Diffuser"
+cp "../../plugins/FOA/Encode/Omni"                                      "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Omni"
+cp "../../plugins/FOA/Encode/Pantophonic2D"                             "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Pantophonic2D"
+cp "../../plugins/FOA/Encode/Periphonic3D"                              "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Periphonic3D"
+cp "../../plugins/FOA/Encode/Planewave"                                 "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Planewave"
+cp "../../plugins/FOA/Encode/Quad"                                      "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Quad"
+cp "../../plugins/FOA/Encode/Spreader"                                  "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Spreader"
+cp "../../plugins/FOA/Encode/Stereo"                                    "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/Stereo"
+cp "../../plugins/FOA/Encode/SuperStereo"                               "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/SuperStereo"
+cp "../../plugins/FOA/Encode/UHJ"                                       "ATK for Reaper/Copy content to Effects/ATK/FOA/Encode/UHJ"
 
 
 # Copy CookDSP library files
-cp "../../plugins/libraries/cookdsp/cookdsp.jsfx-inc"					"ATK for Reaper/Copy content to Effects/ATK/libraries/cookdsp/cookdsp.jsfx-inc"
-cp -r "../../plugins/libraries/cookdsp/cookdsp"							"ATK for Reaper/Copy content to Effects/ATK/libraries/cookdsp/cookdsp"
+cp "../../plugins/libraries/cookdsp/cookdsp.jsfx-inc"                   "ATK for Reaper/Copy content to Effects/ATK/libraries/cookdsp/cookdsp.jsfx-inc"
+cp -r "../../plugins/libraries/cookdsp/cookdsp"                         "ATK for Reaper/Copy content to Effects/ATK/libraries/cookdsp/cookdsp"
 
 
 # Copy ATK library files
-cp "../../plugins/libraries/atk/atk.jsfx-inc"							"ATK for Reaper/Copy content to Effects/ATK/libraries/atk/atk.jsfx-inc"
-cp "../../plugins/libraries/atk/atkConstantsAndMathsLibrary.jsfx-inc"	"ATK for Reaper/Copy content to Effects/ATK/libraries/atk/atkConstantsAndMathsLibrary.jsfx-inc"
-cp "../../plugins/libraries/atk/atkGraphicsLibrary.jsfx-inc"			"ATK for Reaper/Copy content to Effects/ATK/libraries/atk/atkGraphicsLibrary.jsfx-inc"
-cp "../../plugins/libraries/atk/atkKernelLibrary.jsfx-inc"				"ATK for Reaper/Copy content to Effects/ATK/libraries/atk/atkKernelLibrary.jsfx-inc"
-cp "../../plugins/libraries/atk/atkMatrixLibrary.jsfx-inc"				"ATK for Reaper/Copy content to Effects/ATK//libraries/atk/atkMatrixLibrary.jsfx-inc"
+cp "../../plugins/libraries/atk/atk.jsfx-inc"                           "ATK for Reaper/Copy content to Effects/ATK/libraries/atk/atk.jsfx-inc"
+cp "../../plugins/libraries/atk/atkConstantsAndMathsLibrary.jsfx-inc"   "ATK for Reaper/Copy content to Effects/ATK/libraries/atk/atkConstantsAndMathsLibrary.jsfx-inc"
+cp "../../plugins/libraries/atk/atkGraphicsLibrary.jsfx-inc"            "ATK for Reaper/Copy content to Effects/ATK/libraries/atk/atkGraphicsLibrary.jsfx-inc"
+cp "../../plugins/libraries/atk/atkKernelLibrary.jsfx-inc"              "ATK for Reaper/Copy content to Effects/ATK/libraries/atk/atkKernelLibrary.jsfx-inc"
+cp "../../plugins/libraries/atk/atkMatrixLibrary.jsfx-inc"              "ATK for Reaper/Copy content to Effects/ATK//libraries/atk/atkMatrixLibrary.jsfx-inc"
 
 # Copy ear images to lib
-cp -r "../../plugins/libraries/atk/ear_photos"							"ATK for Reaper/Copy content to Effects/ATK/libraries/atk"
+cp -r "../../plugins/libraries/atk/ear_photos"                          "ATK for Reaper/Copy content to Effects/ATK/libraries/atk"
 
 
 # Copy transformers
-cp "../../plugins/FOA/Transform/Direct"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/Direct"
-cp "../../plugins/FOA/Transform/DirectO"								"ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/DirectO"
-cp "../../plugins/FOA/Transform/Dominate"								"ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/Dominate"
-cp "../../plugins/FOA/Transform/FocusPressPushZoom"						"ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/FocusPressPushZoom"
-cp "../../plugins/FOA/Transform/Mirror"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/Mirror"
-cp "../../plugins/FOA/Transform/MirrorO"								"ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/MirrorO"
-cp "../../plugins/FOA/Transform/NearfieldProximity"						"ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/NearfieldProximity"
-cp "../../plugins/FOA/Transform/RotateTiltTumble"						"ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/RotateTiltTumble"
+cp "../../plugins/FOA/Transform/Direct"                                 "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/Direct"
+cp "../../plugins/FOA/Transform/DirectO"                                "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/DirectO"
+cp "../../plugins/FOA/Transform/Dominate"                               "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/Dominate"
+cp "../../plugins/FOA/Transform/FocusPressPushZoom"                     "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/FocusPressPushZoom"
+cp "../../plugins/FOA/Transform/Mirror"                                 "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/Mirror"
+cp "../../plugins/FOA/Transform/MirrorO"                                "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/MirrorO"
+cp "../../plugins/FOA/Transform/NearfieldProximity"                     "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/NearfieldProximity"
+cp "../../plugins/FOA/Transform/RotateTiltTumble"                       "ATK for Reaper/Copy content to Effects/ATK/FOA/Transform/RotateTiltTumble"
 
 # Copy utilities
-cp "../../plugins/FOA/Utils/4channels"									"ATK for Reaper/Copy content to Effects/ATK/FOA/Utils/4channels"
-cp "../../plugins/FOA/Utils/MuteSoloChannels"							"ATK for Reaper/Copy content to Effects/ATK/FOA/Utils/MuteSoloChannels"
+cp "../../plugins/FOA/Utils/4channels"                                  "ATK for Reaper/Copy content to Effects/ATK/FOA/Utils/4channels"
+cp "../../plugins/FOA/Utils/MuteSoloChannels"                           "ATK for Reaper/Copy content to Effects/ATK/FOA/Utils/MuteSoloChannels"
 
 # Copy presets
-cp "../../presets/js-ATK_FOA_Utils_MuteSoloChannels.ini"				"ATK for Reaper/Copy content to presets/js-ATK_FOA_Utils_MuteSoloChannels.ini"
+cp "../../presets/js-ATK_FOA_Decode_Mono.ini"                           "ATK for Reaper/Copy content to presets/js-ATK_FOA_Decode_Mono.ini"
+cp "../../presets/js-ATK_FOA_Utils_MuteSoloChannels.ini"                "ATK for Reaper/Copy content to presets/js-ATK_FOA_Utils_MuteSoloChannels.ini"
 
 # Readme and license
 cp "../../license.html" "ATK for Reaper"
 
 pandoc \
-	-f markdown \
-	-t html \
-	-H "../shared/license & readme/styles.css" \
-	-o "ATK for Reaper/readme.html" \
-	"../../readme.md"
+  -f markdown \
+  -t html \
+  -H "../shared/license & readme/styles.css" \
+  -o "ATK for Reaper/readme.html" \
+  "../../readme.md"
 
 
 # Remove all '*.DS_Store' files

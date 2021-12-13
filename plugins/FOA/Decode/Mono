@@ -59,6 +59,9 @@ Initialisation
 // Setting memory locations for 4x4 matrix as 1D array
 mIsInitialised = 0;
 
+// Graphics
+gfx_ext_retina = 1;
+
 
 /**********************************************************
 Updated slider value:
@@ -82,7 +85,91 @@ mNewZ = mPattern * sin(mEle);
   mX = mNewX;
   mY = mNewY;
   mZ = mNewZ;
+  mIsInitialised = 1;
 );
+
+
+/**********************************************************
+Graphics
+**********************************************************/
+@gfx 500 500
+
+function plotPattern( anAngle ) // local (lAngle)
+(
+  lRadius = ( ( 1.0 - mPattern ) + ( mPattern * cos( anAngle - mAzi ) * cos( mEle) ) ) * gRadius;
+  
+  ( lRadius < 0 ) ? (
+    lRadius = -lRadius;
+    gxColorSetHsl(1.0, 30., 1., 0.5);
+    //mPhaseInverse = 1;
+  ) : (
+    gxColorSetHsl(1.0, 60., 1., 0.5);
+    //mPhaseInverse = 0;
+  );
+  
+  mPosX = gCenterX - lRadius * sin( anAngle );
+  mPosY = gCenterX - lRadius * cos( anAngle );
+);
+
+
+determineGeometry();
+drawBackgroundImage();
+
+// Reset azimuth and spread on mouse click
+mouse_cap == 1 ?
+(
+  mMouseX = mouse_x - gCenterX;
+  mMouseY = mouse_y - gCenterY;
+  mAzi = atan2(-mMouseX, -mMouseY);
+  slider1 = mAzi * kRad2Deg;
+  // Notify GUI that azimuth has changed, and update coefficients
+  slider_automate(slider1);
+);
+
+// Draw microphone pattern
+//gxColorSetHsl( 1.0 , 0., 100, 0.5 );
+gfx_r = 1.0;
+gfx_g = 1.0;
+gfx_b = 1.0;
+
+
+i = 1;
+plotPattern( kDeg2Rad * i );
+gfx_x = mPosX;
+gfx_y = mPosY;
+
+loop( 360,
+  i += 1;
+  plotPattern( kDeg2Rad * i );
+  //gfx_r = gfx_g = gfx_b = 1.0 - 0.35 * mPhaseInverse;
+  
+  gfx_lineto( mPosX, mPosY, 1.0 ); 
+);
+
+// Draw circle for interaction, map vertical position to saturation, lightness and radius
+//calculateCoefficients();
+
+mCosAzi  = cos(mAzi);
+mSinAzi  = sin(mAzi);
+mCosEle  = cos(mEle);
+mSinEle  = sin(mEle);
+
+(mSinEle < 0) ? (
+  mSaturation = 1. - 0.25*mSinEle;
+  mLightness = 0.4;
+) : (
+  mSaturation = 1.;
+  mLightness = 0.4 + 0.25*mSinEle;
+);
+gxColorSetHsl(1.0, 195., mSaturation, mLightness);
+
+
+mPosX = gCenterX - gRadius * (mSinAzi * mCosEle);
+mPosY = gCenterY - gRadius * (mCosAzi * mCosEle);
+mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
+
+drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);
+drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 
 
 /**********************************************************
@@ -98,6 +185,7 @@ mIncW = (mNewW - mW) * mInverseSamplesblock;
 mIncX = (mNewX - mX) * mInverseSamplesblock;
 mIncY = (mNewY - mY) * mInverseSamplesblock;
 mIncZ = (mNewZ - mZ) * mInverseSamplesblock;
+
 
 /**********************************************************
 Calculate audio sample
