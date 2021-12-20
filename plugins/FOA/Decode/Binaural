@@ -491,34 +491,40 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
-gfx_clear;
+setPluginModeColour( 2 );
+gfx_rect( 0, 0, gfx_w, gfx_h );
+
 determineGeometry();
 
 gfx_getimgdim(mPreviousSliderValue, mWidth, mHeight);
 
 (mWidth > 0) ? (
   // Display image if it exxists
-  gxPositionSet(gCenterX - 0.5*mWidth, gCenterY - 0.5*mHeight);
+  //gfx_a = 0.35;
+  gxPositionSet( gCenterX - 0.5 * mWidth, gCenterY - 0.5 * mHeight );
   gfx_blit(mPreviousSliderValue, 1., 0.);
-) : (
-  // Else draw black bakground...
-  gxColorSet(1., 0., 0., 0.);
-  gfx_rect(0, 0, 2*gCenterX, 2*gCenterY);
   
-  // ...and some text
-  gfx_setfont(1, "Arial", 14);
+  // Tame image colours
+  setPluginModeColour( 2 );
+  gfx_a = 0.5;
+  gfx_rect( 0, 0, gfx_w, gfx_h );  
+) : (
+  // Else display text
+  gfx_setfont(1, "Arial", 18);
   gfx_measurestr("No image available for this HRTF", mWidth, mHeight);
   gxPositionSet(gCenterX-0.5*mWidth, gCenterY-0.5*mHeight);
-  gxColorSet(1., 1., 1., 1.);
+  gxColorSet(1., 0.9, 0.9, 0.9);
   gfx_drawstr("No image available for this HRTF");
 );
 
 // Draw FuMa – This plugin is not retina, and hence cannot use the default lib funciton
 gfx_setfont( 1, "Arial", 18 );
 gfx_measurestr( "FuMa", stringWidth, stringHeight);
-gxColorSet( 0.5, 1.0 , 1.0 , 1.0 );
+setPluginModeColour( 2 );
+gfx_a = 1.0;
+//gxColorSet( 0.5, 1.0 , 1.0 , 1.0 );
 gfx_rect( 10, 16, stringWidth + 20 , stringHeight + 8 ); 
-gxColorSet( 1.0, 0.15, 0.15, 0.15 );
+gxColorSet( 1.0, 0.9, 0.9, 0.9 );
 gxPositionSet( 20., 20. );
 gfx_drawstr( "FuMa" );
 

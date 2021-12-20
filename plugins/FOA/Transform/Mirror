@@ -265,7 +265,7 @@ function postAfter() local( lStrWidth, lStringHeight )
 );
 
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage( 1 );
 drawFuMa();
 
 // Set font

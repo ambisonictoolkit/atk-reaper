@@ -283,7 +283,7 @@ debugMode == 0 ?
   
   // Set colors
   determineGeometry();
-  drawBackgroundImage();
+  drawBackgroundImage( 1 );
   drawFuMa();
   
   // Radius of interaction circle

@@ -217,18 +217,18 @@ gRadius -= 30 * gfx_ext_retina;
 
 // Only refresh background when needed
 geometryHasChanged( mPrevWidth, mPrevHeight ) ? (
-  drawLEDBackgroundImage();
+  drawLEDBackgroundImage( 2 );
   drawFuMa();
   setSpeakerPositionFont();
   calculateCoordinates();
   
   mDeltaSpeakerPos = 20 * gfx_ext_retina;
 
-  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 4 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 4 ] ), "6" );
-  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 3 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 3 ] ), "5" );
-  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 1 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 1 ] ), "2" );
-  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 2 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 2 ] ), "3" );
-  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 0 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 0 ] ), "1" );
+  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 4 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 4 ] ), "6", 2  );
+  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 3 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 3 ] ), "5", 2  );
+  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 1 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 1 ] ), "2", 2  );
+  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 2 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 2 ] ), "3", 2  );
+  drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ 0 ] ), gCenterY - (gRadius + mDeltaSpeakerPos ) * sin (mAngles[ 0 ] ), "1", 2  );
   
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;

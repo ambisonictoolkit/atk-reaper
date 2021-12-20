@@ -252,8 +252,18 @@ function setLedColour(aGain, aCount) local(lRefColour)
 /********************************************************************
 Graphics: Determine geometry
 ********************************************************************/
-function determineGeometry()
+function setPluginModeColour( aMode )
 (
+  ( aMode == 0 ) ? gxColorSetHsl( 1.0,   0., 0.35 , 0.1 ); // Encoder
+  ( aMode == 1 ) ? gxColorSetHsl( 1.0, 120., 0.35 , 0.1 ); // Transform
+  ( aMode == 2 ) ? gxColorSetHsl( 1.0, 240., 0.35 , 0.1 ); // Decoder
+);
+
+/********************************************************************
+Graphics: Determine geometry
+********************************************************************/
+function determineGeometry() //local (lBgColor )
+(  
   gCenterX = gfx_w  * 0.5;
   gCenterY = gfx_h * 0.5;
 
@@ -302,10 +312,9 @@ function drawLineSegment(aPosition1x, aPosition1y, aPosition2x, aPosition2y, anA
 /********************************************************************
 Graphics: Draw background image similar to ICST ambimonitor
 ********************************************************************/
-function drawBackgroundImage() local(i, lDeltaX, lDeltaY)
+function drawBackgroundImage( aMode ) local(i, lDeltaX, lDeltaY)
 (
-  // Draw background circle
-  gxColorSet(1.0, 0.18, 0.18, 0.18);
+  setPluginModeColour( aMode );
   gfx_circle(gCenterX, gCenterY, gRadius, 1, 1);
   
   gxColorSet(1.0, 0.35, 0.35, 0.35);
@@ -331,14 +340,15 @@ function drawBackgroundImage() local(i, lDeltaX, lDeltaY)
 /********************************************************************
 Graphics: Draw background image for LED peak meter
 ********************************************************************/
-function drawLEDBackgroundImage() local(i, lDeltaX, lDeltaY)
+function drawLEDBackgroundImage( aMode ) local(i, lDeltaX, lDeltaY)
 (
   // Manually clear framebuffer
   gxColorSet(1.0, 0., 0., 0.);
-  gfx_rect(0,0,gfx_w,gfx_h);
+  gfx_rect( 0, 0, gfx_w, gfx_h );
   
   // Draw background circle
-  gxColorSet(1.0, 0.18, 0.18, 0.18);
+  // gxColorSet(1.0, 0.18, 0.18, 0.18);
+  setPluginModeColour( aMode );
   gfx_circle(gCenterX, gCenterY, gRadius, 1, 1);
   
   // Black hole in midle
@@ -355,14 +365,14 @@ function drawLEDBackgroundImage() local(i, lDeltaX, lDeltaY)
 /********************************************************************
 Graphics: Draw background image for LED peak meter
 ********************************************************************/
-function drawPeriphonicLEDBackgroundImage() local(i, lDeltaX, lDeltaY)
+function drawPeriphonicLEDBackgroundImage( aMode ) local(i, lDeltaX, lDeltaY)
 (
   // Manually clear framebuffer
   gxColorSet(1.0, 0., 0., 0.);
   gfx_rect(0,0,gfx_w,gfx_h);
   
   // Draw background circles
-  gxColorSet(1.0, 0.18, 0.18, 0.18);
+  setPluginModeColour( aMode );
   gfx_circle(gCenterX, gCenterYUpper, gRadius, 1, 1); // Upper
   gfx_circle(gCenterX, gCenterYLower, gRadius, 1, 1); // Lower
   
@@ -428,13 +438,14 @@ function setSpeakerPositionFont()
 /********************************************************************
 Graphics: Draw speaker position in peak level meters
 ********************************************************************/
-function drawSpeakerPositiion(aX, aY, aStr) local(lW, lH, lRadius)
+function drawSpeakerPositiion( aX, aY, aStr, aMode ) local(lW, lH, lRadius)
 (
   lRadius = 14 * gfx_ext_retina;
-  gxColorSet(1.0, 0.18, 0.18, 0.18);
-  gfx_circle(aX, aY, lRadius, 1, 1);
-  gxColorSet(1.0, 0.35, 0.35, 0.35);
-  gfx_circle(aX, aY, lRadius, 0, 1);
+  // gxColorSet( 1.0, 0.18, 0.18, 0.18 );
+  setPluginModeColour( aMode );
+  gfx_circle( aX, aY, lRadius, 1, 1 );
+  gxColorSet( 1.0, 0.35, 0.35, 0.35 );
+  gfx_circle( aX, aY, lRadius, 0, 1 );
   
   gxColorSet(1.0, 0.7, 0.7, 0.7);
   gfx_measurestr(aStr, lW, lH);

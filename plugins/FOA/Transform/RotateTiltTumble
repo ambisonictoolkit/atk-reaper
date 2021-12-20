@@ -150,7 +150,7 @@ Custom graphic interface
 
 // Track geometry and draw background
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage( 1 );
 drawFuMa();
 
 // Radius of interaction circle

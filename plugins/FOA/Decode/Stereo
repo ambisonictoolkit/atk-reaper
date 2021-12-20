@@ -200,15 +200,15 @@ gRadius -= 30 * gfx_ext_retina;
 
 // Only refresh background when needed
 ( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( mDegAngle != mPrevDegAngle ) ) ? (
-  drawLEDBackgroundImage();
+  drawLEDBackgroundImage( 2 );
   drawFuMa();
   setSpeakerPositionFont();
   calculateCoordinates();
   
   mSpeakerDist = gRadius + 20. * gfx_ext_retina;
 
-  drawSpeakerPositiion(gCenterX + mSpeakerDist * cos( mDisplayAngles[ 1 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 1 ] ), "2" );
-  drawSpeakerPositiion(gCenterX + mSpeakerDist * cos( mDisplayAngles[ 0 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 0 ] ), "1" );
+  drawSpeakerPositiion(gCenterX + mSpeakerDist * cos( mDisplayAngles[ 1 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 1 ] ), "2", 2 );
+  drawSpeakerPositiion(gCenterX + mSpeakerDist * cos( mDisplayAngles[ 0 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 0 ] ), "1", 2 );
 
   mPrevWidth    = gfx_w;
   mPrevHeight   = gfx_h;

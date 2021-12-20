@@ -117,7 +117,7 @@ Custom graphic interface
 @gfx 500 500
 
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage( 0 );
 drawFuMa();
 
 mInteractionCircleRadius = 11. * gfx_ext_retina;

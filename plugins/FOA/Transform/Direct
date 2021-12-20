@@ -148,7 +148,7 @@ Graphics
 @gfx 500 500
 
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage( 1 );
 drawFuMa();
 
 // Radius of interaction circle

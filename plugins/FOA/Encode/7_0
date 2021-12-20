@@ -126,7 +126,7 @@ Custom graphic interface
 @gfx 500 500
 
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage( 0 );
 drawFuMa();
 
 mDeltaX0   = gRadius * mCosAzi0;
