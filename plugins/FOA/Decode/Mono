@@ -114,6 +114,7 @@ function plotPattern( anAngle ) // local (lAngle)
 
 determineGeometry();
 drawBackgroundImage();
+drawFuMa();
 
 // Reset azimuth and spread on mouse click
 mouse_cap == 1 ?

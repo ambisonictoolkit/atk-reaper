@@ -284,6 +284,7 @@ debugMode == 0 ?
   // Set colors
   determineGeometry();
   drawBackgroundImage();
+  drawFuMa();
   
   // Radius of interaction circle
   kInteractionCircleRadius = 11. * gfx_ext_retina;

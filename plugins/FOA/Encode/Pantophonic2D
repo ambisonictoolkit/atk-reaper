@@ -128,6 +128,7 @@ Custom graphic interface
 
 determineGeometry();
 drawBackgroundImage();
+drawFuMa();
 
 // Size, saturation and luminocity depends on posZ
 gainToColor(0., -24., 6., 0.);

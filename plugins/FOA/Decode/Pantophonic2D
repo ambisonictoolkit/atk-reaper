@@ -229,6 +229,7 @@ gRadius -= 30 * gfx_ext_retina;
 // Only refresh background when needed
 ( geometryHasChanged( mPrevWidth, mPrevHeight ) || sliderHasChanged() ) ? (
   drawLEDBackgroundImage();
+  drawFuMa();
   setSpeakerPositionFont();
   calculateLedCoordinates();
   mDeltaSpeakerPos = 20 * gfx_ext_retina;

@@ -201,6 +201,7 @@ gRadius -= 30 * gfx_ext_retina;
 // Only refresh background when needed
 ( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( mDegAngle != mPrevDegAngle ) ) ? (
   drawLEDBackgroundImage();
+  drawFuMa();
   setSpeakerPositionFont();
   calculateCoordinates();
   

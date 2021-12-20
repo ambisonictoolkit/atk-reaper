@@ -238,35 +238,38 @@ function setInteractionColorWithDepth(aZpos, anIsHighlighted) local(lSaturation,
 );
 
 
-function postBefore()
+function postBefore() local( lStrWidth, lStringHeight )
 (
   setBeforeFontColor();
-  gxPositionSet( 20. * gfx_ext_retina, 20. );
+  gfx_measurestr( "Before", lStrWidth, lStringHeight );
+  gxPositionSet( gfx_w - 20. * gfx_ext_retina - lStrWidth, 20. * gfx_ext_retina );
   gfx_drawstr( "Before" );
 );
 
 
-function postMirror(anIsHighlighted)
+function postMirror(anIsHighlighted) local( lStrWidth, lStringHeight )
 (
   setInteractionColor(anIsHighlighted);
-  gxPositionSet( 20 * gfx_ext_retina, 20. + 22. * gfx_ext_retina );
+  gfx_measurestr( "Mirror", lStrWidth, lStringHeight );
+  gxPositionSet( gfx_w - 20. * gfx_ext_retina - lStrWidth, 42. * gfx_ext_retina );
   gfx_drawstr( "Mirror" );
 );
 
 
-function postAfter()
+function postAfter() local( lStrWidth, lStringHeight )
 (
   setAfterColor();
-  gxPositionSet( 20. * gfx_ext_retina, 20. + 44. * gfx_ext_retina );
+  gfx_measurestr( "After", lStrWidth, lStringHeight );
+  gxPositionSet( gfx_w - 20. * gfx_ext_retina - lStrWidth, 64. * gfx_ext_retina );
   gfx_drawstr( "After" );
 );
 
+determineGeometry();
+drawBackgroundImage();
+drawFuMa();
 
 // Set font
 gfx_setfont(1, "Verdana", 16 * gfx_ext_retina );
-
-determineGeometry();
-drawBackgroundImage();
 
 // Radius of interaction circle
 kInteractionCircleRadius = 11. * gfx_ext_retina;

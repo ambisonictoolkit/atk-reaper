@@ -513,6 +513,15 @@ gfx_getimgdim(mPreviousSliderValue, mWidth, mHeight);
   gfx_drawstr("No image available for this HRTF");
 );
 
+// Draw FuMa – This plugin is not retina, and hence cannot use the default lib funciton
+gfx_setfont( 1, "Arial", 18 );
+gfx_measurestr( "FuMa", stringWidth, stringHeight);
+gxColorSet( 0.5, 1.0 , 1.0 , 1.0 );
+gfx_rect( 10, 16, stringWidth + 20 , stringHeight + 8 ); 
+gxColorSet( 1.0, 0.15, 0.15, 0.15 );
+gxPositionSet( 20., 20. );
+gfx_drawstr( "FuMa" );
+
 
 /**********************************************************
 Preprocessing prior to audio vector processing.

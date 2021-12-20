@@ -263,6 +263,7 @@ gRadius -= 30 * gfx_ext_retina;              // Reduce circle radius
 // Only refresh background when needed
 ( geometryHasChanged( mPrevWidth, mPrevHeight ) || sliderHasChanged()) ? (
   drawPeriphonicLEDBackgroundImage();
+  drawFuMa();
   setSpeakerPositionFont();
   calculateLedCoordinates();
   igfx=mNumSpeakerPairs-1;
@@ -280,12 +281,12 @@ gRadius -= 30 * gfx_ext_retina;              // Reduce circle radius
   );
   
   // Draw titles
-  gfx_x = gCenterX -      ( gRadius + 26 * gfx_ext_retina);
-  gfx_y = gCenterYUpper - ( gRadius + 22 * gfx_ext_retina);
+  gfx_x = 20 * gfx_ext_retina;
+  gfx_y = 42. * gfx_ext_retina;
   gfx_drawstr("Upper Ring");
   
-  gfx_x = gCenterX -      ( gRadius + 26 * gfx_ext_retina);
-  gfx_y = gCenterYLower - ( gRadius + 22 * gfx_ext_retina);
+  gfx_x = 20 * gfx_ext_retina;
+  gfx_y = gCenterYLower - ( gRadius - 0. * gfx_ext_retina);
   gfx_drawstr("Lower Ring");
   
   // Illustrate elevation angle

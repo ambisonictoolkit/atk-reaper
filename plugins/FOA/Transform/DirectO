@@ -117,6 +117,7 @@ Graphics
 // Set colors
 determineGeometry();
 drawBackgroundImage();
+drawFuMa();
 
 // Radius of interaction circle
 mInteractionCircleRadius = 11. * gfx_ext_retina;

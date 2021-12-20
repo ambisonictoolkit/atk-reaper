@@ -380,6 +380,18 @@ function drawPeriphonicLEDBackgroundImage() local(i, lDeltaX, lDeltaY)
 
 
 /********************************************************************
+Graphics: GUI express that this plugin uses FuMa rather than AmbiX
+********************************************************************/
+function drawFuMa()
+(
+  gxColorSet( 1.0, 0.35, 0.35, 0.35 );
+  gfx_setfont( 1, "Arial", 18 * gfx_ext_retina );
+  gxPositionSet( 20. * gfx_ext_retina, 20. * gfx_ext_retina );
+  gfx_drawstr( "FuMa" );
+);
+
+
+/********************************************************************
 Graphics: Draw peak meter LEDs for one speaker
 ********************************************************************/
 function drawSpkrLEDs(aGain, aSpkr, lLedCoordinates) local(lLedCount, i)
