@@ -108,12 +108,12 @@ function plotPattern( anAngle ) // local (lAngle)
   );
   
   mPosX = gCenterX - lRadius * sin( anAngle );
-  mPosY = gCenterX - lRadius * cos( anAngle );
+  mPosY = gCenterY - lRadius * cos( anAngle );
 );
 
 
 determineGeometry();
-drawBackgroundImage();
+drawBackgroundImage( 2 );
 drawFuMa();
 
 // Reset azimuth and spread on mouse click
