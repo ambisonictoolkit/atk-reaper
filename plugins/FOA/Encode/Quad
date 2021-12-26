@@ -94,6 +94,10 @@ Custom graphic interface
 @gfx 500 500
 
 determineGeometry();
+
+// Reduce circle radius
+gRadius -= 30 * gfx_ext_retina;
+
 drawBackgroundImage( 0 );
 drawFuMa();
 
@@ -103,10 +107,19 @@ mDeltaY = gRadius * mSinAzi;
 // Size, saturation and luminocity depends on posZ
 gainToColor(0., -24., 6., 0.);
 
-drawSourceLocation(gCenterX-mDeltaY, gCenterY-mDeltaX, 0., 1.);
-drawSourceLocation(gCenterX+mDeltaY, gCenterY-mDeltaX, 0., 1.);
-drawSourceLocation(gCenterX-mDeltaY, gCenterY+mDeltaX, 0., 1.);
-drawSourceLocation(gCenterX+mDeltaY, gCenterY+mDeltaX, 0., 1.);
+drawSourceLocation( gCenterX - mDeltaY, gCenterY - mDeltaX, 0., 1. );
+drawSourceLocation( gCenterX + mDeltaY, gCenterY - mDeltaX, 0., 1. );
+drawSourceLocation( gCenterX - mDeltaY, gCenterY + mDeltaX, 0., 1. );
+drawSourceLocation( gCenterX + mDeltaY, gCenterY + mDeltaX, 0., 1. );
+
+mDeltaX = ( gRadius + 20 * gfx_ext_retina ) * mCosAzi;
+mDeltaY = ( gRadius + 20 * gfx_ext_retina ) * mSinAzi;
+
+drawSpeakerPositiion( gCenterX - mDeltaY, gCenterY - mDeltaX, "1", 0 );
+drawSpeakerPositiion( gCenterX + mDeltaY, gCenterY - mDeltaX, "2", 0 );
+drawSpeakerPositiion( gCenterX - mDeltaY, gCenterY + mDeltaX, "3", 0 );
+drawSpeakerPositiion( gCenterX + mDeltaY, gCenterY + mDeltaX, "4", 0 );
+
 
 /**********************************************************
 Calculate audio sample

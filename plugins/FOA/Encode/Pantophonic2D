@@ -127,11 +127,12 @@ Custom graphic interface
 @gfx 500 500
 
 determineGeometry();
+
+// Reduce circle radius
+gRadius -= 30 * gfx_ext_retina;
+
 drawBackgroundImage( 0 );
 drawFuMa();
-
-// Size, saturation and luminocity depends on posZ
-gainToColor(0., -24., 6., 0.);
 
 (mSpeakerLayout==0) ? (
   mSpeakerAzi = 0.5 * mSpeakerAziDelta;
@@ -139,9 +140,14 @@ gainToColor(0., -24., 6., 0.);
   mSpeakerAzi = 0.;
 );
 
+i = 1;
 loop(mNumSpeakers,
+  gainToColor(0., -24., 6., 0.);
   drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ),  gCenterY - gRadius * cos( mSpeakerAzi ),  0., 1.);
+  sprintf(speakerLabel,"%i", i); 
+  drawSpeakerPositiion( gCenterX - ( gRadius + 20 * gfx_ext_retina ) * sin( mSpeakerAzi ),  gCenterY - ( gRadius + 20 * gfx_ext_retina ) * cos( mSpeakerAzi ),  speakerLabel, 0);
   mSpeakerAzi += mSpeakerAziDelta;
+  i += 1;
 );
 
 
