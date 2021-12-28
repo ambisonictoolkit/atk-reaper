@@ -104,48 +104,78 @@ matrixDSP[23] =  0.;
 // Initiate graphics
 gfx_ext_retina = 1;
 
+// Testing - debugging
+// drawCount = 0;
+
 
 /**********************************************************
 Custom graphic interface
 **********************************************************/
 @gfx 500 500
 
-determineGeometry();
+// Only refresh GUI when needed
+geometryHasChanged( mPrevWidth, mPrevHeight ) ? (
+  
+  determineGeometry();
 
-// Reduce circle radius
-gRadius -= 30 * gfx_ext_retina;
+  // Reduce circle radius
+  gRadius -= 30 * gfx_ext_retina;
 
-drawBackgroundImage( 0 );
-drawFuMa();
+  drawBackgroundImage( 0 );
+  drawFuMa();
 
-mDeltaX0   = gRadius * mCosAzi0;
-mDeltaY0   = gRadius * mSinAzi0;
-mDeltaX30  = gRadius * mCosAzi30;
-mDeltaY30  = gRadius * mSinAzi30;
-mDeltaX110 = gRadius * mCosAzi110;
-mDeltaY110 = gRadius * mSinAzi110;
+  mDeltaX0   = gRadius * mCosAzi0;
+  mDeltaY0   = gRadius * mSinAzi0;
+  mDeltaX30  = gRadius * mCosAzi30;
+  mDeltaY30  = gRadius * mSinAzi30;
+  mDeltaX110 = gRadius * mCosAzi110;
+  mDeltaY110 = gRadius * mSinAzi110;
 
-// Size, saturation and luminocity depends on posZ
-gainToColor( 0., -24., 6., 0. );
+  // Size, saturation and luminocity depends on posZ
+  gainToColor( 0., -24., 6., 0. );
 
-drawSourceLocation( gCenterX - mDeltaY30,  gCenterY - mDeltaX30,  0., 1. );
-drawSourceLocation( gCenterX + mDeltaY30,  gCenterY - mDeltaX30,  0., 1. );
-drawSourceLocation( gCenterX + mDeltaY0,   gCenterY - mDeltaX0,   0., 1. );
-drawSourceLocation( gCenterX - mDeltaY110, gCenterY - mDeltaX110, 0., 1. );
-drawSourceLocation( gCenterX + mDeltaY110, gCenterY - mDeltaX110, 0., 1. );
+  drawSourceLocation( gCenterX - mDeltaY30,  gCenterY - mDeltaX30,  0., 1. );
+  drawSourceLocation( gCenterX + mDeltaY30,  gCenterY - mDeltaX30,  0., 1. );
+  drawSourceLocation( gCenterX + mDeltaY0,   gCenterY - mDeltaX0,   0., 1. );
+  drawSourceLocation( gCenterX - mDeltaY110, gCenterY - mDeltaX110, 0., 1. );
+  drawSourceLocation( gCenterX + mDeltaY110, gCenterY - mDeltaX110, 0., 1. );
 
-mDeltaX0   = (gRadius + 20 * gfx_ext_retina ) * mCosAzi0;
-mDeltaY0   = (gRadius + 20 * gfx_ext_retina ) * mSinAzi0;
-mDeltaX30  = (gRadius + 20 * gfx_ext_retina ) * mCosAzi30;
-mDeltaY30  = (gRadius + 20 * gfx_ext_retina ) * mSinAzi30;
-mDeltaX110 = (gRadius + 20 * gfx_ext_retina ) * mCosAzi110;
-mDeltaY110 = (gRadius + 20 * gfx_ext_retina ) * mSinAzi110;
+  mDeltaX0   = (gRadius + 20 * gfx_ext_retina ) * mCosAzi0;
+  mDeltaY0   = (gRadius + 20 * gfx_ext_retina ) * mSinAzi0;
+  mDeltaX30  = (gRadius + 20 * gfx_ext_retina ) * mCosAzi30;
+  mDeltaY30  = (gRadius + 20 * gfx_ext_retina ) * mSinAzi30;
+  mDeltaX110 = (gRadius + 20 * gfx_ext_retina ) * mCosAzi110;
+  mDeltaY110 = (gRadius + 20 * gfx_ext_retina ) * mSinAzi110;
 
-drawSpeakerPositiion( gCenterX - mDeltaY30,  gCenterY - mDeltaX30,  "1", 0 );
-drawSpeakerPositiion( gCenterX + mDeltaY30,  gCenterY - mDeltaX30,  "2", 0 );
-drawSpeakerPositiion( gCenterX + mDeltaY0,   gCenterY - mDeltaX0,   "3", 0 );
-drawSpeakerPositiion( gCenterX - mDeltaY110, gCenterY - mDeltaX110, "5", 0 );
-drawSpeakerPositiion( gCenterX + mDeltaY110, gCenterY - mDeltaX110, "6", 0 );
+  drawSpeakerPositiion( gCenterX - mDeltaY30,  gCenterY - mDeltaX30,  "1", 0 );
+  drawSpeakerPositiion( gCenterX + mDeltaY30,  gCenterY - mDeltaX30,  "2", 0 );
+  drawSpeakerPositiion( gCenterX + mDeltaY0,   gCenterY - mDeltaX0,   "3", 0 );
+  drawSpeakerPositiion( gCenterX - mDeltaY110, gCenterY - mDeltaX110, "5", 0 );
+  drawSpeakerPositiion( gCenterX + mDeltaY110, gCenterY - mDeltaX110, "6", 0 );
+  
+  mPrevWidth   = gfx_w;
+  mPrevHeight  = gfx_h;
+  
+  /// Testing
+  // gfx_x = 100;
+  // gfx_y = 100;
+  // drawCount = drawCount + 1;
+  // sprintf(drawCountStr, "Draw Count: %d", drawCount);
+  // gfx_printf(drawCountStr); 
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /**********************************************************

@@ -64,6 +64,10 @@ mInitialised = 0;
 
 // Initiate graphics
 gfx_ext_retina = 1;
+
+// Testing - debugging
+// drawCount = 0;
+
 function calculateCoefficients()
 (
   // Interaction point:
@@ -110,8 +114,6 @@ Custom graphic interface
 @gfx 500 500
 
 determineGeometry();
-drawBackgroundImage( 0 );
-drawFuMa();
 
 // Reset azimuth and spread on mouse click
 mouse_cap == 1 ?
@@ -126,22 +128,42 @@ mouse_cap == 1 ?
   calculateCoefficients();
 );
 
-// Draw circle for interaction, map vertical position to saturation, lightness and radius
-(mSinEle < 0) ? (
-  mSaturation = 1. - 0.25*mSinEle;
-  mLightness = 0.4;
-) : (
-  mSaturation = 1.;
-  mLightness = 0.4 + 0.25*mSinEle;
+// Only refresh GUI when needed
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || slider1 != lastSlider1 || slider2 != lastSlider2 ) ? (
+  
+  drawBackgroundImage( 0 );
+  drawFuMa();
+
+  // Draw circle for interaction, map vertical position to saturation, lightness and radius
+  (mSinEle < 0) ? (
+    mSaturation = 1. - 0.25*mSinEle;
+    mLightness = 0.4;
+  ) : (
+    mSaturation = 1.;
+    mLightness = 0.4 + 0.25*mSinEle;
+  );
+  gxColorSetHsl(1.0, 195., mSaturation, mLightness);
+
+  mPosX = gCenterX - gRadius * (mSinAzi * mCosEle);
+  mPosY = gCenterY - gRadius * (mCosAzi * mCosEle);
+  mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
+
+  drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);
+  drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);  
+  
+  mPrevWidth  = gfx_w;
+  mPrevHeight = gfx_h;
+  lastSlider1 = slider1;
+  lastSlider2 = slider2;
+  
+  /// Testing
+  // gfx_x = 100;
+  // gfx_y = 100;
+  // drawCount = drawCount + 1;
+  // sprintf(drawCountStr, "Draw Count: %d", drawCount);
+  // gfx_printf(drawCountStr); 
 );
-gxColorSetHsl(1.0, 195., mSaturation, mLightness);
 
-mPosX = gCenterX - gRadius * (mSinAzi * mCosEle);
-mPosY = gCenterY - gRadius * (mCosAzi * mCosEle);
-mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
-
-drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);
-drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 
 /**********************************************************
 Preprocessing prior to audio vector processing.

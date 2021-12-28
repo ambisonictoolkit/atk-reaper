@@ -130,6 +130,9 @@ function calculateEncodeMatrix()
 // Initiate graphics
 gfx_ext_retina = 1;
 
+// Testing - debugging
+// drawCount = 0;
+
 
 /**********************************************************
 Updated slider value:
@@ -155,30 +158,48 @@ Custom graphic interface
 **********************************************************/
 @gfx 500 500
 
-determineGeometry();
-drawBackgroundImage( 0 );
-drawFuMa();
+// Only refresh background when needed
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || slider1 != lastSlider1 || slider2 != lastSlider2 || slider3 != lastSlider3 ) ? (
+  
+  determineGeometry();
+  drawBackgroundImage( 0 );
+  drawFuMa();
 
-// Size, saturation and luminocity depends on posZ
-gainToColor(0., -24., 6., -mSinEle);
+  // Size, saturation and luminocity depends on posZ
+  gainToColor(0., -24., 6., -mSinEle);
 
-(mSpeakerLayout==0) ? (
-  mSpeakerAzi = 0.5 * mSpeakerAziDelta;
-) : (
-  mSpeakerAzi = 0.;
+  (mSpeakerLayout==0) ? (
+    mSpeakerAzi = 0.5 * mSpeakerAziDelta;
+  ) : (
+    mSpeakerAzi = 0.;
+  );
+
+  loop( mNumSpeakerPairs,
+    drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ) * mCosEle,  gCenterY - gRadius * cos( mSpeakerAzi ) * mCosEle,  mSinEle, 1. );
+    mSpeakerAzi += mSpeakerAziDelta;
+  );
+
+  gainToColor( 0., -24., 6., mSinEle );
+
+  loop( mNumSpeakerPairs,
+    drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ) * mCosEle,  gCenterY - gRadius * cos( mSpeakerAzi ) * mCosEle,  -mSinEle, 1. );
+    mSpeakerAzi += mSpeakerAziDelta;
+  );
+  
+  mPrevWidth  = gfx_w;
+  mPrevHeight = gfx_h;
+  lastSlider1 = slider1;
+  lastSlider2 = slider2;
+  lastSlider3 = slider3;
+  
+  /// Testing
+  // gfx_x = 100;
+  // gfx_y = 100;
+  // drawCount = drawCount + 1;
+  // sprintf(drawCountStr, "Draw Count: %d", drawCount);
+  // gfx_printf(drawCountStr); 
 );
 
-loop( mNumSpeakerPairs,
-  drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ) * mCosEle,  gCenterY - gRadius * cos( mSpeakerAzi ) * mCosEle,  mSinEle, 1. );
-  mSpeakerAzi += mSpeakerAziDelta;
-);
-
-gainToColor( 0., -24., 6., mSinEle );
-
-loop( mNumSpeakerPairs,
-  drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ) * mCosEle,  gCenterY - gRadius * cos( mSpeakerAzi ) * mCosEle,  -mSinEle, 1. );
-  mSpeakerAzi += mSpeakerAziDelta;
-);
 
 /**********************************************************
 Calculate audio sample
