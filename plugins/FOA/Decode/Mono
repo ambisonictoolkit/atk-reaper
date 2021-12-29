@@ -62,6 +62,9 @@ mIsInitialised = 0;
 // Graphics
 gfx_ext_retina = 1;
 
+// Testing - debugging
+// drawCount = 0;
+
 
 /**********************************************************
 Updated slider value:
@@ -101,20 +104,15 @@ function plotPattern( anAngle ) // local (lAngle)
   ( lRadius < 0 ) ? (
     lRadius = -lRadius;
     gxColorSetHsl(1.0, 30., 1., 0.5);
-    //mPhaseInverse = 1;
   ) : (
     gxColorSetHsl(1.0, 60., 1., 0.5);
-    //mPhaseInverse = 0;
   );
   
   mPosX = gCenterX - lRadius * sin( anAngle );
   mPosY = gCenterY - lRadius * cos( anAngle );
 );
 
-
 determineGeometry();
-drawBackgroundImage( 2 );
-drawFuMa();
 
 // Reset azimuth and spread on mouse click
 mouse_cap == 1 ?
@@ -123,54 +121,64 @@ mouse_cap == 1 ?
   mMouseY = mouse_y - gCenterY;
   mAzi = atan2(-mMouseX, -mMouseY);
   slider1 = mAzi * kRad2Deg;
+  
   // Notify GUI that azimuth has changed, and update coefficients
   slider_automate(slider1);
 );
 
-// Draw microphone pattern
-//gxColorSetHsl( 1.0 , 0., 100, 0.5 );
-gfx_r = 1.0;
-gfx_g = 1.0;
-gfx_b = 1.0;
-
-
-i = 1;
-plotPattern( kDeg2Rad * i );
-gfx_x = mPosX;
-gfx_y = mPosY;
-
-loop( 360,
-  i += 1;
-  plotPattern( kDeg2Rad * i );
-  //gfx_r = gfx_g = gfx_b = 1.0 - 0.35 * mPhaseInverse;
+// Only refresh GUI when needed
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || slider1 != lastSlider1 || slider2 != lastSlider2 || slider3 != lastSlider3 ) ? (
   
-  gfx_lineto( mPosX, mPosY, 1.0 ); 
+  drawBackgroundImage( 2 );
+  drawFuMa();
+
+  // Draw microphone pattern
+  i = 1;
+  plotPattern( kDeg2Rad * i );
+  gfx_x = mPosX;
+  gfx_y = mPosY;
+
+  loop( 360,
+    i += 1;
+    plotPattern( kDeg2Rad * i );
+    gfx_lineto( mPosX, mPosY, 1.0 ); 
+  );
+
+  // Draw circle for interaction, map vertical position to saturation, lightness and radius
+  mCosAzi  = cos(mAzi);
+  mSinAzi  = sin(mAzi);
+  mCosEle  = cos(mEle);
+  mSinEle  = sin(mEle);
+
+  (mSinEle < 0) ? (
+    mSaturation = 1. - 0.25*mSinEle;
+    mLightness = 0.4;
+  ) : (
+    mSaturation = 1.;
+    mLightness = 0.4 + 0.25*mSinEle;
+  );
+  gxColorSetHsl(1.0, 195., mSaturation, mLightness);
+
+  mPosX = gCenterX - gRadius * (mSinAzi * mCosEle);
+  mPosY = gCenterY - gRadius * (mCosAzi * mCosEle);
+  mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
+
+  drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);
+  drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
+  
+  mPrevWidth  = gfx_w;
+  mPrevHeight = gfx_h;
+  lastSlider1 = slider1;
+  lastSlider2 = slider2;
+  lastSlider3 = slider3;
+  
+  /// Testing
+  // gfx_x = 100;
+  // gfx_y = 100;
+  // drawCount = drawCount + 1;
+  // sprintf(drawCountStr, "Draw Count: %d", drawCount);
+  // gfx_printf(drawCountStr); 
 );
-
-// Draw circle for interaction, map vertical position to saturation, lightness and radius
-//calculateCoefficients();
-
-mCosAzi  = cos(mAzi);
-mSinAzi  = sin(mAzi);
-mCosEle  = cos(mEle);
-mSinEle  = sin(mEle);
-
-(mSinEle < 0) ? (
-  mSaturation = 1. - 0.25*mSinEle;
-  mLightness = 0.4;
-) : (
-  mSaturation = 1.;
-  mLightness = 0.4 + 0.25*mSinEle;
-);
-gxColorSetHsl(1.0, 195., mSaturation, mLightness);
-
-
-mPosX = gCenterX - gRadius * (mSinAzi * mCosEle);
-mPosY = gCenterY - gRadius * (mCosAzi * mCosEle);
-mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
-
-drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);
-drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 
 
 /**********************************************************

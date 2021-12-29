@@ -129,7 +129,7 @@ Custom graphic interface
 @gfx 500 500
 
 
-// Only refresh background when needed
+// Only refresh GUI when needed
 geometryHasChanged( mPrevWidth, mPrevHeight ) ? (
   
   determineGeometry();
