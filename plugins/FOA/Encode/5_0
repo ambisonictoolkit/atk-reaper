@@ -104,8 +104,8 @@ matrixDSP[23] =  0.;
 // Initiate graphics
 gfx_ext_retina = 1;
 
-// Testing - debugging
-// drawCount = 0;
+// Prevent auto clear of each frame
+gfx_clear = -1;
 
 
 /**********************************************************
@@ -155,27 +155,7 @@ geometryHasChanged( mPrevWidth, mPrevHeight ) ? (
   
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;
-  
-  /// Testing
-  // gfx_x = 100;
-  // gfx_y = 100;
-  // drawCount = drawCount + 1;
-  // sprintf(drawCountStr, "Draw Count: %d", drawCount);
-  // gfx_printf(drawCountStr); 
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /**********************************************************

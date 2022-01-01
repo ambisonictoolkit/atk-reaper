@@ -95,7 +95,10 @@ memset(mDisplayPeaks,0,kMaxNumSpeakers);
 
 // Graphics
 gfx_ext_retina = 1;
-gfx_clear=-1;           // Prevent auto clear of each frame
+
+// Prevent auto clear of each frame
+gfx_clear = -1;
+
 kRefreshRate = 0.05;    // Refresh rate in sec
 mRefreshSampCount = 0;
 mDoRefresh = 1;

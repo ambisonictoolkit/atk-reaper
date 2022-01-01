@@ -135,6 +135,9 @@ matrixMirrorNonRotated[23] = 0;
 // Initiate graphics
 gfx_ext_retina = 1;
 
+// Prevent auto clear of each frame
+gfx_clear = -1;
+
 // Initialisation of user interaction parameters
 mPreviousMouseCap = 0;
 mClickingAtCircle = 0;
@@ -264,23 +267,19 @@ function postAfter() local( lStrWidth, lStringHeight )
   gfx_drawstr( "After" );
 );
 
-determineGeometry();
-drawBackgroundImage( 1 );
-drawFuMa();
 
-// Set font
-gfx_setfont(1, "Verdana", 16 * gfx_ext_retina );
+determineGeometry();
 
 // Radius of interaction circle
 kInteractionCircleRadius = 11. * gfx_ext_retina;
 
-
 // Only update plugin parameters if the user click and drag interaction circle
 mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
+
 // Save current mouse_cap value in order to use in the above test at next iteration
 mPreviousMouseCap = mouse_cap;
 
-// Mouse interaction: Reset mAzimuth and transformAngle
+// Mouse interaction - reset mAzimuth and transformAngle
 (mClickingAtCircle) ? (
   mMouseX = mouse_x - gCenterX;
   mMouseY = mouse_y - gCenterY;
@@ -297,123 +296,141 @@ mPreviousMouseCap = mouse_cap;
   mHiglightCircle = hoverOverInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 );
 
-// Draw mirror plane
-setInteractionColor(mHiglightCircle);
 
-// Outline of mirror plane:
-mPos1x = gCenterX - matrixMirrorRotatedInterpreted[ 6 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 12 ] ) * gRadius * kSqrt2;
-mPos1y = gCenterY - matrixMirrorRotatedInterpreted[ 0 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 12 ] ) * gRadius * kSqrt2;
-
-mPos2x = gCenterX - matrixMirrorRotatedInterpreted[ 7 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 13 ] ) * gRadius * kSqrt2;
-mPos2y = gCenterY - matrixMirrorRotatedInterpreted[ 1 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 13 ] ) * gRadius * kSqrt2;
-
-mPos3x = gCenterX - matrixMirrorRotatedInterpreted[ 8 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 14 ] ) * gRadius * kSqrt2;
-mPos3y = gCenterY - matrixMirrorRotatedInterpreted[ 2 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 14 ] ) * gRadius * kSqrt2;
-
-mPos4x = gCenterX - matrixMirrorRotatedInterpreted[ 9 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 15 ] ) * gRadius * kSqrt2;
-mPos4y = gCenterY - matrixMirrorRotatedInterpreted[ 3 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 15 ] ) * gRadius * kSqrt2;
-
-// Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-drawQuadrangleOutline( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, mPos3x + 1.5, mPos3y + 1.5, mPos4x + 1.5, mPos4y + 1.5, 1. );
-drawQuadrangleOutline( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, mPos3x + 1.0, mPos3y + 1.0, mPos4x + 1.0, mPos4y + 1.0, 1. );
-drawQuadrangleOutline( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, mPos3x + 0.5, mPos3y + 0.5, mPos4x + 0.5, mPos4y + 0.5, 1. );
-drawQuadrangleOutline( mPos1x      , mPos1y      , mPos2x      , mPos2y      , mPos3x      , mPos3y      , mPos4x      , mPos4y      , 1.);
-drawQuadrangleOutline( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, mPos3x - 0.5, mPos3y - 0.5, mPos4x - 0.5, mPos4y - 0.5, 1. );
-drawQuadrangleOutline( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, mPos3x - 1.0, mPos3y - 1.0, mPos4x - 1.0, mPos4y - 1.0, 1. );
-drawQuadrangleOutline( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, mPos3x - 1.5, mPos3y - 1.5, mPos4x - 1.5, mPos4y - 1.5, 1. );
-
-// Draw line at intersection between horisontal plane and mirror plane
-mPos1x = gCenterX - matrixMirrorRotatedInterpreted[ 10 ] * gRadius;
-mPos1y = gCenterY - matrixMirrorRotatedInterpreted[  4 ] * gRadius;
-
-mPos2x = gCenterX - matrixMirrorRotatedInterpreted[ 11 ] * gRadius;
-mPos2y = gCenterY - matrixMirrorRotatedInterpreted[  5 ] * gRadius;
-
-// Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-drawLineSegment( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, 1. );
-drawLineSegment( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, 1. );
-drawLineSegment( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, 1. );
-drawLineSegment( mPos1x      , mPos1y      , mPos2x      , mPos2y      , 1. );
-drawLineSegment( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, 1. );
-drawLineSegment( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, 1. );
-drawLineSegment( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, 1. );
-postMirror(mHiglightCircle);
-
-// Draw lines illustrating how each point has been mirrored
-i = 0;
-loop(mNumDisplayedPoints,
-  mPos1x = gCenterX - gRadius * matrixDisplayNonTransformedInterpreted[ mNumDisplayedPoints + i ];
-  mPos1y = gCenterY - gRadius * matrixDisplayNonTransformedInterpreted[ i ];
-  mPos1z = matrixDisplayNonTransformedInterpreted[ 2 * mNumDisplayedPoints + i ];
+// Only refresh GUI when needed - contrary to most plugins, highlight (mouse hovering) requires a full GUI redraw
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) || ( mHiglightCircle != lastHHiglightCircle ) ) ? (
   
-  mPos3x = gCenterX - gRadius * matrixDisplayTransformedInterpreted[ mNumDisplayedPoints + i ];
-  mPos3y = gCenterY - gRadius * matrixDisplayTransformedInterpreted[ i ];
-  mPos3z = matrixDisplayTransformedInterpreted[ 2 * mNumDisplayedPoints + i ];
-  
-  mPos2x = ( mPos1x + mPos3x ) * 0.5;
-  mPos2y = ( mPos1y + mPos3y ) * 0.5;
-  mPos2z = ( mPos1z + mPos3z ) * 0.5;
-  
-  // Draw first part of line in "before" color
-  setBeforeColor();
-  
+  drawBackgroundImage( 1 );
+  drawFuMa();
+
+  // Set font
+  gfx_setfont(1, "Verdana", 16 * gfx_ext_retina );
+
+  // Draw mirror plane
+  setInteractionColor(mHiglightCircle);
+
+  // Outline of mirror plane:
+  mPos1x = gCenterX - matrixMirrorRotatedInterpreted[ 6 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 12 ] ) * gRadius * kSqrt2;
+  mPos1y = gCenterY - matrixMirrorRotatedInterpreted[ 0 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 12 ] ) * gRadius * kSqrt2;
+
+  mPos2x = gCenterX - matrixMirrorRotatedInterpreted[ 7 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 13 ] ) * gRadius * kSqrt2;
+  mPos2y = gCenterY - matrixMirrorRotatedInterpreted[ 1 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 13 ] ) * gRadius * kSqrt2;
+
+  mPos3x = gCenterX - matrixMirrorRotatedInterpreted[ 8 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 14 ] ) * gRadius * kSqrt2;
+  mPos3y = gCenterY - matrixMirrorRotatedInterpreted[ 2 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 14 ] ) * gRadius * kSqrt2;
+
+  mPos4x = gCenterX - matrixMirrorRotatedInterpreted[ 9 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 15 ] ) * gRadius * kSqrt2;
+  mPos4y = gCenterY - matrixMirrorRotatedInterpreted[ 3 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 15 ] ) * gRadius * kSqrt2;
+
   // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-  drawLineSegment(mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, 1. );
-  drawLineSegment(mPos1x      , mPos1y      , mPos2x      , mPos2y      , 1. );
-  drawLineSegment(mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, 1. );
-  
-  // Draw small point where beam intersects mirror
-  setInteractionColorWithDepth( mPos2z, mHiglightCircle );
-  gfx_circle( mPos2x, mPos2y, ( 2.5 + 1.4 * mPos2z ) * gfx_ext_retina, 1 );
-  
-  // Draw second part of line
-  // TODO: Optmise, with current use of colors there is no need to draw this as two sections
-  setBeforeColor();
-  
+  drawQuadrangleOutline( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, mPos3x + 1.5, mPos3y + 1.5, mPos4x + 1.5, mPos4y + 1.5, 1. );
+  drawQuadrangleOutline( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, mPos3x + 1.0, mPos3y + 1.0, mPos4x + 1.0, mPos4y + 1.0, 1. );
+  drawQuadrangleOutline( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, mPos3x + 0.5, mPos3y + 0.5, mPos4x + 0.5, mPos4y + 0.5, 1. );
+  drawQuadrangleOutline( mPos1x      , mPos1y      , mPos2x      , mPos2y      , mPos3x      , mPos3y      , mPos4x      , mPos4y      , 1.);
+  drawQuadrangleOutline( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, mPos3x - 0.5, mPos3y - 0.5, mPos4x - 0.5, mPos4y - 0.5, 1. );
+  drawQuadrangleOutline( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, mPos3x - 1.0, mPos3y - 1.0, mPos4x - 1.0, mPos4y - 1.0, 1. );
+  drawQuadrangleOutline( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, mPos3x - 1.5, mPos3y - 1.5, mPos4x - 1.5, mPos4y - 1.5, 1. );
+
+  // Draw line at intersection between horisontal plane and mirror plane
+  mPos1x = gCenterX - matrixMirrorRotatedInterpreted[ 10 ] * gRadius;
+  mPos1y = gCenterY - matrixMirrorRotatedInterpreted[  4 ] * gRadius;
+
+  mPos2x = gCenterX - matrixMirrorRotatedInterpreted[ 11 ] * gRadius;
+  mPos2y = gCenterY - matrixMirrorRotatedInterpreted[  5 ] * gRadius;
+
   // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-  drawLineSegment( mPos2x + 0.5, mPos2y + 0.5, mPos3x + 0.5, mPos3y + 0.5, 1. );
-  drawLineSegment( mPos2x      , mPos2y      , mPos3x      , mPos3y      , 1. );
-  drawLineSegment( mPos2x - 0.5, mPos2y - 0.5, mPos3x - 0.5, mPos3y - 0.5, 1. );
+  drawLineSegment( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, 1. );
+  drawLineSegment( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, 1. );
+  drawLineSegment( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, 1. );
+  drawLineSegment( mPos1x      , mPos1y      , mPos2x      , mPos2y      , 1. );
+  drawLineSegment( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, 1. );
+  drawLineSegment( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, 1. );
+  drawLineSegment( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, 1. );
+  postMirror(mHiglightCircle);
+
+  // Draw lines illustrating how each point has been mirrored
+  i = 0;
+  loop(mNumDisplayedPoints,
+    mPos1x = gCenterX - gRadius * matrixDisplayNonTransformedInterpreted[ mNumDisplayedPoints + i ];
+    mPos1y = gCenterY - gRadius * matrixDisplayNonTransformedInterpreted[ i ];
+    mPos1z = matrixDisplayNonTransformedInterpreted[ 2 * mNumDisplayedPoints + i ];
   
-  i += 1;
+    mPos3x = gCenterX - gRadius * matrixDisplayTransformedInterpreted[ mNumDisplayedPoints + i ];
+    mPos3y = gCenterY - gRadius * matrixDisplayTransformedInterpreted[ i ];
+    mPos3z = matrixDisplayTransformedInterpreted[ 2 * mNumDisplayedPoints + i ];
+  
+    mPos2x = ( mPos1x + mPos3x ) * 0.5;
+    mPos2y = ( mPos1y + mPos3y ) * 0.5;
+    mPos2z = ( mPos1z + mPos3z ) * 0.5;
+  
+    // Draw first part of line in "before" color
+    setBeforeColor();
+  
+    // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
+    drawLineSegment(mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, 1. );
+    drawLineSegment(mPos1x      , mPos1y      , mPos2x      , mPos2y      , 1. );
+    drawLineSegment(mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, 1. );
+  
+    // Draw small point where beam intersects mirror
+    setInteractionColorWithDepth( mPos2z, mHiglightCircle );
+    gfx_circle( mPos2x, mPos2y, ( 2.5 + 1.4 * mPos2z ) * gfx_ext_retina, 1 );
+  
+    // Draw second part of line
+    // TODO: Optmise, with current use of colors there is no need to draw this as two sections
+    setBeforeColor();
+  
+    // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
+    drawLineSegment( mPos2x + 0.5, mPos2y + 0.5, mPos3x + 0.5, mPos3y + 0.5, 1. );
+    drawLineSegment( mPos2x      , mPos2y      , mPos3x      , mPos3y      , 1. );
+    drawLineSegment( mPos2x - 0.5, mPos2y - 0.5, mPos3x - 0.5, mPos3y - 0.5, 1. );
+  
+    i += 1;
+  );
+
+  // Draw non-transformed points:
+  setBeforeColor();
+  displayTransformedPointsWithCustomColor( matrixDisplayNonTransformedInterpreted, mNumDisplayedPoints );
+  postBefore();
+
+  // Draw points illustrating the effect of the transform
+  setAfterColor();
+  displayTransformedPoints( matrixDisplayTransformedInterpreted, mNumDisplayedPoints, 0 );
+  postAfter();
+
+  //setInteractionColor(0);
+  gxColorSetHsl(1.0, 195., 1., 0.4 + 0.15*mHiglightCircle);
+  mPosX = gCenterX - gRadius * slider4 * (mSinAzimuth * mCosElevation);
+  mPosY = gCenterY - gRadius * slider4 * (mCosAzimuth * mCosElevation);
+
+  // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
+  drawLineSegment( gCenterX + 1.5, gCenterY + 1.5, mPosX + 1.5, mPosY + 1.5, 1. );
+  drawLineSegment( gCenterX + 1.0, gCenterY + 1.0, mPosX + 1.0, mPosY + 1.0, 1. );
+  drawLineSegment( gCenterX + 0.5, gCenterY + 0.5, mPosX + 0.5, mPosY + 0.5, 1. );
+  drawLineSegment( gCenterX      , gCenterY      , mPosX      , mPosY      , 1. );
+  drawLineSegment( gCenterX - 0.5, gCenterY - 0.5, mPosX - 0.5, mPosY - 0.5, 1. );
+  drawLineSegment( gCenterX - 1.0, gCenterY - 1.0, mPosX - 1.0, mPosY - 1.0, 1. );
+  drawLineSegment( gCenterX - 1.5, gCenterY - 1.5, mPosX - 1.5, mPosY - 1.5, 1. );
+
+  // Draw circle for interaction, map vertical position to saturation, lightness and radius
+  (mSinElevation < 0) ? (
+    mSaturation = 1. - 0.25*mSinElevation;
+    mLightness = 0.4;
+  ) : (
+    mSaturation = 1.;
+    mLightness = 0.4 + 0.25*mSinElevation;
+  );
+  gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15*mHiglightCircle);
+
+  mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
+  drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
+  
+  mPrevWidth  = gfx_w;
+  mPrevHeight = gfx_h;
+  lastSlider1 = slider1;
+  lastSlider2 = slider2;
+  
+  lastHHiglightCircle = mHiglightCircle;
 );
-
-// Draw non-transformed points:
-setBeforeColor();
-displayTransformedPointsWithCustomColor( matrixDisplayNonTransformedInterpreted, mNumDisplayedPoints );
-postBefore();
-
-// Draw points illustrating the effect of the transform
-setAfterColor();
-displayTransformedPoints( matrixDisplayTransformedInterpreted, mNumDisplayedPoints, 0 );
-postAfter();
-
-//setInteractionColor(0);
-gxColorSetHsl(1.0, 195., 1., 0.4 + 0.15*mHiglightCircle);
-mPosX = gCenterX - gRadius * slider4 * (mSinAzimuth * mCosElevation);
-mPosY = gCenterY - gRadius * slider4 * (mCosAzimuth * mCosElevation);
-
-// Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-drawLineSegment( gCenterX + 1.5, gCenterY + 1.5, mPosX + 1.5, mPosY + 1.5, 1. );
-drawLineSegment( gCenterX + 1.0, gCenterY + 1.0, mPosX + 1.0, mPosY + 1.0, 1. );
-drawLineSegment( gCenterX + 0.5, gCenterY + 0.5, mPosX + 0.5, mPosY + 0.5, 1. );
-drawLineSegment( gCenterX      , gCenterY      , mPosX      , mPosY      , 1. );
-drawLineSegment( gCenterX - 0.5, gCenterY - 0.5, mPosX - 0.5, mPosY - 0.5, 1. );
-drawLineSegment( gCenterX - 1.0, gCenterY - 1.0, mPosX - 1.0, mPosY - 1.0, 1. );
-drawLineSegment( gCenterX - 1.5, gCenterY - 1.5, mPosX - 1.5, mPosY - 1.5, 1. );
-
-// Draw circle for interaction, map vertical position to saturation, lightness and radius
-(mSinElevation < 0) ? (
-  mSaturation = 1. - 0.25*mSinElevation;
-  mLightness = 0.4;
-) : (
-  mSaturation = 1.;
-  mLightness = 0.4 + 0.25*mSinElevation;
-);
-gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15*mHiglightCircle);
-
-mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
-drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 
 
 /**********************************************************

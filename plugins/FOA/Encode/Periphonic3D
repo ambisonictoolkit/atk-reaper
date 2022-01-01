@@ -130,8 +130,8 @@ function calculateEncodeMatrix()
 // Initiate graphics
 gfx_ext_retina = 1;
 
-// Testing - debugging
-// drawCount = 0;
+// Prevent auto clear of each frame
+gfx_clear = -1;
 
 
 /**********************************************************
@@ -159,7 +159,7 @@ Custom graphic interface
 @gfx 500 500
 
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || slider1 != lastSlider1 || slider2 != lastSlider2 || slider3 != lastSlider3 ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) || ( slider3 != lastSlider3 ) ) ? (
   
   determineGeometry();
   drawBackgroundImage( 0 );
@@ -191,13 +191,6 @@ Custom graphic interface
   lastSlider1 = slider1;
   lastSlider2 = slider2;
   lastSlider3 = slider3;
-  
-  /// Testing
-  // gfx_x = 100;
-  // gfx_y = 100;
-  // drawCount = drawCount + 1;
-  // sprintf(drawCountStr, "Draw Count: %d", drawCount);
-  // gfx_printf(drawCountStr); 
 );
 
 

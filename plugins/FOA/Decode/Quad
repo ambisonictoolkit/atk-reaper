@@ -93,33 +93,36 @@ memset(mDisplayPeaks,0,kMaxNumSpeakers);
 
 // Graphics
 gfx_ext_retina = 1;
-gfx_clear=-1;           // Prevent auto clear of each frame
+
+// Prevent auto clear of each frame
+gfx_clear = -1;
+
 kRefreshRate = 0.05;    // Refresh rate in sec
 mRefreshSampCount = 0;
 mDoRefresh = 1;
 
 
-function calculateLedCoordinates(aLedCount, anAngleLo, anAngleHi) local (lLedRadius)
+function calculateLedCoordinates( aLedCount, anAngleLo, anAngleHi ) local ( lLedRadius )
 (
   // LED coordinates as convex poygon  
   lLedRadius = gRadius * 0.2;
-  lLedRadInc = (0.8*gRadius) / (2*kNumLeds+1);
+  lLedRadInc = ( 0.8 * gRadius ) / ( 2 * kNumLeds + 1 );
   loop(kNumLeds,
     
     // LED coordinates as convex poygon
     
     // Inner points;
-    mLedCoordinates[aLedCount]     =  gCenterX + cos(anAngleLo) * lLedRadius;
-    mLedCoordinates[aLedCount + 1] =  gCenterY - sin(anAngleLo) * lLedRadius;
-    mLedCoordinates[aLedCount + 2] =  gCenterX + cos(anAngleHi) * lLedRadius;
-    mLedCoordinates[aLedCount + 3] =  gCenterY - sin(anAngleHi) * lLedRadius;
+    mLedCoordinates[ aLedCount ]     =  gCenterX + cos( anAngleLo ) * lLedRadius;
+    mLedCoordinates[ aLedCount + 1 ] =  gCenterY - sin( anAngleLo ) * lLedRadius;
+    mLedCoordinates[ aLedCount + 2 ] =  gCenterX + cos( anAngleHi ) * lLedRadius;
+    mLedCoordinates[ aLedCount + 3 ] =  gCenterY - sin( anAngleHi ) * lLedRadius;
     lLedRadius += lLedRadInc;
     
     // Outer points
-    mLedCoordinates[aLedCount + 4] =  gCenterX + cos(anAngleHi) * lLedRadius;
-    mLedCoordinates[aLedCount + 5] =  gCenterY - sin(anAngleHi) * lLedRadius;
-    mLedCoordinates[aLedCount + 6] =  gCenterX + cos(anAngleLo) * lLedRadius;
-    mLedCoordinates[aLedCount + 7] =  gCenterY - sin(anAngleLo) * lLedRadius;
+    mLedCoordinates[ aLedCount + 4 ] =  gCenterX + cos( anAngleHi ) * lLedRadius;
+    mLedCoordinates[ aLedCount + 5 ] =  gCenterY - sin( anAngleHi ) * lLedRadius;
+    mLedCoordinates[ aLedCount + 6 ] =  gCenterX + cos( anAngleLo ) * lLedRadius;
+    mLedCoordinates[ aLedCount + 7 ] =  gCenterY - sin( anAngleLo ) * lLedRadius;
     lLedRadius += lLedRadInc;
     
     aLedCount += 8;
@@ -129,54 +132,54 @@ function calculateLedCoordinates(aLedCount, anAngleLo, anAngleHi) local (lLedRad
 );
 
 
-function calculateCoordinates() local(lAngleLo, lAngleHi, lDeltaAngle, lLedCount)
+function calculateCoordinates() local( lAngleLo, lAngleHi, lDeltaAngle, lLedCount )
 (  
   lLedCount = 0;
   lDeltaAngle = 22.5; 
   
   // Left
-  mDisplayAngles[0] = 90+slider1;
-  lAngleLo   = mDisplayAngles[0] - lDeltaAngle;
-  lAngleLo   = max(lAngleLo, 95);
-  lAngleHi   = mDisplayAngles[0] + lDeltaAngle;
-  lAngleHi   = min(lAngleHi, 175);
-  mDisplayAngles[0] = mDisplayAngles[0] * kDeg2Rad;
+  mDisplayAngles[ 0 ] = 90+slider1;
+  lAngleLo   = mDisplayAngles[ 0 ] - lDeltaAngle;
+  lAngleLo   = max( lAngleLo, 95 );
+  lAngleHi   = mDisplayAngles[ 0 ] + lDeltaAngle;
+  lAngleHi   = min( lAngleHi, 175 );
+  mDisplayAngles[ 0 ] = mDisplayAngles[ 0 ] * kDeg2Rad;
   lAngleLo   = lAngleLo * kDeg2Rad;
   lAngleHi   = lAngleHi * kDeg2Rad;
-  lLedCount  = calculateLedCoordinates(lLedCount, lAngleLo, lAngleHi);
+  lLedCount  = calculateLedCoordinates( lLedCount, lAngleLo, lAngleHi );
   
   // Right
-  mDisplayAngles[1] = 90-slider1;
-  lAngleLo   = mDisplayAngles[1] - lDeltaAngle;
-  lAngleLo   = max(lAngleLo, 5);
-  lAngleHi   = mDisplayAngles[1] + lDeltaAngle;
-  lAngleHi   = min(lAngleHi, 85);
-  mDisplayAngles[1] = mDisplayAngles[1] * kDeg2Rad;
+  mDisplayAngles[ 1 ] = 90 - slider1;
+  lAngleLo   = mDisplayAngles[ 1 ] - lDeltaAngle;
+  lAngleLo   = max( lAngleLo, 5 );
+  lAngleHi   = mDisplayAngles[ 1 ] + lDeltaAngle;
+  lAngleHi   = min( lAngleHi, 85 );
+  mDisplayAngles[ 1 ] = mDisplayAngles[ 1 ] * kDeg2Rad;
   lAngleLo   = lAngleLo * kDeg2Rad;
   lAngleHi   = lAngleHi * kDeg2Rad;
-  lLedCount  = calculateLedCoordinates(lLedCount, lAngleLo, lAngleHi);
+  lLedCount  = calculateLedCoordinates( lLedCount, lAngleLo, lAngleHi );
   
   // Sur Left
-  mDisplayAngles[2] = 270-slider1;
-  lAngleLo   = mDisplayAngles[2] - lDeltaAngle;
-  lAngleLo   = max(lAngleLo, 185);
-  lAngleHi   = mDisplayAngles[2] + lDeltaAngle;
-  lAngleHi   = min(lAngleHi, 265);
-  mDisplayAngles[2] = mDisplayAngles[2] * kDeg2Rad;
+  mDisplayAngles[ 2 ] = 270 - slider1;
+  lAngleLo   = mDisplayAngles[ 2 ] - lDeltaAngle;
+  lAngleLo   = max( lAngleLo, 185 );
+  lAngleHi   = mDisplayAngles[ 2 ] + lDeltaAngle;
+  lAngleHi   = min( lAngleHi, 265 );
+  mDisplayAngles[ 2 ] = mDisplayAngles[ 2 ] * kDeg2Rad;
   lAngleLo   = lAngleLo * kDeg2Rad;
   lAngleHi   = lAngleHi * kDeg2Rad;
   lLedCount  = calculateLedCoordinates(lLedCount, lAngleLo, lAngleHi);
   
   // Sur Right
-  mDisplayAngles[3] = 270+slider1;
-  lAngleLo   = mDisplayAngles[3] - lDeltaAngle;
-  lAngleLo   = max(lAngleLo, 275);
-  lAngleHi   = mDisplayAngles[3] + lDeltaAngle;
-  lAngleHi   = min(lAngleHi, 355);
-  mDisplayAngles[3] = mDisplayAngles[3] * kDeg2Rad;
+  mDisplayAngles[ 3 ] = 270 + slider1;
+  lAngleLo   = mDisplayAngles[ 3 ] - lDeltaAngle;
+  lAngleLo   = max( lAngleLo, 275 );
+  lAngleHi   = mDisplayAngles[ 3 ] + lDeltaAngle;
+  lAngleHi   = min( lAngleHi, 355 );
+  mDisplayAngles[ 3 ] = mDisplayAngles[ 3 ] * kDeg2Rad;
   lAngleLo   = lAngleLo * kDeg2Rad;
   lAngleHi   = lAngleHi * kDeg2Rad;
-  lLedCount  = calculateLedCoordinates(lLedCount, lAngleLo, lAngleHi);
+  lLedCount  = calculateLedCoordinates( lLedCount, lAngleLo, lAngleHi );
 );
 
 

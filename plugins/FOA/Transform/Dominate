@@ -93,6 +93,13 @@ generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
 // Initiate graphics
 gfx_ext_retina = 1;
 
+// Prevent auto clear of each frame
+gfx_clear = -1;
+
+// This only needs to be generated once:
+mNumDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
+
 // Initialisation of user interaction parameters
 mPreviousMouseCap = 0;
 mClickingAtCircle = 0;
@@ -156,17 +163,15 @@ Graphics
 @gfx 500 500
 
 determineGeometry();
-drawBackgroundImage( 1 );
-drawFuMa();
 
 // Radius of interaction circle
 kInteractionCircleRadius = 11. * gfx_ext_retina;
 
 // Only update plugin parameters if the user click and drag interaction circle
 mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
+
 // Save current mouse_cap value in order to use in the above test at next iteration
 mPreviousMouseCap = mouse_cap;
-
 
 (mClickingAtCircle) ? (    
   mMouseX = mouse_x - gCenterX;
@@ -194,26 +199,47 @@ mPreviousMouseCap = mouse_cap;
   mHiglightCircle = hoverOverInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 );
 
-// Draw points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
-
-
-// Calculate absolute position of interaction circle
-mPosX = gCenterX - gRadius * slider3 * kInv24 * (mSinAzimuth * mCosElevation);
-mPosY = gCenterY - gRadius * slider3 * kInv24 * (mCosAzimuth * mCosElevation);
-
-
-// Draw circle for interaction, map vertical position to saturation, lightness and radius
-mSinElevation < 0 ? (
-  mSaturation = 1. - 0.25 * mSinElevation;
-  mLightness = 0.4;
-) : (
-  mSaturation = 1.;
-  mLightness = 0.4 + 0.25 * mSinElevation;
+// Only refresh GUI when needed
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) || ( slider3 != lastSlider3 ) ) ? (
+  
+  drawBackgroundImage( 1 );
+  drawFuMa();
+  
+  // Draw points illustrating the effect of the transform
+  displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
+  
+  // Force redraw of interaction circle
+  lastHHiglightCircle = -1;
+  
+  mPrevWidth  = gfx_w;
+  mPrevHeight = gfx_h;
+  lastSlider1 = slider1;
+  lastSlider2 = slider2;
+  lastSlider3 = slider3;
 );
-gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15*mHiglightCircle);
-mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
-drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
+
+// Draw circle for interaction
+( mHiglightCircle != lastHHiglightCircle ) ? (
+  
+  // Color depends on elevation, mouseClick and mouseHover
+  mSinElevation < 0 ? (
+    mSaturation = 1. - 0.25 * mSinElevation;
+    mLightness = 0.4;
+  ) : (
+    mSaturation = 1.;
+    mLightness = 0.4 + 0.25 * mSinElevation;
+  );
+  gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15 * mHiglightCircle );
+  
+  // Position and radius depends on elevation
+  mPosX = gCenterX - gRadius * slider3 * kInv24 * (mSinAzimuth * mCosElevation);
+  mPosY = gCenterY - gRadius * slider3 * kInv24 * (mCosAzimuth * mCosElevation);
+  mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
+  
+  drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
+  
+  lastHHiglightCircle = mHiglightCircle;
+);
 
 
 /**********************************************************

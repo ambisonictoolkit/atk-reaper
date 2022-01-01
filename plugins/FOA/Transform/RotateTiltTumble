@@ -87,12 +87,16 @@ generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
 // Initiate graphics
 gfx_ext_retina = 1;
 
+// Prevent auto clear of each frame
+gfx_clear = -1;
+
 // Initialisation of user interaction parameters
 mPreviousMouseCap = 0;
 
 mClickingAtRotateCircle = 0;
 mClickingAtTiltCircle   = 0;
 mClickingAtTumbleCircle = 0;
+
 
 function calculateCoefficients()
 (
@@ -131,6 +135,7 @@ function calculateCoefficients()
   mSinTumble = sin(mTumbleAngle);
 );
 
+
 /**********************************************************
 Updated slider value:
 **********************************************************/
@@ -150,8 +155,6 @@ Custom graphic interface
 
 // Track geometry and draw background
 determineGeometry();
-drawBackgroundImage( 1 );
-drawFuMa();
 
 // Radius of interaction circle
 mInteractionCircleRadius = 11. * gfx_ext_retina;
@@ -281,132 +284,167 @@ mClickingAtRotateCircle ?
 mPreviousMouseCap = mouse_cap;
 
 
-
-// --- TILT TRANSFORMATION PLANE
-
-// The plane is darker when upside down
-mCosTilt < 0 ?
-(
-  gxColorSetHsl( 1.0, 195, 1.0, 0.25 + 0.15*mHiglightTiltCircle );
-) :
-( 
-  gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15*mHiglightTiltCircle );
-);
-mTiltDeltaX = gRadius * mCosTilt;
-mTiltDeltaY = gRadius * mSinTilt * 0.1;
-mRadiusFraction = 0.2 * gRadius;
-
-drawQuadrangleOutline( gCenterX - mTiltDeltaX - 0.5, gCenterY - mRadiusFraction - mTiltDeltaY - 0.5,
-                       gCenterX + mTiltDeltaX - 0.5, gCenterY - mRadiusFraction + mTiltDeltaY - 0.5,
-                       gCenterX + mTiltDeltaX - 0.5, gCenterY + mRadiusFraction - mTiltDeltaY - 0.5,
-                       gCenterX - mTiltDeltaX - 0.5, gCenterY + mRadiusFraction + mTiltDeltaY - 0.5, 
-                       1. );
-
-drawQuadrangleOutline( gCenterX - mTiltDeltaX + 0.5, gCenterY - mRadiusFraction - mTiltDeltaY + 0.5,
-                       gCenterX + mTiltDeltaX + 0.5, gCenterY - mRadiusFraction + mTiltDeltaY + 0.5,
-                       gCenterX + mTiltDeltaX + 0.5, gCenterY + mRadiusFraction - mTiltDeltaY + 0.5,
-                       gCenterX - mTiltDeltaX + 0.5, gCenterY + mRadiusFraction + mTiltDeltaY + 0.5, 
-                       1. );
-                      
-drawQuadrangleOutline( gCenterX - mTiltDeltaX, gCenterY - mRadiusFraction - mTiltDeltaY,
-                       gCenterX + mTiltDeltaX, gCenterY - mRadiusFraction + mTiltDeltaY,
-                       gCenterX + mTiltDeltaX, gCenterY + mRadiusFraction - mTiltDeltaY,
-                       gCenterX - mTiltDeltaX, gCenterY + mRadiusFraction + mTiltDeltaY, 
-                       1. ); 
-
-// --- TUMBLE TRANSFORMATION PLANE
-
-// The plane is darker when upside down
-mCosTumble < 0 ?
-(
-  gxColorSetHsl( 1.0, 195, 1.0, 0.25 + 0.15*mHiglightTumbleCircle );
-) : 
-(
-  gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15*mHiglightTumbleCircle );
+// Only refresh GUI when needed - contrary to most plugins, highlight (mouse hovering) requires a full GUI redraw
+( geometryHasChanged( mPrevWidth, mPrevHeight ) 
+  || ( slider1 != lastSlider1 )
+  || ( slider2 != lastSlider2 )
+  || ( slider3 != lastSlider3 )
+  || ( mHiglightRotateCircle != mLastHiglightRotateCircle )
+  || ( mHiglightTiltCircle   != mLastHiglightTiltCircle   )
+  || ( mHiglightTumbleCircle != mLastHiglightTumbleCircle )
+) ? (
   
+  
+  drawBackgroundImage( 1 );
+  drawFuMa();
+  
+  // --- ROTATION CIRCLE - only when highlighted
+  mHiglightRotateCircle ? (
+    gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightRotateCircle );
+    gfx_circle( gCenterX, gCenterY, gRadius - 0.5, 0, 1);
+    gfx_circle( gCenterX, gCenterY, gRadius      , 0, 1);
+    gfx_circle( gCenterX, gCenterY, gRadius + 0.5, 0, 1);
+  );
+
+  // --- TILT TRANSFORMATION PLANE
+
+  // The plane is darker when upside down
+  mCosTilt < 0 ?
+  (
+    gxColorSetHsl( 1.0, 195, 1.0, 0.25 + 0.15 * mHiglightTiltCircle );
+  ) :
+  ( 
+    gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTiltCircle );
+  );
+  mTiltDeltaX = gRadius * mCosTilt;
+  mTiltDeltaY = gRadius * mSinTilt * 0.1;
+  mRadiusFraction = 0.2 * gRadius;
+
+  drawQuadrangleOutline( gCenterX - mTiltDeltaX - 0.5, gCenterY - mRadiusFraction - mTiltDeltaY - 0.5,
+                         gCenterX + mTiltDeltaX - 0.5, gCenterY - mRadiusFraction + mTiltDeltaY - 0.5,
+                         gCenterX + mTiltDeltaX - 0.5, gCenterY + mRadiusFraction - mTiltDeltaY - 0.5,
+                         gCenterX - mTiltDeltaX - 0.5, gCenterY + mRadiusFraction + mTiltDeltaY - 0.5, 
+                         1. );
+
+  drawQuadrangleOutline( gCenterX - mTiltDeltaX + 0.5, gCenterY - mRadiusFraction - mTiltDeltaY + 0.5,
+                         gCenterX + mTiltDeltaX + 0.5, gCenterY - mRadiusFraction + mTiltDeltaY + 0.5,
+                         gCenterX + mTiltDeltaX + 0.5, gCenterY + mRadiusFraction - mTiltDeltaY + 0.5,
+                         gCenterX - mTiltDeltaX + 0.5, gCenterY + mRadiusFraction + mTiltDeltaY + 0.5, 
+                         1. );
+                      
+  drawQuadrangleOutline( gCenterX - mTiltDeltaX, gCenterY - mRadiusFraction - mTiltDeltaY,
+                         gCenterX + mTiltDeltaX, gCenterY - mRadiusFraction + mTiltDeltaY,
+                         gCenterX + mTiltDeltaX, gCenterY + mRadiusFraction - mTiltDeltaY,
+                         gCenterX - mTiltDeltaX, gCenterY + mRadiusFraction + mTiltDeltaY, 
+                         1. ); 
+
+
+  // --- TUMBLE TRANSFORMATION PLANE
+
+  // The plane is darker when upside down
+  mCosTumble < 0 ?
+  (
+    gxColorSetHsl( 1.0, 195, 1.0, 0.25 + 0.15 * mHiglightTumbleCircle );
+  ) : 
+  (
+    gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTumbleCircle );
+  
+  );
+
+  mTumbleDeltaX = gRadius * mSinTumble * 0.1;
+  mTumbleDeltaY = gRadius * mCosTumble;
+
+  drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX - 0.5, gCenterY - mTumbleDeltaY - 0.5,
+                        gCenterX - mRadiusFraction + mTumbleDeltaX - 0.5, gCenterY + mTumbleDeltaY - 0.5,
+                        gCenterX + mRadiusFraction - mTumbleDeltaX - 0.5, gCenterY + mTumbleDeltaY - 0.5,
+                        gCenterX + mRadiusFraction + mTumbleDeltaX - 0.5, gCenterY - mTumbleDeltaY - 0.5,
+                        1.);
+
+  drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX + 0.5, gCenterY - mTumbleDeltaY + 0.5,
+                        gCenterX - mRadiusFraction + mTumbleDeltaX + 0.5, gCenterY + mTumbleDeltaY + 0.5,
+                        gCenterX + mRadiusFraction - mTumbleDeltaX + 0.5, gCenterY + mTumbleDeltaY + 0.5,
+                        gCenterX + mRadiusFraction + mTumbleDeltaX + 0.5, gCenterY - mTumbleDeltaY + 0.5,
+                        1.);
+
+  drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX, gCenterY - mTumbleDeltaY,
+                        gCenterX - mRadiusFraction + mTumbleDeltaX, gCenterY + mTumbleDeltaY,
+                        gCenterX + mRadiusFraction - mTumbleDeltaX, gCenterY + mTumbleDeltaY,
+                        gCenterX + mRadiusFraction + mTumbleDeltaX, gCenterY - mTumbleDeltaY,
+                        1.);
+
+  // Draw points illustrating the combined effect of the transforms
+  displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, 0);
+
+
+  // --- TUMBLE INTERACTION CIRCLE
+  //TUMBLE: Draw indicator with grey inner vertical line
+  mPosTumbleX = gCenterX;
+  mPosTumbleY = gCenterY - mTumbleAngle * kRad2Norm * gRadius;
+
+  gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTumbleCircle );
+  drawInteractionCircle( mPosTumbleX, mPosTumbleY, mInteractionCircleRadius );
+
+  gxColorSetHsl( 1.0, 195., 1.0, 0.4 );
+  gxColorSet( 1.0, 0.8, 0.8, 0.8 );
+
+  drawLineSegment( mPosTumbleX,       mPosTumbleY - mInteractionCircleRadius + 5,
+                   mPosTumbleX,       mPosTumbleY + mInteractionCircleRadius - 5, 1 );
+                 
+  drawLineSegment( mPosTumbleX - 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
+                   mPosTumbleX - 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
+
+  drawLineSegment( mPosTumbleX + 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
+                   mPosTumbleX + 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
+
+
+  // --- TILT INTERACTION CIRCLE (we need to draw the circles so that Rotation is on top)
+
+  // Absolute position of circle.
+  // Y position is concstant and shifted slightly upwards from center in order to avoid intial overlap with tumble indicator
+  mPosTiltX = gCenterX + mTiltAngle * kRad2Norm * gRadius;
+  mPosTiltY = gCenterY - 25. * gfx_ext_retina;
+
+  gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTiltCircle );
+  drawInteractionCircle( gCenterX + mTiltAngle * kRad2Norm * gRadius, gCenterY - 25. * gfx_ext_retina, mInteractionCircleRadius );
+
+  // Draw grey horisontal inner line
+  gxColorSet(1.0, 0.8, 0.8, 0.8);
+
+  drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY - 1,
+                   mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY - 1, 1 );
+
+  drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY + 1,
+                   mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY + 1, 1 );
+                 
+  drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY,
+                   mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY, 1 );
+                
+                
+  // --- ROTATION INTERACTION CIRCLE
+  
+  // Absolute position of interaction circle
+  mPosRotateX = gCenterX - gRadius * mSinRotation;
+  mPosRotateY = gCenterY - gRadius * mCosRotation;
+  
+  gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightRotateCircle );
+  drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius );
+  
+  // Draw inner gray circle
+  gxColorSet( 1.0, 0.8, 0.8, 0.8 );
+  drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius - 7 * gfx_ext_retina );
+  
+  
+  mPrevWidth  = gfx_w;
+  mPrevHeight = gfx_h;
+  
+  lastSlider1 = slider1;
+  lastSlider2 = slider2;
+  lastSlider3 = slider3;
+  
+  mLastHiglightRotateCircle = mHiglightRotateCircle;
+  mLastHiglightTiltCircle   = mHiglightTiltCircle;
+  mLastHiglightTumbleCircle = mHiglightTumbleCircle;
 );
-
-mTumbleDeltaX = gRadius * mSinTumble * 0.1;
-mTumbleDeltaY = gRadius * mCosTumble;
-
-drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX - 0.5, gCenterY - mTumbleDeltaY - 0.5,
-                      gCenterX - mRadiusFraction + mTumbleDeltaX - 0.5, gCenterY + mTumbleDeltaY - 0.5,
-                      gCenterX + mRadiusFraction - mTumbleDeltaX - 0.5, gCenterY + mTumbleDeltaY - 0.5,
-                      gCenterX + mRadiusFraction + mTumbleDeltaX - 0.5, gCenterY - mTumbleDeltaY - 0.5,
-                      1.);
-
-drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX + 0.5, gCenterY - mTumbleDeltaY + 0.5,
-                      gCenterX - mRadiusFraction + mTumbleDeltaX + 0.5, gCenterY + mTumbleDeltaY + 0.5,
-                      gCenterX + mRadiusFraction - mTumbleDeltaX + 0.5, gCenterY + mTumbleDeltaY + 0.5,
-                      gCenterX + mRadiusFraction + mTumbleDeltaX + 0.5, gCenterY - mTumbleDeltaY + 0.5,
-                      1.);
-
-drawQuadrangleOutline(gCenterX - mRadiusFraction - mTumbleDeltaX, gCenterY - mTumbleDeltaY,
-                      gCenterX - mRadiusFraction + mTumbleDeltaX, gCenterY + mTumbleDeltaY,
-                      gCenterX + mRadiusFraction - mTumbleDeltaX, gCenterY + mTumbleDeltaY,
-                      gCenterX + mRadiusFraction + mTumbleDeltaX, gCenterY - mTumbleDeltaY,
-                      1.);
-
-// Draw points illustrating the combined effect of the transforms
-displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, 0);
-
-
-// --- TUMBLE INTERACTION CIRCLE
-//TUMBLE: Draw indicator with grey inner vertical line
-mPosTumbleX = gCenterX;
-mPosTumbleY = gCenterY - mTumbleAngle * kRad2Norm * gRadius;
-
-gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15*mHiglightTumbleCircle );
-drawInteractionCircle( mPosTumbleX, mPosTumbleY, mInteractionCircleRadius );
-
-gxColorSetHsl( 1.0, 195., 1.0, 0.4 );
-gxColorSet( 1.0, 0.8, 0.8, 0.8 );
-
-drawLineSegment( mPosTumbleX,       mPosTumbleY - mInteractionCircleRadius + 5,
-                 mPosTumbleX,       mPosTumbleY + mInteractionCircleRadius - 5, 1 );
-                 
-drawLineSegment( mPosTumbleX - 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
-                 mPosTumbleX - 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
-
-drawLineSegment( mPosTumbleX + 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
-                 mPosTumbleX + 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
-
-
-// --- TILT INTERACTION CIRCLE (we need to draw the circles so that Rotation is on top)
-
-// Absolute position of circle.
-// Y position is concstant and shifted slightly upwards from center in order to avoid intial overlap with tumble indicator
-mPosTiltX = gCenterX + mTiltAngle * kRad2Norm * gRadius;
-mPosTiltY = gCenterY - 25. * gfx_ext_retina;
-
-gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTiltCircle );
-drawInteractionCircle( gCenterX + mTiltAngle * kRad2Norm * gRadius, gCenterY - 25. * gfx_ext_retina, mInteractionCircleRadius );
-
-// Draw grey horisontal inner line
-gxColorSet(1.0, 0.8, 0.8, 0.8);
-
-drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY - 1,
-                 mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY - 1, 1 );
-
-drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY + 1,
-                 mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY + 1, 1 );
-                 
-drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY,
-                 mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY, 1 );
-                
-                
- // --- ROTATION INTERACTION CIRCLE
-
- // Absolute position of interaction circle
- mPosRotateX = gCenterX - gRadius * mSinRotation;
- mPosRotateY = gCenterY - gRadius * mCosRotation;
-
- gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightRotateCircle );
- drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius );
-
- // Draw inner gray circle
- gxColorSet( 1.0, 0.8, 0.8, 0.8 );
- drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius - 7 * gfx_ext_retina );
 
 
 /**********************************************************

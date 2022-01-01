@@ -128,7 +128,10 @@ memset(mDisplayPeaks,0,kMaxNumSpeakers);
 
 // Graphics
 gfx_ext_retina = 1;
-gfx_clear=-1;           // Prevent auto clear of each frame
+
+// Prevent auto clear of each frame
+gfx_clear = -1;
+
 kRefreshRate = 0.05;    // Refresh rate in sec
 mRefreshSampCount = 0;
 mDoRefresh = 1;
@@ -223,24 +226,24 @@ mElevation = slider2 * kDeg2Rad;
 mSpeakerLayout = slider3;
 
 // Generate decoding matrix
-generateDecodePeriphonicMatrix(mMatrixDSP, mNumSpeakerPairs, mElevation, mSpeakerLayout);
+generateDecodePeriphonicMatrix( mMatrixDSP, mNumSpeakerPairs, mElevation, mSpeakerLayout );
 
 // Clear peak buffers
-memset(mPeaks, 0., mNumSpeakers);
-memset(mDisplayPeaks, 0., mNumSpeakers);
+memset( mPeaks, 0., mNumSpeakers );
+memset( mDisplayPeaks, 0., mNumSpeakers );
 
-(slider4 == 0) ? (mPeakScalar = 0.02) :
-(slider4 == 1) ? (mPeakScalar = 0.03) :
-(slider4 == 2) ? (mPeakScalar = 0.05) :
-(slider4 == 3) ? (mPeakScalar = 0.10) :
-(slider4 == 4) ? (mPeakScalar = 0.20) :
-(slider4 == 5) ? (mPeakScalar = 0.30) :
-(slider4 == 6) ? (mPeakScalar = 0.50) :
-(slider4 == 7) ? (mPeakScalar = 1.00) :
-(slider4 == 8) ? (mPeakScalar = 3.00) :
-(slider4 == 9) ? (mPeakScalar = 6.00);
+( slider4 == 0 ) ? ( mPeakScalar = 0.02 ) :
+( slider4 == 1 ) ? ( mPeakScalar = 0.03 ) :
+( slider4 == 2 ) ? ( mPeakScalar = 0.05 ) :
+( slider4 == 3 ) ? ( mPeakScalar = 0.10 ) :
+( slider4 == 4 ) ? ( mPeakScalar = 0.20 ) :
+( slider4 == 5 ) ? ( mPeakScalar = 0.30 ) :
+( slider4 == 6 ) ? ( mPeakScalar = 0.50 ) :
+( slider4 == 7 ) ? ( mPeakScalar = 1.00 ) :
+( slider4 == 8 ) ? ( mPeakScalar = 3.00 ) :
+( slider4 == 9 ) ? ( mPeakScalar = 6.00 );
 
-mPeakScalar = pow( 0.5, 1.0/(mPeakScalar * srate));
+mPeakScalar = pow( 0.5, 1.0 / ( mPeakScalar * srate ) );
 
 
 /**********************************************************
@@ -250,11 +253,11 @@ Graphics
 
 // Make sure we can't have more channels than the track has
 // (Code resides here rather than in slider section in order to take action as soon as we know num_ch)
-(num_ch>0) ? (
-  mNumSpeakers = max(3, min(num_ch, mNumSpeakers));
-  mNumSpeakerPairs = mNumSpeakers/2;
+( num_ch > 0 ) ? (
+  mNumSpeakers = max( 3, min( num_ch, mNumSpeakers ) );
+  mNumSpeakerPairs = mNumSpeakers / 2;
   slider1 = mNumSpeakerPairs;
-  slider_automate(slider1);
+  slider_automate( slider1 );
 );
 
 determinePeriphonicGeometry();
@@ -266,11 +269,11 @@ gRadius -= 30 * gfx_ext_retina;              // Reduce circle radius
   drawFuMa();
   setSpeakerPositionFont();
   calculateLedCoordinates();
-  igfx=mNumSpeakerPairs-1;
+  igfx = mNumSpeakerPairs - 1;
   mSpeakerDist = gRadius + 20. * gfx_ext_retina;
   loop( mNumSpeakerPairs,
     // Upper speakers
-    sprintf( spkStr, "%d", igfx+1 );
+    sprintf( spkStr, "%d", igfx + 1 );
     drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mAngles[ igfx ] ), gCenterYUpper - mSpeakerDist * sin( mAngles[ igfx ] ), spkStr, 2 );
     
     // Lower speakers

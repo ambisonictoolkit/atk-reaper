@@ -99,10 +99,13 @@ memset(mDisplayPeaks,0,kMaxNumSpeakers+1);
 
 // Graphics
 gfx_ext_retina = 1;
-gfx_clear = -1;           // Prevent auto clear of each frame
-kRefreshRate = 0.05;    // Refresh rate in sec
+
+// Prevent auto clear of each frame
+gfx_clear = -1;
+
+kRefreshRate      = 0.05;    // Refresh rate in sec
 mRefreshSampCount = 0;
-mDoRefresh = 1;
+mDoRefresh        = 1;
 
 
 function calculateLedCoordinates(aLedCount, anAngleLo, anAngleHi) local (lLedRadius)

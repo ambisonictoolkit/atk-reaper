@@ -314,6 +314,10 @@ Graphics: Draw background image similar to ICST ambimonitor
 ********************************************************************/
 function drawBackgroundImage( aMode ) local(i, lDeltaX, lDeltaY)
 (
+  // Clear to black
+  gxColorSet( 1., 0.0, 0.0, 0.0 );
+  gfx_rect( 0., 0., gfx_w, gfx_h );
+  
   setPluginModeColour( aMode );
   gfx_circle(gCenterX, gCenterY, gRadius, 1, 1);
   

@@ -62,8 +62,12 @@ mIsInitialised = 0;
 // Graphics
 gfx_ext_retina = 1;
 
-// Testing - debugging
-// drawCount = 0;
+// Prevent auto clear of each frame
+gfx_clear = -1;
+
+// Initialisation of user interaction parameters
+mPreviousMouseCap = 0;
+mClickingAtCircle = 0;
 
 
 /**********************************************************
@@ -108,8 +112,8 @@ function plotPattern( anAngle ) // local (lAngle)
     gxColorSetHsl(1.0, 60., 1., 0.5);
   );
   
-  mPosX = gCenterX - lRadius * sin( anAngle );
-  mPosY = gCenterY - lRadius * cos( anAngle );
+  mPlotPatternX = gCenterX - lRadius * sin( anAngle );
+  mPlotPatternY = gCenterY - lRadius * cos( anAngle );
 );
 
 determineGeometry();
@@ -124,32 +128,51 @@ mouse_cap == 1 ?
   
   // Notify GUI that azimuth has changed, and update coefficients
   slider_automate(slider1);
+  
+  mHiglightCircle = 1;
+) : (
+  // Check hover relative to most recently drawn position
+  mHiglightCircle = hoverOverInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
 );
 
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || slider1 != lastSlider1 || slider2 != lastSlider2 || slider3 != lastSlider3 ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) || ( slider3 != lastSlider3 ) ) ? (
   
   drawBackgroundImage( 2 );
   drawFuMa();
+  
+  // Force redraw of interaction circle
+  lastHHiglightCircle = -1;
 
   // Draw microphone pattern
   i = 1;
   plotPattern( kDeg2Rad * i );
-  gfx_x = mPosX;
-  gfx_y = mPosY;
+  gfx_x = mPlotPatternX;
+  gfx_y = mPlotPatternY;
 
   loop( 360,
     i += 1;
     plotPattern( kDeg2Rad * i );
-    gfx_lineto( mPosX, mPosY, 1.0 ); 
+    gfx_lineto( mPlotPatternX, mPlotPatternY, 1.0 ); 
   );
+  
+  mPrevWidth  = gfx_w;
+  mPrevHeight = gfx_h;
+  lastSlider1 = slider1;
+  lastSlider2 = slider2;
+  lastSlider3 = slider3;
+);
 
+// Draw circle for interaction
+( mHiglightCircle != lastHHiglightCircle ) ? (
+  
   // Draw circle for interaction, map vertical position to saturation, lightness and radius
   mCosAzi  = cos(mAzi);
   mSinAzi  = sin(mAzi);
   mCosEle  = cos(mEle);
   mSinEle  = sin(mEle);
-
+  
+  // Color depends on elevation, mouseClick and mouseHover
   (mSinEle < 0) ? (
     mSaturation = 1. - 0.25*mSinEle;
     mLightness = 0.4;
@@ -157,28 +180,21 @@ mouse_cap == 1 ?
     mSaturation = 1.;
     mLightness = 0.4 + 0.25*mSinEle;
   );
-  gxColorSetHsl(1.0, 195., mSaturation, mLightness);
-
+  gxColorSetHsl( 1.0, 195., mSaturation, mLightness + 0.15 * mHiglightCircle );
+  
+  // Position and radius depends on elevation
   mPosX = gCenterX - gRadius * (mSinAzi * mCosEle);
   mPosY = gCenterY - gRadius * (mCosAzi * mCosEle);
   mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
-
+  
+  // Draw line from centre to interaciton circle
   drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);
+  
   drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
   
-  mPrevWidth  = gfx_w;
-  mPrevHeight = gfx_h;
-  lastSlider1 = slider1;
-  lastSlider2 = slider2;
-  lastSlider3 = slider3;
-  
-  /// Testing
-  // gfx_x = 100;
-  // gfx_y = 100;
-  // drawCount = drawCount + 1;
-  // sprintf(drawCountStr, "Draw Count: %d", drawCount);
-  // gfx_printf(drawCountStr); 
+  lastHHiglightCircle = mHiglightCircle;
 );
+
 
 
 /**********************************************************

@@ -70,6 +70,13 @@ matrixDisplayInterpreted = 1500;
 // Initiate graphics
 gfx_ext_retina = 1;
 
+// Prevent auto clear of each frame
+gfx_clear = -1;
+
+// This only needs to be generated once:
+mNumDisplayedPoints = 24;
+generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
+
 // This only needs to be generated once:
 numDisplayedPoints = 24;
 generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
@@ -116,29 +123,28 @@ Graphics
 
 // Set colors
 determineGeometry();
-drawBackgroundImage( 1 );
-drawFuMa();
 
 // Radius of interaction circle
 mInteractionCircleRadius = 11. * gfx_ext_retina;
 
 // Only update plugin parameters if the user click and drag interaction circle
 mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
+
 // Save current mouse_cap value in order to use in the above test at next iteration
 mPreviousMouseCap = mouse_cap;
 
 (mClickingAtCircle) ? (
-  mMouseX = mouse_x - gCenterX;
-  mMouseY = mouse_y - gCenterY;
-  mAzimuth = atan2(mMouseX, -mMouseY);
+  mMouseX  = mouse_x - gCenterX;
+  mMouseY  = mouse_y - gCenterY;
+  mAzimuth = atan2( mMouseX, -mMouseY );
 
-  mNormTransformAngle = 1. - sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius;
+  mNormTransformAngle = 1. - sqrt( mMouseX * mMouseX + mMouseY * mMouseY ) * gInverseRadius;
   // Restrict the range to [0, 1]
   mNormTransformAngle < 0. ? mNormTransformAngle = 0.;
   
   slider1 = mNormTransformAngle * 90.;
   mTransformAngle = mNormTransformAngle * $pi * 0.5;
-  slider_automate(slider1);
+  slider_automate( slider1 );
   calculateMatrix();
   
   mHiglightCircle = 1;
@@ -146,15 +152,38 @@ mPreviousMouseCap = mouse_cap;
   mHiglightCircle = hoverOverInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
 );
 
-// Draw points illustrating the effect of the transform
-displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
+// Only refresh GUI when needed
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( mAzimuth != mPrevAzimuth )) ? (
+  
+  drawBackgroundImage( 1 );
+  drawFuMa();
 
-// Draw circle for interaction, map vertical position to saturation, lightness and radius
-mPosX = gCenterX + gRadius * (1. - mNormTransformAngle) * sin(mAzimuth);
-mPosY = gCenterY - gRadius * (1. - mNormTransformAngle) * cos(mAzimuth);
+  // Draw points illustrating the effect of the transform
+  displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 1);
+  
+  // Force redraw of interaction circle
+  lastHHiglightCircle = -1;
+  
+  mPrevWidth  = gfx_w;
+  mPrevHeight = gfx_h;
+  lastSlider1 = slider1;
+);
 
-gxColorSetHsl(1.0, 195., 1., 0.4 + 0.15*mHiglightCircle);
-drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
+// Draw circle for interaction
+( mHiglightCircle != lastHHiglightCircle ) ? (
+  
+  // Color depends on elevation, mouseClick and mouseHover
+  gxColorSetHsl( 1.0, 195., 1., 0.4 + 0.15 * mHiglightCircle );
+  
+  // Calculate absolute position of interaction circle
+  mPosX = gCenterX + gRadius * ( 1. - mNormTransformAngle ) * sin( mAzimuth );
+  mPosY = gCenterY - gRadius * ( 1. - mNormTransformAngle ) * cos( mAzimuth );
+  
+  drawInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
+  
+  lastHHiglightCircle = mHiglightCircle;
+  mPrevAzimuth        = mAzimuth;
+);
 
 
 /**********************************************************

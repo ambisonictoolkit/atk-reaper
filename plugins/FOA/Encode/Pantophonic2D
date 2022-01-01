@@ -105,8 +105,8 @@ function calculateEncodeMatrix()
 // Initiate graphics
 gfx_ext_retina = 1;
 
-// Testing - debugging
-// drawCount = 0;
+// Prevent auto clear of each frame
+gfx_clear = -1;
 
 
 /**********************************************************
@@ -130,7 +130,7 @@ Custom graphic interface
 @gfx 500 500
 
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || slider1 != lastSlider1 || slider2 != lastSlider2 ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) ) ? (
 
   determineGeometry();
 
@@ -140,7 +140,7 @@ Custom graphic interface
   drawBackgroundImage( 0 );
   drawFuMa();
 
-  (mSpeakerLayout==0) ? (
+  ( mSpeakerLayout == 0) ? (
     mSpeakerAzi = 0.5 * mSpeakerAziDelta;
   ) : (
     mSpeakerAzi = 0.;
@@ -148,7 +148,7 @@ Custom graphic interface
 
   i = 1;
   loop(mNumSpeakers,
-    gainToColor(0., -24., 6., 0.);
+    gainToColor( 0., -24., 6., 0. );
     drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ),  gCenterY - gRadius * cos( mSpeakerAzi ),  0., 1.);
     sprintf(speakerLabel,"%i", i); 
     drawSpeakerPositiion( gCenterX - ( gRadius + 20 * gfx_ext_retina ) * sin( mSpeakerAzi ),  gCenterY - ( gRadius + 20 * gfx_ext_retina ) * cos( mSpeakerAzi ),  speakerLabel, 0);
@@ -160,13 +160,6 @@ Custom graphic interface
   mPrevHeight = gfx_h;
   lastSlider1 = slider1;
   lastSlider2 = slider2;
-  
-  /// Testing
-  // gfx_x = 100;
-  // gfx_y = 100;
-  // drawCount = drawCount + 1;
-  // sprintf(drawCountStr, "Draw Count: %d", drawCount);
-  // gfx_printf(drawCountStr); 
 );
 
 
