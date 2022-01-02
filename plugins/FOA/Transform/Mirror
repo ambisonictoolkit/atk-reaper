@@ -268,6 +268,8 @@ function postAfter() local( lStrWidth, lStringHeight )
 );
 
 
+mChannelWarning = testNumChannels( 4 );
+
 determineGeometry();
 
 // Radius of interaction circle
@@ -298,59 +300,61 @@ mPreviousMouseCap = mouse_cap;
 
 
 // Only refresh GUI when needed - contrary to most plugins, highlight (mouse hovering) requires a full GUI redraw
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) || ( mHiglightCircle != lastHHiglightCircle ) ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( mHiglightCircle != mPrevHHiglightCircle ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
   
   drawBackgroundImage( 1 );
   drawFuMa();
 
   // Set font
-  gfx_setfont(1, "Verdana", 16 * gfx_ext_retina );
+  gfx_setfont( 1, "Verdana", 16 * gfx_ext_retina );
 
   // Draw mirror plane
-  setInteractionColor(mHiglightCircle);
+  setInteractionColor( mHiglightCircle );
+  
+  !mChannelWarning ? (
+    // Outline of mirror plane:
+    mPos1x = gCenterX - matrixMirrorRotatedInterpreted[ 6 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 12 ] ) * gRadius * kSqrt2;
+    mPos1y = gCenterY - matrixMirrorRotatedInterpreted[ 0 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 12 ] ) * gRadius * kSqrt2;
 
-  // Outline of mirror plane:
-  mPos1x = gCenterX - matrixMirrorRotatedInterpreted[ 6 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 12 ] ) * gRadius * kSqrt2;
-  mPos1y = gCenterY - matrixMirrorRotatedInterpreted[ 0 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 12 ] ) * gRadius * kSqrt2;
+    mPos2x = gCenterX - matrixMirrorRotatedInterpreted[ 7 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 13 ] ) * gRadius * kSqrt2;
+    mPos2y = gCenterY - matrixMirrorRotatedInterpreted[ 1 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 13 ] ) * gRadius * kSqrt2;
 
-  mPos2x = gCenterX - matrixMirrorRotatedInterpreted[ 7 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 13 ] ) * gRadius * kSqrt2;
-  mPos2y = gCenterY - matrixMirrorRotatedInterpreted[ 1 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 13 ] ) * gRadius * kSqrt2;
+    mPos3x = gCenterX - matrixMirrorRotatedInterpreted[ 8 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 14 ] ) * gRadius * kSqrt2;
+    mPos3y = gCenterY - matrixMirrorRotatedInterpreted[ 2 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 14 ] ) * gRadius * kSqrt2;
 
-  mPos3x = gCenterX - matrixMirrorRotatedInterpreted[ 8 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 14 ] ) * gRadius * kSqrt2;
-  mPos3y = gCenterY - matrixMirrorRotatedInterpreted[ 2 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 14 ] ) * gRadius * kSqrt2;
+    mPos4x = gCenterX - matrixMirrorRotatedInterpreted[ 9 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 15 ] ) * gRadius * kSqrt2;
+    mPos4y = gCenterY - matrixMirrorRotatedInterpreted[ 3 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 15 ] ) * gRadius * kSqrt2;
 
-  mPos4x = gCenterX - matrixMirrorRotatedInterpreted[ 9 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 15 ] ) * gRadius * kSqrt2;
-  mPos4y = gCenterY - matrixMirrorRotatedInterpreted[ 3 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 15 ] ) * gRadius * kSqrt2;
+    // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
+    drawQuadrangleOutline( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, mPos3x + 1.5, mPos3y + 1.5, mPos4x + 1.5, mPos4y + 1.5, 1. );
+    drawQuadrangleOutline( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, mPos3x + 1.0, mPos3y + 1.0, mPos4x + 1.0, mPos4y + 1.0, 1. );
+    drawQuadrangleOutline( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, mPos3x + 0.5, mPos3y + 0.5, mPos4x + 0.5, mPos4y + 0.5, 1. );
+    drawQuadrangleOutline( mPos1x      , mPos1y      , mPos2x      , mPos2y      , mPos3x      , mPos3y      , mPos4x      , mPos4y      , 1.);
+    drawQuadrangleOutline( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, mPos3x - 0.5, mPos3y - 0.5, mPos4x - 0.5, mPos4y - 0.5, 1. );
+    drawQuadrangleOutline( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, mPos3x - 1.0, mPos3y - 1.0, mPos4x - 1.0, mPos4y - 1.0, 1. );
+    drawQuadrangleOutline( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, mPos3x - 1.5, mPos3y - 1.5, mPos4x - 1.5, mPos4y - 1.5, 1. );
 
-  // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-  drawQuadrangleOutline( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, mPos3x + 1.5, mPos3y + 1.5, mPos4x + 1.5, mPos4y + 1.5, 1. );
-  drawQuadrangleOutline( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, mPos3x + 1.0, mPos3y + 1.0, mPos4x + 1.0, mPos4y + 1.0, 1. );
-  drawQuadrangleOutline( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, mPos3x + 0.5, mPos3y + 0.5, mPos4x + 0.5, mPos4y + 0.5, 1. );
-  drawQuadrangleOutline( mPos1x      , mPos1y      , mPos2x      , mPos2y      , mPos3x      , mPos3y      , mPos4x      , mPos4y      , 1.);
-  drawQuadrangleOutline( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, mPos3x - 0.5, mPos3y - 0.5, mPos4x - 0.5, mPos4y - 0.5, 1. );
-  drawQuadrangleOutline( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, mPos3x - 1.0, mPos3y - 1.0, mPos4x - 1.0, mPos4y - 1.0, 1. );
-  drawQuadrangleOutline( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, mPos3x - 1.5, mPos3y - 1.5, mPos4x - 1.5, mPos4y - 1.5, 1. );
+    // Draw line at intersection between horisontal plane and mirror plane
+    mPos1x = gCenterX - matrixMirrorRotatedInterpreted[ 10 ] * gRadius;
+    mPos1y = gCenterY - matrixMirrorRotatedInterpreted[  4 ] * gRadius;
 
-  // Draw line at intersection between horisontal plane and mirror plane
-  mPos1x = gCenterX - matrixMirrorRotatedInterpreted[ 10 ] * gRadius;
-  mPos1y = gCenterY - matrixMirrorRotatedInterpreted[  4 ] * gRadius;
+    mPos2x = gCenterX - matrixMirrorRotatedInterpreted[ 11 ] * gRadius;
+    mPos2y = gCenterY - matrixMirrorRotatedInterpreted[  5 ] * gRadius;
 
-  mPos2x = gCenterX - matrixMirrorRotatedInterpreted[ 11 ] * gRadius;
-  mPos2y = gCenterY - matrixMirrorRotatedInterpreted[  5 ] * gRadius;
-
-  // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-  drawLineSegment( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, 1. );
-  drawLineSegment( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, 1. );
-  drawLineSegment( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, 1. );
-  drawLineSegment( mPos1x      , mPos1y      , mPos2x      , mPos2y      , 1. );
-  drawLineSegment( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, 1. );
-  drawLineSegment( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, 1. );
-  drawLineSegment( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, 1. );
-  postMirror(mHiglightCircle);
+    // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
+    drawLineSegment( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, 1. );
+    drawLineSegment( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, 1. );
+    drawLineSegment( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, 1. );
+    drawLineSegment( mPos1x      , mPos1y      , mPos2x      , mPos2y      , 1. );
+    drawLineSegment( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, 1. );
+    drawLineSegment( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, 1. );
+    drawLineSegment( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, 1. );
+  );
+  postMirror( mHiglightCircle );
 
   // Draw lines illustrating how each point has been mirrored
   i = 0;
-  loop(mNumDisplayedPoints,
+  loop( mNumDisplayedPoints,
     mPos1x = gCenterX - gRadius * matrixDisplayNonTransformedInterpreted[ mNumDisplayedPoints + i ];
     mPos1y = gCenterY - gRadius * matrixDisplayNonTransformedInterpreted[ i ];
     mPos1z = matrixDisplayNonTransformedInterpreted[ 2 * mNumDisplayedPoints + i ];
@@ -367,9 +371,9 @@ mPreviousMouseCap = mouse_cap;
     setBeforeColor();
   
     // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-    drawLineSegment(mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, 1. );
-    drawLineSegment(mPos1x      , mPos1y      , mPos2x      , mPos2y      , 1. );
-    drawLineSegment(mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, 1. );
+    drawLineSegment( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, 1. );
+    drawLineSegment( mPos1x      , mPos1y      , mPos2x      , mPos2y      , 1. );
+    drawLineSegment( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, 1. );
   
     // Draw small point where beam intersects mirror
     setInteractionColorWithDepth( mPos2z, mHiglightCircle );
@@ -396,40 +400,44 @@ mPreviousMouseCap = mouse_cap;
   setAfterColor();
   displayTransformedPoints( matrixDisplayTransformedInterpreted, mNumDisplayedPoints, 0 );
   postAfter();
+  
+  mChannelWarning ? (
+    drawChannelWarning( 4 );
+  ): (
+    //setInteractionColor(0);
+    gxColorSetHsl( 1.0, 195., 1., 0.4 + 0.15 * mHiglightCircle );
+    mPosX = gCenterX - gRadius * slider4 * ( mSinAzimuth * mCosElevation );
+    mPosY = gCenterY - gRadius * slider4 * ( mCosAzimuth * mCosElevation );
 
-  //setInteractionColor(0);
-  gxColorSetHsl(1.0, 195., 1., 0.4 + 0.15*mHiglightCircle);
-  mPosX = gCenterX - gRadius * slider4 * (mSinAzimuth * mCosElevation);
-  mPosY = gCenterY - gRadius * slider4 * (mCosAzimuth * mCosElevation);
+    // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
+    drawLineSegment( gCenterX + 1.5, gCenterY + 1.5, mPosX + 1.5, mPosY + 1.5, 1. );
+    drawLineSegment( gCenterX + 1.0, gCenterY + 1.0, mPosX + 1.0, mPosY + 1.0, 1. );
+    drawLineSegment( gCenterX + 0.5, gCenterY + 0.5, mPosX + 0.5, mPosY + 0.5, 1. );
+    drawLineSegment( gCenterX      , gCenterY      , mPosX      , mPosY      , 1. );
+    drawLineSegment( gCenterX - 0.5, gCenterY - 0.5, mPosX - 0.5, mPosY - 0.5, 1. );
+    drawLineSegment( gCenterX - 1.0, gCenterY - 1.0, mPosX - 1.0, mPosY - 1.0, 1. );
+    drawLineSegment( gCenterX - 1.5, gCenterY - 1.5, mPosX - 1.5, mPosY - 1.5, 1. );
 
-  // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-  drawLineSegment( gCenterX + 1.5, gCenterY + 1.5, mPosX + 1.5, mPosY + 1.5, 1. );
-  drawLineSegment( gCenterX + 1.0, gCenterY + 1.0, mPosX + 1.0, mPosY + 1.0, 1. );
-  drawLineSegment( gCenterX + 0.5, gCenterY + 0.5, mPosX + 0.5, mPosY + 0.5, 1. );
-  drawLineSegment( gCenterX      , gCenterY      , mPosX      , mPosY      , 1. );
-  drawLineSegment( gCenterX - 0.5, gCenterY - 0.5, mPosX - 0.5, mPosY - 0.5, 1. );
-  drawLineSegment( gCenterX - 1.0, gCenterY - 1.0, mPosX - 1.0, mPosY - 1.0, 1. );
-  drawLineSegment( gCenterX - 1.5, gCenterY - 1.5, mPosX - 1.5, mPosY - 1.5, 1. );
+    // Draw circle for interaction, map vertical position to saturation, lightness and radius
+    (mSinElevation < 0) ? (
+      mSaturation = 1. - 0.25*mSinElevation;
+      mLightness = 0.4;
+    ) : (
+      mSaturation = 1.;
+      mLightness = 0.4 + 0.25 * mSinElevation;
+    );
+    gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15 * mHiglightCircle);
 
-  // Draw circle for interaction, map vertical position to saturation, lightness and radius
-  (mSinElevation < 0) ? (
-    mSaturation = 1. - 0.25*mSinElevation;
-    mLightness = 0.4;
-  ) : (
-    mSaturation = 1.;
-    mLightness = 0.4 + 0.25*mSinElevation;
+    mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
+    drawInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
   );
-  gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15*mHiglightCircle);
-
-  mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
-  drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
   
-  mPrevWidth  = gfx_w;
-  mPrevHeight = gfx_h;
-  lastSlider1 = slider1;
-  lastSlider2 = slider2;
-  
-  lastHHiglightCircle = mHiglightCircle;
+  mPrevWidth           = gfx_w;
+  mPrevHeight          = gfx_h;
+  mPrevSlider1         = slider1;
+  mPrevSlider2         = slider2;
+  mPrevChannelWarning  = mChannelWarning;
+  mPrevHHiglightCircle = mHiglightCircle;
 );
 
 

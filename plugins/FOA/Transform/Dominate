@@ -88,7 +88,7 @@ matrixDisplayInterpreted = 1500;
 
 // This only needs to be generated once:
 numDisplayedPoints = 24;
-generateDisplaySignalMatrix(matrixDisplayPoints, numDisplayedPoints);
+generateDisplaySignalMatrix( matrixDisplayPoints, numDisplayedPoints );
 
 // Initiate graphics
 gfx_ext_retina = 1;
@@ -98,7 +98,7 @@ gfx_clear = -1;
 
 // This only needs to be generated once:
 mNumDisplayedPoints = 24;
-generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
+generateDisplaySignalMatrix( matrixDisplayPoints, mNumDisplayedPoints );
 
 // Initialisation of user interaction parameters
 mPreviousMouseCap = 0;
@@ -108,36 +108,36 @@ mClickingAtCircle = 0;
 function calculateMatrix()
 (
   // Required for graphics
-  mCosAzimuth   = cos(mAzimuth);
-  mSinAzimuth   = sin(mAzimuth);
+  mCosAzimuth   = cos( mAzimuth );
+  mSinAzimuth   = sin( mAzimuth );
 
-  mCosElevation = cos(mElevation);
-  mSinElevation = sin(mElevation);
+  mCosElevation = cos( mElevation );
+  mSinElevation = sin( mElevation );
   
   // Generate matrixes
-  generateRotationMatrix(matrixRotate1,   -mAzimuth);
-  generateTumblelMatrix(matrixTumble1,    -mElevation);
-  generateDominateMatrix(matrixTransform,  mGain);
-  generateRotationMatrix(matrixRotate2,    mAzimuth);
-  generateTumblelMatrix(matrixTumble2,     mElevation);
+  generateRotationMatrix( matrixRotate1,   -mAzimuth );
+  generateTumblelMatrix(  matrixTumble1,   -mElevation );
+  generateDominateMatrix( matrixTransform,  mGain );
+  generateRotationMatrix( matrixRotate2,    mAzimuth );
+  generateTumblelMatrix(  matrixTumble2,    mElevation );
   
   /* Build processing matrix by performing a series of matrix multiplications
                         result =         left     X               right             */
-  matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1);
-  matrixMultiplication  (matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
-  matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
-  matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
+  matrixMultiplication  ( matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1 );
+  matrixMultiplication  ( matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1 );
+  matrixMultiplication  ( matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2 );
+  matrixMultiplication  ( matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1 );
   
   /* Transformation and interpretation of display points */
-  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints);
-  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints);
+  matrixMultiplication( matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints );
+  interpreteProcessedPoints( matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints );
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   mInitialised == 0 ?
   (
     i = 0;
     loop(16,
-      matrixDSP[i] = matrixNewDSP[i];
+      matrixDSP[ i ] = matrixNewDSP[ i ];
     );
     // Now we are fully initialised
     mInitialised = 1;
@@ -162,6 +162,8 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
+mChannelWarning = testNumChannels( 4 );
+
 determineGeometry();
 
 // Radius of interaction circle
@@ -178,18 +180,18 @@ mPreviousMouseCap = mouse_cap;
   mMouseY = mouse_y - gCenterY;
   
   // Update mAzimuth and slider1 and notify GUI of the change
-  mAzimuth = atan2(-mMouseX, -mMouseY);
+  mAzimuth = atan2( -mMouseX, -mMouseY );
   slider1 = mAzimuth * kRad2Deg;
-  slider_automate(slider1);
+  slider_automate( slider1 );
   
   // At (abs(elevation) > 88 degrees) it becomes meaningless to alter the transformation angle
-  (mCosElevation > kCos88) ? (
+  ( mCosElevation > kCos88 ) ? (
     // Update transformAngle and slider3 and notify GUI of the change
-    slider3 = 24. * sqrt(mMouseX*mMouseX + mMouseY*mMouseY) * gInverseRadius / mCosElevation;
+    slider3 = 24. * sqrt( mMouseX*mMouseX + mMouseY*mMouseY ) * gInverseRadius / mCosElevation;
     // Restrict the range to [0, 24]
     slider3 > 24. ? slider3 = 24.;
     mGain    = slider3;
-    slider_automate(slider3);
+    slider_automate( slider3 );
   );
   
   calculateMatrix();
@@ -200,26 +202,30 @@ mPreviousMouseCap = mouse_cap;
 );
 
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) || ( slider3 != lastSlider3 ) ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( slider3 != mPrevSlider3 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
   
   drawBackgroundImage( 1 );
   drawFuMa();
   
   // Draw points illustrating the effect of the transform
-  displayTransformedPoints(matrixDisplayInterpreted, numDisplayedPoints, 0);
+  displayTransformedPoints( matrixDisplayInterpreted, numDisplayedPoints, 0 );
   
   // Force redraw of interaction circle
-  lastHHiglightCircle = -1;
+  mPrevHHiglightCircle = -1;
   
-  mPrevWidth  = gfx_w;
-  mPrevHeight = gfx_h;
-  lastSlider1 = slider1;
-  lastSlider2 = slider2;
-  lastSlider3 = slider3;
+  // Draw channel warning if needed
+  mChannelWarning ? drawChannelWarning( 4 );
+  
+  mPrevWidth          = gfx_w;
+  mPrevHeight         = gfx_h;
+  mPrevSlider1        = slider1;
+  mPrevSlider2        = slider2;
+  mPrevSlider3        = slider3;
+  mPrevChannelWarning = mChannelWarning;
 );
 
-// Draw circle for interaction
-( mHiglightCircle != lastHHiglightCircle ) ? (
+// Redraw interaction circle when needed - avoid if channel warning
+( ( mHiglightCircle != mPrevHHiglightCircle ) && !mChannelWarning ) ? (
   
   // Color depends on elevation, mouseClick and mouseHover
   mSinElevation < 0 ? (
@@ -232,13 +238,13 @@ mPreviousMouseCap = mouse_cap;
   gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15 * mHiglightCircle );
   
   // Position and radius depends on elevation
-  mPosX = gCenterX - gRadius * slider3 * kInv24 * (mSinAzimuth * mCosElevation);
-  mPosY = gCenterY - gRadius * slider3 * kInv24 * (mCosAzimuth * mCosElevation);
+  mPosX = gCenterX - gRadius * slider3 * kInv24 * ( mSinAzimuth * mCosElevation );
+  mPosY = gCenterY - gRadius * slider3 * kInv24 * ( mCosAzimuth * mCosElevation );
   mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
   
-  drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
+  drawInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
   
-  lastHHiglightCircle = mHiglightCircle;
+  mPrevHHiglightCircle = mHiglightCircle;
 );
 
 
@@ -251,8 +257,8 @@ mInverseSamplesblock = 1. / samplesblock;
 
 // Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
 ii = 0;
-loop(16,
-  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * mInverseSamplesblock;
+loop( 16,
+  matrixInc[ ii ] = ( matrixNewDSP[ ii ] - matrixDSP[ ii ] ) * mInverseSamplesblock;
   ii += 1;
 );
 
@@ -264,7 +270,7 @@ Calculate audio sample
 
 ii = 0;
 loop(16,
-  matrixDSP[ii] += matrixInc[ii];
+  matrixDSP[ ii ] += matrixInc[ ii ];
   ii += 1;
 );
 
@@ -281,7 +287,7 @@ zIn = spl3;
 );
 
 // Matrix multiplication with input signal:
-spl0 = wIn * matrixDSP[0] + xIn  * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
-spl1 = wIn * matrixDSP[4] + xIn  * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
-spl2 = wIn * matrixDSP[8] + xIn  * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
-spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];
+spl0 = wIn * matrixDSP[ 0 ]  + xIn * matrixDSP[ 1 ]  + yIn * matrixDSP[ 2 ]  + zIn * matrixDSP[ 3 ];
+spl1 = wIn * matrixDSP[ 4 ]  + xIn * matrixDSP[ 5 ]  + yIn * matrixDSP[ 6 ]  + zIn * matrixDSP[ 7 ];
+spl2 = wIn * matrixDSP[ 8 ]  + xIn * matrixDSP[ 9 ]  + yIn * matrixDSP[ 10 ] + zIn * matrixDSP[ 11 ];
+spl3 = wIn * matrixDSP[ 12 ] + xIn * matrixDSP[ 13 ] + yIn * matrixDSP[ 14 ] + zIn * matrixDSP[ 15 ];

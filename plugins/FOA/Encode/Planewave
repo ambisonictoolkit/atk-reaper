@@ -75,26 +75,26 @@ mClickingAtCircle = 0;
 function calculateCoefficients()
 (
   // Interaction point:
-  mCosAzi  = cos(mAzimuth);
-  mSinAzi  = sin(mAzimuth);
-  mCosEle  = cos(mElevation);
-  mSinEle  = sin(mElevation);
+  mCosAzi  = cos( mAzimuth );
+  mSinAzi  = sin( mAzimuth );
+  mCosEle  = cos( mElevation );
+  mSinEle  = sin( mElevation );
   
   // W
-  matrixNewDSP[0] = kInvSqrt2;
+  matrixNewDSP[ 0 ] = kInvSqrt2;
   // X
-  matrixNewDSP[1] = mCosAzi * mCosEle;
+  matrixNewDSP[ 1 ] = mCosAzi * mCosEle;
   // Y
-  matrixNewDSP[2] = mSinAzi * mCosEle;
+  matrixNewDSP[ 2 ] = mSinAzi * mCosEle;
   // Z
-  matrixNewDSP[3] = mSinEle;
+  matrixNewDSP[ 3 ] = mSinEle;
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   mInitialised == 0 ?
   (
     i = 0;
     loop(4,
-      matrixDSP[i] = matrixNewDSP[i];
+      matrixDSP[ i ] = matrixNewDSP[ i ];
     );
     // Now we are fully initialised
     mInitialised = 1;
@@ -117,6 +117,8 @@ Custom graphic interface
 **********************************************************/
 @gfx 500 500
 
+mChannelWarning = testNumChannels( 4 );
+
 determineGeometry();
 
 // Only update plugin parameters if the user click and drag interaction circle
@@ -128,13 +130,13 @@ mPreviousMouseCap = mouse_cap;
 // Reset azimuth and spread on mouse click
 mClickingAtCircle ?
 (
-  mMouseX = mouse_x - gCenterX;
-  mMouseY = mouse_y - gCenterY;
-  mAzimuth = atan2(-mMouseX, -mMouseY);
-  slider1 = mAzimuth * kRad2Deg;
+  mMouseX  = mouse_x - gCenterX;
+  mMouseY  = mouse_y - gCenterY;
+  mAzimuth = atan2( -mMouseX, -mMouseY );
+  slider1  = mAzimuth * kRad2Deg;
   
   // Notify GUI that azimuth has changed, and update coefficients
-  slider_automate(slider1);
+  slider_automate( slider1 );
 
   calculateCoefficients();
   
@@ -145,22 +147,26 @@ mClickingAtCircle ?
 );
 
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
   
   drawBackgroundImage( 0 );
   drawFuMa();
   
   // Force redraw of interaction circle
-  lastHHiglightCircle = -1;
+  mPrevHHiglightCircle = -1;
   
-  mPrevWidth  = gfx_w;
-  mPrevHeight = gfx_h;
-  lastSlider1 = slider1;
-  lastSlider2 = slider2;
+  // Draw channel warning if needed
+  mChannelWarning ? drawChannelWarning( 4 );
+  
+  mPrevWidth          = gfx_w;
+  mPrevHeight         = gfx_h;
+  mPrevSlider1        = slider1;
+  mPrevSlider2        = slider2;
+  mPrevChannelWarning = mChannelWarning;
 );
 
 // Draw circle for interaction
-( mHiglightCircle != lastHHiglightCircle ) ? (
+( ( mHiglightCircle != mPrevHHiglightCircle ) && !mChannelWarning ) ? (
   
   // Color depends on elevation, mouseClick and mouseHover
   (mSinEle < 0) ? (
@@ -173,8 +179,8 @@ mClickingAtCircle ?
   gxColorSetHsl( 1.0, 195., mSaturation, mLightness + 0.15 * mHiglightCircle );
 
   // Position and radius depends on elevation
-  mPosX = gCenterX - gRadius * (mSinAzi * mCosEle);
-  mPosY = gCenterY - gRadius * (mCosAzi * mCosEle);
+  mPosX = gCenterX - gRadius * ( mSinAzi * mCosEle );
+  mPosY = gCenterY - gRadius * ( mCosAzi * mCosEle );
   mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
 
   // Draw line from centre to interaciton circle
@@ -182,7 +188,7 @@ mClickingAtCircle ?
   
   drawInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
   
-  lastHHiglightCircle = mHiglightCircle;
+  mPrevHHiglightCircle = mHiglightCircle;
 );
 
 
@@ -196,7 +202,7 @@ mInverseSamplesblock = 1. / samplesblock;
 // Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
 ii = 0;
 loop(4,
-  matrixInc[ii] = (matrixNewDSP[ii] - matrixDSP[ii]) * mInverseSamplesblock;
+  matrixInc[ ii ] = ( matrixNewDSP[ ii ] - matrixDSP[ ii ] ) * mInverseSamplesblock;
   ii += 1;
 );
 
@@ -208,15 +214,15 @@ Calculate audio sample
 
 ii = 0;
 loop(4,
-  matrixDSP[ii] += matrixInc[ii];
+  matrixDSP[ ii ] += matrixInc[ ii ];
   ii += 1;
 );
 
 inMono = spl0;
 
 // Matrix multiplication with input signal:
-spl0 = inMono * matrixDSP[0];
-spl1 = inMono * matrixDSP[1];
-spl2 = inMono * matrixDSP[2];
-spl3 = inMono * matrixDSP[3];
+spl0 = inMono * matrixDSP[ 0 ];
+spl1 = inMono * matrixDSP[ 1 ];
+spl2 = inMono * matrixDSP[ 2 ];
+spl3 = inMono * matrixDSP[ 3 ];
 

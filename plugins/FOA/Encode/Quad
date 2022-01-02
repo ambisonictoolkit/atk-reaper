@@ -96,8 +96,11 @@ Custom graphic interface
 **********************************************************/
 @gfx 500 500
 
+// Test if track has sufficient number of channels
+mChannelWarning = testNumChannels( 4 );
+
 // Only refresh GUI when needed
-geometryHasChanged( mPrevWidth, mPrevHeight ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
   
   determineGeometry();
 
@@ -126,8 +129,11 @@ geometryHasChanged( mPrevWidth, mPrevHeight ) ? (
   drawSpeakerPositiion( gCenterX - mDeltaY, gCenterY + mDeltaX, "3", 0 );
   drawSpeakerPositiion( gCenterX + mDeltaY, gCenterY + mDeltaX, "4", 0 );
   
+  mChannelWarning ? drawChannelWarning( 4 );
+  
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;
+  mPrevChannelWarning = mChannelWarning;
 );
 
 

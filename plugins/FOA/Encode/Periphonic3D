@@ -158,8 +158,10 @@ Custom graphic interface
 **********************************************************/
 @gfx 500 500
 
+mChannelWarning = testNumChannels( mNumSpeakerPairs * 2 );
+
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) || ( slider3 != lastSlider3 ) ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( slider3 != mPrevSlider3 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
   
   determineGeometry();
   drawBackgroundImage( 0 );
@@ -186,11 +188,14 @@ Custom graphic interface
     mSpeakerAzi += mSpeakerAziDelta;
   );
   
-  mPrevWidth  = gfx_w;
-  mPrevHeight = gfx_h;
-  lastSlider1 = slider1;
-  lastSlider2 = slider2;
-  lastSlider3 = slider3;
+  mChannelWarning ? drawChannelWarning( mNumSpeakerPairs * 2 );
+  
+  mPrevWidth          = gfx_w;
+  mPrevHeight         = gfx_h;
+  mPrevSlider1        = slider1;
+  mPrevSlider2        = slider2;
+  mPrevSlider3        = slider3;
+  mPrevChannelWarning = mChannelWarning;
 );
 
 

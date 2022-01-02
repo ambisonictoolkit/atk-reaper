@@ -96,35 +96,35 @@ mClickingAtCircle = 0;
 
 // This only needs to be generated once:
 mNumDisplayedPoints = 24;
-generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
+generateDisplaySignalMatrix( matrixDisplayPoints, mNumDisplayedPoints );
 
 
 function calculateMatrix()
 (  
   // Generate matrixes
-  generateRotationMatrix(matrixRotate1, -mAzimuth);
-  generateTumblelMatrix(matrixTumble1, -mElevation);
-  generateDirectMatrix(matrixTransform, mTransformAngle);
-  generateRotationMatrix(matrixRotate2, mAzimuth);
-  generateTumblelMatrix(matrixTumble2, mElevation);
+  generateRotationMatrix( matrixRotate1, -mAzimuth );
+  generateTumblelMatrix( matrixTumble1,  -mElevation );
+  generateDirectMatrix( matrixTransform, mTransformAngle );
+  generateRotationMatrix( matrixRotate2, mAzimuth );
+  generateTumblelMatrix( matrixTumble2,  mElevation );
   
   /* Build processing matrix by performing a series of matrix multiplications
                        result =              left     X               right             */
-  matrixMultiplication(matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1);
-  matrixMultiplication(matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
-  matrixMultiplication(matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
-  matrixMultiplication(matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
+  matrixMultiplication( matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1 );
+  matrixMultiplication( matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1 );
+  matrixMultiplication( matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2 );
+  matrixMultiplication( matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1 );
   
   /* Transformation and interpretation of display points */
-  matrixMultiplication(matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, mNumDisplayedPoints, matrixDisplayPoints);
-  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, mNumDisplayedPoints);
+  matrixMultiplication( matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, mNumDisplayedPoints, matrixDisplayPoints );
+  interpreteProcessedPoints( matrixDisplayInterpreted, matrixDisplayTransformed, mNumDisplayedPoints );
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   mInitialised == 0 ?
   (
     i = 0;
     loop(16,
-      matrixDSP[i] = matrixNewDSP[i];
+      matrixDSP[ i ] = matrixNewDSP[ i ];
     );
     // Now we are fully initialised
     mInitialised = 1;
@@ -150,6 +150,8 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
+mChannelWarning = testNumChannels( 4 );
+
 determineGeometry();
 
 // Radius of interaction circle
@@ -165,14 +167,14 @@ mPreviousMouseCap = mouse_cap;
   mMouseX = mouse_x - gCenterX;
   mMouseY = mouse_y - gCenterY;
   
-  mAzimuth = atan2(-mMouseX, -mMouseY);
+  mAzimuth = atan2( -mMouseX, -mMouseY );
 
   // Update slider2 and notify GUI of the change  
   slider1 = mAzimuth * kRad2Deg;
   slider_automate( slider1 );
   mNormTransformAngle = ( 1. - sqrt( mMouseX * mMouseX + mMouseY * mMouseY ) * gInverseRadius );
   // Restrict the range to [0, 1.]
-  mNormTransformAngle < 0. ? mNormTransformAngle = 0.;
+  ( mNormTransformAngle < 0. ) ? ( mNormTransformAngle = 0. );
 
   // Update mTransformAngle and slider, and notify GUI of the change
   mTransformAngle = mNormTransformAngle * $pi * 0.5;
@@ -186,7 +188,7 @@ mPreviousMouseCap = mouse_cap;
 );
 
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || slider1 != lastSlider1 || slider2 != lastSlider2 || slider3 != lastSlider3 ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( slider3 != mPrevSlider3 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
   
   drawBackgroundImage( 1 );
   drawFuMa();
@@ -195,17 +197,21 @@ mPreviousMouseCap = mouse_cap;
   displayTransformedPoints( matrixDisplayInterpreted, mNumDisplayedPoints, 1 );
   
   // Force redraw of interaction circle
-  lastHHiglightCircle = -1;
+  mPrevHHiglightCircle = -1;
   
-  mPrevWidth  = gfx_w;
-  mPrevHeight = gfx_h;
-  lastSlider1 = slider1;
-  lastSlider2 = slider2;
-  lastSlider3 = slider3;
+  // Draw channel warning if needed
+  mChannelWarning ? drawChannelWarning( 4 );
+  
+  mPrevWidth          = gfx_w;
+  mPrevHeight         = gfx_h;
+  mPrevSlider1        = slider1;
+  mPrevSlider2        = slider2;
+  mPrevSlider3        = slider3;
+  mPrevChannelWarning = mChannelWarning;
 );
 
-// Draw circle for interaction
-( mHiglightCircle != lastHHiglightCircle ) ? (
+// Redraw interaction circle when needed - avoid if channel warning
+( ( mHiglightCircle != mPrevHHiglightCircle ) && !mChannelWarning ) ? (
   
   // Color depends on elevation, mouseClick and mouseHover
   gxColorSetHsl( 1.0, 195., 1., 0.4 + 0.15 * mHiglightCircle );
@@ -219,7 +225,7 @@ mPreviousMouseCap = mouse_cap;
   
   drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
   
-  lastHHiglightCircle = mHiglightCircle;
+  mPrevHHiglightCircle = mHiglightCircle;
 );
 
 
@@ -245,7 +251,7 @@ Calculate audio sample
 
 ii = 0;
 loop(16,
-  matrixDSP[ii] += matrixInc[ii];
+  matrixDSP[ ii ] += matrixInc[ ii ];
   ii += 1;
 );
 
@@ -255,14 +261,14 @@ yIn = spl2;
 zIn = spl3;
 
 // Some transforms blow up if track is 2 channels only as spl2 and spl3 might be un-ininitiated.
-(num_ch == 2) ? (
+( num_ch == 2 ) ? (
   yIn = 0.;
   zIn = 0.;
 );
 
 
 // Matrix multiplication with input signal:
-spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
-spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
-spl2 = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
-spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];
+spl0 = wIn * matrixDSP[ 0 ]  + xIn * matrixDSP[ 1 ]  + yIn * matrixDSP[ 2 ]  + zIn * matrixDSP[ 3 ];
+spl1 = wIn * matrixDSP[ 4 ]  + xIn * matrixDSP[ 5 ]  + yIn * matrixDSP[ 6 ]  + zIn * matrixDSP[ 7 ];
+spl2 = wIn * matrixDSP[ 8 ]  + xIn * matrixDSP[ 9 ]  + yIn * matrixDSP[ 10 ] + zIn * matrixDSP[ 11 ];
+spl3 = wIn * matrixDSP[ 12 ] + xIn * matrixDSP[ 13 ] + yIn * matrixDSP[ 14 ] + zIn * matrixDSP[ 15 ];

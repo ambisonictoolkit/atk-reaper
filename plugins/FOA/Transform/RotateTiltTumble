@@ -153,6 +153,8 @@ Custom graphic interface
 **********************************************************/
 @gfx 500 500
 
+mChannelWarning = testNumChannels( 4 );
+
 // Track geometry and draw background
 determineGeometry();
 
@@ -286,12 +288,13 @@ mPreviousMouseCap = mouse_cap;
 
 // Only refresh GUI when needed - contrary to most plugins, highlight (mouse hovering) requires a full GUI redraw
 ( geometryHasChanged( mPrevWidth, mPrevHeight ) 
-  || ( slider1 != lastSlider1 )
-  || ( slider2 != lastSlider2 )
-  || ( slider3 != lastSlider3 )
+  || ( slider1               != lastSlider1 )
+  || ( slider2               != lastSlider2 )
+  || ( slider3               != lastSlider3 )
   || ( mHiglightRotateCircle != mLastHiglightRotateCircle )
   || ( mHiglightTiltCircle   != mLastHiglightTiltCircle   )
   || ( mHiglightTumbleCircle != mLastHiglightTumbleCircle )
+  || ( mChannelWarning       != mPrevChannelWarning )
 ) ? (
   
   
@@ -374,72 +377,78 @@ mPreviousMouseCap = mouse_cap;
 
   // Draw points illustrating the combined effect of the transforms
   displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, 0);
+  
+  // Draw channel warning if needed
+  mChannelWarning ? drawChannelWarning( 4 );
+  
+  !mChannelWarning ? (
+    
+    // --- TUMBLE INTERACTION CIRCLE
+    //TUMBLE: Draw indicator with grey inner vertical line
+    mPosTumbleX = gCenterX;
+    mPosTumbleY = gCenterY - mTumbleAngle * kRad2Norm * gRadius;
 
+    gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTumbleCircle );
+    drawInteractionCircle( mPosTumbleX, mPosTumbleY, mInteractionCircleRadius );
 
-  // --- TUMBLE INTERACTION CIRCLE
-  //TUMBLE: Draw indicator with grey inner vertical line
-  mPosTumbleX = gCenterX;
-  mPosTumbleY = gCenterY - mTumbleAngle * kRad2Norm * gRadius;
+    gxColorSetHsl( 1.0, 195., 1.0, 0.4 );
+    gxColorSet( 1.0, 0.8, 0.8, 0.8 );
 
-  gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTumbleCircle );
-  drawInteractionCircle( mPosTumbleX, mPosTumbleY, mInteractionCircleRadius );
-
-  gxColorSetHsl( 1.0, 195., 1.0, 0.4 );
-  gxColorSet( 1.0, 0.8, 0.8, 0.8 );
-
-  drawLineSegment( mPosTumbleX,       mPosTumbleY - mInteractionCircleRadius + 5,
-                   mPosTumbleX,       mPosTumbleY + mInteractionCircleRadius - 5, 1 );
+    drawLineSegment( mPosTumbleX,       mPosTumbleY - mInteractionCircleRadius + 5,
+                     mPosTumbleX,       mPosTumbleY + mInteractionCircleRadius - 5, 1 );
                  
-  drawLineSegment( mPosTumbleX - 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
-                   mPosTumbleX - 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
+    drawLineSegment( mPosTumbleX - 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
+                     mPosTumbleX - 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
 
-  drawLineSegment( mPosTumbleX + 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
-                   mPosTumbleX + 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
+    drawLineSegment( mPosTumbleX + 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
+                     mPosTumbleX + 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
 
 
-  // --- TILT INTERACTION CIRCLE (we need to draw the circles so that Rotation is on top)
+    // --- TILT INTERACTION CIRCLE (we need to draw the circles so that Rotation is on top)
 
-  // Absolute position of circle.
-  // Y position is concstant and shifted slightly upwards from center in order to avoid intial overlap with tumble indicator
-  mPosTiltX = gCenterX + mTiltAngle * kRad2Norm * gRadius;
-  mPosTiltY = gCenterY - 25. * gfx_ext_retina;
+    // Absolute position of circle.
+    // Y position is concstant and shifted slightly upwards from center in order to avoid intial overlap with tumble indicator
+    mPosTiltX = gCenterX + mTiltAngle * kRad2Norm * gRadius;
+    mPosTiltY = gCenterY - 25. * gfx_ext_retina;
 
-  gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTiltCircle );
-  drawInteractionCircle( gCenterX + mTiltAngle * kRad2Norm * gRadius, gCenterY - 25. * gfx_ext_retina, mInteractionCircleRadius );
+    gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTiltCircle );
+    drawInteractionCircle( gCenterX + mTiltAngle * kRad2Norm * gRadius, gCenterY - 25. * gfx_ext_retina, mInteractionCircleRadius );
 
-  // Draw grey horisontal inner line
-  gxColorSet(1.0, 0.8, 0.8, 0.8);
+    // Draw grey horisontal inner line
+    gxColorSet(1.0, 0.8, 0.8, 0.8);
 
-  drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY - 1,
-                   mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY - 1, 1 );
+    drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY - 1,
+                     mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY - 1, 1 );
 
-  drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY + 1,
-                   mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY + 1, 1 );
+    drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY + 1,
+                     mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY + 1, 1 );
                  
-  drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY,
-                   mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY, 1 );
+    drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY,
+                     mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY, 1 );
                 
                 
-  // --- ROTATION INTERACTION CIRCLE
+    // --- ROTATION INTERACTION CIRCLE
   
-  // Absolute position of interaction circle
-  mPosRotateX = gCenterX - gRadius * mSinRotation;
-  mPosRotateY = gCenterY - gRadius * mCosRotation;
+    // Absolute position of interaction circle
+    mPosRotateX = gCenterX - gRadius * mSinRotation;
+    mPosRotateY = gCenterY - gRadius * mCosRotation;
   
-  gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightRotateCircle );
-  drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius );
+    gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightRotateCircle );
+    drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius );
   
-  // Draw inner gray circle
-  gxColorSet( 1.0, 0.8, 0.8, 0.8 );
-  drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius - 7 * gfx_ext_retina );
-  
-  
+    // Draw inner gray circle
+    gxColorSet( 1.0, 0.8, 0.8, 0.8 );
+    drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius - 7 * gfx_ext_retina );
+  );
+
   mPrevWidth  = gfx_w;
   mPrevHeight = gfx_h;
   
   lastSlider1 = slider1;
   lastSlider2 = slider2;
   lastSlider3 = slider3;
+  
+  mPrevChannelWarning = mChannelWarning;
   
   mLastHiglightRotateCircle = mHiglightRotateCircle;
   mLastHiglightTiltCircle   = mHiglightTiltCircle;
