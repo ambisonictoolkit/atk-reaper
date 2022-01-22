@@ -117,16 +117,16 @@ function prepareKernel(anImpulseBuffer, aKernel, aKernelSize, anFftSize, aChanne
   // FFT and convolution operate on complex numbers
   i2 = 0;
   i3 = 0;
-  loop(aKernelSize,
+  loop( aKernelSize,
     
     // Copy first channel
-    aKernel[i2]     = anImpulseBuffer[i3 + aChannelOffset];
+    aKernel[ i2 ]     = anImpulseBuffer[ i3 + aChannelOffset ];
     
     // Are we to copy two (WX) or one (Y) channel from the IR into kernel?
-    (aNumChannels == 2) ? (
-      aKernel[i2 + 1] = anImpulseBuffer[i3 + aChannelOffset + 1];
+    ( aNumChannels == 2 ) ? (
+      aKernel[ i2 + 1 ] = anImpulseBuffer[ i3 + aChannelOffset + 1 ];
     ) : (
-      aKernel[i2 + 1] = 0.;
+      aKernel[ i2 + 1 ] = 0.;
     );
     
     i2 += 2;
@@ -136,16 +136,16 @@ function prepareKernel(anImpulseBuffer, aKernel, aKernelSize, anFftSize, aChanne
   /* FFT Size is twice that of the kernel, and we need to pad with zeros.
    Additionally we do complex FFT and hence operate on stereo buffers.
    */
-  memset(aKernel + (aKernelSize*2), 0.0, aKernelSize*2);
+  memset( aKernel + ( aKernelSize * 2 ), 0.0, aKernelSize * 2 );
   
   // Do FFT of the impulse response
-  fft(aKernel, mFftSize);
+  fft( aKernel, mFftSize );
   
   // Scale kernel to compensate for the size of the FFT window
   lInvFftSize = 1 / anFftSize;
   i=0;
   loop(anFftSize*2, 
-    aKernel[i] *= lInvFftSize; 
+    aKernel[ i ] *= lInvFftSize; 
     i += 1; 
   );
 );
@@ -157,29 +157,29 @@ Updated slider value:
 @slider
 
 // Has kernel size changed?
-((mPreviousKernelSliderValue != slider1) || (mPreviousSampleRate != srate)) ?
+( ( mPreviousKernelSliderValue != slider1 ) || ( mPreviousSampleRate != srate ) ) ?
 (
   mPreviousKernelSliderValue = slider1;
   
   mPreviousSampleRate        = srate;
   slider2 = sampleRateToSlider();
-  sliderchange(slider2);
+  sliderchange( slider2 );
   
   mSampleRateSupported = isThisSampleRateSupported();
   
   // Get new kernel size
   mKernelSize = 256;
-  loop (slider1,
+  loop ( slider1,
     mKernelSize = mKernelSize * 2;
   );
     
   // Set filename of impulse response file
-  sprintf(mFilenameL, "ATK/kernels/FOA/encoders/uhj/%i/%i/0000/UHJ_L.wav", mPreviousSampleRate, mKernelSize);
-  sprintf(mFilenameR, "ATK/kernels/FOA/encoders/uhj/%i/%i/0000/UHJ_R.wav", mPreviousSampleRate, mKernelSize);
+  sprintf( mFilenameL, "ATK/kernels/FOA/encoders/uhj/%i/%i/0000/UHJ_L.wav", mPreviousSampleRate, mKernelSize );
+  sprintf( mFilenameR, "ATK/kernels/FOA/encoders/uhj/%i/%i/0000/UHJ_R.wav", mPreviousSampleRate, mKernelSize );
   
   // Cupy impulse (3 channels WXY) from file to buffer
-  readKernelImpulseFromFile(mFilenameL, mImpulseBufferL);
-  readKernelImpulseFromFile(mFilenameR, mImpulseBufferR);
+  readKernelImpulseFromFile( mFilenameL, mImpulseBufferL );
+  readKernelImpulseFromFile( mFilenameR, mImpulseBufferR );
   
   // Set flag that FFT need to be recalculated
   mFftNewRequired = 1;
@@ -192,7 +192,7 @@ Preprocessing prior to audio vector processing.
 @block
 
 // If kernel size has changed and sample rate is supported, prepare a new kernel
-(mFftNewRequired && mSampleRateSupported) ? (
+( mFftNewRequired && mSampleRateSupported ) ? (
   
   mFftSize = 2 * mKernelSize;
   
@@ -202,11 +202,11 @@ Preprocessing prior to audio vector processing.
   chunksize2 = chunksize * 2;
   
   // Do FFT on the impulse responses
-  prepareKernel(mImpulseBufferL, mKernelL2WX, mKernelSize, mFftSize, 0, 2);
-  prepareKernel(mImpulseBufferL, mKernelL2YZ, mKernelSize, mFftSize, 2, 1);
+  prepareKernel( mImpulseBufferL, mKernelL2WX, mKernelSize, mFftSize, 0, 2 );
+  prepareKernel( mImpulseBufferL, mKernelL2YZ, mKernelSize, mFftSize, 2, 1 );
 
-  prepareKernel(mImpulseBufferR, mKernelR2WX, mKernelSize, mFftSize, 0, 2);
-  prepareKernel(mImpulseBufferR, mKernelR2YZ, mKernelSize, mFftSize, 2, 1);
+  prepareKernel( mImpulseBufferR, mKernelR2WX, mKernelSize, mFftSize, 0, 2 );
+  prepareKernel( mImpulseBufferR, mKernelR2YZ, mKernelSize, mFftSize, 2, 1 );
   
   // Reset current write/read position within the blocks
   mBufferPosition = 0; 
@@ -217,7 +217,7 @@ Preprocessing prior to audio vector processing.
 
 // Force reset value of slider in case the user changed it manually
 slider2 = sampleRateToSlider();
-sliderchange(slider2);
+sliderchange( slider2 );
 
 
 /**********************************************************
@@ -242,12 +242,12 @@ mSampleRateSupported ? (
     mBlockCurrentL2WX     = mTempBlock;
     
     // Pad the tail of the buffer to zero
-    memset(mBlockCurrentL2WX+chunksize*2, 0, (mFftSize-chunksize)*2);
+    memset( mBlockCurrentL2WX + chunksize * 2, 0, ( mFftSize - chunksize ) * 2 );
     
     // The actual convolution
-    fft(mBlockCurrentL2WX, mFftSize);
-    convolve_c(mBlockCurrentL2WX, mKernelL2WX, mFftSize);
-    ifft(mBlockCurrentL2WX, mFftSize);
+    fft( mBlockCurrentL2WX, mFftSize );
+    convolve_c( mBlockCurrentL2WX, mKernelL2WX, mFftSize );
+    ifft( mBlockCurrentL2WX, mFftSize );
     
     
     /***** Convolve Left to Y (and Z)  *****/
@@ -261,9 +261,9 @@ mSampleRateSupported ? (
     memset(mBlockCurrentL2YZ+chunksize*2, 0, (mFftSize-chunksize)*2);
     
     // The actual convolution
-    fft(mBlockCurrentL2YZ, mFftSize);
-    convolve_c(mBlockCurrentL2YZ, mKernelL2YZ, mFftSize);
-    ifft(mBlockCurrentL2YZ, mFftSize);
+    fft( mBlockCurrentL2YZ, mFftSize );
+    convolve_c( mBlockCurrentL2YZ, mKernelL2YZ, mFftSize );
+    ifft( mBlockCurrentL2YZ, mFftSize );
     
     
     /***** Convolve Right to WX *****/
@@ -274,12 +274,12 @@ mSampleRateSupported ? (
     mBlockCurrentR2WX     = mTempBlock;
     
     // Pad the tail of the buffer to zero
-    memset(mBlockCurrentR2WX+chunksize*2, 0, (mFftSize-chunksize)*2);
+    memset( mBlockCurrentR2WX + chunksize * 2, 0, ( mFftSize - chunksize ) * 2 );
     
     // The actual convolution
-    fft(mBlockCurrentR2WX, mFftSize);
-    convolve_c(mBlockCurrentR2WX, mKernelR2WX, mFftSize);
-    ifft(mBlockCurrentR2WX, mFftSize);
+    fft( mBlockCurrentR2WX, mFftSize );
+    convolve_c( mBlockCurrentR2WX, mKernelR2WX, mFftSize );
+    ifft( mBlockCurrentR2WX, mFftSize );
     
     
     /***** Convolve Right to Y (and Z)  *****/
@@ -290,27 +290,27 @@ mSampleRateSupported ? (
     mBlockCurrentR2YZ     = mTempBlock;
     
     // Pad the tail of the buffer to zero
-    memset(mBlockCurrentR2YZ+chunksize*2, 0, (mFftSize-chunksize)*2);
+    memset( mBlockCurrentR2YZ + chunksize * 2, 0, ( mFftSize - chunksize ) * 2 );
     
     // The actual convolution
-    fft(mBlockCurrentR2YZ, mFftSize);
-    convolve_c(mBlockCurrentR2YZ, mKernelR2YZ, mFftSize);
-    ifft(mBlockCurrentR2YZ, mFftSize);
+    fft( mBlockCurrentR2YZ, mFftSize );
+    convolve_c( mBlockCurrentR2YZ, mKernelR2YZ, mFftSize );
+    ifft( mBlockCurrentR2YZ, mFftSize );
     
     
     // Update delay compensation
-    pdc_delay = ((1.5 * mKernelSize)|0) - 2;
+    pdc_delay = ( ( 1.5 * mKernelSize ) | 0 ) - 2;
   
     // Delay compensation affects channels 1-3
-    pdc_bot_ch=0;
-    pdc_top_ch=4;
+    pdc_bot_ch = 0;
+    pdc_top_ch = 4;
     
     // Current write/read position within the blocks starts counting from 0 again
-    mBufferPosition=0;
+    mBufferPosition = 0;
   );
   
   
-  mBufferPosition2 = mBufferPosition*2;
+  mBufferPosition2 = mBufferPosition * 2;
   
   
   // Buffer incoming audio as real value, set imaginary value to zero
