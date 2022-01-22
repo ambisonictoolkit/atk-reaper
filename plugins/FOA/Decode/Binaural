@@ -187,56 +187,56 @@ loop (106,
 );
 
 //...but there are some exceptions
-mFileNameArray[10] =  0;
-mFileNameArray[11] =  1;
-mFileNameArray[12] =  2;
-mFileNameArray[13] =  3;
-mFileNameArray[14] =  4;
-mFileNameArray[15] =  5;
-mFileNameArray[16] =  6;
-mFileNameArray[17] =  7;
-mFileNameArray[18] =  8;
-mFileNameArray[19] =  9;
-mFileNameArray[20] = 10;
-mFileNameArray[21] = 11;
-mFileNameArray[22] = 12;
-mFileNameArray[23] = 13;
-mFileNameArray[24] = 14;
-mFileNameArray[25] = 15;
-mFileNameArray[26] = 16;
-mFileNameArray[27] = 17;
-mFileNameArray[28] = 18;
-mFileNameArray[29] = 19;
-mFileNameArray[30] = 20;
-mFileNameArray[31] = 21;
-mFileNameArray[32] = 22;
-mFileNameArray[33] = 23;
-mFileNameArray[34] = 24;
-mFileNameArray[35] = 25;
-mFileNameArray[36] = 26;
-mFileNameArray[37] = 27;
-mFileNameArray[38] = 28;
-mFileNameArray[39] = 29;
-mFileNameArray[40] = 30;
-mFileNameArray[41] = 31;
-mFileNameArray[42] = 32;
-mFileNameArray[43] = 33;
-mFileNameArray[44] = 34;
-mFileNameArray[45] = 35;
-mFileNameArray[46] = 36;
-mFileNameArray[47] = 37;
-mFileNameArray[48] = 38;
-mFileNameArray[49] = 39;
-mFileNameArray[50] = 40;
-mFileNameArray[51] = 41;
-mFileNameArray[52] = 42;
-mFileNameArray[53] = 43;
-mFileNameArray[54] = 44;
+mFileNameArray[ 10 ] =  0;
+mFileNameArray[ 11 ] =  1;
+mFileNameArray[ 12 ] =  2;
+mFileNameArray[ 13 ] =  3;
+mFileNameArray[ 14 ] =  4;
+mFileNameArray[ 15 ] =  5;
+mFileNameArray[ 16 ] =  6;
+mFileNameArray[ 17 ] =  7;
+mFileNameArray[ 18 ] =  8;
+mFileNameArray[ 19 ] =  9;
+mFileNameArray[ 20 ] = 10;
+mFileNameArray[ 21 ] = 11;
+mFileNameArray[ 22 ] = 12;
+mFileNameArray[ 23 ] = 13;
+mFileNameArray[ 24 ] = 14;
+mFileNameArray[ 25 ] = 15;
+mFileNameArray[ 26 ] = 16;
+mFileNameArray[ 27 ] = 17;
+mFileNameArray[ 28 ] = 18;
+mFileNameArray[ 29 ] = 19;
+mFileNameArray[ 30 ] = 20;
+mFileNameArray[ 31 ] = 21;
+mFileNameArray[ 32 ] = 22;
+mFileNameArray[ 33 ] = 23;
+mFileNameArray[ 34 ] = 24;
+mFileNameArray[ 35 ] = 25;
+mFileNameArray[ 36 ] = 26;
+mFileNameArray[ 37 ] = 27;
+mFileNameArray[ 38 ] = 28;
+mFileNameArray[ 39 ] = 29;
+mFileNameArray[ 40 ] = 30;
+mFileNameArray[ 41 ] = 31;
+mFileNameArray[ 42 ] = 32;
+mFileNameArray[ 43 ] = 33;
+mFileNameArray[ 44 ] = 34;
+mFileNameArray[ 45 ] = 35;
+mFileNameArray[ 46 ] = 36;
+mFileNameArray[ 47 ] = 37;
+mFileNameArray[ 48 ] = 38;
+mFileNameArray[ 49 ] = 39;
+mFileNameArray[ 50 ] = 40;
+mFileNameArray[ 51 ] = 41;
+mFileNameArray[ 52 ] = 42;
+mFileNameArray[ 53 ] = 43;
+mFileNameArray[ 54 ] = 44;
 
 i = 0;
-loop(106,
-  (mFileNameArray[i] >= 0) ? (
-    gfx_loadimg(i, mFileNameArray[i]);
+loop( 106,
+  ( mFileNameArray[ i ] >= 0 ) ? (
+    gfx_loadimg( i, mFileNameArray[ i ] );
   );
   i += 1;
 );
@@ -244,32 +244,35 @@ loop(106,
 // Prevent auto clear of each frame
 gfx_clear = -1;
 
+// Graphics
+gfx_ext_retina = 1;
+
 
 /********************************************************************
 Get folderpath to impulse responses
 ********************************************************************/
-function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported, lHrtf)
+function getFolderPath ( aSliderValue, aFolderPath ) local( lSampleRateIsSupported, lHrtf )
 (
   // Determine if current sample rate is supported
   lSampleRateIsSupported = isThisSampleRateSupported();
   
-  (lSampleRateIsSupported) ? (
+  ( lSampleRateIsSupported ) ? (
     
     // Kernel size depends on sample rate
-    ((srate == 44100) || (srate == 48000)) ? (
+    ( ( srate == 44100 ) || ( srate == 48000 ) ) ? (
       mKernelSize = 512;
     ) : (
-      ((srate == 88200) || (srate == 96000)) ? (
+      ( ( srate == 88200 ) || ( srate == 96000 ) ) ? (
         mKernelSize = 1024;
       ) : (
-        ((srate == 176400) || (srate == 192000)) ? (
+        ( ( srate == 176400 ) || ( srate == 192000 ) ) ? (
           mKernelSize = 2048;
         );
       );
     );
     
     /***** Slider values 0-9 : Spherical HRTF *****/ 
-    (aSliderValue < 10) ? (
+    ( aSliderValue < 10 ) ? (
       (
         // Vertical property, spherical HRTFs are horisontal only
         mVerticalIsSupported = 0; 
@@ -278,65 +281,65 @@ function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported,
         lHrtf = aSliderValue;
         
         // Path to HRTF files
-        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/spherical/%i/%i/%04d/", srate, mKernelSize, lHrtf);
+        sprintf( aFolderPath, "ATK/kernels/FOA/decoders/spherical/%i/%i/%04d/", srate, mKernelSize, lHrtf );
       );
     
     /***** Slider values 10-54 : CIPIC HRTF *****/
-    ) : (aSliderValue < 55) ? (
+    ) : ( aSliderValue < 55 ) ? (
       
       (
         // Vertical property
         mVerticalIsSupported = 1;
         
         // HRTF ID
-        (aSliderValue == 10) ? (lHrtf =   3) :
-        (aSliderValue == 11) ? (lHrtf =   8) :
-        (aSliderValue == 12) ? (lHrtf =   9) :
-        (aSliderValue == 13) ? (lHrtf =  10) :
-        (aSliderValue == 14) ? (lHrtf =  11) :
-        (aSliderValue == 15) ? (lHrtf =  12) :
-        (aSliderValue == 16) ? (lHrtf =  15) :
-        (aSliderValue == 17) ? (lHrtf =  17) :
-        (aSliderValue == 18) ? (lHrtf =  18) :
-        (aSliderValue == 19) ? (lHrtf =  19) :
-        (aSliderValue == 20) ? (lHrtf =  20) :
-        (aSliderValue == 21) ? (lHrtf =  21) :
-        (aSliderValue == 22) ? (lHrtf =  27) :
-        (aSliderValue == 23) ? (lHrtf =  28) :
-        (aSliderValue == 24) ? (lHrtf =  33) :
-        (aSliderValue == 25) ? (lHrtf =  40) :
-        (aSliderValue == 26) ? (lHrtf =  44) :
-        (aSliderValue == 27) ? (lHrtf =  48) :
-        (aSliderValue == 28) ? (lHrtf =  50) :
-        (aSliderValue == 29) ? (lHrtf =  51) :
-        (aSliderValue == 30) ? (lHrtf =  58) :
-        (aSliderValue == 31) ? (lHrtf =  59) :
-        (aSliderValue == 32) ? (lHrtf =  60) :
-        (aSliderValue == 33) ? (lHrtf =  61) :
-        (aSliderValue == 34) ? (lHrtf =  65) :
-        (aSliderValue == 35) ? (lHrtf = 119) :
-        (aSliderValue == 36) ? (lHrtf = 124) :
-        (aSliderValue == 37) ? (lHrtf = 126) :
-        (aSliderValue == 38) ? (lHrtf = 127) :
-        (aSliderValue == 39) ? (lHrtf = 131) :
-        (aSliderValue == 30) ? (lHrtf = 133) :
-        (aSliderValue == 41) ? (lHrtf = 134) :
-        (aSliderValue == 42) ? (lHrtf = 135) :
-        (aSliderValue == 43) ? (lHrtf = 137) :
-        (aSliderValue == 44) ? (lHrtf = 147) :
-        (aSliderValue == 45) ? (lHrtf = 148) :
-        (aSliderValue == 46) ? (lHrtf = 152) :
-        (aSliderValue == 47) ? (lHrtf = 153) :
-        (aSliderValue == 48) ? (lHrtf = 154) :
-        (aSliderValue == 49) ? (lHrtf = 155) :
-        (aSliderValue == 40) ? (lHrtf = 156) :
-        (aSliderValue == 51) ? (lHrtf = 158) :
-        (aSliderValue == 52) ? (lHrtf = 162) :
-        (aSliderValue == 53) ? (lHrtf = 163) :
-        (aSliderValue == 54) ? (lHrtf = 165);
+        ( aSliderValue == 10 ) ? ( lHrtf =   3 ) :
+        ( aSliderValue == 11 ) ? ( lHrtf =   8 ) :
+        ( aSliderValue == 12 ) ? ( lHrtf =   9 ) :
+        ( aSliderValue == 13 ) ? ( lHrtf =  10 ) :
+        ( aSliderValue == 14 ) ? ( lHrtf =  11 ) :
+        ( aSliderValue == 15 ) ? ( lHrtf =  12 ) :
+        ( aSliderValue == 16 ) ? ( lHrtf =  15 ) :
+        ( aSliderValue == 17 ) ? ( lHrtf =  17 ) :
+        ( aSliderValue == 18 ) ? ( lHrtf =  18 ) :
+        ( aSliderValue == 19 ) ? ( lHrtf =  19 ) :
+        ( aSliderValue == 20 ) ? ( lHrtf =  20 ) :
+        ( aSliderValue == 21 ) ? ( lHrtf =  21 ) :
+        ( aSliderValue == 22 ) ? ( lHrtf =  27 ) :
+        ( aSliderValue == 23 ) ? ( lHrtf =  28 ) :
+        ( aSliderValue == 24 ) ? ( lHrtf =  33 ) :
+        ( aSliderValue == 25 ) ? ( lHrtf =  40 ) :
+        ( aSliderValue == 26 ) ? ( lHrtf =  44 ) :
+        ( aSliderValue == 27 ) ? ( lHrtf =  48 ) :
+        ( aSliderValue == 28 ) ? ( lHrtf =  50 ) :
+        ( aSliderValue == 29 ) ? ( lHrtf =  51 ) :
+        ( aSliderValue == 30 ) ? ( lHrtf =  58 ) :
+        ( aSliderValue == 31 ) ? ( lHrtf =  59 ) :
+        ( aSliderValue == 32 ) ? ( lHrtf =  60 ) :
+        ( aSliderValue == 33 ) ? ( lHrtf =  61 ) :
+        ( aSliderValue == 34 ) ? ( lHrtf =  65 ) :
+        ( aSliderValue == 35 ) ? ( lHrtf = 119 ) :
+        ( aSliderValue == 36 ) ? ( lHrtf = 124 ) :
+        ( aSliderValue == 37 ) ? ( lHrtf = 126 ) :
+        ( aSliderValue == 38 ) ? ( lHrtf = 127 ) :
+        ( aSliderValue == 39 ) ? ( lHrtf = 131 ) :
+        ( aSliderValue == 30 ) ? ( lHrtf = 133 ) :
+        ( aSliderValue == 41 ) ? ( lHrtf = 134 ) :
+        ( aSliderValue == 42 ) ? ( lHrtf = 135 ) :
+        ( aSliderValue == 43 ) ? ( lHrtf = 137 ) :
+        ( aSliderValue == 44 ) ? ( lHrtf = 147 ) :
+        ( aSliderValue == 45 ) ? ( lHrtf = 148 ) :
+        ( aSliderValue == 46 ) ? ( lHrtf = 152 ) :
+        ( aSliderValue == 47 ) ? ( lHrtf = 153 ) :
+        ( aSliderValue == 48 ) ? ( lHrtf = 154 ) :
+        ( aSliderValue == 49 ) ? ( lHrtf = 155 ) :
+        ( aSliderValue == 40 ) ? ( lHrtf = 156 ) :
+        ( aSliderValue == 51 ) ? ( lHrtf = 158 ) :
+        ( aSliderValue == 52 ) ? ( lHrtf = 162 ) :
+        ( aSliderValue == 53 ) ? ( lHrtf = 163 ) :
+        ( aSliderValue == 54 ) ? ( lHrtf = 165);
         
         // Path to HRTF files
-        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/cipic/%i/%i/%04d/", srate, mKernelSize, lHrtf);
+        sprintf( aFolderPath, "ATK/kernels/FOA/decoders/cipic/%i/%i/%04d/", srate, mKernelSize, lHrtf );
       );
     
     /***** Slider values 55-105 : Listen HRTF *****/
@@ -346,66 +349,66 @@ function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported,
         mVerticalIsSupported = 1;
         
         // HRTF ID
-        (aSliderValue ==  55) ? (lHrtf = 1002) :
-        (aSliderValue ==  56) ? (lHrtf = 1003) :
-        (aSliderValue ==  57) ? (lHrtf = 1004) :
-        (aSliderValue ==  58) ? (lHrtf = 1005) :
-        (aSliderValue ==  59) ? (lHrtf = 1006) :
-        (aSliderValue ==  60) ? (lHrtf = 1007) :
-        (aSliderValue ==  61) ? (lHrtf = 1008) :
-        (aSliderValue ==  62) ? (lHrtf = 1009) :
-        (aSliderValue ==  63) ? (lHrtf = 1012) :
-        (aSliderValue ==  64) ? (lHrtf = 1013) :
-        (aSliderValue ==  65) ? (lHrtf = 1014) :
-        (aSliderValue ==  66) ? (lHrtf = 1015) :
-        (aSliderValue ==  67) ? (lHrtf = 1016) :
-        (aSliderValue ==  68) ? (lHrtf = 1017) :
-        (aSliderValue ==  69) ? (lHrtf = 1018) :
-        (aSliderValue ==  70) ? (lHrtf = 1020) :
-        (aSliderValue ==  71) ? (lHrtf = 1021) :
-        (aSliderValue ==  72) ? (lHrtf = 1022) :
-        (aSliderValue ==  73) ? (lHrtf = 1023) :
-        (aSliderValue ==  74) ? (lHrtf = 1025) :
-        (aSliderValue ==  75) ? (lHrtf = 1026) :
-        (aSliderValue ==  76) ? (lHrtf = 1028) :
-        (aSliderValue ==  77) ? (lHrtf = 1029) :
-        (aSliderValue ==  78) ? (lHrtf = 1030) :
-        (aSliderValue ==  79) ? (lHrtf = 1031) :
-        (aSliderValue ==  80) ? (lHrtf = 1032) :
-        (aSliderValue ==  81) ? (lHrtf = 1033) :
-        (aSliderValue ==  82) ? (lHrtf = 1034) :
-        (aSliderValue ==  83) ? (lHrtf = 1037) :
-        (aSliderValue ==  84) ? (lHrtf = 1038) :
-        (aSliderValue ==  85) ? (lHrtf = 1039) :
-        (aSliderValue ==  86) ? (lHrtf = 1040) :
-        (aSliderValue ==  87) ? (lHrtf = 1041) :
-        (aSliderValue ==  88) ? (lHrtf = 1042) :
-        (aSliderValue ==  89) ? (lHrtf = 1043) :
-        (aSliderValue ==  90) ? (lHrtf = 1044) :
-        (aSliderValue ==  91) ? (lHrtf = 1045) :
-        (aSliderValue ==  92) ? (lHrtf = 1046) :
-        (aSliderValue ==  93) ? (lHrtf = 1047) :
-        (aSliderValue ==  94) ? (lHrtf = 1048) :
-        (aSliderValue ==  95) ? (lHrtf = 1049) :
-        (aSliderValue ==  96) ? (lHrtf = 1050) :
-        (aSliderValue ==  97) ? (lHrtf = 1051) :
-        (aSliderValue ==  98) ? (lHrtf = 1052) :
-        (aSliderValue ==  99) ? (lHrtf = 1053) :
-        (aSliderValue == 100) ? (lHrtf = 1054) :
-        (aSliderValue == 101) ? (lHrtf = 1055) :
-        (aSliderValue == 102) ? (lHrtf = 1056) :
-        (aSliderValue == 103) ? (lHrtf = 1057) :
-        (aSliderValue == 104) ? (lHrtf = 1058) :
-        (aSliderValue == 105) ? (lHrtf = 1059);
+        ( aSliderValue ==  55 ) ? ( lHrtf = 1002 ) :
+        ( aSliderValue ==  56 ) ? ( lHrtf = 1003 ) :
+        ( aSliderValue ==  57 ) ? ( lHrtf = 1004 ) :
+        ( aSliderValue ==  58 ) ? ( lHrtf = 1005 ) :
+        ( aSliderValue ==  59 ) ? ( lHrtf = 1006 ) :
+        ( aSliderValue ==  60 ) ? ( lHrtf = 1007 ) :
+        ( aSliderValue ==  61 ) ? ( lHrtf = 1008 ) :
+        ( aSliderValue ==  62 ) ? ( lHrtf = 1009 ) :
+        ( aSliderValue ==  63 ) ? ( lHrtf = 1012 ) :
+        ( aSliderValue ==  64 ) ? ( lHrtf = 1013 ) :
+        ( aSliderValue ==  65 ) ? ( lHrtf = 1014 ) :
+        ( aSliderValue ==  66 ) ? ( lHrtf = 1015 ) :
+        ( aSliderValue ==  67 ) ? ( lHrtf = 1016 ) :
+        ( aSliderValue ==  68 ) ? ( lHrtf = 1017 ) :
+        ( aSliderValue ==  69 ) ? ( lHrtf = 1018 ) :
+        ( aSliderValue ==  70 ) ? ( lHrtf = 1020 ) :
+        ( aSliderValue ==  71 ) ? ( lHrtf = 1021 ) :
+        ( aSliderValue ==  72 ) ? ( lHrtf = 1022 ) :
+        ( aSliderValue ==  73 ) ? ( lHrtf = 1023 ) :
+        ( aSliderValue ==  74 ) ? ( lHrtf = 1025 ) :
+        ( aSliderValue ==  75 ) ? ( lHrtf = 1026 ) :
+        ( aSliderValue ==  76 ) ? ( lHrtf = 1028 ) :
+        ( aSliderValue ==  77 ) ? ( lHrtf = 1029 ) :
+        ( aSliderValue ==  78 ) ? ( lHrtf = 1030 ) :
+        ( aSliderValue ==  79 ) ? ( lHrtf = 1031 ) :
+        ( aSliderValue ==  80 ) ? ( lHrtf = 1032 ) :
+        ( aSliderValue ==  81 ) ? ( lHrtf = 1033 ) :
+        ( aSliderValue ==  82 ) ? ( lHrtf = 1034 ) :
+        ( aSliderValue ==  83 ) ? ( lHrtf = 1037 ) :
+        ( aSliderValue ==  84 ) ? ( lHrtf = 1038 ) :
+        ( aSliderValue ==  85 ) ? ( lHrtf = 1039 ) :
+        ( aSliderValue ==  86 ) ? ( lHrtf = 1040 ) :
+        ( aSliderValue ==  87 ) ? ( lHrtf = 1041 ) :
+        ( aSliderValue ==  88 ) ? ( lHrtf = 1042 ) :
+        ( aSliderValue ==  89 ) ? ( lHrtf = 1043 ) :
+        ( aSliderValue ==  90 ) ? ( lHrtf = 1044 ) :
+        ( aSliderValue ==  91 ) ? ( lHrtf = 1045 ) :
+        ( aSliderValue ==  92 ) ? ( lHrtf = 1046 ) :
+        ( aSliderValue ==  93 ) ? ( lHrtf = 1047 ) :
+        ( aSliderValue ==  94 ) ? ( lHrtf = 1048 ) :
+        ( aSliderValue ==  95 ) ? ( lHrtf = 1049 ) :
+        ( aSliderValue ==  96 ) ? ( lHrtf = 1050 ) :
+        ( aSliderValue ==  97 ) ? ( lHrtf = 1051 ) :
+        ( aSliderValue ==  98 ) ? ( lHrtf = 1052 ) :
+        ( aSliderValue ==  99 ) ? ( lHrtf = 1053 ) :
+        ( aSliderValue == 100 ) ? ( lHrtf = 1054 ) :
+        ( aSliderValue == 101 ) ? ( lHrtf = 1055 ) :
+        ( aSliderValue == 102 ) ? ( lHrtf = 1056 ) :
+        ( aSliderValue == 103 ) ? ( lHrtf = 1057 ) :
+        ( aSliderValue == 104 ) ? ( lHrtf = 1058 ) :
+        ( aSliderValue == 105 ) ? ( lHrtf = 1059);
         
         // Path to HRTF files
-        sprintf(aFolderPath, "ATK/kernels/FOA/decoders/listen/%i/%i/%04d/", srate, mKernelSize, lHrtf);
+        sprintf( aFolderPath, "ATK/kernels/FOA/decoders/listen/%i/%i/%04d/", srate, mKernelSize, lHrtf );
       );
     );
   ) : (
  
     // Current sample rate is not supported
-    sprintf(aFolderPath, "/No HRTF available/");
+    sprintf( aFolderPath, "/No HRTF available/" );
     mKernelSize = 0;
     mVerticalIsSupported = 0;
   );
@@ -418,28 +421,28 @@ function getFolderPath (aSliderValue, aFolderPath) local(lSampleRateIsSupported,
 /********************************************************************
 Prepare a new kernel from an impulse buffer
 ********************************************************************/
-function prepareKernel(anImpulseBuffer, aKernel, aKernelSize, anFftSize) local(i, lInvFftSize)
+function prepareKernel( anImpulseBuffer, aKernel, aKernelSize, anFftSize ) local( i, lInvFftSize )
 (
   // We do not need to resample, as IR in UHJ decoding does not depend on sample rate
   
   // Copy left and right channel of IR to the kernel buffer
   // Every 2nd sample is left, right, left, right,...
   // FFT and convolution operate on complex numbers
-  memcpy(aKernel, anImpulseBuffer, aKernelSize*2);
+  memcpy( aKernel, anImpulseBuffer, aKernelSize * 2 );
   
   /* FFT Size is twice that of the kernel, and we need to pad with zeros.
    Additionally we do complex FFT and hence operate on stereo buffers.
    */
-  memset(aKernel + (aKernelSize*2), 0.0, aKernelSize*2);
+  memset(aKernel + ( aKernelSize * 2 ), 0.0, aKernelSize * 2 );
   
   // Do FFT of the impulse response
-  fft(aKernel, mFftSize);
+  fft( aKernel, mFftSize );
   
   // Scale kernel to compensate for the size of the FFT window
   lInvFftSize = 1 / anFftSize;
   i=0;
-  loop(anFftSize*2, 
-    aKernel[i] *= lInvFftSize; 
+  loop( anFftSize * 2,
+    aKernel[ i ] *= lInvFftSize;
     i += 1; 
   );
 );
@@ -453,32 +456,32 @@ Updated slider value:
 // TODO: Re-read kernel if samle rate has changed - check this for all other sample-rate-dependent plugins as well!
 
 // Has kernel size changed?
-((mPreviousSliderValue != slider1) || (mPreviousSampleRate != srate)) ?
+( ( mPreviousSliderValue != slider1 ) || ( mPreviousSampleRate != srate ) ) ?
 (
   mPreviousSliderValue = slider1;
   mPreviousSampleRate  = srate;
   
   // This function also sets mKernelSize and mVerticalIsSupported
-  mSampleRateIsSupported = getFolderPath(mPreviousSliderValue, mFolderPath);
+  mSampleRateIsSupported = getFolderPath( mPreviousSliderValue, mFolderPath );
   
-  (mSampleRateIsSupported) ? (
+  ( mSampleRateIsSupported ) ? (
     // Set filename of impulse response files, and read impulse files from disk
-    strcpy(mFilenameW, mFolderPath);
-    strcat(mFilenameW, "HRIR_W.wav");
-    readKernelImpulseFromFile(mFilenameW, mImpulseBufferW);
+    strcpy( mFilenameW, mFolderPath );
+    strcat( mFilenameW, "HRIR_W.wav" );
+    readKernelImpulseFromFile( mFilenameW, mImpulseBufferW );
     
-    strcpy(mFilenameX, mFolderPath);
-    strcat(mFilenameX, "HRIR_X.wav");
-    readKernelImpulseFromFile(mFilenameX, mImpulseBufferX);
+    strcpy( mFilenameX, mFolderPath );
+    strcat( mFilenameX, "HRIR_X.wav" );
+    readKernelImpulseFromFile( mFilenameX, mImpulseBufferX );
     
-    strcpy(mFilenameY, mFolderPath);
-    strcat(mFilenameY, "HRIR_Y.wav");
-    readKernelImpulseFromFile(mFilenameY, mImpulseBufferY);
+    strcpy( mFilenameY, mFolderPath );
+    strcat( mFilenameY, "HRIR_Y.wav" );
+    readKernelImpulseFromFile( mFilenameY, mImpulseBufferY );
     
     (mVerticalIsSupported) ? (
-      strcpy(mFilenameZ, mFolderPath);
-      strcat(mFilenameZ, "HRIR_Z.wav");
-      readKernelImpulseFromFile(mFilenameZ, mImpulseBufferZ);
+      strcpy( mFilenameZ, mFolderPath );
+      strcat( mFilenameZ, "HRIR_Z.wav" );
+      readKernelImpulseFromFile( mFilenameZ, mImpulseBufferZ );
     );
     
     // Set flag that FFT need to be recalculated
@@ -486,7 +489,7 @@ Updated slider value:
   );
 );
 
-preamp = 2^(slider2/6);
+preamp = 2 ^ ( slider2 / 6 );
 
 
 /**********************************************************
@@ -494,49 +497,49 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
+// Test if track has sufficient number of channels
+mChannelWarning = testNumChannels( 4 );
+
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
   
+  // Clear backgrond
   setPluginModeColour( 2 );
   gfx_rect( 0, 0, gfx_w, gfx_h );
 
   determineGeometry();
 
-  gfx_getimgdim(mPreviousSliderValue, mWidth, mHeight);
+  gfx_getimgdim( mPreviousSliderValue, mWidth, mHeight );
 
-  (mWidth > 0) ? (
+  ( mWidth > 0 ) ? (
     // Display image if it exxists
     //gfx_a = 0.35;
-    gxPositionSet( gCenterX - 0.5 * mWidth, gCenterY - 0.5 * mHeight );
-    gfx_blit(mPreviousSliderValue, 1., 0.);
+    gxPositionSet( gCenterX - 0.5 * mWidth * gfx_ext_retina, gCenterY - 0.5 * mHeight * gfx_ext_retina );
+    gfx_blit( mPreviousSliderValue, gfx_ext_retina, 0. );
   
     // Tame image colours
     setPluginModeColour( 2 );
     gfx_a = 0.5;
-    gfx_rect( 0, 0, gfx_w, gfx_h );  
+    gfx_rect( 0, 0, gfx_w, gfx_h );
   ) : (
     // Else display text
-    gfx_setfont(1, "Arial", 18);
-    gfx_measurestr("No image available for this HRTF", mWidth, mHeight);
-    gxPositionSet(gCenterX-0.5*mWidth, gCenterY-0.5*mHeight);
-    gxColorSet(1., 0.9, 0.9, 0.9);
-    gfx_drawstr("No image available for this HRTF");
+    gfx_setfont( 1, "Arial", 18 * gfx_ext_retina );
+    mString = "No image available for this HRTF";
+    gfx_measurestr( mString, mWidth, mHeight );
+    gxPositionSet( gCenterX - 0.5 * mWidth , gCenterY - 0.5 * mHeight );
+    gxColorSet( 1., 0.9, 0.9, 0.9 );
+    gfx_drawstr( mString );
   );
 
-  // Draw FuMa – This plugin is not retina, and hence cannot use the default lib funciton
-  gfx_setfont( 1, "Arial", 18 );
-  gfx_measurestr( "FuMa", stringWidth, stringHeight);
-  setPluginModeColour( 2 );
-  gfx_a = 1.0;
-  //gxColorSet( 0.5, 1.0 , 1.0 , 1.0 );
-  gfx_rect( 10, 16, stringWidth + 20 , stringHeight + 8 ); 
-  gxColorSet( 1.0, 0.9, 0.9, 0.9 );
-  gxPositionSet( 20., 20. );
-  gfx_drawstr( "FuMa" );
+  drawFuMa();
   
-  mPrevWidth  = gfx_w;
-  mPrevHeight = gfx_h;
-  lastSlider1 = slider1;
+  // TODO: Binaural is not retina, and that screws up th below function
+  mChannelWarning ? drawChannelWarning( 4 );
+  
+  mPrevWidth          = gfx_w;
+  mPrevHeight         = gfx_h;
+  mPrevSlider1        = slider1;
+  mPrevChannelWarning = mChannelWarning;
 );
 
 
@@ -556,11 +559,11 @@ mFftNewRequired ? (
   chunksize2 = chunksize * 2;
   
   // Do FFT on the impulse responses
-  prepareKernel(mImpulseBufferW, mKernelW, mKernelSize, mFftSize);
-  prepareKernel(mImpulseBufferX, mKernelX, mKernelSize, mFftSize);
-  prepareKernel(mImpulseBufferY, mKernelY, mKernelSize, mFftSize);
+  prepareKernel( mImpulseBufferW, mKernelW, mKernelSize, mFftSize );
+  prepareKernel( mImpulseBufferX, mKernelX, mKernelSize, mFftSize );
+  prepareKernel( mImpulseBufferY, mKernelY, mKernelSize, mFftSize );
   mVerticalIsSupported ? (
-    prepareKernel(mImpulseBufferZ, mKernelZ, mKernelSize, mFftSize);
+    prepareKernel( mImpulseBufferZ, mKernelZ, mKernelSize, mFftSize );
   );
   
   // Reset current write/read position within the blocks
@@ -571,7 +574,7 @@ mFftNewRequired ? (
 );
 
 slider3 = mSampleRateIsSupported;
-sliderchange(slider3);
+sliderchange( slider3 );
 
 
 /**********************************************************
@@ -594,12 +597,12 @@ mSampleRateIsSupported ? (
     mBlockCurrentW     = mTempBlock;
     
     // Pad the tail of the buffer to zero
-    memset(mBlockCurrentW+chunksize*2, 0, (mFftSize-chunksize)*2);
+    memset( mBlockCurrentW + chunksize * 2, 0, ( mFftSize - chunksize ) * 2 );
     
     // The actual convolution
-    fft(mBlockCurrentW, mFftSize);
-    convolve_c(mBlockCurrentW, mKernelW, mFftSize);
-    ifft(mBlockCurrentW, mFftSize);
+    fft( mBlockCurrentW, mFftSize );
+    convolve_c( mBlockCurrentW, mKernelW, mFftSize );
+    ifft( mBlockCurrentW, mFftSize );
     
     
     /***** Convolve X *****/
@@ -610,12 +613,12 @@ mSampleRateIsSupported ? (
     mBlockCurrentX     = mTempBlock;
     
     // Pad the tail of the buffer to zero
-    memset(mBlockCurrentX+chunksize*2, 0, (mFftSize-chunksize)*2);
+    memset( mBlockCurrentX + chunksize * 2, 0, ( mFftSize - chunksize ) * 2 );
     
     // The actual convolution
-    fft(mBlockCurrentX, mFftSize);
-    convolve_c(mBlockCurrentX, mKernelX, mFftSize);
-    ifft(mBlockCurrentX, mFftSize);
+    fft( mBlockCurrentX, mFftSize );
+    convolve_c( mBlockCurrentX, mKernelX, mFftSize );
+    ifft( mBlockCurrentX, mFftSize );
     
     
     /***** Convolve Y *****/
@@ -626,12 +629,12 @@ mSampleRateIsSupported ? (
     mBlockCurrentY     = mTempBlock;
     
     // Pad the tail of the buffer to zero
-    memset(mBlockCurrentY+chunksize*2, 0, (mFftSize-chunksize)*2);
+    memset( mBlockCurrentY + chunksize * 2, 0, ( mFftSize - chunksize ) * 2 );
     
     // The actual convolution
-    fft(mBlockCurrentY, mFftSize);
-    convolve_c(mBlockCurrentY, mKernelY, mFftSize);
-    ifft(mBlockCurrentY, mFftSize);
+    fft( mBlockCurrentY, mFftSize );
+    convolve_c( mBlockCurrentY, mKernelY, mFftSize );
+    ifft( mBlockCurrentY, FftSize );
     
     
     /***** Convolve Y *****/
@@ -643,28 +646,28 @@ mSampleRateIsSupported ? (
       mBlockCurrentZ     = mTempBlock;
     
       // Pad the tail of the buffer to zero
-      memset(mBlockCurrentZ+chunksize*2, 0, (mFftSize-chunksize)*2);
+      memset( mBlockCurrentZ + chunksize * 2, 0, ( mFftSize - chunksize ) * 2 );
     
       // The actual convolution
-      fft(mBlockCurrentZ, mFftSize);
-      convolve_c(mBlockCurrentZ, mKernelZ, mFftSize);
-      ifft(mBlockCurrentZ, mFftSize);
+      fft( mBlockCurrentZ, mFftSize );
+      convolve_c( mBlockCurrentZ, mKernelZ, mFftSize );
+      ifft( mBlockCurrentZ, FftSize );
     ) : (
       // Vertical component is ignored, zeroing all buffer values
-       memset(mBlockCurrentZ, 0, (mFftSize-chunksize)*4);
+       memset( mBlockCurrentZ, 0, ( mFftSize - chunksize ) * 4 );
     );
     
     
     // Update delay compensation
-    pdc_delay = ((1.5 * mKernelSize)|0) - 2;
+    pdc_delay = ( ( 1.5 * mKernelSize ) | 0 ) - 2;
     
     // Delay compensation affects channels 1-2
-    pdc_bot_ch=0;
-    pdc_top_ch=2;
+    pdc_bot_ch = 0;
+    pdc_top_ch = 2;
     
     
     // Current write/read position within the blocks starts counting from 0 again
-    mBufferPosition=0;
+    mBufferPosition = 0;
   );
   
   
@@ -679,34 +682,34 @@ mSampleRateIsSupported ? (
   // Buffer incoming audio as real value, set imaginary value to zero:
   
   // W
-  mBlockLastAndNextW[mBufferPosition2]   = spl0 * preamp;
-  mBlockLastAndNextW[mBufferPosition2+1] = 0;
+  mBlockLastAndNextW[ mBufferPosition2 ]     = spl0 * preamp;
+  mBlockLastAndNextW[ mBufferPosition2 + 1 ] = 0;
   
   // X
-  mBlockLastAndNextX[mBufferPosition2]   = spl1 * preamp;
-  mBlockLastAndNextX[mBufferPosition2+1] = 0;
+  mBlockLastAndNextX[ mBufferPosition2 ]     = spl1 * preamp;
+  mBlockLastAndNextX[ mBufferPosition2 + 1 ] = 0;
   
   // Y
-  mBlockLastAndNextY[mBufferPosition2]   = spl2 * preamp;
-  mBlockLastAndNextY[mBufferPosition2+1] = 0;
+  mBlockLastAndNextY[ mBufferPosition2 ]     = spl2 * preamp;
+  mBlockLastAndNextY[ mBufferPosition2 + 1 ] = 0;
   
   // Z
-  mBlockLastAndNextZ[mBufferPosition2]   = spl3 * preamp;
-  mBlockLastAndNextZ[mBufferPosition2+1] = 0;
+  mBlockLastAndNextZ[ mBufferPosition2 ]     = spl3 * preamp;
+  mBlockLastAndNextZ[ mBufferPosition2 + 1 ] = 0;
   
   // Copy convolved sample values to output
-  spl0 = mBlockCurrentW[mBufferPosition2]   + mBlockCurrentX[mBufferPosition2]   + mBlockCurrentY[mBufferPosition2]   + mBlockCurrentZ[mBufferPosition2];
-  spl1 = mBlockCurrentW[mBufferPosition2+1] + mBlockCurrentX[mBufferPosition2+1] + mBlockCurrentY[mBufferPosition2+1] + mBlockCurrentZ[mBufferPosition2+1];
+  spl0 = mBlockCurrentW[ mBufferPosition2 ]     + mBlockCurrentX[ mBufferPosition2 ]     + mBlockCurrentY[ mBufferPosition2 ]     + mBlockCurrentZ[ mBufferPosition2 ];
+  spl1 = mBlockCurrentW[ mBufferPosition2 + 1 ] + mBlockCurrentX[ mBufferPosition2 + 1 ] + mBlockCurrentY[ mBufferPosition2 + 1 ] + mBlockCurrentZ[ mBufferPosition2 + 1 ];
   
   
   // Add the overlap part (In this plugin we will always be overlapping)
   mBufferPosition < mFftSize-chunksize ? 
   (
-    spl0 += mBlockLastAndNextW[chunksize2+mBufferPosition2]   + mBlockLastAndNextX[chunksize2+mBufferPosition2]   
-          + mBlockLastAndNextY[chunksize2+mBufferPosition2]   + mBlockLastAndNextZ[chunksize2+mBufferPosition2];;
+    spl0 += mBlockLastAndNextW[ chunksize2 + mBufferPosition2 ]     + mBlockLastAndNextX[ chunksize2 + mBufferPosition2 ]
+          + mBlockLastAndNextY[ chunksize2 + mBufferPosition2 ]     + mBlockLastAndNextZ[ chunksize2 + mBufferPosition2 ];
           
-    spl1 += mBlockLastAndNextW[chunksize2+mBufferPosition2+1] + mBlockLastAndNextX[chunksize2+mBufferPosition2+1] 
-          + mBlockLastAndNextY[chunksize2+mBufferPosition2+1] + mBlockLastAndNextZ[chunksize2+mBufferPosition2+1];;
+    spl1 += mBlockLastAndNextW[ chunksize2 + mBufferPosition2 + 1 ] + mBlockLastAndNextX[ chunksize2 + mBufferPosition2 + 1 ] 
+          + mBlockLastAndNextY[ chunksize2 + mBufferPosition2 + 1 ] + mBlockLastAndNextZ[ chunksize2 + mBufferPosition2 + 1 ];
   );
   
     
