@@ -90,13 +90,13 @@ kMaxNumSpeakers = 16;
 memCount   = 1024;
 
 mMatrixDSP = memCount; // kMaxNumSpeakers x 4 matrix as 1D array
-memCount   += kMaxNumSpeakers*4;
+memCount   += kMaxNumSpeakers * 4;
 
 mAngles  = memCount; // Azimuth angles for GUI display
 memCount += kMaxNumSpeakers;
 
 mLedCoordinates = memCount;
-memCount += 2*4*kNumLeds*kMaxNumSpeakers; // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
+memCount += 2 * 4 * kNumLeds * kMaxNumSpeakers; // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
  
 mPeaks = memCount;
 memCount += kMaxNumSpeakers;
@@ -105,8 +105,8 @@ mDisplayPeaks = memCount;
 memCount += kMaxNumSpeakers;
 
 // Zero max peak values at start
-memset(mPeaks,0,kMaxNumSpeakers);
-memset(mDisplayPeaks,0,kMaxNumSpeakers);
+memset( mPeaks, 0, kMaxNumSpeakers );
+memset( mDisplayPeaks, 0, kMaxNumSpeakers );
 
 // Graphics
 gfx_ext_retina = 1;
@@ -119,15 +119,15 @@ mRefreshSampCount = 0;
 mDoRefresh = 1;
 
 
-function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lAngleInc, lLedRadius, lLedRadInc, lLedCount)
+function calculateLedCoordinates() local( i, j, lAngleLo, lAngleMid, lAngleHi, lAngleInc, lLedRadius, lLedRadInc, lLedCount )
 (
   i = 0;
   
   // Angles in degrees
   lAngleInc = 360./mNumSpeakers;
-  lAngleLo  = 90. -         0.5 * mSpeakerLayout   * lAngleInc + 0.5 * mAngularDistance;
-  lAngleMid = 90. + (0.5 - (0.5 * mSpeakerLayout)) * lAngleInc;
-  lAngleHi  = 90. + (1.0 - (0.5 * mSpeakerLayout)) * lAngleInc - 0.5 * mAngularDistance;
+  lAngleLo  = 90. -           0.5 * mSpeakerLayout    * lAngleInc + 0.5 * mAngularDistance;
+  lAngleMid = 90. + ( 0.5 - ( 0.5 * mSpeakerLayout) ) * lAngleInc;
+  lAngleHi  = 90. + ( 1.0 - ( 0.5 * mSpeakerLayout) ) * lAngleInc - 0.5 * mAngularDistance;
   
   // Converted to radians
   lAngleInc = lAngleInc * kDeg2Rad;
@@ -135,7 +135,7 @@ function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lA
   lAngleMid = lAngleMid * kDeg2Rad;
   lAngleHi  = lAngleHi  * kDeg2Rad;  
   
-  lLedRadInc = (0.8*gRadius) / (2*kNumLeds+1);
+  lLedRadInc = ( 0.8 * gRadius ) / ( 2 * kNumLeds + 1 );
   lLedCount = 0;
   
   loop(mNumSpeakers,
@@ -147,18 +147,18 @@ function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lA
       // LED coordinates as convex poygon
       
       // Inner points;
-      mLedCoordinates[lLedCount]     =  gCenterX + cos(lAngleLo) * lLedRadius;
-      mLedCoordinates[lLedCount + 1] =  gCenterY - sin(lAngleLo) * lLedRadius;
-      mLedCoordinates[lLedCount + 2] =  gCenterX + cos(lAngleHi) * lLedRadius;
-      mLedCoordinates[lLedCount + 3] =  gCenterY - sin(lAngleHi) * lLedRadius;
+      mLedCoordinates[ lLedCount ]     =  gCenterX + cos( lAngleLo ) * lLedRadius;
+      mLedCoordinates[ lLedCount + 1 ] =  gCenterY - sin( lAngleLo ) * lLedRadius;
+      mLedCoordinates[ lLedCount + 2 ] =  gCenterX + cos( lAngleHi ) * lLedRadius;
+      mLedCoordinates[ lLedCount + 3 ] =  gCenterY - sin( lAngleHi ) * lLedRadius;
       lLedRadius += lLedRadInc;
       
       // Outer points
       
-      mLedCoordinates[lLedCount + 4] =  gCenterX + cos(lAngleHi) * lLedRadius;
-      mLedCoordinates[lLedCount + 5] =  gCenterY - sin(lAngleHi) * lLedRadius;
-      mLedCoordinates[lLedCount + 6] =  gCenterX + cos(lAngleLo) * lLedRadius;
-      mLedCoordinates[lLedCount + 7] =  gCenterY - sin(lAngleLo) * lLedRadius;
+      mLedCoordinates[ lLedCount + 4 ] =  gCenterX + cos( lAngleHi ) * lLedRadius;
+      mLedCoordinates[ lLedCount + 5 ] =  gCenterY - sin( lAngleHi ) * lLedRadius;
+      mLedCoordinates[ lLedCount + 6 ] =  gCenterX + cos( lAngleLo ) * lLedRadius;
+      mLedCoordinates[ lLedCount + 7 ] =  gCenterY - sin( lAngleLo ) * lLedRadius;
       lLedRadius += lLedRadInc;
       
       lLedCount += 8;
@@ -174,7 +174,7 @@ function calculateLedCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lA
 // Full redraw required if sliders 1 or 2 change
 function sliderHasChanged()
 (
-  (slider1 != mPrevSlider1 || slider2 != mPrevSlider2);
+  ( ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) );
 );
 
 
@@ -184,31 +184,31 @@ Updated slider value:
 @slider
 
 // Round off in case user types in a decimal value
-mNumSpeakers   = floor(slider1+0.5);
+mNumSpeakers   = floor( slider1 + 0.5 );
 
-mAngularDistance = 360./(2.*mNumSpeakers);
+mAngularDistance = 360. / ( 2. * mNumSpeakers );
 
 mSpeakerLayout = slider2;
 
 // Generate 16 x 4 decoding matrix
-generateDecodePantoMatrix(mMatrixDSP, mNumSpeakers, mSpeakerLayout);
+generateDecodePantoMatrix( mMatrixDSP, mNumSpeakers, mSpeakerLayout );
 
 // Clear peak buffers
-memset(mPeaks, 0., mNumSpeakers);
-memset(mDisplayPeaks, 0., mNumSpeakers);
+memset( mPeaks, 0., mNumSpeakers );
+memset( mDisplayPeaks, 0., mNumSpeakers );
 
-(slider3 == 0) ? (mPeakScalar = 0.02) :
-(slider3 == 1) ? (mPeakScalar = 0.03) :
-(slider3 == 2) ? (mPeakScalar = 0.05) :
-(slider3 == 3) ? (mPeakScalar = 0.10) :
-(slider3 == 4) ? (mPeakScalar = 0.20) :
-(slider3 == 5) ? (mPeakScalar = 0.30) :
-(slider3 == 6) ? (mPeakScalar = 0.50) :
-(slider3 == 7) ? (mPeakScalar = 1.00) :
-(slider3 == 8) ? (mPeakScalar = 3.00) :
-(slider3 == 9) ? (mPeakScalar = 6.00);
+( slider3 == 0 ) ? ( mPeakScalar = 0.02 ) :
+( slider3 == 1 ) ? ( mPeakScalar = 0.03 ) :
+( slider3 == 2 ) ? ( mPeakScalar = 0.05 ) :
+( slider3 == 3 ) ? ( mPeakScalar = 0.10 ) :
+( slider3 == 4 ) ? ( mPeakScalar = 0.20 ) :
+( slider3 == 5 ) ? ( mPeakScalar = 0.30 ) :
+( slider3 == 6 ) ? ( mPeakScalar = 0.50 ) :
+( slider3 == 7 ) ? ( mPeakScalar = 1.00 ) :
+( slider3 == 8 ) ? ( mPeakScalar = 3.00 ) :
+( slider3 == 9 ) ? ( mPeakScalar = 6.00 );
 
-mPeakScalar = pow( 0.5, 1.0/(mPeakScalar * srate));
+mPeakScalar = pow( 0.5, 1.0 / ( mPeakScalar * srate ) );
 
 
 /**********************************************************
@@ -216,13 +216,8 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
-// Make sure we can't have more channels than the track has
-// (Code resides here rather than in slider section in order to take action as soon as we know num_ch)
-(num_ch>0) ? (
-  mNumSpeakers = max(2, min(num_ch, mNumSpeakers));
-  slider1 = mNumSpeakers;
-  slider_automate(slider1);
-);
+// Test if track has sufficient number of channels
+mChannelWarning = testNumChannels( max( 4, mNumSpeakers ) );
 
 determineGeometry();
 
@@ -230,13 +225,13 @@ determineGeometry();
 gRadius -= 30 * gfx_ext_retina;
 
 // Only refresh background when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || sliderHasChanged() ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || sliderHasChanged() || ( mChannelWarning != mPrevChannelWarning) ) ? (
   drawLEDBackgroundImage( 2 );
   drawFuMa();
   setSpeakerPositionFont();
   calculateLedCoordinates();
   mDeltaSpeakerPos = 20 * gfx_ext_retina;
-  igfx=mNumSpeakers-1;
+  igfx = mNumSpeakers - 1;
   loop(mNumSpeakers,
     sprintf( spkStr, "%d", igfx + 1 );
     drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ igfx ] ), gCenterY - ( gRadius + mDeltaSpeakerPos  ) * sin( mAngles[ igfx ] ), spkStr, 2 );
@@ -247,14 +242,18 @@ gRadius -= 30 * gfx_ext_retina;
   mPrevSlider1 = slider1;
   mPrevSlider2 = slider2;
   
+  // Draw channel warning if needed
+  mChannelWarning ? drawChannelWarning( max( 4, mNumSpeakers ) );
+  mPrevChannelWarning = mChannelWarning;
+  
   mDoRefresh = 1;
 );
 
 // Draw LEDs for all speakers
-(mDoRefresh) ? (
-  igfx=0;
-  loop(mNumSpeakers,
-    drawSpkrLEDs(amp2db( mDisplayPeaks[ igfx ] ), igfx, mLedCoordinates );
+( mDoRefresh && !mChannelWarning ) ? (
+  igfx = 0;
+  loop( mNumSpeakers,
+    drawSpkrLEDs( amp2db( mDisplayPeaks[ igfx ] ), igfx, mLedCoordinates );
     mDisplayPeaks[ igfx ] = 0.;
     igfx += 1;
   );
@@ -268,7 +267,7 @@ Audio block pre-processing
 **********************************************************/
 @block
 
-(mRefreshSampCount > kRefreshRate*srate) ? (
+( mRefreshSampCount > kRefreshRate * srate ) ? (
   mDoRefresh = 1;
 ) : (
   mRefreshSampCount += samplesblock;
@@ -292,41 +291,34 @@ yIn = spl2;
 
 // Matrix multiplication with input signal, 2D so z can be ignored.
 
-spl0  = wIn * mMatrixDSP[0]  + xIn * mMatrixDSP[1]  + yIn * mMatrixDSP[2];
-spl1  = wIn * mMatrixDSP[4]  + xIn * mMatrixDSP[5]  + yIn * mMatrixDSP[6];
-      
-spl2  = wIn * mMatrixDSP[8]  + xIn * mMatrixDSP[9]  + yIn * mMatrixDSP[10];
-spl3  = wIn * mMatrixDSP[12] + xIn * mMatrixDSP[13] + yIn * mMatrixDSP[14];
-      
-spl4  = wIn * mMatrixDSP[16] + xIn * mMatrixDSP[17] + yIn * mMatrixDSP[18];
-spl5  = wIn * mMatrixDSP[20] + xIn * mMatrixDSP[21] + yIn * mMatrixDSP[22];
-      
-spl6  = wIn * mMatrixDSP[24] + xIn * mMatrixDSP[25] + yIn * mMatrixDSP[26];
-spl7  = wIn * mMatrixDSP[28] + xIn * mMatrixDSP[29] + yIn * mMatrixDSP[30];
-
-spl8  = wIn * mMatrixDSP[32] + xIn * mMatrixDSP[33] + yIn * mMatrixDSP[34];
-spl9  = wIn * mMatrixDSP[36] + xIn * mMatrixDSP[37] + yIn * mMatrixDSP[38];
-
-spl10 = wIn * mMatrixDSP[40] + xIn * mMatrixDSP[41] + yIn * mMatrixDSP[42];
-spl11 = wIn * mMatrixDSP[44] + xIn * mMatrixDSP[45] + yIn * mMatrixDSP[46];
-
-spl12 = wIn * mMatrixDSP[48] + xIn * mMatrixDSP[49] + yIn * mMatrixDSP[50];
-spl13 = wIn * mMatrixDSP[52] + xIn * mMatrixDSP[53] + yIn * mMatrixDSP[54];
-
-spl14 = wIn * mMatrixDSP[56] + xIn * mMatrixDSP[57] + yIn * mMatrixDSP[58];
-spl15 = wIn * mMatrixDSP[60] + xIn * mMatrixDSP[61] + yIn * mMatrixDSP[62];
+spl0  = wIn * mMatrixDSP[ 0 ]  + xIn * mMatrixDSP[ 1 ]  + yIn * mMatrixDSP[ 2 ];
+spl1  = wIn * mMatrixDSP[ 4 ]  + xIn * mMatrixDSP[ 5 ]  + yIn * mMatrixDSP[ 6 ];
+spl2  = wIn * mMatrixDSP[ 8 ]  + xIn * mMatrixDSP[ 9 ]  + yIn * mMatrixDSP[ 10 ];
+spl3  = wIn * mMatrixDSP[ 12 ] + xIn * mMatrixDSP[ 13 ] + yIn * mMatrixDSP[ 14 ];
+spl4  = wIn * mMatrixDSP[ 16 ] + xIn * mMatrixDSP[ 17 ] + yIn * mMatrixDSP[ 18 ];
+spl5  = wIn * mMatrixDSP[ 20 ] + xIn * mMatrixDSP[ 21 ] + yIn * mMatrixDSP[ 22 ];
+spl6  = wIn * mMatrixDSP[ 24 ] + xIn * mMatrixDSP[ 25 ] + yIn * mMatrixDSP[ 26 ];
+spl7  = wIn * mMatrixDSP[ 28 ] + xIn * mMatrixDSP[ 29 ] + yIn * mMatrixDSP[ 30 ];
+spl8  = wIn * mMatrixDSP[ 32 ] + xIn * mMatrixDSP[ 33 ] + yIn * mMatrixDSP[ 34 ];
+spl9  = wIn * mMatrixDSP[ 36 ] + xIn * mMatrixDSP[ 37 ] + yIn * mMatrixDSP[ 38 ];
+spl10 = wIn * mMatrixDSP[ 40 ] + xIn * mMatrixDSP[ 41 ] + yIn * mMatrixDSP[ 42 ];
+spl11 = wIn * mMatrixDSP[ 44 ] + xIn * mMatrixDSP[ 45 ] + yIn * mMatrixDSP[ 46 ];
+spl12 = wIn * mMatrixDSP[ 48 ] + xIn * mMatrixDSP[ 49 ] + yIn * mMatrixDSP[ 50 ];
+spl13 = wIn * mMatrixDSP[ 52 ] + xIn * mMatrixDSP[ 53 ] + yIn * mMatrixDSP[ 54 ];
+spl14 = wIn * mMatrixDSP[ 56 ] + xIn * mMatrixDSP[ 57 ] + yIn * mMatrixDSP[ 58 ];
+spl15 = wIn * mMatrixDSP[ 60 ] + xIn * mMatrixDSP[ 61 ] + yIn * mMatrixDSP[ 62 ];
 
 // Peak monitoring
 ispl = 0;
-loop(mNumSpeakers,
-  input = spl(ispl);
-  output = mPeaks[ispl];
-  input = abs(input);
+loop( mNumSpeakers,
+  input = spl( ispl );
+  output = mPeaks[ ispl ];
+  input = abs( input );
 
   // When we hit a peak, ride the peak to the top, else exponential decay
   ( input >= output ) ? (output = input) : (output = output * mPeakScalar);
-  mPeaks[ispl] = output;
-  mDisplayPeaks[ispl] = max(mDisplayPeaks[ispl], output);
+  mPeaks[ ispl ] = output;
+  mDisplayPeaks[ ispl ] = max( mDisplayPeaks[ ispl ], output );
   
   /* ext_nodenorm is not set in init. Hence we have denorm added to the input signal, 
      and do not have to bother about denorm issues here.

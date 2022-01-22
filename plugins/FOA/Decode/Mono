@@ -81,10 +81,10 @@ mPattern = slider3;
 mReturnMode = slider4;
 
 
-mNewW = (1. - mPattern) * sqrt(2.);
-mNewX = mPattern * cos(mAzi) * cos(mEle);
-mNewY = mPattern * sin(mAzi) * cos(mEle);
-mNewZ = mPattern * sin(mEle);
+mNewW = ( 1. - mPattern ) * sqrt( 2. );
+mNewX = mPattern * cos( mAzi ) * cos( mEle );
+mNewY = mPattern * sin( mAzi ) * cos( mEle );
+mNewZ = mPattern * sin( mEle );
 
 (mIsInitialised == 0) ?
 (
@@ -116,6 +116,10 @@ function plotPattern( anAngle ) // local (lAngle)
   mPlotPatternY = gCenterY - lRadius * cos( anAngle );
 );
 
+
+// Test if track has sufficient number of channels
+mChannelWarning = testNumChannels( 4 );
+
 determineGeometry();
 
 // Reset azimuth and spread on mouse click
@@ -136,13 +140,13 @@ mouse_cap == 1 ?
 );
 
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != lastSlider1 ) || ( slider2 != lastSlider2 ) || ( slider3 != lastSlider3 ) ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( slider3 != mPrevSlider3 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
   
   drawBackgroundImage( 2 );
   drawFuMa();
   
   // Force redraw of interaction circle
-  lastHHiglightCircle = -1;
+  mPrevHHiglightCircle = -1;
 
   // Draw microphone pattern
   i = 1;
@@ -156,15 +160,19 @@ mouse_cap == 1 ?
     gfx_lineto( mPlotPatternX, mPlotPatternY, 1.0 ); 
   );
   
-  mPrevWidth  = gfx_w;
-  mPrevHeight = gfx_h;
-  lastSlider1 = slider1;
-  lastSlider2 = slider2;
-  lastSlider3 = slider3;
+  // Draw channel warning if needed
+  mChannelWarning ? drawChannelWarning( 4 );
+  
+  mPrevWidth          = gfx_w;
+  mPrevHeight         = gfx_h;
+  mPrevSlider1        = slider1;
+  mPrevSlider2        = slider2;
+  mPrevSlider3        = slider3;
+  mPrevChannelWarning = mChannelWarning;
 );
 
-// Draw circle for interaction
-( mHiglightCircle != lastHHiglightCircle ) ? (
+// Redraw interaction circle when needed - avoid if channel warning
+( ( mHiglightCircle != mPrevHHiglightCircle ) && !mChannelWarning ) ? (
   
   // Draw circle for interaction, map vertical position to saturation, lightness and radius
   mCosAzi  = cos(mAzi);
@@ -192,7 +200,7 @@ mouse_cap == 1 ?
   
   drawInteractionCircle(mPosX, mPosY, mInteractionCircleRadius);
   
-  lastHHiglightCircle = mHiglightCircle;
+  mPrevHHiglightCircle = mHiglightCircle;
 );
 
 
@@ -206,10 +214,10 @@ mInverseSamplesblock = 1. / samplesblock;
 
 // Counter is called "ii" rather than "i" in order to ensure that we do not use the same counter here as in other sections
 
-mIncW = (mNewW - mW) * mInverseSamplesblock;
-mIncX = (mNewX - mX) * mInverseSamplesblock;
-mIncY = (mNewY - mY) * mInverseSamplesblock;
-mIncZ = (mNewZ - mZ) * mInverseSamplesblock;
+mIncW = ( mNewW - mW ) * mInverseSamplesblock;
+mIncX = ( mNewX - mX ) * mInverseSamplesblock;
+mIncY = ( mNewY - mY ) * mInverseSamplesblock;
+mIncZ = ( mNewZ - mZ ) * mInverseSamplesblock;
 
 
 /**********************************************************

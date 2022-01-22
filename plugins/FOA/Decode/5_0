@@ -85,17 +85,17 @@ mAngles = memCount;
 memCount += kMaxNumSpeakers;
 
 mLedCoordinates = memCount;
-memCount += 2*4*kNumLeds*kMaxNumSpeakers; // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
+memCount += 2 * 4 * kNumLeds * kMaxNumSpeakers; // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
  
 mPeaks = memCount;
-memCount += kMaxNumSpeakers+1; // Also reserving slot for unused LFE
+memCount += kMaxNumSpeakers + 1; // Also reserving slot for unused LFE
 
 mDisplayPeaks = memCount;
-memCount += kMaxNumSpeakers+1; // Also reserving slot for unused LFE
+memCount += kMaxNumSpeakers + 1; // Also reserving slot for unused LFE
 
 // Zero max peak values at start
-memset(mPeaks,0,kMaxNumSpeakers+1);
-memset(mDisplayPeaks,0,kMaxNumSpeakers+1);
+memset( mPeaks, 0, kMaxNumSpeakers + 1 );
+memset( mDisplayPeaks, 0, kMaxNumSpeakers + 1 );
 
 // Graphics
 gfx_ext_retina = 1;
@@ -112,7 +112,7 @@ function calculateLedCoordinates(aLedCount, anAngleLo, anAngleHi) local (lLedRad
 (
   // LED coordinates as convex poygon  
   lLedRadius = gRadius * 0.2;
-  lLedRadInc = (0.8*gRadius) / (2*kNumLeds+1);
+  lLedRadInc = ( 0.8 * gRadius ) / ( 2 * kNumLeds + 1 );
   loop(kNumLeds,
     
     // LED coordinates as convex poygon
@@ -145,34 +145,34 @@ function calculateCoordinates() local(i, j, lAngleLo, lAngleMid, lAngleHi, lAngl
   lLedCount = 0;
   
   // Left
-  mAngles[0] = 120 * kDeg2Rad;
-  lAngleLo   = 110 * kDeg2Rad;
-  lAngleHi   = 130 * kDeg2Rad;
-  lLedCount  = calculateLedCoordinates(lLedCount, lAngleLo, lAngleHi);
+  mAngles[ 0 ] = 120 * kDeg2Rad;
+  lAngleLo     = 110 * kDeg2Rad;
+  lAngleHi     = 130 * kDeg2Rad;
+  lLedCount    = calculateLedCoordinates( lLedCount, lAngleLo, lAngleHi );
   
   // Right
-  mAngles[1] =  60 * kDeg2Rad;
-  lAngleLo   =  50 * kDeg2Rad;
-  lAngleHi   =  70 * kDeg2Rad;
-  lLedCount  = calculateLedCoordinates(lLedCount, lAngleLo, lAngleHi);
+  mAngles[ 1 ] =  60 * kDeg2Rad;
+  lAngleLo     =  50 * kDeg2Rad;
+  lAngleHi     =  70 * kDeg2Rad;
+  lLedCount    = calculateLedCoordinates( lLedCount, lAngleLo, lAngleHi );
   
   // Center
-  mAngles[2] =  90 * kDeg2Rad;
-  lAngleLo   =  80 * kDeg2Rad;
-  lAngleHi   = 100 * kDeg2Rad;
-  lLedCount  = calculateLedCoordinates(lLedCount, lAngleLo, lAngleHi);
+  mAngles[ 2 ] =  90 * kDeg2Rad;
+  lAngleLo     =  80 * kDeg2Rad;
+  lAngleHi     = 100 * kDeg2Rad;
+  lLedCount    = calculateLedCoordinates( lLedCount, lAngleLo, lAngleHi );
   
   // Sur Left
-  mAngles[3] = 200 * kDeg2Rad;
-  lAngleLo   = 180 * kDeg2Rad;
-  lAngleHi   = 220 * kDeg2Rad;
-  lLedCount  = calculateLedCoordinates(lLedCount, lAngleLo, lAngleHi);
+  mAngles[ 3 ] = 200 * kDeg2Rad;
+  lAngleLo     = 180 * kDeg2Rad;
+  lAngleHi     = 220 * kDeg2Rad;
+  lLedCount    = calculateLedCoordinates( lLedCount, lAngleLo, lAngleHi );
   
   // Sur Right
-  mAngles[4] = 340 * kDeg2Rad;
-  lAngleLo   = 320 * kDeg2Rad;
-  lAngleHi   = 360 * kDeg2Rad;
-  lLedCount  = calculateLedCoordinates(lLedCount, lAngleLo, lAngleHi);
+  mAngles[ 4 ] = 340 * kDeg2Rad;
+  lAngleLo     = 320 * kDeg2Rad;
+  lAngleHi     = 360 * kDeg2Rad;
+  lLedCount    = calculateLedCoordinates( lLedCount, lAngleLo, lAngleHi );
 );
 
 
@@ -194,18 +194,18 @@ slider1 == 0 ? (
   );
 );
                  
-(slider2 == 0) ? (mPeakScalar = 0.02) :
-(slider2 == 1) ? (mPeakScalar = 0.03) :
-(slider2 == 2) ? (mPeakScalar = 0.05) :
-(slider2 == 3) ? (mPeakScalar = 0.10) :
-(slider2 == 4) ? (mPeakScalar = 0.20) :
-(slider2 == 5) ? (mPeakScalar = 0.30) :
-(slider2 == 6) ? (mPeakScalar = 0.50) :
-(slider2 == 7) ? (mPeakScalar = 1.00) :
-(slider2 == 8) ? (mPeakScalar = 3.00) :
-(slider2 == 9) ? (mPeakScalar = 6.00);
+( slider2 == 0 ) ? ( mPeakScalar = 0.02 ) :
+( slider2 == 1 ) ? ( mPeakScalar = 0.03 ) :
+( slider2 == 2 ) ? ( mPeakScalar = 0.05 ) :
+( slider2 == 3 ) ? ( mPeakScalar = 0.10 ) :
+( slider2 == 4 ) ? ( mPeakScalar = 0.20 ) :
+( slider2 == 5 ) ? ( mPeakScalar = 0.30 ) :
+( slider2 == 6 ) ? ( mPeakScalar = 0.50 ) :
+( slider2 == 7 ) ? ( mPeakScalar = 1.00 ) :
+( slider2 == 8 ) ? ( mPeakScalar = 3.00 ) :
+( slider2 == 9 ) ? ( mPeakScalar = 6.00 );
 
-mPeakScalar = pow( 0.5, 1.0/(mPeakScalar * srate));
+mPeakScalar = pow( 0.5, 1.0/( mPeakScalar * srate ) );
 
 
 /**********************************************************
@@ -213,13 +213,16 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
+// Test if track has sufficient number of channels
+mChannelWarning = testNumChannels( 6 );
+
 determineGeometry();
 
 // Reduce circle radius
 gRadius -= 30 * gfx_ext_retina;
 
 // Only refresh background when needed
-geometryHasChanged( mPrevWidth, mPrevHeight ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( mChannelWarning != mPrevChannelWarning) ) ? (
   drawLEDBackgroundImage( 2 );
   drawFuMa();
   setSpeakerPositionFont();
@@ -236,11 +239,15 @@ geometryHasChanged( mPrevWidth, mPrevHeight ) ? (
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;
   
+  // Draw channel warning if needed
+  mChannelWarning ? drawChannelWarning( 6 );
+  mPrevChannelWarning = mChannelWarning;
+  
   mDoRefresh = 1;
 );
 
 // Draw LEDs for all speakers
-( mDoRefresh ) ? (
+( mDoRefresh && !mChannelWarning ) ? (
   drawSpkrLEDs( amp2db( mDisplayPeaks[ 0 ] ), 0, mLedCoordinates );
   drawSpkrLEDs( amp2db( mDisplayPeaks[ 1 ] ), 1, mLedCoordinates );
   drawSpkrLEDs( amp2db( mDisplayPeaks[ 2 ] ), 2, mLedCoordinates );
@@ -283,34 +290,34 @@ zIn = spl3;
 // Matrix multiplication with input signal.
 
 // Front (left and right)
-spl0 = wIn * matrixDSP[0]  + xIn * matrixDSP[1]  + yIn * matrixDSP[2]  + zIn * matrixDSP[3];
-spl1 = wIn * matrixDSP[4]  + xIn * matrixDSP[5]  + yIn * matrixDSP[6]  + zIn * matrixDSP[7];
+spl0 = wIn * matrixDSP[ 0 ]  + xIn * matrixDSP[ 1 ]  + yIn * matrixDSP[ 2 ]  + zIn * matrixDSP[ 3 ];
+spl1 = wIn * matrixDSP[ 4 ]  + xIn * matrixDSP[ 5 ]  + yIn * matrixDSP[ 6 ]  + zIn * matrixDSP[ 7 ];
 
 // Center & LFE
-spl2 = wIn * matrixDSP[8]  + xIn * matrixDSP[9]  + yIn * matrixDSP[10] + zIn * matrixDSP[11];
-spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14] + zIn * matrixDSP[15];
+spl2 = wIn * matrixDSP[ 8 ]  + xIn * matrixDSP[ 9 ]  + yIn * matrixDSP[ 10 ] + zIn * matrixDSP[ 11 ];
+spl3 = wIn * matrixDSP[ 12 ] + xIn * matrixDSP[ 13 ] + yIn * matrixDSP[ 14 ] + zIn * matrixDSP[ 15 ];
 
 // Surround
-spl4 = wIn * matrixDSP[16] + xIn * matrixDSP[17] + yIn * matrixDSP[18] + zIn * matrixDSP[19];
-spl5 = wIn * matrixDSP[20] + xIn * matrixDSP[21] + yIn * matrixDSP[22] + zIn * matrixDSP[23];
+spl4 = wIn * matrixDSP[ 16 ] + xIn * matrixDSP[ 17 ] + yIn * matrixDSP[1 8 ] + zIn * matrixDSP[ 1 9];
+spl5 = wIn * matrixDSP[ 20 ] + xIn * matrixDSP[ 21 ] + yIn * matrixDSP[2 2 ] + zIn * matrixDSP[ 2 3];
 
 // Surround back
-spl6 = wIn * matrixDSP[24] + xIn * matrixDSP[25] + yIn * matrixDSP[26] + zIn * matrixDSP[27];
-spl7 = wIn * matrixDSP[28] + xIn * matrixDSP[29] + yIn * matrixDSP[30] + zIn * matrixDSP[31];
+spl6 = wIn * matrixDSP[ 24 ] + xIn * matrixDSP[ 25 ] + yIn * matrixDSP[ 26 ] + zIn * matrixDSP[ 27 ];
+spl7 = wIn * matrixDSP[ 28 ] + xIn * matrixDSP[ 29 ] + yIn * matrixDSP[ 30 ] + zIn * matrixDSP[ 31 ];
 
 
 
 // Peak monitoring
 ispl = 0;
-loop(6,
-  input = spl(ispl);
-  output = mPeaks[ispl];
-  input = abs(input);
+loop( 6,
+  input  = spl( ispl );
+  output = mPeaks[ ispl ];
+  input  = abs( input );
 
   // When we hit a peak, ride the peak to the top, else exponential decay
-  ( input >= output ) ? (output = input) : (output = output * mPeakScalar);
-  mPeaks[ispl] = output;
-  mDisplayPeaks[ispl] = max(mDisplayPeaks[ispl], output);
+  ( input >= output ) ? ( output = input ) : ( output = output * mPeakScalar );
+  mPeaks[ ispl ] = output;
+  mDisplayPeaks[ ispl ] = max( mDisplayPeaks[ ispl ], output );
   
   /* ext_nodenorm is not set in init. Hence we have denorm added to the input signal, 
      and do not have to bother about denorm issues here.

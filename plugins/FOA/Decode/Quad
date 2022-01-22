@@ -214,13 +214,16 @@ Graphics
 **********************************************************/
 @gfx 500 500
 
+// Test if track has sufficient number of channels
+mChannelWarning = testNumChannels( 4 );
+
 determineGeometry();
 
 // Reduce circle radius
 gRadius -= 30 * gfx_ext_retina;
 
 // Only refresh background when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( mDegAngle != mPrevDegAngle ) ) ? (
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( mDegAngle != mPrevDegAngle ) || ( mChannelWarning != mPrevChannelWarning) ) ? (
   drawLEDBackgroundImage( 2 );
   drawFuMa();
   setSpeakerPositionFont();
@@ -236,12 +239,16 @@ gRadius -= 30 * gfx_ext_retina;
   mPrevWidth    = gfx_w;
   mPrevHeight   = gfx_h;
   mPrevDegAngle = mDegAngle;
-  
+
+  // Draw channel warning if needed
+  mChannelWarning ? drawChannelWarning( 4 );
+  mPrevChannelWarning = mChannelWarning;
+    
   mDoRefresh = 1;
 );
 
 // Draw LEDs for all speakers
-( mDoRefresh ) ? (
+( mDoRefresh && !mChannelWarning ) ? (
   drawSpkrLEDs( amp2db( mDisplayPeaks[ 0 ] ), 0, mLedCoordinates );
   drawSpkrLEDs( amp2db( mDisplayPeaks[ 1 ] ), 1, mLedCoordinates );
   drawSpkrLEDs( amp2db( mDisplayPeaks[ 2 ] ), 2, mLedCoordinates );
