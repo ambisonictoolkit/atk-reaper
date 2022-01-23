@@ -141,8 +141,10 @@ mChannelWarning = testNumChannels( max( 4, mNumSpeakers ) );
 
   determineGeometry();
 
-  // Reduce circle radius
-  gRadius -= 30 * gfx_ext_retina;
+  // Reduce circle radius, but not if UI is small
+  ( !gResponsive ) ? (
+    gRadius -= 30 * gfx_ext_retina;
+  );
 
   drawBackgroundImage( 0 );
   drawFuMa();
@@ -157,8 +159,10 @@ mChannelWarning = testNumChannels( max( 4, mNumSpeakers ) );
   loop(mNumSpeakers,
     gainToColor( 0., -24., 6., 0. );
     drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ),  gCenterY - gRadius * cos( mSpeakerAzi ),  0., 1.);
-    sprintf(speakerLabel,"%i", i); 
-    drawSpeakerPositiion( gCenterX - ( gRadius + 20 * gfx_ext_retina ) * sin( mSpeakerAzi ),  gCenterY - ( gRadius + 20 * gfx_ext_retina ) * cos( mSpeakerAzi ),  speakerLabel, 0);
+    sprintf(speakerLabel,"%i", i);
+    ( !gResponsive ) ? (
+      drawSpeakerPositiion( gCenterX - ( gRadius + 20 * gfx_ext_retina ) * sin( mSpeakerAzi ),  gCenterY - ( gRadius + 20 * gfx_ext_retina ) * cos( mSpeakerAzi ),  speakerLabel, 0);
+    );
     mSpeakerAzi += mSpeakerAziDelta;
     i += 1;
   );

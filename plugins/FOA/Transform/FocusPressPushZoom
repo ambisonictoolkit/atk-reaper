@@ -294,9 +294,6 @@ debugMode == 0 ?
   // Set colors
   determineGeometry();
   
-  // Radius of interaction circle
-  kInteractionCircleRadius = 11. * gfx_ext_retina;
-  
   // Only update plugin parameters if the user click and drag interaction circle
   mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
   
@@ -371,7 +368,7 @@ debugMode == 0 ?
     // Position and radius depends on azimuth and elevation
     mPosX = gCenterX - gRadius * mNormTransformAngle * ( mSinAzimuth * mCosElevation );
     mPosY = gCenterY - gRadius * mNormTransformAngle * ( mCosAzimuth * mCosElevation );
-    mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
+    mInteractionCircleRadius = radiusWthElevation( gInteractionCircleRadius, mElevation );
     
     drawInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
     

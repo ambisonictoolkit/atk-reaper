@@ -165,10 +165,10 @@ Custom graphic interface
 
 mChannelWarning = testNumChannels( mNumSpeakerPairs * 2 );
 
+determineGeometry();
+
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( slider3 != mPrevSlider3 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
-  
-  determineGeometry();
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( slider3 != mPrevSlider3 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (  
   drawBackgroundImage( 0 );
   drawFuMa();
 

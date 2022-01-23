@@ -158,9 +158,6 @@ mChannelWarning = testNumChannels( 4 );
 
 determineGeometry();
 
-// Radius of interaction circle
-mInteractionCircleRadius = 11. * gfx_ext_retina;
-
 // Only update plugin parameters if the user click and drag interaction circle
 mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
 
@@ -216,13 +213,21 @@ mPreviousMouseCap = mouse_cap;
 
 // Redraw interaction circle when needed - avoid if channel warning
 ( ( mHiglightCircle != mPrevHHiglightCircle ) && !mChannelWarning ) ? (
-  
+    
   // Color depends on elevation, mouseClick and mouseHover
-  gxColorSetHsl( 1.0, 195., 1., 0.4 + 0.15 * mHiglightCircle );
+  mSinElevation < 0 ? (
+    mSaturation = 1. - 0.25 * mSinElevation;
+    mLightness = 0.4;
+  ) : (
+    mSaturation = 1.;
+    mLightness = 0.4 + 0.25 * mSinElevation;
+  );
+  gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15 * mHiglightCircle );
   
-  // Calculate absolute position of interaction circle
+  // Position and radius depends on elevation
   mPosX = gCenterX - gRadius * ( 1. - mNormTransformAngle ) * sin( mAzimuth );
   mPosY = gCenterY - gRadius * ( 1. - mNormTransformAngle ) * cos( mAzimuth );
+  mInteractionCircleRadius = radiusWthElevation( gInteractionCircleRadius, mElevation );
   
   // Draw line from centre to interaciton circle
   drawLineSegment( gCenterX, gCenterY, mPosX, mPosY, 1. );

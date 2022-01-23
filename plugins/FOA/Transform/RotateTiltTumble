@@ -60,9 +60,6 @@ Initialisation
 **********************************************************/
 @init
 
-// Graphics constants:
-mInteractionCircleRadius = 11.;
-
 // Flag indicating that the plugin has not been fully mInitialised yet
 mInitialised = 0;
 
@@ -162,12 +159,9 @@ mChannelWarning = testNumChannels( 4 );
 // Track geometry and draw background
 determineGeometry();
 
-// Radius of interaction circle
-mInteractionCircleRadius = 11. * gfx_ext_retina;
-
 // --- MOUSE INTERACTION - there are 7 possible cases
 
-mClickingAtRotateCircle = clickingOnInteractionCircle( mPreviousMouseCap, mPosRotateX, mPosRotateY, mInteractionCircleRadius, mClickingAtRotateCircle );
+mClickingAtRotateCircle = clickingOnInteractionCircle( mPreviousMouseCap, mPosRotateX, mPosRotateY, gInteractionCircleRadius, mClickingAtRotateCircle );
 
 mClickingAtRotateCircle ?
 (
@@ -192,7 +186,7 @@ mClickingAtRotateCircle ?
   mHiglightTumbleCircle   = 0;
 ) :
 (  
-  mClickingAtTiltCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosTiltX, mPosTiltY, mInteractionCircleRadius, mClickingAtTiltCircle);
+  mClickingAtTiltCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosTiltX, mPosTiltY, gInteractionCircleRadius, mClickingAtTiltCircle);
   
   mClickingAtTiltCircle ?
   (
@@ -226,7 +220,7 @@ mClickingAtRotateCircle ?
     mHiglightTumbleCircle   = 0;
   ) :
   (
-    mClickingAtTumbleCircle = clickingOnInteractionCircle( mPreviousMouseCap, mPosTumbleX, mPosTumbleY, mInteractionCircleRadius, mClickingAtTumbleCircle );
+    mClickingAtTumbleCircle = clickingOnInteractionCircle( mPreviousMouseCap, mPosTumbleX, mPosTumbleY, gInteractionCircleRadius, mClickingAtTumbleCircle );
     
     mClickingAtTumbleCircle ?
     (
@@ -255,7 +249,7 @@ mClickingAtRotateCircle ?
       mHiglightTiltCircle   = 0;
       mHiglightTumbleCircle = 1;
     ) : (
-      mHiglightRotateCircle = hoverOverInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius );
+      mHiglightRotateCircle = hoverOverInteractionCircle( mPosRotateX, mPosRotateY, gInteractionCircleRadius );
       
       mHiglightRotateCircle ?
       (  
@@ -266,7 +260,7 @@ mClickingAtRotateCircle ?
         mHiglightTumbleCircle = 0;
       ) :
       (
-        mHiglightTiltCircle = hoverOverInteractionCircle( mPosTiltX, mPosTiltY, mInteractionCircleRadius );
+        mHiglightTiltCircle = hoverOverInteractionCircle( mPosTiltX, mPosTiltY, gInteractionCircleRadius );
         
         mHiglightTiltCircle ?
         (  
@@ -279,7 +273,7 @@ mClickingAtRotateCircle ?
         ) : (
           // --- Case 6: Hovering over tumble circle AND // Case 7: Mouse is neither click-dragging nor hovering
           
-          mHiglightTumbleCircle = hoverOverInteractionCircle( mPosTumbleX, mPosTumbleY, mInteractionCircleRadius );
+          mHiglightTumbleCircle = hoverOverInteractionCircle( mPosTumbleX, mPosTumbleY, gInteractionCircleRadius );
         );
       ); 
     );
@@ -393,19 +387,19 @@ mPreviousMouseCap = mouse_cap;
     mPosTumbleY = gCenterY - mTumbleAngle * kRad2Norm * gRadius;
 
     gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTumbleCircle );
-    drawInteractionCircle( mPosTumbleX, mPosTumbleY, mInteractionCircleRadius );
+    drawInteractionCircle( mPosTumbleX, mPosTumbleY, gInteractionCircleRadius );
 
     gxColorSetHsl( 1.0, 195., 1.0, 0.4 );
     gxColorSet( 1.0, 0.8, 0.8, 0.8 );
 
-    drawLineSegment( mPosTumbleX,       mPosTumbleY - mInteractionCircleRadius + 5,
-                     mPosTumbleX,       mPosTumbleY + mInteractionCircleRadius - 5, 1 );
+    drawLineSegment( mPosTumbleX,       mPosTumbleY - gInteractionCircleRadius + 5,
+                     mPosTumbleX,       mPosTumbleY + gInteractionCircleRadius - 5, 1 );
                  
-    drawLineSegment( mPosTumbleX - 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
-                     mPosTumbleX - 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
+    drawLineSegment( mPosTumbleX - 1.0, mPosTumbleY - gInteractionCircleRadius + 5,
+                     mPosTumbleX - 1.0, mPosTumbleY + gInteractionCircleRadius - 5, 1 );
 
-    drawLineSegment( mPosTumbleX + 1.0, mPosTumbleY - mInteractionCircleRadius + 5,
-                     mPosTumbleX + 1.0, mPosTumbleY + mInteractionCircleRadius - 5, 1 );
+    drawLineSegment( mPosTumbleX + 1.0, mPosTumbleY - gInteractionCircleRadius + 5,
+                     mPosTumbleX + 1.0, mPosTumbleY + gInteractionCircleRadius - 5, 1 );
 
 
     // --- TILT INTERACTION CIRCLE (we need to draw the circles so that Rotation is on top)
@@ -416,19 +410,19 @@ mPreviousMouseCap = mouse_cap;
     mPosTiltY = gCenterY - 25. * gfx_ext_retina;
 
     gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightTiltCircle );
-    drawInteractionCircle( gCenterX + mTiltAngle * kRad2Norm * gRadius, gCenterY - 25. * gfx_ext_retina, mInteractionCircleRadius );
+    drawInteractionCircle( gCenterX + mTiltAngle * kRad2Norm * gRadius, gCenterY - 25. * gfx_ext_retina, gInteractionCircleRadius );
 
     // Draw grey horisontal inner line
     gxColorSet(1.0, 0.8, 0.8, 0.8);
 
-    drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY - 1,
-                     mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY - 1, 1 );
+    drawLineSegment( mPosTiltX - gInteractionCircleRadius + 5, mPosTiltY - 1,
+                     mPosTiltX + gInteractionCircleRadius - 5, mPosTiltY - 1, 1 );
 
-    drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY + 1,
-                     mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY + 1, 1 );
+    drawLineSegment( mPosTiltX - gInteractionCircleRadius + 5, mPosTiltY + 1,
+                     mPosTiltX + gInteractionCircleRadius - 5, mPosTiltY + 1, 1 );
                  
-    drawLineSegment( mPosTiltX - mInteractionCircleRadius + 5, mPosTiltY,
-                     mPosTiltX + mInteractionCircleRadius - 5, mPosTiltY, 1 );
+    drawLineSegment( mPosTiltX - gInteractionCircleRadius + 5, mPosTiltY,
+                     mPosTiltX + gInteractionCircleRadius - 5, mPosTiltY, 1 );
                 
                 
     // --- ROTATION INTERACTION CIRCLE
@@ -438,11 +432,11 @@ mPreviousMouseCap = mouse_cap;
     mPosRotateY = gCenterY - gRadius * mCosRotation;
   
     gxColorSetHsl( 1.0, 195., 1.0, 0.4 + 0.15 * mHiglightRotateCircle );
-    drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius );
+    drawInteractionCircle( mPosRotateX, mPosRotateY, gInteractionCircleRadius );
   
     // Draw inner gray circle
     gxColorSet( 1.0, 0.8, 0.8, 0.8 );
-    drawInteractionCircle( mPosRotateX, mPosRotateY, mInteractionCircleRadius - 7 * gfx_ext_retina );
+    drawInteractionCircle( mPosRotateX, mPosRotateY, gInteractionCircleRadius - 7 * gfx_ext_retina );
   );
 
   mPrevWidth  = gfx_w;

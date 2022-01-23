@@ -170,9 +170,6 @@ mChannelWarning = testNumChannels( 4 );
 
 determineGeometry();
 
-// Radius of interaction circle
-kInteractionCircleRadius = 11. * gfx_ext_retina;
-
 // Only update plugin parameters if the user click and drag interaction circle
 mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
 
@@ -244,7 +241,7 @@ mPreviousMouseCap = mouse_cap;
   // Position and radius depends on elevation
   mPosX = gCenterX - gRadius * slider3 * kInv24 * ( mSinAzimuth * mCosElevation );
   mPosY = gCenterY - gRadius * slider3 * kInv24 * ( mCosAzimuth * mCosElevation );
-  mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
+  mInteractionCircleRadius = radiusWthElevation( gInteractionCircleRadius, mElevation );
   
   drawInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
   

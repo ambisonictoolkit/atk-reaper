@@ -93,7 +93,7 @@ matrixMirrorRotatedInterpreted  = 1760;
 
 // Display points only needs to be generated once:
 mNumDisplayedPoints = 24;
-generateDisplaySignalMatrix(matrixDisplayPoints, mNumDisplayedPoints);
+generateDisplaySignalMatrix( matrixDisplayPoints, mNumDisplayedPoints );
 
 // We'll display non-transformed points as well, and hence they need to be interpreted.
 interpreteProcessedPoints(matrixDisplayNonTransformedInterpreted, matrixDisplayPoints, mNumDisplayedPoints);
@@ -247,37 +247,40 @@ function setInteractionColorWithDepth(aZpos, anIsHighlighted) local(lSaturation,
 
 function postBefore() local( lStrWidth, lStringHeight )
 (
-  setBeforeFontColor();
-  gfx_measurestr( "Before", lStrWidth, lStringHeight );
-  gxPositionSet( gfx_w - 20. * gfx_ext_retina - lStrWidth, 20. * gfx_ext_retina );
-  gfx_drawstr( "Before" );
+  ( !gResponsive ) ? (
+    setBeforeFontColor();
+    gfx_measurestr( "Before", lStrWidth, lStringHeight );
+    gxPositionSet( gfx_w - 20. * gfx_ext_retina - lStrWidth, 20. * gfx_ext_retina );
+    gfx_drawstr( "Before" );
+);
 );
 
 
 function postMirror(anIsHighlighted) local( lStrWidth, lStringHeight )
 (
-  setInteractionColor(anIsHighlighted);
-  gfx_measurestr( "Mirror", lStrWidth, lStringHeight );
-  gxPositionSet( gfx_w - 20. * gfx_ext_retina - lStrWidth, 42. * gfx_ext_retina );
-  gfx_drawstr( "Mirror" );
+  ( !gResponsive ) ? (
+    setInteractionColor(anIsHighlighted);
+    gfx_measurestr( "Mirror", lStrWidth, lStringHeight );
+    gxPositionSet( gfx_w - 20. * gfx_ext_retina - lStrWidth, 42. * gfx_ext_retina );
+    gfx_drawstr( "Mirror" );
+  );
 );
 
 
 function postAfter() local( lStrWidth, lStringHeight )
 (
-  setAfterColor();
-  gfx_measurestr( "After", lStrWidth, lStringHeight );
-  gxPositionSet( gfx_w - 20. * gfx_ext_retina - lStrWidth, 64. * gfx_ext_retina );
-  gfx_drawstr( "After" );
+  ( !gResponsive ) ? (
+    setAfterColor();
+    gfx_measurestr( "After", lStrWidth, lStringHeight );
+    gxPositionSet( gfx_w - 20. * gfx_ext_retina - lStrWidth, 64. * gfx_ext_retina );
+    gfx_drawstr( "After" );
+  );
 );
 
 
 mChannelWarning = testNumChannels( 4 );
 
 determineGeometry();
-
-// Radius of interaction circle
-kInteractionCircleRadius = 11. * gfx_ext_retina;
 
 // Only update plugin parameters if the user click and drag interaction circle
 mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
@@ -330,13 +333,15 @@ mPreviousMouseCap = mouse_cap;
     mPos4y = gCenterY - matrixMirrorRotatedInterpreted[ 3 ] * ( 1. + 0.2 * matrixMirrorRotatedInterpreted[ 15 ] ) * gRadius * kSqrt2;
 
     // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-    drawQuadrangleOutline( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, mPos3x + 1.5, mPos3y + 1.5, mPos4x + 1.5, mPos4y + 1.5, 1. );
-    drawQuadrangleOutline( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, mPos3x + 1.0, mPos3y + 1.0, mPos4x + 1.0, mPos4y + 1.0, 1. );
     drawQuadrangleOutline( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, mPos3x + 0.5, mPos3y + 0.5, mPos4x + 0.5, mPos4y + 0.5, 1. );
     drawQuadrangleOutline( mPos1x      , mPos1y      , mPos2x      , mPos2y      , mPos3x      , mPos3y      , mPos4x      , mPos4y      , 1.);
     drawQuadrangleOutline( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, mPos3x - 0.5, mPos3y - 0.5, mPos4x - 0.5, mPos4y - 0.5, 1. );
-    drawQuadrangleOutline( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, mPos3x - 1.0, mPos3y - 1.0, mPos4x - 1.0, mPos4y - 1.0, 1. );
-    drawQuadrangleOutline( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, mPos3x - 1.5, mPos3y - 1.5, mPos4x - 1.5, mPos4y - 1.5, 1. );
+    ( !gResponsive ) ? (
+      drawQuadrangleOutline( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, mPos3x + 1.5, mPos3y + 1.5, mPos4x + 1.5, mPos4y + 1.5, 1. );
+      drawQuadrangleOutline( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, mPos3x + 1.0, mPos3y + 1.0, mPos4x + 1.0, mPos4y + 1.0, 1. );
+      drawQuadrangleOutline( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, mPos3x - 1.0, mPos3y - 1.0, mPos4x - 1.0, mPos4y - 1.0, 1. );
+      drawQuadrangleOutline( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, mPos3x - 1.5, mPos3y - 1.5, mPos4x - 1.5, mPos4y - 1.5, 1. );
+    );
 
     // Draw line at intersection between horisontal plane and mirror plane
     mPos1x = gCenterX - matrixMirrorRotatedInterpreted[ 10 ] * gRadius;
@@ -346,13 +351,15 @@ mPreviousMouseCap = mouse_cap;
     mPos2y = gCenterY - matrixMirrorRotatedInterpreted[  5 ] * gRadius;
 
     // Drawing twice to get thicker lines (as JS does not support adjustable line thickness)
-    drawLineSegment( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, 1. );
-    drawLineSegment( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, 1. );
     drawLineSegment( mPos1x + 0.5, mPos1y + 0.5, mPos2x + 0.5, mPos2y + 0.5, 1. );
     drawLineSegment( mPos1x      , mPos1y      , mPos2x      , mPos2y      , 1. );
     drawLineSegment( mPos1x - 0.5, mPos1y - 0.5, mPos2x - 0.5, mPos2y - 0.5, 1. );
-    drawLineSegment( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, 1. );
-    drawLineSegment( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, 1. );
+    ( !gResponsive ) ? (
+      drawLineSegment( mPos1x + 1.5, mPos1y + 1.5, mPos2x + 1.5, mPos2y + 1.5, 1. );
+      drawLineSegment( mPos1x + 1.0, mPos1y + 1.0, mPos2x + 1.0, mPos2y + 1.0, 1. );
+      drawLineSegment( mPos1x - 1.0, mPos1y - 1.0, mPos2x - 1.0, mPos2y - 1.0, 1. );
+      drawLineSegment( mPos1x - 1.5, mPos1y - 1.5, mPos2x - 1.5, mPos2y - 1.5, 1. );
+    );
   );
   postMirror( mHiglightCircle );
 
@@ -381,7 +388,11 @@ mPreviousMouseCap = mouse_cap;
   
     // Draw small point where beam intersects mirror
     setInteractionColorWithDepth( mPos2z, mHiglightCircle );
-    gfx_circle( mPos2x, mPos2y, ( 2.5 + 1.4 * mPos2z ) * gfx_ext_retina, 1 );
+    ( gResponsive ) ? (
+      gfx_circle( mPos2x, mPos2y, ( 1.2 + 0.6 * mPos2z ) * gfx_ext_retina, 1 );
+    ) : (
+      gfx_circle( mPos2x, mPos2y, ( 2.5 + 1.4 * mPos2z ) * gfx_ext_retina, 1 );
+    );
   
     // Draw second part of line
     // TODO: Optmise, with current use of colors there is no need to draw this as two sections
@@ -432,7 +443,8 @@ mPreviousMouseCap = mouse_cap;
     );
     gxColorSetHsl(1.0, 195., mSaturation, mLightness + 0.15 * mHiglightCircle);
 
-    mInteractionCircleRadius = 4. * mSinElevation + kInteractionCircleRadius;
+    mInteractionCircleRadius = radiusWthElevation( gInteractionCircleRadius, mElevation );
+    
     drawInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
   );
   

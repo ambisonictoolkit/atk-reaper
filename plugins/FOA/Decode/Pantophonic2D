@@ -225,21 +225,30 @@ mChannelWarning = testNumChannels( max( 4, mNumSpeakers ) );
 
 determineGeometry();
 
-// Reduce circle radius
-gRadius -= 30 * gfx_ext_retina;
+// Reduce circle radius, but not if UI is small
+( !gResponsive ) ? (
+  gRadius -= 30 * gfx_ext_retina;
+);
+
 
 // Only refresh background when needed
 ( geometryHasChanged( mPrevWidth, mPrevHeight ) || sliderHasChanged() || ( mChannelWarning != mPrevChannelWarning) ) ? (
   drawLEDBackgroundImage( 2 );
   drawFuMa();
-  setSpeakerPositionFont();
+  
   calculateLedCoordinates();
-  mDeltaSpeakerPos = 20 * gfx_ext_retina;
-  igfx = mNumSpeakers - 1;
-  loop(mNumSpeakers,
-    sprintf( spkStr, "%d", igfx + 1 );
-    drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ igfx ] ), gCenterY - ( gRadius + mDeltaSpeakerPos  ) * sin( mAngles[ igfx ] ), spkStr, 2 );
-    igfx -= 1;
+  
+  ( !gResponsive ) ? (
+    setSpeakerPositionFont();
+    
+    mDeltaSpeakerPos = 20 * gfx_ext_retina;
+  
+    igfx = mNumSpeakers - 1;
+    loop(mNumSpeakers,
+      sprintf( spkStr, "%d", igfx + 1 );
+      drawSpeakerPositiion( gCenterX + ( gRadius + mDeltaSpeakerPos ) * cos( mAngles[ igfx ] ), gCenterY - ( gRadius + mDeltaSpeakerPos  ) * sin( mAngles[ igfx ] ), spkStr, 2 );
+      igfx -= 1;
+    );
   );
   mPrevWidth   = gfx_w;
   mPrevHeight  = gfx_h;

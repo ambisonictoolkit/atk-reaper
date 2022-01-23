@@ -268,8 +268,21 @@ function determineGeometry() //local (lBgColor )
   gCenterY = gfx_h * 0.5;
 
   gCenterX < gCenterY ? gRadius = gCenterX : gRadius = gCenterY;
-  gRadius = gRadius - 10. * gfx_ext_retina;
+  
+  // Resonsive (simplified and small) UI?
+  gResponsive = ( gRadius < 200 * gfx_ext_retina );
+  
+  // Less padding and smaller interaction circle when small
+  ( gResponsive ) ? (
+    gRadius = gRadius - 2. * gfx_ext_retina;
+    gInteractionCircleRadius = 5. * gfx_ext_retina;
+  ) : (
+    gRadius = gRadius - 10. * gfx_ext_retina;
+    gInteractionCircleRadius = 11. * gfx_ext_retina;
+  );
   gInverseRadius = 1. / gRadius;
+  
+  // TODO - sett radius for interaksjonssirkel her
 );
 
 
@@ -398,10 +411,12 @@ Graphics: GUI express that this plugin uses FuMa rather than AmbiX
 ********************************************************************/
 function drawFuMa()
 (
-  gxColorSet( 1.0, 0.35, 0.35, 0.35 );
-  gfx_setfont( 1, "Arial", 18 * gfx_ext_retina );
-  gxPositionSet( 20. * gfx_ext_retina, 20. * gfx_ext_retina );
-  gfx_drawstr( "FuMa" );
+  ( !gResponsive ) ? (
+    gxColorSet( 1.0, 0.35, 0.35, 0.35 );
+    gfx_setfont( 1, "Arial", 18 * gfx_ext_retina );
+    gxPositionSet( 20. * gfx_ext_retina, 20. * gfx_ext_retina );
+    gfx_drawstr( "FuMa" );
+  );
 );
 
 
@@ -412,7 +427,7 @@ function testNumChannels( aRequiredNumChannels )
 (
   // If num_ch or required number of channels have changed, test for sufficient number of channels
   ( ( num_ch != mPrevNumCh ) || ( aRequiredNumChannels != mPrevRequiredNumChannels ) ) ? (
-    mChannelWarningCount =  mWarningInc = ( num_ch < aRequiredNumChannels; );
+    mChannelWarningCount =  mWarningInc = ( ( num_ch < aRequiredNumChannels; )  && ( num_ch > 0) );
   );
   mPrevNumCh               = num_ch;
   mPrevRequiredNumChannels = aRequiredNumChannels;
@@ -427,7 +442,7 @@ function testNumChannels( aRequiredNumChannels )
 Graphics: GUI express that this plugin uses FuMa rather than AmbiX
 ********************************************************************/
 function drawChannelWarning( aRequiredNumChannels ) local( lString, lMinNumChannels, lHorPadding , lWidth, lHeight)
-(
+(  
   lHorPadding = 20.0 * gfx_ext_retina;
   
   // How many channels are needed, considering that Reaper always have even number of channels?
@@ -439,7 +454,11 @@ function drawChannelWarning( aRequiredNumChannels ) local( lString, lMinNumChann
   
   // Red background
   gxColorSet( 1.0, 0.86, 0.21, 0.27 );
-  gfx_rect( lHorPadding, gCenterY - 50. * gfx_ext_retina, gfx_w - 2 * lHorPadding, 100. * gfx_ext_retina );
+  ( gResponsive ) ? (
+    gfx_rect( 0, 0, gfx_w, gfx_h); 
+  ) : (
+    gfx_rect( lHorPadding, gCenterY - 50. * gfx_ext_retina, gfx_w - 2 * lHorPadding, 100. * gfx_ext_retina );
+  );
   
   // White text
   gxColorSet( 1.0, 1.0, 1.0, 1.0 );
@@ -489,18 +508,18 @@ Graphics: Draw peak meter LEDs for one speaker
 function drawSpkrLEDs(aGain, aSpkr, lLedCoordinates) local(lLedCount, i)
 (
   i = 0;
-  lLedCount = 8*kNumLeds*aSpkr;
+  lLedCount = 8 * kNumLeds * aSpkr;
   loop(kNumLeds,
-    setLedColour(aGain, i);
+    setLedColour( aGain, i );
     gfx_triangle(
-      lLedCoordinates[lLedCount],
-      lLedCoordinates[lLedCount + 1],
-      lLedCoordinates[lLedCount + 2],
-      lLedCoordinates[lLedCount + 3],
-      lLedCoordinates[lLedCount + 4],
-      lLedCoordinates[lLedCount + 5],
-      lLedCoordinates[lLedCount + 6],
-      lLedCoordinates[lLedCount + 7]
+      lLedCoordinates[ lLedCount],
+      lLedCoordinates[ lLedCount + 1],
+      lLedCoordinates[ lLedCount + 2],
+      lLedCoordinates[ lLedCount + 3],
+      lLedCoordinates[ lLedCount + 4],
+      lLedCoordinates[ lLedCount + 5],
+      lLedCoordinates[ lLedCount + 6],
+      lLedCoordinates[ lLedCount + 7]
     );
     lLedCount += 8;
     i += 1;
@@ -581,8 +600,13 @@ function drawSourceLocation( aCenterX, aCenterY, aPosZ, aDirectedness ) local(lR
   lAlpha = gfx_a;
   
   // Calculate radius and transparency
-  lMinSourceRadius = 6. * gfx_ext_retina;
-  lRadius = ( 1. - aDirectedness ) * ( gRadius - lMinSourceRadius ) + 2.5 * aPosZ * gfx_ext_retina + lMinSourceRadius ;
+  ( gResponsive ) ? (
+    lMinSourceRadius = 2.5 * gfx_ext_retina;
+    lRadius = ( 1. - aDirectedness ) * ( gRadius - lMinSourceRadius ) + 1.0 * aPosZ * gfx_ext_retina + lMinSourceRadius ;
+  ) : (
+    lMinSourceRadius = 6.0 * gfx_ext_retina;
+    lRadius = ( 1. - aDirectedness ) * ( gRadius - lMinSourceRadius ) + 2.5 * aPosZ * gfx_ext_retina + lMinSourceRadius ;
+  );
   
   // We use the square of lDirectedness for alpha so that it gets more rapidly transparent when the circle grows.
   // This looks better in the GUIs, as it doesn't get completely clogged by many almost non-transparent circles.
@@ -600,7 +624,11 @@ Graphics: Draw centered filled-in square
 ********************************************************************/
 function drawSourceLocationCenter(aCenterX, aCenterY) local(lRadius)
 (
-  gfx_circle( aCenterX, aCenterY, 3 * gfx_ext_retina , 1, 1 );
+  ( gResponsive ) ? (
+    gfx_circle( aCenterX, aCenterY, 1.25 * gfx_ext_retina , 1, 1 );
+  ) : (
+    gfx_circle( aCenterX, aCenterY, 3.00 * gfx_ext_retina , 1, 1 );
+  );
 );
 
 
@@ -631,10 +659,21 @@ function drawInteractionSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRad
 );
 
 
+
+function radiusWthElevation( aRadius, aElevation ) local( lTenp )
+(
+  ( gResponsive ) ? (
+    lTemp = 2. * sin( aElevation ) * gfx_ext_retina + aRadius;
+  ) : (
+    lTemp = 4. * sin( aElevation ) * gfx_ext_retina + aRadius;
+  );
+  lTemp;
+);
+
 /********************************************************************
 Graphics: Draw interactive square
 ********************************************************************/
-function drawInteractionCircle(aCenterX, aCenterY, aRadius) local(lSquareRadius, lAlpha, lRed, lGreen, lBlue)
+function drawInteractionCircle( aCenterX, aCenterY, aRadius ) local( lSquareRadius, lAlpha, lRed, lGreen, lBlue )
 (
   // Temporarily store incoming color
 	lAlpha = gfx_a;
@@ -643,14 +682,14 @@ function drawInteractionCircle(aCenterX, aCenterY, aRadius) local(lSquareRadius,
 	lBlue  = gfx_b;
   
   // Draw filled circle
-  gfx_circle(aCenterX,aCenterY,aRadius,1,1);
+  gfx_circle( aCenterX, aCenterY, aRadius, 1, 1 );
   
   // Draw white border
-  gxColorSet(1., 1., 1., 1.);
-  gfx_circle(aCenterX,aCenterY,aRadius,0,1);
+  gxColorSet( 1., 1., 1., 1. );
+  gfx_circle( aCenterX, aCenterY, aRadius, 0, 1 );
                       
   // Return color to its prior value
-  gxColorSet(lAlpha, lRed, lGreen, lBlue);
+  gxColorSet( lAlpha, lRed, lGreen, lBlue);
 );
 
 
@@ -726,10 +765,7 @@ function displayTransformedPoints( aMatrix, aNumPoints, aDrawCenterPoint ) local
     lSquareSize = 2. * lPosZ + 8.;
     gainToColor(aMatrix[3 * aNumPoints + i], -24., 6., lPosZ);
     
-    //drawCenteredSquare(lPosX, lPosY, lSquareSize);
-    //(lGain >= -70.) ? (
-      drawSourceLocation( lPosX, lPosY, lPosZ, lDirectedness );
-      //);
+    drawSourceLocation( lPosX, lPosY, lPosZ, lDirectedness );
     i += 1;
   );
   
@@ -771,7 +807,7 @@ function displayTransformedPointsWithCustomColor(aMatrix, aNumPoints) local(i, l
     lDirectedness = sqrt( aMatrix[ i ] * aMatrix[ i ] + aMatrix[ aNumPoints + i ]  * aMatrix[ aNumPoints + i ] + aMatrix[ 2 * aNumPoints + i ] * aMatrix[ 2 * aNumPoints + i ] );
         
     //drawCenteredSquare(lPosX, lPosY, lSquareSize);
-    drawSourceLocation( lPosX, lPosY, lPosZ-1.0, lDirectedness );
+    drawSourceLocation( lPosX, lPosY, lPosZ - 1.0, lDirectedness );
     i += 1;
   );
 );

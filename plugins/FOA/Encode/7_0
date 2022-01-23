@@ -139,8 +139,10 @@ mChannelWarning = testNumChannels( 8 );
   
   determineGeometry();
 
-  // Reduce circle radius
-  gRadius -= 30 * gfx_ext_retina;
+  // Reduce circle radius, but not if UI is small
+  ( !gResponsive ) ? (
+    gRadius -= 30 * gfx_ext_retina;
+  );
 
   drawBackgroundImage( 0 );
   drawFuMa();
@@ -173,14 +175,16 @@ mChannelWarning = testNumChannels( 8 );
   mDeltaY90  = ( gRadius + 20 * gfx_ext_retina ) * mSinAzi90;
   mDeltaX135 = ( gRadius + 20 * gfx_ext_retina ) * mCosAzi135;
   mDeltaY135 = ( gRadius + 20 * gfx_ext_retina ) * mSinAzi135;
-
-  drawSpeakerPositiion( gCenterX-mDeltaY30,  gCenterY-mDeltaX30,  "1", 0 );
-  drawSpeakerPositiion( gCenterX+mDeltaY30,  gCenterY-mDeltaX30,  "2", 0 );
-  drawSpeakerPositiion( gCenterX+mDeltaY0,   gCenterY-mDeltaX0,   "3", 0 );
-  drawSpeakerPositiion( gCenterX-mDeltaY90,  gCenterY-mDeltaX90,  "5", 0 );
-  drawSpeakerPositiion( gCenterX+mDeltaY90,  gCenterY-mDeltaX90,  "6", 0 );
-  drawSpeakerPositiion( gCenterX-mDeltaY135, gCenterY-mDeltaX135, "7", 0 );
-  drawSpeakerPositiion( gCenterX+mDeltaY135, gCenterY-mDeltaX135, "8", 0 );
+  
+  ( !gResponsive ) ? (
+    drawSpeakerPositiion( gCenterX-mDeltaY30,  gCenterY-mDeltaX30,  "1", 0 );
+    drawSpeakerPositiion( gCenterX+mDeltaY30,  gCenterY-mDeltaX30,  "2", 0 );
+    drawSpeakerPositiion( gCenterX+mDeltaY0,   gCenterY-mDeltaX0,   "3", 0 );
+    drawSpeakerPositiion( gCenterX-mDeltaY90,  gCenterY-mDeltaX90,  "5", 0 );
+    drawSpeakerPositiion( gCenterX+mDeltaY90,  gCenterY-mDeltaX90,  "6", 0 );
+    drawSpeakerPositiion( gCenterX-mDeltaY135, gCenterY-mDeltaX135, "7", 0 );
+    drawSpeakerPositiion( gCenterX+mDeltaY135, gCenterY-mDeltaX135, "8", 0 );
+  );
   
   mChannelWarning ? drawChannelWarning( 8 );
   

@@ -78,16 +78,16 @@ Updated slider value:
 **********************************************************/
 @slider
 
-mAzi        = slider1 * kDeg2Rad;
-mEle        = slider2 * kDeg2Rad;
+mAzimuth        = slider1 * kDeg2Rad;
+mElevation        = slider2 * kDeg2Rad;
 mPattern = slider3;
 mReturnMode = slider4;
 
 
 mNewW = ( 1. - mPattern ) * sqrt( 2. );
-mNewX = mPattern * cos( mAzi ) * cos( mEle );
-mNewY = mPattern * sin( mAzi ) * cos( mEle );
-mNewZ = mPattern * sin( mEle );
+mNewX = mPattern * cos( mAzimuth ) * cos( mElevation );
+mNewY = mPattern * sin( mAzimuth ) * cos( mElevation );
+mNewZ = mPattern * sin( mElevation );
 
 (mIsInitialised == 0) ?
 (
@@ -106,7 +106,7 @@ Graphics
 
 function plotPattern( anAngle ) // local (lAngle)
 (
-  lRadius = ( ( 1.0 - mPattern ) + ( mPattern * cos( anAngle - mAzi ) * cos( mEle) ) ) * gRadius;
+  lRadius = ( ( 1.0 - mPattern ) + ( mPattern * cos( anAngle - mAzimuth ) * cos( mElevation) ) ) * gRadius;
   
   ( lRadius < 0 ) ? (
     lRadius = -lRadius;
@@ -130,8 +130,8 @@ mouse_cap == 1 ?
 (
   mMouseX = mouse_x - gCenterX;
   mMouseY = mouse_y - gCenterY;
-  mAzi = atan2(-mMouseX, -mMouseY);
-  slider1 = mAzi * kRad2Deg;
+  mAzimuth = atan2(-mMouseX, -mMouseY);
+  slider1 = mAzimuth * kRad2Deg;
   
   // Notify GUI that azimuth has changed, and update coefficients
   slider_automate(slider1);
@@ -178,10 +178,10 @@ mouse_cap == 1 ?
 ( ( mHiglightCircle != mPrevHHiglightCircle ) && !mChannelWarning ) ? (
   
   // Draw circle for interaction, map vertical position to saturation, lightness and radius
-  mCosAzi  = cos(mAzi);
-  mSinAzi  = sin(mAzi);
-  mCosEle  = cos(mEle);
-  mSinEle  = sin(mEle);
+  mCosAzi  = cos(mAzimuth);
+  mSinAzi  = sin(mAzimuth);
+  mCosEle  = cos(mElevation);
+  mSinEle  = sin(mElevation);
   
   // Color depends on elevation, mouseClick and mouseHover
   (mSinEle < 0) ? (
@@ -196,7 +196,7 @@ mouse_cap == 1 ?
   // Position and radius depends on elevation
   mPosX = gCenterX - gRadius * (mSinAzi * mCosEle);
   mPosY = gCenterY - gRadius * (mCosAzi * mCosEle);
-  mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
+  mInteractionCircleRadius = radiusWthElevation( gInteractionCircleRadius, mElevationvation );
   
   // Draw line from centre to interaciton circle
   drawLineSegment(gCenterX, gCenterY, mPosX, mPosY, 1);

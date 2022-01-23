@@ -173,19 +173,19 @@ mClickingAtCircle ?
   
   // Color depends on elevation, mouseClick and mouseHover
   (mSinEle < 0) ? (
-    mSaturation = 1. - 0.25*mSinEle;
+    mSaturation = 1. - 0.25 * mSinEle;
     mLightness = 0.4;
   ) : (
     mSaturation = 1.;
-    mLightness = 0.4 + 0.25*mSinEle;
+    mLightness = 0.4 + 0.25 * mSinEle;
   );
   gxColorSetHsl( 1.0, 195., mSaturation, mLightness + 0.15 * mHiglightCircle );
 
   // Position and radius depends on elevation
   mPosX = gCenterX - gRadius * ( mSinAzi * mCosEle );
   mPosY = gCenterY - gRadius * ( mCosAzi * mCosEle );
-  mInteractionCircleRadius = ( 4. * mSinEle + 11. ) * gfx_ext_retina;
-
+  mInteractionCircleRadius = radiusWthElevation( gInteractionCircleRadius, mElevation );
+  
   // Draw line from centre to interaciton circle
   drawLineSegment( gCenterX, gCenterY, mPosX, mPosY, 1 );
   

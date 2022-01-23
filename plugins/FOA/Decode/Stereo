@@ -204,8 +204,10 @@ mChannelWarning = testNumChannels( 4 );
 
 determineGeometry();
 
-// Reduce circle radius
-gRadius -= 30 * gfx_ext_retina;
+// Reduce circle radius, but not if UI is small
+( !gResponsive ) ? (
+  gRadius -= 30 * gfx_ext_retina;
+);
 
 // Only refresh background when needed
 ( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( mDegAngle != mPrevDegAngle ) || ( mChannelWarning != mPrevChannelWarning) ) ? (
@@ -216,8 +218,10 @@ gRadius -= 30 * gfx_ext_retina;
   
   mSpeakerDist = gRadius + 20. * gfx_ext_retina;
 
-  drawSpeakerPositiion(gCenterX + mSpeakerDist * cos( mDisplayAngles[ 1 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 1 ] ), "2", 2 );
-  drawSpeakerPositiion(gCenterX + mSpeakerDist * cos( mDisplayAngles[ 0 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 0 ] ), "1", 2 );
+  ( !gResponsive ) ? (
+    drawSpeakerPositiion(gCenterX + mSpeakerDist * cos( mDisplayAngles[ 1 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 1 ] ), "2", 2 );
+    drawSpeakerPositiion(gCenterX + mSpeakerDist * cos( mDisplayAngles[ 0 ] ), gCenterY - mSpeakerDist * sin( mDisplayAngles[ 0 ] ), "1", 2 );
+  );
 
   mPrevWidth    = gfx_w;
   mPrevHeight   = gfx_h;

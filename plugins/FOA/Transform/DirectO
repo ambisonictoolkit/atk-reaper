@@ -128,11 +128,8 @@ mChannelWarning = testNumChannels( 4 );
 
 determineGeometry();
 
-// Radius of interaction circle
-mInteractionCircleRadius = 11. * gfx_ext_retina;
-
 // Only update plugin parameters if the user click and drag interaction circle
-mClickingAtCircle = clickingOnInteractionCircle( mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle );
+mClickingAtCircle = clickingOnInteractionCircle( mPreviousMouseCap, mPosX, mPosY, gInteractionCircleRadius, mClickingAtCircle );
 
 // Save current mouse_cap value in order to use in the above test at next iteration
 mPreviousMouseCap = mouse_cap;
@@ -153,7 +150,7 @@ mPreviousMouseCap = mouse_cap;
   
   mHiglightCircle = 1;
 ) : (
-  mHiglightCircle = hoverOverInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
+  mHiglightCircle = hoverOverInteractionCircle( mPosX, mPosY, gInteractionCircleRadius );
 );
 
 // Only refresh GUI when needed
@@ -187,7 +184,7 @@ mPreviousMouseCap = mouse_cap;
   mPosX = gCenterX + gRadius * ( 1. - mNormTransformAngle ) * sin( mAzimuth );
   mPosY = gCenterY - gRadius * ( 1. - mNormTransformAngle ) * cos( mAzimuth );
   
-  drawInteractionCircle( mPosX, mPosY, mInteractionCircleRadius );
+  drawInteractionCircle( mPosX, mPosY, gInteractionCircleRadius );
   
   mPrevHHiglightCircle = mHiglightCircle;
   mPrevAzimuth        = mAzimuth;
