@@ -45,8 +45,12 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
+
 slider1:0<180,-180,0.1>Azimuth (mouse)
 slider2:0<-90,90,0.1>Elevation
+
+
+options:no_meter
 
 
 /**********************************************************

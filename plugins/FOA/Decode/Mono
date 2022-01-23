@@ -51,6 +51,9 @@ slider3:0.5<0,1.,0.01>Mic pattern (Omni - Cardoid - Figure 8)
 slider4:0<0,1,1{Left channel only, Left and right channel}>Returned signal
 
 
+options:no_meter
+
+
 /**********************************************************
 Initialisation
 **********************************************************/

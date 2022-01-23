@@ -72,9 +72,13 @@ out_pin:14
 out_pin:15
 out_pin:16
 
+
 slider1:4<3,16,1>Number of speakers
 slider2:0<0,1,1{Flat, Point}>Speaker orientation
 slider3:5<0,10,1{20 ms, 30 ms, 50 ms, 100 ms, 200 ms, 300 ms, 500 ms, 1 sec, 3 sec, 6 secs}>Peak level decay half time
+
+
+options:no_meter
 
 
 /**********************************************************

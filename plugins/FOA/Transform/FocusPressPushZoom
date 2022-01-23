@@ -55,10 +55,15 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
+
 slider1:0<0,3,1{Focus, Press, Push, Zoom}>Transformation mode
 slider2:0<180,-180,0.1>Azimuth (mouse)
 slider3:0<-90,90,0.1>Elevation
 slider4:0<0,90,0.1>Degree of transformation (mouse)
+
+
+options:no_meter
+
 
 /* --- DEBUG STUFF ---*/
 // Debug sliders:

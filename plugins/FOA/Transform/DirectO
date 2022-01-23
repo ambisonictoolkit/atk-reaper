@@ -46,7 +46,11 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
+
 slider1:0<0,90,0.1>Degree of transformation
+
+
+options:no_meter
 
 
 /**********************************************************

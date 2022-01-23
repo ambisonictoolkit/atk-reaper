@@ -63,8 +63,13 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
+
 slider1:4<2,16,1>Number of speakers
 slider2:0<0,1,1{Flat, Point}>Speaker orientation
+
+
+options:no_meter
+
 
 /**********************************************************
 Initialisation

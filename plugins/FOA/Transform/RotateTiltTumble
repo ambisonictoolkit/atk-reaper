@@ -45,10 +45,14 @@ out_pin:X
 out_pin:Y
 out_pin:Z
 
+
 // Slider range is set to [-360,360] rather than [-180, 180] for more flexible scripting of rotating movements
 slider1:0<180,-180,0.1>Rotate (mouse)
 slider2:0<-180,180,0.1>Tilt (mouse)
 slider3:0<-180,180,0.1>Tumble (mouse)
+
+
+options:no_meter
 
 
 /**********************************************************
