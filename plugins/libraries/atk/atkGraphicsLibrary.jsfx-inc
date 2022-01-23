@@ -297,7 +297,17 @@ function determinePeriphonicGeometry()
   gCenterYLower = gfx_h * 0.75;
 
   gCenterX < gCenterYUpper ? gRadius = gCenterX : gRadius = gCenterYUpper;
-  gRadius = gRadius - 10;
+  
+  // Resonsive (simplified and small) UI?
+  gResponsive = ( gRadius < 200 * gfx_ext_retina );
+  
+  // Less padding and smaller interaction circle when small
+  ( gResponsive ) ? (
+    gRadius = gRadius - 2. * gfx_ext_retina;
+  ) : (
+    gRadius = gRadius - 10. * gfx_ext_retina;
+  );
+  
   gInverseRadius = 1. / gRadius;
 );
 

@@ -258,7 +258,11 @@ Graphics
 mChannelWarning = testNumChannels( max( 4, mNumSpeakers ) );
 
 determinePeriphonicGeometry();
-gRadius -= 30 * gfx_ext_retina;              // Reduce circle radius
+
+// Reduce circle radius, but not if UI is small
+( !gResponsive ) ? (
+  gRadius -= 30 * gfx_ext_retina;
+);
 
 // Only refresh background when needed
 ( geometryHasChanged( mPrevWidth, mPrevHeight ) || sliderHasChanged() || ( mChannelWarning != mPrevChannelWarning) ) ? (
@@ -266,28 +270,33 @@ gRadius -= 30 * gfx_ext_retina;              // Reduce circle radius
   drawFuMa();
   setSpeakerPositionFont();
   calculateLedCoordinates();
-  igfx = mNumSpeakerPairs - 1;
-  mSpeakerDist = gRadius + 20. * gfx_ext_retina;
-  loop( mNumSpeakerPairs,
-    // Upper speakers
-    sprintf( spkStr, "%d", igfx + 1 );
-    drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mAngles[ igfx ] ), gCenterYUpper - mSpeakerDist * sin( mAngles[ igfx ] ), spkStr, 2 );
+  
+  ( !gResponsive ) ? (
+    igfx = mNumSpeakerPairs - 1;
+    mSpeakerDist = gRadius + 20. * gfx_ext_retina;
+    loop( mNumSpeakerPairs,
+      // Upper speakers
+      sprintf( spkStr, "%d", igfx + 1 );
+      drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mAngles[ igfx ] ), gCenterYUpper - mSpeakerDist * sin( mAngles[ igfx ] ), spkStr, 2 );
     
-    // Lower speakers
-    sprintf( spkStr, "%d", igfx + 1 + mNumSpeakerPairs );
-    drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mAngles[ igfx ] ), gCenterYLower - mSpeakerDist * sin( mAngles[ igfx ] ), spkStr, 2 );
+      // Lower speakers
+      sprintf( spkStr, "%d", igfx + 1 + mNumSpeakerPairs );
+      drawSpeakerPositiion( gCenterX + mSpeakerDist * cos( mAngles[ igfx ] ), gCenterYLower - mSpeakerDist * sin( mAngles[ igfx ] ), spkStr, 2 );
     
-    igfx -= 1;
+      igfx -= 1;
+    );
   );
   
   // Draw titles
-  gfx_x = 20 * gfx_ext_retina;
-  gfx_y = 42. * gfx_ext_retina;
-  gfx_drawstr( "Upper Ring" );
+  ( !gResponsive ) ? (
+    gfx_x = 20 * gfx_ext_retina;
+    gfx_y = 42. * gfx_ext_retina;
+    gfx_drawstr( "Upper Ring" );
   
-  gfx_x = 20 * gfx_ext_retina;
-  gfx_y = gCenterYLower - ( gRadius - 0. * gfx_ext_retina);
-  gfx_drawstr( "Lower Ring" );
+    gfx_x = 20 * gfx_ext_retina;
+    gfx_y = gCenterYLower - ( gRadius - 0. * gfx_ext_retina);
+    gfx_drawstr( "Lower Ring" );
+  );
   
   // Illustrate elevation angle
   xPos1 = gCenterX + 0.75 * gRadius;
