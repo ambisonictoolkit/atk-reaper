@@ -437,7 +437,7 @@ function testNumChannels( aRequiredNumChannels )
 (
   // If num_ch or required number of channels have changed, test for sufficient number of channels
   ( ( num_ch != mPrevNumCh ) || ( aRequiredNumChannels != mPrevRequiredNumChannels ) ) ? (
-    mChannelWarningCount =  mWarningInc = ( ( num_ch < aRequiredNumChannels; )  && ( num_ch > 0) );
+    mChannelWarningCount =  mWarningInc = ( num_ch < aRequiredNumChannels; );
   );
   mPrevNumCh               = num_ch;
   mPrevRequiredNumChannels = aRequiredNumChannels;
@@ -462,20 +462,30 @@ function drawChannelWarning( aRequiredNumChannels ) local( lString, lMinNumChann
   gxColorSet( 0.5, 0.5, 0.5, 0.5 );
   gfx_rect( 0, 0, gfx_w, gfx_h);
   
-  // Red background
-  gxColorSet( 1.0, 0.86, 0.21, 0.27 );
+  // Notification background
+  ( num_ch == 0 ) ? (
+    gxColorSet( 1.0, 1.00, 0.757, 0.027 ); // Warning color
+  ) : (
+    gxColorSet( 1.0, 0.86, 0.21, 0.27 ); // Danger color
+  );
+
+  // All the way horizontally if small UI, else padded
   ( gResponsive ) ? (
-    gfx_rect( 0, 0, gfx_w, gfx_h); 
+    gfx_rect( 0, gCenterY - 50. * gfx_ext_retina, gfx_w, 100. * gfx_ext_retina );
   ) : (
     gfx_rect( lHorPadding, gCenterY - 50. * gfx_ext_retina, gfx_w - 2 * lHorPadding, 100. * gfx_ext_retina );
   );
   
   // White text
   gxColorSet( 1.0, 1.0, 1.0, 1.0 );
-  
   gfx_setfont( 1, "Arial", 18 * gfx_ext_retina, 'b' );
   gxPositionSet( 1.5 * lHorPadding, gCenterY - 1.5 * lHorPadding );
-  sprintf( aString, "Warning!" );
+  ( num_ch == 0 ) ? (
+    sprintf( aString, "Bypassed" );
+  ) : (
+    sprintf( aString, "Warning!" );
+  );
+  
   gfx_measurestr( lString, lWidth, lHeight);
   ( lWidth  > ( gfx_w - 3 * lHorPadding ) ) ? (
     // Just a warning triangle
@@ -489,24 +499,25 @@ function drawChannelWarning( aRequiredNumChannels ) local( lString, lMinNumChann
     gxPositionSet( gCenterX - ( 0.5 * lWidth ), gCenterY - ( 0.2 * lHeight ) );
     gfx_drawstr( lString );
   ) : (
-    gfx_drawstr( aString );
-    
-    gfx_setfont( 1, "Arial", 18 * gfx_ext_retina );
-    gxPositionSet( 1.5 * lHorPadding, gCenterY );
-    
-    sprintf( lString, "For this plugin to work, the track needs %i channels.", lMinNumChannels );
-    // Do we need a line break?
-    gfx_measurestr( lString, lWidth, lHeight);
-    ( lWidth  > ( gfx_w - 3 * lHorPadding ) ) ? (
-      sprintf( lString, "For this plugin to work,\nthe track needs %i channels.", lMinNumChannels );
+    ( num_ch > 0 ) ? (
+      gfx_drawstr( aString );
       
-      // Or not show this text at all?
+      gfx_setfont( 1, "Arial", 18 * gfx_ext_retina );
+      gxPositionSet( 1.5 * lHorPadding, gCenterY );
+    
+      sprintf( lString, "For this plugin to work, the track needs %i channels.", lMinNumChannels );
+      // Do we need a line break?
       gfx_measurestr( lString, lWidth, lHeight);
       ( lWidth  > ( gfx_w - 3 * lHorPadding ) ) ? (
-        sprintf( lString, "", lMinNumChannels );
+        sprintf( lString, "For this plugin to work,\nthe track needs %i channels.", lMinNumChannels );
+      
+        // Or not show this text at all?
+        gfx_measurestr( lString, lWidth, lHeight);
+        ( lWidth  > ( gfx_w - 3 * lHorPadding ) ) ? (
+          sprintf( lString, "", lMinNumChannels );
+        );
       );
     );
-
     gfx_drawstr( lString );
   );
 );
