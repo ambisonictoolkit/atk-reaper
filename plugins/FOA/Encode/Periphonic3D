@@ -161,37 +161,87 @@ calculateEncodeMatrix();
 /**********************************************************
 Custom graphic interface
 **********************************************************/
-@gfx 500 500
+@gfx 400 800
 
 mChannelWarning = testNumChannels( mNumSpeakerPairs * 2 );
 
-determineGeometry();
+determinePeriphonicGeometry();
+
+// Reduce circle radius, but not if UI is small
+( !gResponsive ) ? (
+  gRadius -= 30 * gfx_ext_retina;
+);
 
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( slider3 != mPrevSlider3 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (  
-  drawBackgroundImage( 0 );
+( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( slider3 != mPrevSlider3 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
+  drawPeriphonicBackgroundImage( 0 );
   drawFuMa();
 
-  // Size, saturation and luminocity depends on posZ
-  gainToColor(0., -24., 6., -mSinEle);
-
-  (mSpeakerLayout==0) ? (
+  ( mSpeakerLayout == 0 ) ? (
     mSpeakerAzi = 0.5 * mSpeakerAziDelta;
   ) : (
     mSpeakerAzi = 0.;
   );
-
+  
+  igfx = 1;
+  
   loop( mNumSpeakerPairs,
-    drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ) * mCosEle,  gCenterY - gRadius * cos( mSpeakerAzi ) * mCosEle,  mSinEle, 1. );
+    
+    // Indicate speaker locations
+    mDeltaX = gRadius * sin( mSpeakerAzi ) * mCosEle;
+    mDeltaY = gRadius * cos( mSpeakerAzi ) * mCosEle;
+    
+    gainToColor(0., -24., 6., 0.0);
+    
+    drawSourceLocation( gCenterX - mDeltaX,  gCenterYUpper - mDeltaY,  mSinEle, 1. );
+    drawSourceLocation( gCenterX - mDeltaX,  gCenterYLower - mDeltaY,  mSinEle, 1. );
+    
+    // Indicate channel numbering
+    ( !gResponsive ) ? (
+      mDeltaX = ( gRadius + 20. * gfx_ext_retina ) * sin( mSpeakerAzi );
+      mDeltaY = ( gRadius + 20. * gfx_ext_retina ) * cos( mSpeakerAzi );
+    
+      // Upper speakers
+      sprintf( spkStr, "%d", igfx );
+      drawSpeakerPositiion( gCenterX - mDeltaX, gCenterYUpper - mDeltaY, spkStr, 0 );
+  
+      // Lower speakers
+      sprintf( spkStr, "%d", igfx + mNumSpeakerPairs );
+      drawSpeakerPositiion( gCenterX - mDeltaX, gCenterYLower - mDeltaY, spkStr, 0 );
+    );
+    
     mSpeakerAzi += mSpeakerAziDelta;
+    igfx += 1;
   );
-
-  gainToColor( 0., -24., 6., mSinEle );
-
-  loop( mNumSpeakerPairs,
-    drawSourceLocation( gCenterX - gRadius * sin( mSpeakerAzi ) * mCosEle,  gCenterY - gRadius * cos( mSpeakerAzi ) * mCosEle,  -mSinEle, 1. );
-    mSpeakerAzi += mSpeakerAziDelta;
+  
+  // Draw titles
+  ( !gResponsive ) ? (
+    gfx_x = 20 * gfx_ext_retina;
+    gfx_y = 42. * gfx_ext_retina;
+    gfx_drawstr( "Upper Ring" );
+  
+    gfx_x = 20 * gfx_ext_retina;
+    gfx_y = gCenterYLower - ( gRadius - 0. * gfx_ext_retina);
+    gfx_drawstr( "Lower Ring" );
   );
+  
+  // Illustrate elevation angle
+  xPos1 = gCenterX + 0.75 * gRadius;
+  yPos1 = gCenterY;
+  xPos2 = gCenterX + 1.25 * gRadius;
+  yPos2 = gCenterY;
+  drawLineSegment( xPos1, yPos1, xPos2, yPos2, 1 );
+
+  xPos2 = gCenterX + ( 0.75 + 0.5 * cos( mElevation ) ) * gRadius;
+  yPos2 = gCenterY          - 0.5 * sin( mElevation )   * gRadius;
+  drawLineSegment( xPos1, yPos1, xPos2, yPos2, 1 );
+  
+  xPos2 = gCenterX + ( 0.75 + 0.5 * cos( mElevation ) ) * gRadius;
+  yPos2 = gCenterY          + 0.5 * sin( mElevation )   * gRadius;
+  drawLineSegment( xPos1, yPos1, xPos2, yPos2, 1 );
+  
+  gfx_arc( xPos1, yPos1, 0.22 * gRadius, $pi * 0.5, $pi * 0.5 - mElevation, 1. );
+  gfx_arc( xPos1, yPos1, 0.18 * gRadius, $pi * 0.5, $pi * 0.5 + mElevation, 1. );
   
   mChannelWarning ? drawChannelWarning( mNumSpeakerPairs * 2 );
   

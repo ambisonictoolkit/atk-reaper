@@ -363,6 +363,42 @@ function drawBackgroundImage( aMode ) local(i, lDeltaX, lDeltaY)
 );
 
 
+/********************************************************************
+Graphics: Draw background image similar to ICST ambimonitor
+********************************************************************/
+function drawPeriphonicBackgroundImage( aMode ) local(i, lDeltaX, lDeltaY)
+(
+  // Clear to black
+  gxColorSet( 1., 0.0, 0.0, 0.0 );
+  gfx_rect( 0., 0., gfx_w, gfx_h );
+  
+  // Draw background circles
+  setPluginModeColour( aMode );
+  gfx_circle( gCenterX, gCenterYUpper, gRadius, 1, 1 ); // Upper
+  gfx_circle( gCenterX, gCenterYLower, gRadius, 1, 1 ); // Lower
+  
+  gxColorSet( 1.0, 0.35, 0.35, 0.35 );
+  
+  // Draw circles
+  i = 1;
+  loop(10,
+    gfx_circle( gCenterX, gCenterYUpper, 0.1 * i * gRadius, 0, 1 );
+    gfx_circle( gCenterX, gCenterYLower, 0.1 * i * gRadius, 0, 1 );
+    i += 1;
+  );
+  
+  // Draw lines for every 30 degrees
+  i = 0;
+  loop(6,
+    lDeltaX = gRadius * cos($pi*i/6);
+    lDeltaY = gRadius * sin($pi*i/6);
+    drawLineSegment( gCenterX - lDeltaX, gCenterYUpper - lDeltaY, gCenterX + lDeltaX, gCenterYUpper + lDeltaY, 1 );
+    drawLineSegment( gCenterX - lDeltaX, gCenterYLower - lDeltaY, gCenterX + lDeltaX, gCenterYLower + lDeltaY, 1 );
+    i += 1;
+  );
+);
+
+
 
 /********************************************************************
 Graphics: Draw background image for LED peak meter
