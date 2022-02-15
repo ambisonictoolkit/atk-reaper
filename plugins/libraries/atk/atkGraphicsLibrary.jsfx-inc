@@ -74,14 +74,14 @@ function hls_value(aN1, aN2, aHue)
     );
   );
   
-  aHue < 60. ? (
-    aN1+(aN2-aN1)*aHue/60.
+  ( aHue < 60. ) ? (
+    aN1 + ( aN2 - aN1 ) * aHue / 60.
   ) : (
     aHue < 180. ? (
       aN2;
     ) : (
       aHue < 240. ? (
-        aN1+(aN2-aN1)*(240-aHue)/60.;
+        aN1 + ( aN2 - aN1 ) * ( 240 - aHue ) / 60.;
       ) : (
         aN1;
       );
@@ -93,10 +93,10 @@ function hls_value(aN1, aN2, aHue)
 /********************************************************************
 Graphics: Set color based on hsl values
 ********************************************************************/
-function gxColorSetHsl(anAlpha, aHue, aSaturation, aLightness) local(lRed, lGreen, lBlue, lM1, lM2)
+function gxColorSetHsl( anAlpha, aHue, aSaturation, aLightness ) local( lRed, lGreen, lBlue, lM1, lM2 )
 (
   aLightness <= 0.5 ? (
-    lM2 = aLightness*(1.0+aSaturation);
+    lM2 = aLightness * ( 1.0+aSaturation );
   ) : (
     lM2 = aLightness + aSaturation - aLightness * aSaturation;
   );
@@ -108,12 +108,12 @@ function gxColorSetHsl(anAlpha, aHue, aSaturation, aLightness) local(lRed, lGree
   	lGreen = aLightness;
   	lBlue = aLightness;
   ) : (
-    lRed = hls_value(lM1, lM2, aHue+120.0);
-  	lGreen = hls_value(lM1, lM2, aHue);
-  	lBlue = hls_value(lM1, lM2, aHue-120.0);
+    lRed = hls_value( lM1, lM2, aHue + 120.0 );
+  	lGreen = hls_value( lM1, lM2, aHue );
+  	lBlue = hls_value( lM1, lM2, aHue - 120.0 );
   );
   
-  gxColorSet(anAlpha, lRed, lGreen, lBlue)
+  gxColorSet( anAlpha, lRed, lGreen, lBlue )
 );
 
 
@@ -212,30 +212,30 @@ function setOverloadColour()
   gxColorSet(1., 1., 0., 0.);
 );
 
-function setLedColour(aGain, aCount) local(lRefColour)
+function setLedColour(aGain, aPolarity, aCount) local( lRefColour, lTemp )
 (
-  lRefColour = 1.5 -aCount*kDecibelsPerLed;
+  lRefColour = 1.5 - aCount * kDecibelsPerLed;
   (lRefColour > 0.) ? (lRefColour = 0);
   
-  (aGain<lRefColour) ? (
+  ( aGain < lRefColour ) ? (
     setInactiveColour();
   ) : (
     (lRefColour >= 0.) ? (
       setOverloadColour();
     ) : (
-      (lRefColour > (-3*kDecibelsPerLed)) ? (
+      ( lRefColour > ( -3 * kDecibelsPerLed ) ) ? (
         setHotColour();
       ) : (
-        (lRefColour > (-6*kDecibelsPerLed)) ? (
+        ( lRefColour > ( -6 * kDecibelsPerLed ) ) ? (
           setWarmColour();
         ) : (
-          (lRefColour > (-9*kDecibelsPerLed)) ? (
+          ( lRefColour > ( -9 * kDecibelsPerLed ) ) ? (
             setTepidColour();
           ) : (
-            (lRefColour > (-12*kDecibelsPerLed)) ? (
+            (lRefColour >  (-12 * kDecibelsPerLed ) ) ? (
               setColdColour();
             ) : (
-              (lRefColour > (-15*kDecibelsPerLed)) ? (
+              ( lRefColour > ( -15 * kDecibelsPerLed) )  ? (
                 setFrostyColour();
               ) : (
                 setArticColour();
@@ -244,6 +244,12 @@ function setLedColour(aGain, aCount) local(lRefColour)
           );
         );
       );
+    );
+    ( !aPolarity ) ? (
+      // Quick and dirty way of brightening, affects the cold blue colours the most
+      gfx_r = gfx_r * ( 2.5 );
+      gfx_g = gfx_g * ( 2.5 );
+      gfx_b = gfx_b * ( 2.5 );
     );
   );
 );
@@ -562,12 +568,12 @@ function drawChannelWarning( aRequiredNumChannels ) local( lString, lMinNumChann
 /********************************************************************
 Graphics: Draw peak meter LEDs for one speaker
 ********************************************************************/
-function drawSpkrLEDs(aGain, aSpkr, lLedCoordinates) local(lLedCount, i)
+function drawSpkrLEDs( aGain, aSpkr, aPolarity, lLedCoordinates ) local(lLedCount, i)
 (
   i = 0;
   lLedCount = 8 * kNumLeds * aSpkr;
   loop(kNumLeds,
-    setLedColour( aGain, i );
+    setLedColour( aGain, aPolarity, i );
     gfx_triangle(
       lLedCoordinates[ lLedCount],
       lLedCoordinates[ lLedCount + 1],

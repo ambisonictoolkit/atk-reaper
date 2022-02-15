@@ -76,7 +76,7 @@ kMaxNumSpeakers = 4;
 // Memory allocations
 memCount   = 1024;
 
-matrixDSP = memCount;   //  for 4x4 matrix as 1D array
+matrixDSP = memCount;         //  for 4x4 matrix as 1D array
 memCount  += 4*4;
 
 mDisplayAngles = memCount;
@@ -86,14 +86,18 @@ mLedCoordinates = memCount;
 memCount += 2*4*kNumLeds*kMaxNumSpeakers; // 2 (x,y) x 4 (points per LED) x kNumLeds * kMaxNumSpeakers array of coordinates
  
 mPeaks = memCount;
-memCount += kMaxNumSpeakers; // Also reserving slot for unused C and LFE
+memCount += kMaxNumSpeakers;  // Also reserving slot for unused C and LFE
 
 mDisplayPeaks = memCount;
-memCount += kMaxNumSpeakers; // Also reserving slot for unused C and LFE
+memCount += kMaxNumSpeakers;  // Also reserving slot for unused C and LFE
+
+mPolarityAccum = memCount;
+memCount += 4;                // Acuumulator to test for polarity
 
 // Zero max peak values at start
-memset(mPeaks,0,kMaxNumSpeakers);
-memset(mDisplayPeaks,0,kMaxNumSpeakers);
+memset( mPeaks,         0, kMaxNumSpeakers );
+memset( mDisplayPeaks,  0, kMaxNumSpeakers );
+memset( mPolarityAccum, 0, kMaxNumSpeakers );
 
 // Graphics
 gfx_ext_retina = 1;
@@ -258,12 +262,17 @@ determineGeometry();
 
 // Draw LEDs for all speakers
 ( mDoRefresh && !mChannelWarning ) ? (
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 0 ] ), 0, mLedCoordinates );
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 1 ] ), 1, mLedCoordinates );
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 2 ] ), 2, mLedCoordinates );
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 3 ] ), 3, mLedCoordinates );
+  
+  i = 0;
+  loop(4,
+    mPolarity = ( mPolarityAccum[ i ] >= 0 );
+    drawSpkrLEDs( amp2db( mDisplayPeaks[ i ] ), i, mPolarity, mLedCoordinates );
+    i += 1;
+  );
 
-  memset( mDisplayPeaks, 0., 4. );
+  memset( mDisplayPeaks, 0., kMaxNumSpeakers );
+  memset( mPolarityAccum, 0, kMaxNumSpeakers );
+  
   mRefreshSampCount = 0;
   mDoRefresh = 0;
 );
@@ -310,14 +319,21 @@ spl3 = wIn * matrixDSP[12] + xIn * matrixDSP[13] + yIn * matrixDSP[14];
 // Peak monitoring
 ispl = 0;
 loop(4,
-  input = spl(ispl);
-  output = mPeaks[ispl];
-  input = abs(input);
+  input = spl( ispl );
+  output = mPeaks[ ispl ];
+  input = abs( input );
 
   // When we hit a peak, ride the peak to the top, else exponential decay
-  ( input >= output ) ? (output = input) : (output = output * mPeakScalar);
-  mPeaks[ispl] = output;
-  mDisplayPeaks[ispl] = max(mDisplayPeaks[ispl], output);
+  ( input >= output ) ? (
+    output = input
+  ) : (
+    output = output * mPeakScalar
+  );
+  mPeaks[ ispl ] = output;
+  mDisplayPeaks[ ispl ] = max( mDisplayPeaks[ ispl], output );
+  
+  // Accumulate polarity
+  mPolarityAccum[ ispl ] += wIn * spl( ispl );  
   
   /* ext_nodenorm is not set in init. Hence we have denorm added to the input signal, 
      and do not have to bother about denorm issues here.

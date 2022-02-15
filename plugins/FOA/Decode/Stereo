@@ -92,9 +92,13 @@ memCount += kMaxNumSpeakers;
 mDisplayPeaks = memCount;
 memCount += kMaxNumSpeakers;
 
+mPolarityAccum = memCount;
+memCount += kMaxNumSpeakers;                // Acuumulator to test for polarity
+
 // Zero max peak values at start
-memset( mPeaks, 0, kMaxNumSpeakers );
-memset( mDisplayPeaks, 0, kMaxNumSpeakers );
+memset( mPeaks,         0, kMaxNumSpeakers );
+memset( mDisplayPeaks,  0, kMaxNumSpeakers );
+memset( mPolarityAccum, 0, kMaxNumSpeakers );
 
 // Graphics
 gfx_ext_retina = 1;
@@ -236,10 +240,14 @@ determineGeometry();
 
 // Draw LEDs for all speakers
 ( mDoRefresh && !mChannelWarning ) ? (
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 0 ] ), 0, mLedCoordinates );
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 1 ] ), 1, mLedCoordinates );
+  mPolarity = ( mPolarityAccum[ 0 ] >= 0 );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 0 ] ), 0, mPolarity, mLedCoordinates );
+  mPolarity = ( mPolarityAccum[ 1 ] >= 0 );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 1 ] ), 1, mPolarity, mLedCoordinates );
 
   memset( mDisplayPeaks, 0., kMaxNumSpeakers );
+  memset( mPolarityAccum, 0, kMaxNumSpeakers );
+  
   mRefreshSampCount = 0;
   mDoRefresh = 0;
 );
@@ -295,6 +303,8 @@ loop(kMaxNumSpeakers,
   ( input >= output ) ? ( output = input ) : ( output = output * mPeakScalar );
   mPeaks[ ispl ] = output;
   mDisplayPeaks[ ispl ] = max( mDisplayPeaks[ ispl], output );
+  
+  mPolarityAccum[ ispl ] += wIn * spl( ispl );
   
   /* ext_nodenorm is not set in init. Hence we have denorm added to the input signal, 
      and do not have to bother about denorm issues here.

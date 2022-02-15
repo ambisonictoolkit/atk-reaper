@@ -97,9 +97,13 @@ memCount += kMaxNumSpeakers + 1; // Also reserving slot for unused LFE
 mDisplayPeaks = memCount;
 memCount += kMaxNumSpeakers + 1; // Also reserving slot for unused LFE
 
+mPolarityAccum = memCount;
+memCount += kMaxNumSpeakers + 1; // Acuumulator to test for polarity
+
 // Zero max peak values at start
-memset( mPeaks, 0, kMaxNumSpeakers + 1 );
-memset( mDisplayPeaks, 0, kMaxNumSpeakers + 1 );
+memset( mPeaks,         0, kMaxNumSpeakers + 1 );
+memset( mDisplayPeaks,  0, kMaxNumSpeakers + 1 );
+memset( mPolarityAccum, 0, kMaxNumSpeakers + 1 );
 
 // Graphics
 gfx_ext_retina = 1;
@@ -256,13 +260,20 @@ determineGeometry();
 
 // Draw LEDs for all speakers
 ( mDoRefresh && !mChannelWarning ) ? (
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 0 ] ), 0, mLedCoordinates );
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 1 ] ), 1, mLedCoordinates );
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 2 ] ), 2, mLedCoordinates );
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 4 ] ), 3, mLedCoordinates );
-  drawSpkrLEDs( amp2db( mDisplayPeaks[ 5 ] ), 4, mLedCoordinates );
+  mPolarity = ( mPolarityAccum[ 0 ] >= 0 );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 0 ] ), 0, mPolarity, mLedCoordinates );
+  mPolarity = ( mPolarityAccum[ 1 ] >= 0 );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 1 ] ), 1, mPolarity, mLedCoordinates );
+  mPolarity = ( mPolarityAccum[ 2 ] >= 0 );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 2 ] ), 2, mPolarity, mLedCoordinates );
+  mPolarity = ( mPolarityAccum[ 4 ] >= 0 );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 4 ] ), 3, mPolarity, mLedCoordinates );
+  mPolarity = ( mPolarityAccum[ 5 ] >= 0 );
+  drawSpkrLEDs( amp2db( mDisplayPeaks[ 5 ] ), 4, mPolarity, mLedCoordinates );
 
   memset( mDisplayPeaks, 0., 6. );
+  memset( mPolarityAccum, 0, kMaxNumSpeakers );
+  
   mRefreshSampCount = 0;
   mDoRefresh = 0;
 );
@@ -326,6 +337,9 @@ loop( 6,
   ( input >= output ) ? ( output = input ) : ( output = output * mPeakScalar );
   mPeaks[ ispl ] = output;
   mDisplayPeaks[ ispl ] = max( mDisplayPeaks[ ispl ], output );
+  
+  // Accumulate polarity
+  mPolarityAccum[ ispl ] += wIn * spl( ispl );
   
   /* ext_nodenorm is not set in init. Hence we have denorm added to the input signal, 
      and do not have to bother about denorm issues here.
