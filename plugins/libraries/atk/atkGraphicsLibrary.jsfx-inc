@@ -96,7 +96,7 @@ Graphics: Set color based on hsl values
 function gxColorSetHsl( anAlpha, aHue, aSaturation, aLightness ) local( lRed, lGreen, lBlue, lM1, lM2 )
 (
   aLightness <= 0.5 ? (
-    lM2 = aLightness * ( 1.0+aSaturation );
+    lM2 = aLightness * ( 1.0 + aSaturation );
   ) : (
     lM2 = aLightness + aSaturation - aLightness * aSaturation;
   );
@@ -108,9 +108,9 @@ function gxColorSetHsl( anAlpha, aHue, aSaturation, aLightness ) local( lRed, lG
   	lGreen = aLightness;
   	lBlue = aLightness;
   ) : (
-    lRed = hls_value( lM1, lM2, aHue + 120.0 );
+    lRed   = hls_value( lM1, lM2, aHue + 120.0 );
   	lGreen = hls_value( lM1, lM2, aHue );
-  	lBlue = hls_value( lM1, lM2, aHue - 120.0 );
+  	lBlue  = hls_value( lM1, lM2, aHue - 120.0 );
   );
   
   gxColorSet( anAlpha, lRed, lGreen, lBlue )
@@ -212,6 +212,58 @@ function setOverloadColour()
   gxColorSet(1., 1., 0., 0.);
 );
 
+
+/********************************************************************
+Graphics: Increase luminance by anAmount
+********************************************************************/
+function lightenUp( anAmount) local( lHue, lSaturation, lLightness, lMin, lMax, lDelta, lM1, lM2 )
+(
+  // 1 - Convert RGB to HSL
+  
+  lMin = min( min( gfx_r, gfx_g ), gfx_b );
+  lMax = max( max( gfx_r, gfx_g ), gfx_b );
+  
+  lLightness = ( lMax - lMin ) / 2.0;
+  
+  ( lMax == lMin ) ? (
+    lSaturation = 0;
+    lHue = 0;
+  ) : (
+    lDelta = lMax - lMin;
+    
+    ( lLightness < 0.5 ) ? (
+      lSaturation = lDelta / ( lMax + lMin );
+    ) : (
+      lSaturation = lDelta / ( 2.0 - lMax - lMin );
+    );
+    
+    ( gfx_r == lMax ) ? (
+      lHue = ( gfx_g - gfx_b ) / lDelta;
+    ) : (
+      ( gfx_g == lMax ) ? (
+        lHue = 2.0 + ( gfx_b - gfx_r ) / lDelta;
+      ) : (
+        ( gfx_b == lMax ) ? (
+          lHue = 4.0 + ( gfx_r - gfx_g ) / lDelta;
+        );
+      );
+    );
+    
+    lHue = lHue * 60;
+    ( lHue < 0. ) ? (
+      lHue += 360;
+    );
+    
+  );
+  
+  // 2 - Increase lightness
+  lLightness = min( lLightness + anAmount, 1.0 );
+  
+  // 3 - Convert HSL to RGB
+  gxColorSetHsl( 1.0, lHue, lSaturation, lLightness );  
+);
+
+
 function setLedColour(aGain, aPolarity, aCount) local( lRefColour, lTemp )
 (
   lRefColour = 1.5 - aCount * kDecibelsPerLed;
@@ -246,10 +298,7 @@ function setLedColour(aGain, aPolarity, aCount) local( lRefColour, lTemp )
       );
     );
     ( !aPolarity ) ? (
-      // Quick and dirty way of brightening, affects the cold blue colours the most
-      gfx_r = gfx_r * ( 2.5 );
-      gfx_g = gfx_g * ( 2.5 );
-      gfx_b = gfx_b * ( 2.5 );
+      lightenUp( 0.35 );
     );
   );
 );
