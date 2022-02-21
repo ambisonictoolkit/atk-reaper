@@ -65,6 +65,7 @@ mInitialised = 0;
 
 mAzimuth   = 0;
 mElevation = 0.;
+kDrawMode  = 0.;  // Not implemented as a variable (slider) in this plugin
 
 // Constants
 kInv24   = 1. / 24.;
@@ -134,7 +135,7 @@ function calculateMatrix()
   
   /* Transformation and interpretation of display points */
   matrixMultiplication( matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints );
-  interpreteProcessedPoints( matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints );
+  interpreteProcessedPoints( matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints, kDrawMode );
   
   // Set initial DSP processing coefficients if the plugin has not yet been initialised
   mInitialised == 0 ?
@@ -209,7 +210,7 @@ mPreviousMouseCap = mouse_cap;
   drawFuMa();
   
   // Draw points illustrating the effect of the transform
-  displayTransformedPoints( matrixDisplayInterpreted, numDisplayedPoints, 0 );
+  displayTransformedPoints( matrixDisplayInterpreted, numDisplayedPoints, kDrawMode, 0 );
   
   // Force redraw of interaction circle
   mPrevHHiglightCircle = -1;

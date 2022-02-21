@@ -60,6 +60,7 @@ slider1:0<0,3,1{Focus, Press, Push, Zoom}>Transformation mode
 slider2:0<180,-180,0.1>Azimuth (mouse)
 slider3:0<-90,90,0.1>Elevation
 slider4:0<0,90,0.1>Degree of transformation (mouse)
+slider5:0<0,2,1{Degree of Direct Transform, Energy Normalised Intensity Vectors (rE), Potential Energy Normalised Intensity Vectors (rV)}>Display mode
 
 
 options:no_meter
@@ -83,6 +84,8 @@ mInitialised = 0;
 
 mAzimuth   = 0;
 mElevation = 0.;
+
+mDrawMode        = 0;
 mDrawCenterPoint = 0;   // This depends on whether transform mode affects directioness or not
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
@@ -190,7 +193,7 @@ function calculateMatrix()
   
   // Transformation and interpretation of display points
   matrixMultiplication  ( matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, mNumDisplayedPoints, matrixDisplayPoints );
-  interpreteProcessedPoints( matrixDisplayInterpreted, matrixDisplayTransformed, mNumDisplayedPoints );
+  interpreteProcessedPoints( matrixDisplayInterpreted, matrixDisplayTransformed, mNumDisplayedPoints, mDrawMode );
   
   // Set initial DSP processing coefficients if the plugin has not yet been mInitialised
   mInitialised == 0 ?
@@ -215,6 +218,7 @@ mAzimuth             = slider2 * kDeg2Rad;
 mElevation           = slider3 * kDeg2Rad;
 mNormTransformAngle  = slider4 / 90.;
 mTransformAngle      = slider4 * kDeg2Rad;
+mDrawMode            = slider5;
 
 /* --- DEBUG STUFF ---
 debugMode       = slider5;
@@ -329,13 +333,21 @@ debugMode == 0 ?
   );
   
   // Only refresh GUI when needed
-  ( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( slider2 != mPrevSlider2 ) || ( slider3 != mPrevSlider3 ) || ( slider4 != mPrevSlider4 ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
+  (
+    geometryHasChanged( mPrevWidth, mPrevHeight ) 
+    || ( slider1 != mPrevSlider1 ) 
+    || ( slider2 != mPrevSlider2 ) 
+    || ( slider3 != mPrevSlider3 ) 
+    || ( slider4 != mPrevSlider4 ) 
+    || ( slider5 != mPrevSlider5 ) 
+    || ( mChannelWarning != mPrevChannelWarning )
+  ) ? (
     
     drawBackgroundImage( 1 );
     drawFuMa();
   
     // Draw points illustrating the effect of the transform
-    displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, mDrawCenterPoint);
+    displayTransformedPoints( matrixDisplayInterpreted, mNumDisplayedPoints, mDrawMode, mDrawCenterPoint );
     
     // Force redraw of interaction circle
     mPrevHHiglightCircle = -1;
@@ -349,6 +361,7 @@ debugMode == 0 ?
     mPrevSlider2        = slider2;
     mPrevSlider3        = slider3;
     mPrevSlider4        = slider4;
+    mPrevSlider5        = slider5;
     mPrevChannelWarning = mChannelWarning;
   );
   

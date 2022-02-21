@@ -858,45 +858,57 @@ function hoverOverInteractionCircle(aPosX, aPosY, anInteractionCircleRadius) loc
 /********************************************************************
 Graphics: Draw points illustrating the effect of various transforms
 ********************************************************************/
-function displayTransformedPoints( aMatrix, aNumPoints, aDrawCenterPoint ) local(i, lPosX, lPosY, lPosZ, lGain, lDirectedness, lSquareSize)
+function displayTransformedPoints( aMatrix, aNumPoints, aMode, aDrawCenterPoint ) local(i, lPosX, lPosY, lPosZ, lGain, lDirectedness, lSquareSize )
 (
   // Draw transparent circles indicating the location and directedness of each source after the transform
   // TODO: Also take z value into account in this visualisation?
   i = 0;
   loop(
     aNumPoints,
-    lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
-    lPosY = gCenterY - gRadius * aMatrix[i];
-    lPosZ = aMatrix[2 * aNumPoints + i];
-    lGain = aMatrix[3 * aNumPoints + i];
+    lPosX = gCenterX - gRadius * aMatrix[ aNumPoints + i ];
+    lPosY = gCenterY - gRadius * aMatrix[ i ];
+    lPosZ = aMatrix[ 2 * aNumPoints + i ];
+    lGain = aMatrix[ 3 * aNumPoints + i ];
     
-    // Calculate degree of directedness
-    lDirectedness = sqrt( aMatrix[ i ] * aMatrix[ i ] + aMatrix[ aNumPoints + i ] * aMatrix[ aNumPoints + i ] + aMatrix[ 2 * aNumPoints + i ] * aMatrix[ 2 * aNumPoints + i ] );
+    // Saturation and luminocity depends on posZ
+    gainToColor( aMatrix[ 3 * aNumPoints + i ], -24., 6., lPosZ );
     
-    // Size, saturation and luminocity depends on posZ
-    lSquareSize = 2. * lPosZ + 8.;
-    gainToColor(aMatrix[3 * aNumPoints + i], -24., 6., lPosZ);
+    ( aMode == 0 ) ? (
+      // Mode 0 - Degree of Directedness Transformation - Draw circles
+      
+      lDirectedness = sqrt( aMatrix[ i ] * aMatrix[ i ] + aMatrix[ aNumPoints + i ] * aMatrix[ aNumPoints + i ] + aMatrix[ 2 * aNumPoints + i ] * aMatrix[ 2 * aNumPoints + i ] );
+      drawSourceLocation( lPosX, lPosY, lPosZ, lDirectedness );
+    ) : (
+      
+      // Mode 1 (rE) and Mode 2 (rV)) - draw vector lines with a circle, semi-transpatent in Mode 2
+      
+      drawLineSegment( gCenterX, gCenterY, lPosX, lPosY, 1);
+      ( aMode == 2 ) ? (
+        gfx_a *= 0.25;
+        gfx_circle( lPosX, lPosY, gInteractionCircleRadius * 0.5 , 1 , 1 );
+        gfx_a *= 4;
+      );
+      gfx_circle( lPosX, lPosY, gInteractionCircleRadius * 0.5 , ( aMode == 1 ) , 1 );
+    ); 
     
-    drawSourceLocation( lPosX, lPosY, lPosZ, lDirectedness );
     i += 1;
   );
   
-  // Draw darker circles at the azi/ele/directedness center location of each source after the transform
-  ( aDrawCenterPoint ?
+  // Draw darker circles at the azi/ele/directedness center location of each source after the transform - only for Mode 0 and 2
+  ( aDrawCenterPoint && ( aMode == 0 ) ) ? (
     (
       i = 0;
       loop(
         aNumPoints,
         lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
         lPosY = gCenterY - gRadius * aMatrix[i];
-        gxColorSet(0.25, 0., 0., 0.);
+        gxColorSet( 0.25, 0., 0., 0. );
         drawSourceLocationCenter( lPosX, lPosY );
         i += 1;
       );
     );
   );
 );
-
 
 
 
@@ -910,10 +922,10 @@ function displayTransformedPointsWithCustomColor(aMatrix, aNumPoints) local(i, l
   i = 0;
   loop(
     aNumPoints,
-    lPosX = gCenterX - gRadius * aMatrix[aNumPoints+i];
-    lPosY = gCenterY - gRadius * aMatrix[i];
-    lPosZ = aMatrix[2 * aNumPoints + i];
-    lGain = aMatrix[3 * aNumPoints + i];
+    lPosX = gCenterX - gRadius * aMatrix[ aNumPoints+i ];
+    lPosY = gCenterY - gRadius * aMatrix[ i ];
+    lPosZ = aMatrix[ 2 * aNumPoints + i ];
+    lGain = aMatrix[ 3 * aNumPoints + i ];
     
     // Calculate degree of directedness
     lDirectedness = sqrt( aMatrix[ i ] * aMatrix[ i ] + aMatrix[ aNumPoints + i ]  * aMatrix[ aNumPoints + i ] + aMatrix[ 2 * aNumPoints + i ] * aMatrix[ 2 * aNumPoints + i ] );

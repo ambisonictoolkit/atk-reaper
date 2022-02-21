@@ -63,6 +63,8 @@ Initialisation
 // Flag indicating that the plugin has not been fully mInitialised yet
 mInitialised = 0;
 
+kDrawMode    = 0.;  // Not implemented as a variable (slider) in this plugin
+
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate    = 1000;
 matrixTumble    = 1020;
@@ -112,7 +114,7 @@ function calculateCoefficients()
   
   /* Transformation and interpretation of display points */
   matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, mNumDisplayedPoints, matrixDisplayPoints);
-  interpreteProcessedPoints(matrixDisplayInterpreted, matrixDisplayTransformed, mNumDisplayedPoints);
+  interpreteProcessedPoints( matrixDisplayInterpreted, matrixDisplayTransformed, mNumDisplayedPoints, kDrawMode );
   
   // Set initial DSP processing coefficients if the plugin has not yet been mInitialised
   mInitialised == 0 ?
@@ -374,7 +376,7 @@ mPreviousMouseCap = mouse_cap;
                         1.);
 
   // Draw points illustrating the combined effect of the transforms
-  displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, 0);
+  displayTransformedPoints(matrixDisplayInterpreted, mNumDisplayedPoints, kDrawMode, 0);
   
   // Draw channel warning if needed
   mChannelWarning ? drawChannelWarning( 4 );

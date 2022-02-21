@@ -63,6 +63,7 @@ mInitialised = 0;
 
 mAzimuth   = 0;
 mElevation = 0.;
+kDrawMode  = 0.;  // Not implemented as a variable (slider) in this plugin
 
 // Setting memory locations for a number of 4x4 matrixes as 1D arrays
 matrixRotate1   = 1000;
@@ -96,45 +97,45 @@ mNumDisplayedPoints = 24;
 generateDisplaySignalMatrix( matrixDisplayPoints, mNumDisplayedPoints );
 
 // We'll display non-transformed points as well, and hence they need to be interpreted.
-interpreteProcessedPoints(matrixDisplayNonTransformedInterpreted, matrixDisplayPoints, mNumDisplayedPoints);
+interpreteProcessedPoints( matrixDisplayNonTransformedInterpreted, matrixDisplayPoints, mNumDisplayedPoints, kDrawMode );
 
 // Override gain for interpreted non-transformed points. This way they'll show up as blue.
 i = 0;
 loop(mNumDisplayedPoints,
-  matrixDisplayNonTransformedInterpreted[mNumDisplayedPoints*3 + i] = -20.;
+  matrixDisplayNonTransformedInterpreted[ mNumDisplayedPoints * 3 + i ] = -20.;
   i += 1;
 );
 
 // Six points on non-rotated mirror plane
-matrixMirrorNonRotated[0]  = kInvSqrt2;
-matrixMirrorNonRotated[6]  = cos($pi*0.25) * cos($pi*0.5);
-matrixMirrorNonRotated[12] = cos($pi*0.25) * sin($pi*0.5);
-matrixMirrorNonRotated[18] = sin($pi*0.25);
+matrixMirrorNonRotated[ 0 ]  = kInvSqrt2;
+matrixMirrorNonRotated[ 6 ]  = cos( $pi * 0.25 ) * cos( $pi * 0.5 );
+matrixMirrorNonRotated[ 12 ] = cos( $pi * 0.25 ) * sin( $pi * 0.5 );
+matrixMirrorNonRotated[ 18 ] = sin( $pi * 0.25 );
 
-matrixMirrorNonRotated[1]  = kInvSqrt2;
-matrixMirrorNonRotated[7]  = cos(-$pi*0.25) * cos($pi*0.5);
-matrixMirrorNonRotated[13] = cos(-$pi*0.25) * sin($pi*0.5);
-matrixMirrorNonRotated[19] = sin(-$pi*0.25);
+matrixMirrorNonRotated[ 1 ]  = kInvSqrt2;
+matrixMirrorNonRotated[ 7 ]  = cos( -$pi * 0.25 ) * cos( $pi * 0.5 );
+matrixMirrorNonRotated[ 13 ] = cos( -$pi * 0.25 ) * sin( $pi * 0.5 );
+matrixMirrorNonRotated[ 19 ] = sin( -$pi * 0.25 );
 
-matrixMirrorNonRotated[2]  = kInvSqrt2;
-matrixMirrorNonRotated[8]  = cos(-$pi*0.25) * cos(-$pi*0.5);
-matrixMirrorNonRotated[14] = cos(-$pi*0.25) * sin(-$pi*0.5);
-matrixMirrorNonRotated[20] = sin(-$pi*0.25);
+matrixMirrorNonRotated[ 2 ]  = kInvSqrt2;
+matrixMirrorNonRotated[ 8 ]  = cos( -$pi * 0.25 ) * cos( - $pi * 0.5 );
+matrixMirrorNonRotated[ 14 ] = cos( -$pi * 0.25 ) * sin( - $pi * 0.5 );
+matrixMirrorNonRotated[ 20 ] = sin( -$pi * 0.25 );
 
-matrixMirrorNonRotated[3]  = kInvSqrt2;
-matrixMirrorNonRotated[9]  = cos($pi*0.25) * cos(-$pi*0.5);
-matrixMirrorNonRotated[15] = cos($pi*0.25) * sin(-$pi*0.5);
-matrixMirrorNonRotated[21] = sin($pi*0.25);
+matrixMirrorNonRotated[ 3 ]  = kInvSqrt2;
+matrixMirrorNonRotated[ 9 ]  = cos( $pi * 0.25 ) * cos( - $pi * 0.5 );
+matrixMirrorNonRotated[ 15 ] = cos( $pi * 0.25 ) * sin( - $pi * 0.5 );
+matrixMirrorNonRotated[ 21 ] = sin( $pi * 0.25 );
 
-matrixMirrorNonRotated[4]  = kInvSqrt2;
-matrixMirrorNonRotated[10] = cos($pi*0.5);
-matrixMirrorNonRotated[16] = sin($pi*0.5);
-matrixMirrorNonRotated[22] = 0.;
+matrixMirrorNonRotated[ 4 ]  = kInvSqrt2;
+matrixMirrorNonRotated[ 10 ] = cos( $pi * 0.5 );
+matrixMirrorNonRotated[ 16 ] = sin( $pi * 0.5 );
+matrixMirrorNonRotated[ 22 ] = 0.;
 
-matrixMirrorNonRotated[5]  = kInvSqrt2;
-matrixMirrorNonRotated[11] = cos(-$pi*0.5);
-matrixMirrorNonRotated[17] = sin(-$pi*0.5);
-matrixMirrorNonRotated[23] = 0;
+matrixMirrorNonRotated[ 5 ]  = kInvSqrt2;
+matrixMirrorNonRotated[ 11 ] = cos( - $pi * 0.5 );
+matrixMirrorNonRotated[ 17 ] = sin( - $pi * 0.5 );
+matrixMirrorNonRotated[ 23 ] = 0;
 
 // Initiate graphics
 gfx_ext_retina = 1;
@@ -157,27 +158,27 @@ function calculateMatrix()
   mSinElevation = sin(mElevation);
   
   // Generate matrixes
-  generateRotationMatrix(matrixRotate1,-mAzimuth);
-  generateTumblelMatrix(matrixTumble1, -mElevation);
-  generateMirrorMatrix(matrixTransform);
-  generateRotationMatrix(matrixRotate2, mAzimuth);
-  generateTumblelMatrix(matrixTumble2,  mElevation);
+  generateRotationMatrix( matrixRotate1,  - mAzimuth   );
+  generateTumblelMatrix(  matrixTumble1,  - mElevation );
+  generateMirrorMatrix(   matrixTransform );
+  generateRotationMatrix( matrixRotate2,  mAzimuth   );
+  generateTumblelMatrix(  matrixTumble2,  mElevation );
   
   /* Build processing matrix by performing a series of matrix multiplications
-                        result =         left X                   right             */
-  matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1);
-  matrixMultiplication  (matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1);
-  matrixMultiplication  (matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2);
-  matrixMultiplication  (matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1);
+                          result =        left X                   right             */
+  matrixMultiplication  ( matrixTemp1,    4, 4, matrixTumble1,     4, 4, matrixRotate1 );
+  matrixMultiplication  ( matrixTemp2,    4, 4, matrixTransform,   4, 4, matrixTemp1   );
+  matrixMultiplication  ( matrixTemp1,    4, 4, matrixTumble2,     4, 4, matrixTemp2   );
+  matrixMultiplication  ( matrixNewDSP,   4, 4, matrixRotate2,     4, 4, matrixTemp1   );
   
   // Transformation and interpretation of display points
-  matrixMultiplication  (matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, mNumDisplayedPoints, matrixDisplayPoints);
-  interpreteProcessedPoints(matrixDisplayTransformedInterpreted, matrixDisplayTransformed, mNumDisplayedPoints);
+  matrixMultiplication  ( matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, mNumDisplayedPoints, matrixDisplayPoints );
+  interpreteProcessedPoints( matrixDisplayTransformedInterpreted, matrixDisplayTransformed, mNumDisplayedPoints, kDrawMode );
   
   // Rotation and interpretation of mirror plane
-  matrixMultiplication  (matrixTemp1,              4, 4, matrixRotate2, 4, 4, matrixTumble2);
-  matrixMultiplication  (matrixMirrorRotateted,    4, 4, matrixTemp1,   4, 6, matrixMirrorNonRotated);
-  interpreteProcessedPoints(matrixMirrorRotatedInterpreted, matrixMirrorRotateted, 6);
+  matrixMultiplication  ( matrixTemp1,              4, 4, matrixRotate2, 4, 4, matrixTumble2 );
+  matrixMultiplication  ( matrixMirrorRotateted,    4, 4, matrixTemp1,   4, 6, matrixMirrorNonRotated );
+  interpreteProcessedPoints( matrixMirrorRotatedInterpreted, matrixMirrorRotateted, 6, kDrawMode );
   
   // Set initial DSP processing coefficients if the plugin has not yet been mInitialised
   mInitialised == 0 ?
@@ -283,7 +284,7 @@ mChannelWarning = testNumChannels( 4 );
 determineGeometry();
 
 // Only update plugin parameters if the user click and drag interaction circle
-mClickingAtCircle = clickingOnInteractionCircle(mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle);
+mClickingAtCircle = clickingOnInteractionCircle( mPreviousMouseCap, mPosX, mPosY, mInteractionCircleRadius, mClickingAtCircle );
 
 // Save current mouse_cap value in order to use in the above test at next iteration
 mPreviousMouseCap = mouse_cap;
@@ -413,7 +414,7 @@ mPreviousMouseCap = mouse_cap;
 
   // Draw points illustrating the effect of the transform
   setAfterColor();
-  displayTransformedPoints( matrixDisplayTransformedInterpreted, mNumDisplayedPoints, 0 );
+  displayTransformedPoints( matrixDisplayTransformedInterpreted, mNumDisplayedPoints, kDrawMode, 0 );
   postAfter();
   
   mChannelWarning ? (

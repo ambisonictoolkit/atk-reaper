@@ -48,6 +48,7 @@ out_pin:Z
 
 
 slider1:0<0,90,0.1>Degree of transformation
+slider2:0<0,2,1{Degree of Direct Transform, Energy Normalised Intensity Vectors (rE), Potential Energy Normalised Intensity Vectors (rV)}>Display mode
 
 
 options:no_meter
@@ -89,13 +90,15 @@ generateDisplaySignalMatrix( matrixDisplayPoints, numDisplayedPoints );
 mPreviousMouseCap = 0;
 mClickingAtCircle = 0;
 
+mDrawMode         = 0;
+
 function calculateMatrix()
 (
   generateDirectOrigoMatrix( matrixNewDSP, mTransformAngle );
   
   /* Transformation and interpretation of display points */
   matrixMultiplication( matrixDisplayTransformed, 4, 4, matrixNewDSP, 4, numDisplayedPoints, matrixDisplayPoints );
-  interpreteProcessedPoints( matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints );
+  interpreteProcessedPoints( matrixDisplayInterpreted, matrixDisplayTransformed, numDisplayedPoints, mDrawMode );
 
   // Set initial DSP matrix at initialisation
   initialised == 0 ?
@@ -115,7 +118,9 @@ Updated slider value:
 
 mTransformAngle     = slider1 * kDeg2Rad;
 mNormTransformAngle = slider1 / 90.;
+mDrawMode           = slider2;
 calculateMatrix();
+
 
 
 /**********************************************************
@@ -154,13 +159,19 @@ mPreviousMouseCap = mouse_cap;
 );
 
 // Only refresh GUI when needed
-( geometryHasChanged( mPrevWidth, mPrevHeight ) || ( slider1 != mPrevSlider1 ) || ( mAzimuth != mPrevAzimuth ) || ( mChannelWarning != mPrevChannelWarning ) ) ? (
+(
+  geometryHasChanged( mPrevWidth, mPrevHeight ) 
+  || ( slider1 != mPrevSlider1 )
+  || ( slider2 != mPrevSlider2 )
+  || ( mAzimuth != mPrevAzimuth )
+  || ( mChannelWarning != mPrevChannelWarning ) 
+) ? (
   
   drawBackgroundImage( 1 );
   drawFuMa();
 
   // Draw points illustrating the effect of the transform
-  displayTransformedPoints( matrixDisplayInterpreted, numDisplayedPoints, 1 );
+  displayTransformedPoints( matrixDisplayInterpreted, numDisplayedPoints, mDrawMode, 1 );
   
   // Force redraw of interaction circle
   mPrevHHiglightCircle = -1;
@@ -171,6 +182,7 @@ mPreviousMouseCap = mouse_cap;
   mPrevWidth          = gfx_w;
   mPrevHeight         = gfx_h;
   mPrevSlider1        = slider1;
+  mPrevSlider2        = slider2;
   mPrevChannelWarning = mChannelWarning;
 );
 

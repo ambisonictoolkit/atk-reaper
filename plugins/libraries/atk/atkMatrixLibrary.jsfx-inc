@@ -588,35 +588,68 @@ In the resulting matrixOut:
 - Row 3 is z position of transformed point
 - Row 4 is gain value in dB for transformed point
 ********************************************************************/
-function interpreteProcessedPoints(aMatrixOut, aMatrixIn, aNumPoints) local(i, lG0square, lG1square, lW, lX, lY, lZ, lAzi, lEle, lOmni, lGain)
+function interpreteProcessedPoints( aMatrixOut, aMatrixIn, aNumPoints, aMode ) local( i, lG0square, lG1square, lTenp, lW, lX, lY, lZ, lAzi, lEle, lOmni, lGain )
 (
   i = 0;
   loop(aNumPoints,
+    
     lW = aMatrixIn[i];
     lX = aMatrixIn[aNumPoints + i];
     lY = aMatrixIn[aNumPoints*2 + i];
     lZ = aMatrixIn[aNumPoints*3 + i];
     
-    lAzi  = atan2(lY, lX);
-    lEle  = atan2(lZ, sqrt(lX*lX + lY*lY));
+    // These are used in several modes
+    lG0square  = lW * lW;
+    lG1square  = lX*lX + lY*lY + lZ*lZ;
     
-    // Omni transform angle
-    lG0square        = lW * lW;
-    lG1square        = lX*lX + lY*lY + lZ*lZ;
-    lOmni = asin((2.*lG0square - lG1square) / (2.*lG0square + lG1square));
+    // Gain calculation is independent of mode
+    // lGain = amp2db ( lW * sqrt( 2. / ( 1. + ( 2. * lG0square - lG1square ) / ( 2. * lG0square + lG1square ) ) ) );
+    lGain = 10 * log10( 0.5 * ( 2 * lG0square + lG1square ) ); // in dB - Eq from Joseph
     
-    // Gain
-    lGain = lW * sqrt(2. / (1. + sin(lOmni)));
+    ( aMode == 0 ) ? (
+      
+      // Mode 0 - Degree of Directedness Transformation
+      
+      lAzi  = atan2(lY, lX);
+      lEle  = atan2(lZ, sqrt(lX*lX + lY*lY));
     
-    // Normalise omni to [0,1] range
-    lOmni = 2 * lOmni / $pi;
-    lOmni = 1. - lOmni;
+      // Omni transform angle - normalise to [0,1] range
+      lOmni = 1. - ( 2. * asin( ( 2. * lG0square - lG1square ) / ( 2. * lG0square + lG1square ) ) / $pi );
     
-    // From this we calculate relative xyz position of the transformed point
-    aMatrixOut[i]                = lOmni * cos(lAzi) * cos(lEle);
-    aMatrixOut[aNumPoints   + i] = lOmni * sin(lAzi) * cos(lEle);
-    aMatrixOut[aNumPoints*2 + i] = lOmni * sin(lEle);
-    aMatrixOut[aNumPoints*3 + i] = amp2db(lGain);
+      // From this we calculate relative xyz position of the transformed point
+      lX = lOmni * cos( lAzi ) * cos( lEle );   // Pos X
+      lY = lOmni * sin( lAzi ) * cos( lEle );   // Pos Y
+      lZ = lOmni * sin( lEle );                 // Pos Z
+      
+      
+    ) : (
+      ( aMode == 1 ) ? (
+        
+        // Mode 1 - Energy Normalised (Active) Intensity vector, aka rE
+        
+        lTemp = pow( 2, 3. / 2 ) * lW / ( 2 * lG0square + lG1square );
+    
+        lX = lTemp * lX;
+        lY = lTemp * lY;
+        lZ = lTemp * lZ;
+
+      ) : (
+        
+        // Mode 2 - Potential Energy Normalised (Active) Intensity vector, aka (Active) Admittance vector, or rV
+        
+        lTemp = kInvSqrt2 / lW;
+    
+        lX = lTemp * lX;
+        lY = lTemp * lY;
+        lZ = lTemp * lZ;
+      );
+    );
+    
+    // Set matrix
+    aMatrixOut[                  i ] = lX;
+    aMatrixOut[ aNumPoints     + i ] = lY;
+    aMatrixOut[ aNumPoints * 2 + i ] = lZ;
+    aMatrixOut[ aNumPoints * 3 + i ] = lGain;
     
     i += 1;
   );
