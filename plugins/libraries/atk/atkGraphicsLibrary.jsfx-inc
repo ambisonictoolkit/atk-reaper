@@ -707,7 +707,7 @@ function drawCenteredSquare(aCenterX, aCenterY, aSquareSize) local(lSquareRadius
 /********************************************************************
 Graphics: Draw centered filled-in square
 ********************************************************************/
-function drawSourceLocation( aCenterX, aCenterY, aPosZ, aDirectedness ) local(lRadius, lAlpha, lRed, lGreen, lBlue, lMinSourceRadius)
+function drawSourceLocation( aCenterX, aCenterY, aPosZ, aDirectedness, aHighLight ) local(lRadius, lAlpha, lRed, lGreen, lBlue, lMinSourceRadius)
 (
   lAlpha = gfx_a;
   
@@ -728,6 +728,13 @@ function drawSourceLocation( aCenterX, aCenterY, aPosZ, aDirectedness ) local(lR
 	
   gfx_circle( aCenterX, aCenterY, lRadius, 1, 1 );
   gfx_a = lAlpha;
+  
+  ( aHighLight ) ? (
+    gxColorSet( 0.5, 1., 1., 1.);
+    gfx_circle( aCenterX, aCenterY, lRadius + 4.0 * gfx_ext_retina, 0, 1 );
+    gfx_circle( aCenterX, aCenterY, lRadius + 4.5 * gfx_ext_retina, 0, 1 );
+    gfx_circle( aCenterX, aCenterY, lRadius + 5.0 * gfx_ext_retina, 0, 1 );
+  );
 );
 
 
@@ -862,7 +869,7 @@ function displayTransformedPoints( aMatrix, aNumPoints, aMode, aDrawCenterPoint 
 (
   // Draw transparent circles indicating the location and directedness of each source after the transform
   // TODO: Also take z value into account in this visualisation?
-  i = 0;
+  i = aNumPoints - 1;
   loop(
     aNumPoints,
     lPosX = gCenterX - gRadius * aMatrix[ aNumPoints + i ];
@@ -877,7 +884,7 @@ function displayTransformedPoints( aMatrix, aNumPoints, aMode, aDrawCenterPoint 
       // Mode 0 - Degree of Directedness Transformation - Draw circles
       
       lDirectedness = sqrt( aMatrix[ i ] * aMatrix[ i ] + aMatrix[ aNumPoints + i ] * aMatrix[ aNumPoints + i ] + aMatrix[ 2 * aNumPoints + i ] * aMatrix[ 2 * aNumPoints + i ] );
-      drawSourceLocation( lPosX, lPosY, lPosZ, lDirectedness );
+      drawSourceLocation( lPosX, lPosY, lPosZ, lDirectedness, ( i == 0 ) );
     ) : (
       
       // Mode 1 (rE) and Mode 2 (rV)) - draw vector lines with a circle, semi-transpatent in Mode 2
@@ -889,9 +896,16 @@ function displayTransformedPoints( aMatrix, aNumPoints, aMode, aDrawCenterPoint 
         gfx_a *= 4;
       );
       gfx_circle( lPosX, lPosY, gInteractionCircleRadius * 0.5 , ( aMode == 1 ) , 1 );
+      ( i == 0 ) ? (
+        gxColorSet( 0.5, 1., 1., 1. );
+        gfx_circle( lPosX, lPosY, gInteractionCircleRadius * 0.5 , 0 , 1 );
+        gfx_circle( lPosX, lPosY, ( gInteractionCircleRadius * 0.5 ) + 4.0 * gfx_ext_retina , 0 , 1 );
+        gfx_circle( lPosX, lPosY, ( gInteractionCircleRadius * 0.5 ) + 4.5 * gfx_ext_retina , 0 , 1 );
+        gfx_circle( lPosX, lPosY, ( gInteractionCircleRadius * 0.5 ) + 5.0 * gfx_ext_retina , 0 , 1 );
+      );
     ); 
     
-    i += 1;
+    i -= 1;
   );
   
   // Draw darker circles at the azi/ele/directedness center location of each source after the transform - only for Mode 0 and 2
@@ -931,7 +945,7 @@ function displayTransformedPointsWithCustomColor(aMatrix, aNumPoints) local(i, l
     lDirectedness = sqrt( aMatrix[ i ] * aMatrix[ i ] + aMatrix[ aNumPoints + i ]  * aMatrix[ aNumPoints + i ] + aMatrix[ 2 * aNumPoints + i ] * aMatrix[ 2 * aNumPoints + i ] );
         
     //drawCenteredSquare(lPosX, lPosY, lSquareSize);
-    drawSourceLocation( lPosX, lPosY, lPosZ - 1.0, lDirectedness );
+    drawSourceLocation( lPosX, lPosY, lPosZ - 1.0, lDirectedness, 0 );
     i += 1;
   );
 );
