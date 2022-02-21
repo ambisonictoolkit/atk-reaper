@@ -193,8 +193,8 @@ determinePeriphonicGeometry();
     
     gainToColor(0., -24., 6., 0.0);
     
-    drawSourceLocation( gCenterX - mDeltaX,  gCenterYUpper - mDeltaY,  mSinEle, 1. );
-    drawSourceLocation( gCenterX - mDeltaX,  gCenterYLower - mDeltaY,  mSinEle, 1. );
+    drawSourceLocation( gCenterX - mDeltaX,  gCenterYUpper - mDeltaY,  mSinEle, 1., 0 );
+    drawSourceLocation( gCenterX - mDeltaX,  gCenterYLower - mDeltaY,  mSinEle, 1., 0 );
     
     // Indicate channel numbering
     ( !gResponsive ) ? (

@@ -121,10 +121,10 @@ mChannelWarning = testNumChannels( 4 );
   // Size, saturation and luminocity depends on posZ
   gainToColor(0., -24., 6., 0.);
 
-  drawSourceLocation( gCenterX - mDeltaY, gCenterY - mDeltaX, 0., 1. );
-  drawSourceLocation( gCenterX + mDeltaY, gCenterY - mDeltaX, 0., 1. );
-  drawSourceLocation( gCenterX - mDeltaY, gCenterY + mDeltaX, 0., 1. );
-  drawSourceLocation( gCenterX + mDeltaY, gCenterY + mDeltaX, 0., 1. );
+  drawSourceLocation( gCenterX - mDeltaY, gCenterY - mDeltaX, 0., 1., 0 );
+  drawSourceLocation( gCenterX + mDeltaY, gCenterY - mDeltaX, 0., 1., 0 );
+  drawSourceLocation( gCenterX - mDeltaY, gCenterY + mDeltaX, 0., 1., 0 );
+  drawSourceLocation( gCenterX + mDeltaY, gCenterY + mDeltaX, 0., 1., 0 );
 
   mDeltaX = ( gRadius + 20 * gfx_ext_retina ) * mCosAzi;
   mDeltaY = ( gRadius + 20 * gfx_ext_retina ) * mSinAzi;
