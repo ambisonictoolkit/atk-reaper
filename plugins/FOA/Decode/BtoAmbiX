@@ -64,9 +64,9 @@ Updated slider value:
 @slider
 
 (slider1 == 0) ? (
-  strcpy(mFilePath, "ATK/matrices/FOA/decoders/acn-sn3d1.mosl.txt");
+  strcpy(mFilePath, "ATK/matrices/FOA/decoders/hoa1/acn-sn3d1.mosl.txt");
 ) : (
-  strcpy(mFilePath, "ATK/matrices/FOA/decoders/acn-n3d1.mosl.txt");
+  strcpy(mFilePath, "ATK/matrices/FOA/decoders/hoa1/acn-n3d1.mosl.txt");
 );
 
 mFileReadingErrorStatus = mMatrixDSP.matrix_read_from_file(mFilePath);
